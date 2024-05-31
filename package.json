@@ -1,0 +1,43 @@
+{
+  "name": "auction-project",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "prepare": "git config core.hooksPath .hooks",
+    "postinstall": "nuxt prepare",
+    "test": "vitest",
+    "test:e2e": "vitest --dir tests/e2e",
+    "test:integration": "vitest --dir tests/integration",
+    "test:unit": "vitest --dir tests/unit --passWithNoTests",
+    "lint": "eslint --cache .",
+    "lint:fix": "eslint . --fix",
+    "lint:staged": "lint-staged"
+  },
+  "dependencies": {
+    "@bg-dev/nuxt-s3": "^2.0.0",
+    "nodemailer": "^6.9.14",
+    "nuxt": "^3.12.2",
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.3",
+    "vue": "^3.4.29",
+    "vue-router": "^4.3.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.21.1",
+    "@nuxt/test-utils": "^3.13.1",
+    "@types/nodemailer": "^6.4.15",
+    "@vue/test-utils": "^2.4.6",
+    "eslint": "^9.5.0",
+    "eslint-plugin-format": "^0.1.2",
+    "happy-dom": "^14.12.0",
+    "lint-staged": "^15.2.7",
+    "playwright-core": "^1.44.1",
+    "vitest": "^1.6.0"
+  }
+}

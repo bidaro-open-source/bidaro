@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "vue.volar",
+    "Nuxtr.nuxtr-vscode",
+    "dbaeumer.vscode-eslint"
+  ]
+}

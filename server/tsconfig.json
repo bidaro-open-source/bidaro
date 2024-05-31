@@ -1,0 +1,9 @@
+{
+  "extends": "../.nuxt/tsconfig.server.json",
+  "exclude": [
+    "../.sequelizerc",
+    "../eslint.config.mjs",
+    "./database/migrations",
+    "./database/seeders"
+  ]
+}
