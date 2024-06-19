@@ -1,5 +1,5 @@
 import { createTransport } from 'nodemailer'
-import type { EmailSenderPayload } from './templates/types'
+import type { EmailSenderPayload } from './types'
 
 const runtimeConfig = useRuntimeConfig()
 
