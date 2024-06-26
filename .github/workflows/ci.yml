@@ -8,6 +8,7 @@ on:
       - synchronize
       - reopened
     branches:
+      - main
       - develop
 
 env:
