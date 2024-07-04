@@ -1,5 +1,8 @@
 {
   "extends": "../.nuxt/tsconfig.server.json",
+  "files": [
+    "./types/shims.d.ts"
+  ],
   "exclude": [
     "../.sequelizerc",
     "../eslint.config.mjs",
