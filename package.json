@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@bg-dev/nuxt-s3": "^2.0.0",
+    "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.14",
     "nuxt": "^3.12.2",
@@ -26,11 +27,13 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
     "vue": "^3.4.29",
-    "vue-router": "^4.3.3"
+    "vue-router": "^4.3.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.21.1",
     "@nuxt/test-utils": "^3.13.1",
+    "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/nodemailer": "^6.4.15",
     "@vue/test-utils": "^2.4.6",
