@@ -40,5 +40,10 @@ export default defineNuxtConfig({
       fromAddress: '',
       fromName: '',
     },
+    jwt: {
+      secret: '',
+      accessTTL: '',
+      refreshTTL: '',
+    },
   },
 })
