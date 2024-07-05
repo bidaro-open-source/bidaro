@@ -1,14 +1,23 @@
+import {
+  updateAuthenticationSession,
+  verifyAuthenticationSession,
+} from '~/server/services/authentication'
+import {
+  getRefreshToken,
+  setRefreshToken,
+} from '~/server/services/authentication-cookie'
+
 export default defineEventHandler(async (event) => {
-  const refreshToken = getCookie(event, 'jwt')
+  const refreshToken = await getRefreshToken(event)
 
   if (!refreshToken) {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Refresh token not exists!',
+      statusCode: 400,
+      statusMessage: 'Refresh token not found!',
     })
   }
 
-  const verifed = verifyJWT(refreshToken)
+  const verifed = await verifyAuthenticationSession(refreshToken)
 
   if (!verifed) {
     throw createError({
@@ -17,20 +26,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const payload = decodeJWT(refreshToken)
-
-  const jwt = encodeJWT(payload.uid)
-
-  setCookie(event, 'jwt', jwt.refresh_token, {
-    maxAge: +useRuntimeConfig().jwt.refreshTTL,
-    httpOnly: true,
-    sameSite: true,
-    secure: true,
+  const session = await updateAuthenticationSession(refreshToken, {
+    ip: getRequestIP(event),
+    ua: getRequestHeader(event, 'user-agent'),
   })
+
+  setRefreshToken(event, session.refreshToken)
 
   return {
     token_type: 'bearer',
-    access_token: jwt.access_token,
-    refresh_token: jwt.refresh_token,
+    access_token: session.accessToken,
+    refresh_token: session.refreshToken,
   }
 })

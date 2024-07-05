@@ -1,4 +1,3 @@
-import { decodeJWT, verifyJWT } from '../utils/json-web-token'
 import { User } from '../database'
 
 export default defineEventHandler(async (event) => {
@@ -7,9 +6,16 @@ export default defineEventHandler(async (event) => {
   const authorization = getRequestHeader(event, 'Authorization')
 
   if (authorization) {
-    const token = authorization.split(' ')[1]
+    const [type, token] = authorization.split(' ')
 
-    const verifed = verifyJWT(token)
+    if (type !== 'Bearer') {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Authorization method not allowed',
+      })
+    }
+
+    const verifed = verifyAccessToken(token)
 
     if (!verifed) {
       throw createError({
@@ -18,7 +24,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const payload = decodeJWT(token)
+    const payload = decodeAccessToken(token)
 
     const user = await User.findByPk(payload.uid)
 
