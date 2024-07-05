@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { hash } from 'bcrypt'
 import { Op } from 'sequelize'
 import { User } from '~/server/database'
+import { createAuthenticationSession } from '~/server/services/authentication'
+import { setRefreshToken } from '~/server/services/authentication-cookie'
 
 const registerSchema = z.object({
   username: z.string(),
@@ -10,7 +12,10 @@ const registerSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const validatedBody = await readValidatedBody(event, body => registerSchema.parse(body))
+  const validatedBody = await readValidatedBody(
+    event,
+    body => registerSchema.parse(body),
+  )
 
   const userInDB = await User.findOne({
     where: {
@@ -34,19 +39,16 @@ export default defineEventHandler(async (event) => {
     password: await hash(validatedBody.password, 10),
   })
 
-  const jwt = encodeJWT(user.id)
-
-  setCookie(event, 'jwt', jwt.refresh_token, {
-    maxAge: +useRuntimeConfig().jwt.refreshTTL,
-    httpOnly: true,
-    sameSite: true,
-    secure: true,
+  const session = await createAuthenticationSession(user.id, {
+    ip: getRequestIP(event),
+    ua: getRequestHeader(event, 'user-agent'),
   })
 
+  setRefreshToken(event, session.refreshToken)
+
   return {
-    token_type: 'bearer',
-    access_token: jwt.access_token,
-    refresh_token: jwt.refresh_token,
+    access_token: session.accessToken,
+    refresh_token: session.refreshToken,
     user: {
       id: user.id,
       email: user.email,
