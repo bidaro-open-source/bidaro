@@ -24,5 +24,6 @@ export default antfu({
     'no-console': 'off',
     'vue/html-indent': 'warn',
     'vue/html-self-closing': 'off',
+    'max-len': ['error', { code: 80 }],
   },
 })
