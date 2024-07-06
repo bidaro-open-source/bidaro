@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { hash } from 'bcrypt'
 import { Op } from 'sequelize'
-import { User } from '~/server/database'
 import { createAuthenticationSession } from '~/server/services/authentication'
 import { setRefreshToken } from '~/server/services/authentication-cookie'
 
@@ -12,12 +11,14 @@ const registerSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const db = useDatabase(event)
+
   const validatedBody = await readValidatedBody(
     event,
     body => registerSchema.parse(body),
   )
 
-  const userInDB = await User.findOne({
+  const userInDB = await db.User.findOne({
     where: {
       [Op.or]: [
         { email: validatedBody.email },
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await User.create({
+  const user = await db.User.create({
     email: validatedBody.email,
     username: validatedBody.username,
     password: await hash(validatedBody.password, 10),
