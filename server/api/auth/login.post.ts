@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { compare } from 'bcrypt'
-import { User } from '~/server/database'
 import { createAuthenticationSession } from '~/server/services/authentication'
 import { setRefreshToken } from '~/server/services/authentication-cookie'
 
@@ -10,12 +9,14 @@ const loginSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const db = useDatabase(event)
+
   const validatedBody = await readValidatedBody(
     event,
     body => loginSchema.parse(body),
   )
 
-  const user = await User.findOne({
+  const user = await db.User.findOne({
     where: { username: validatedBody.username },
   })
 

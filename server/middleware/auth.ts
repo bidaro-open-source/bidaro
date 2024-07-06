@@ -1,5 +1,3 @@
-import { User } from '../database'
-
 export default defineEventHandler(async (event) => {
   event.context.auth = { isAuthenticated: false }
 
@@ -26,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     const payload = decodeAccessToken(token)
 
-    const user = await User.findByPk(payload.uid)
+    const user = await useDatabase().User.findByPk(payload.uid)
 
     if (!user) {
       throw createError({
