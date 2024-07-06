@@ -24,16 +24,8 @@ export default defineEventHandler(async (event) => {
 
     const payload = decodeAccessToken(token)
 
-    const user = await useDatabase().User.findByPk(payload.uid)
-
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'User not found!',
-      })
-    }
-
-    event.context.auth.user = user
+    event.context.auth.uid = payload.uid
+    event.context.auth.assessToken = token
     event.context.auth.isAuthenticated = true
   }
 })

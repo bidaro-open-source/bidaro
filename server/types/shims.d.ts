@@ -1,8 +1,7 @@
-import type { User } from '../database'
-
 interface AuthorizationData {
   isAuthenticated: boolean
-  user?: User
+  assessToken?: JsonWebToken
+  uid?: JsonWebTokenPayload['uid']
 }
 
 declare module 'h3' {
