@@ -1,4 +1,3 @@
-import type { H3Event } from 'h3'
 import type { RefreshToken } from './authentication'
 
 const COOKIE_REFRESH_TOKEN_NAME = 'jwt'
