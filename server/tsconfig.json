@@ -4,9 +4,6 @@
     "./types/shims.d.ts"
   ],
   "exclude": [
-    "../.sequelizerc",
-    "../eslint.config.mjs",
-    "./database/migrations",
-    "./database/seeders"
+    "../eslint.config.mjs"
   ]
 }
