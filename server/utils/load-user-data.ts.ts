@@ -1,5 +1,3 @@
-import type { H3Event } from 'h3'
-
 /**
  * Alias for loading user data by access token.
  *

@@ -1,4 +1,3 @@
-import type { H3Event } from 'h3'
 import { Sequelize } from 'sequelize'
 import { UserFactory } from '../database'
 

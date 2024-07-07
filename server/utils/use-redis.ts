@@ -1,4 +1,3 @@
-import type { H3Event } from 'h3'
 import { Redis } from 'ioredis'
 
 let instance: Redis | undefined
