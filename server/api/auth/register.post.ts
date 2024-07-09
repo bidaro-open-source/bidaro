@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { hash } from 'bcrypt'
 import { Op } from 'sequelize'
 import { createAuthenticationSession } from '~/server/services/authentication'
-import { setRefreshToken } from '~/server/services/authentication-cookie'
 
 const registerSchema = z.object({
   username: z.string(),

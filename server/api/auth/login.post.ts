@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { compare } from 'bcrypt'
 import { createAuthenticationSession } from '~/server/services/authentication'
-import { setRefreshToken } from '~/server/services/authentication-cookie'
 
 const loginSchema = z.object({
   username: z.string(),
