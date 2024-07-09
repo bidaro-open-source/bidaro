@@ -1,8 +1,4 @@
 import { deleteAuthenticationSession } from '~/server/services/authentication'
-import {
-  deleteRefreshToken,
-  getRefreshToken,
-} from '~/server/services/authentication-cookie'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

@@ -1,4 +1,4 @@
-import type { RefreshToken } from './authentication'
+import type { RefreshToken } from '../services/authentication'
 
 const COOKIE_REFRESH_TOKEN_NAME = 'jwt'
 const COOKIE_REFRESH_TOKEN_BODY_NAME = 'refresh_token'

@@ -2,10 +2,6 @@ import {
   updateAuthenticationSession,
   verifyAuthenticationSession,
 } from '~/server/services/authentication'
-import {
-  getRefreshToken,
-  setRefreshToken,
-} from '~/server/services/authentication-cookie'
 
 export default defineEventHandler(async (event) => {
   const refreshToken = await getRefreshToken(event)
