@@ -33,11 +33,10 @@ export function setRefreshToken(
   event: H3Event,
   refreshToken: RefreshToken,
 ): void {
-  const runtimeConfig = useRuntimeConfig()
-  const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
+  const ttl = +useRuntimeConfig(event).jwt.refreshTTL
 
   setCookie(event, COOKIE_REFRESH_TOKEN_NAME, refreshToken, {
-    maxAge: refreshTokenTTL,
+    maxAge: ttl,
     httpOnly: true,
     sameSite: true,
     secure: true,
