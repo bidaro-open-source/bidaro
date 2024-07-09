@@ -88,7 +88,7 @@ export async function createAuthenticationSession(
 ): Promise<TokensPair> {
   const redis = useRedis()
   const runtimeConfig = useRuntimeConfig()
-  const accessToken = encodeAccessToken({ uid })
+  const accessToken = createAccessToken({ uid })
   const refreshToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
 
@@ -131,7 +131,7 @@ export async function updateAuthenticationSession(
     throw new Error('Refresh token not found!')
 
   const uid = session.uid
-  const newAccessToken = encodeAccessToken({ uid })
+  const newAccessToken = createAccessToken({ uid })
   const newRefreshToken = uuidv4()
   const refreshTokenTTL = +useRuntimeConfig().jwt.refreshTTL
 
