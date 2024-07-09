@@ -6,7 +6,7 @@ export interface JsonWebTokenPayload {
   uid: number
 }
 
-export function encodeAccessToken(payload: JsonWebTokenPayload): JsonWebToken {
+export function createAccessToken(payload: JsonWebTokenPayload): JsonWebToken {
   const runtimeConfig = useRuntimeConfig()
 
   return jwt.sign(
@@ -27,5 +27,5 @@ export function verifyAccessToken(token: JsonWebToken): boolean {
 }
 
 export function decodeAccessToken(token: JsonWebToken): JsonWebTokenPayload {
-  return jwt.verify(token, useRuntimeConfig().jwt.secret) as JsonWebTokenPayload
+  return jwt.decode(token) as JsonWebTokenPayload
 }
