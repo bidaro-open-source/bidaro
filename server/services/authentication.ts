@@ -7,44 +7,12 @@ export interface TokensPair {
   refreshToken: RefreshToken
 }
 
-export interface SessionMetadata {
-  id: string
+export interface SessionMetadata extends RequestMetadata {
+  uuid: string
   uid: number
-  ua: string | undefined
-  ip: string | undefined
-  exp: number
-  createdAt: Date
-}
-
-export interface SessionMetadataOptional {
-  ua?: string
-  ip?: string
 }
 
 export const REDIS_SESSION_NAMESPACE = 'refresh-session'
-
-/**
- * Generates request metadata of authentication session.
- *
- * @param uid user id
- * @param metadata session metadata
- * @returns authentication session metadata
- */
-function createMetadata(
-  uid: number,
-  metadata: SessionMetadataOptional,
-): SessionMetadata {
-  const runtimeConfig = useRuntimeConfig()
-
-  return {
-    id: uuidv4(),
-    ip: metadata.ip,
-    ua: metadata.ua,
-    exp: Math.floor(Date.now() / 1000) + +runtimeConfig.jwt.refreshTTL,
-    createdAt: new Date(),
-    uid,
-  }
-}
 
 /**
  * Returns user refresh session by refresh token.
@@ -84,15 +52,15 @@ export async function verifyAuthenticationSession(
  */
 export async function createAuthenticationSession(
   uid: number,
-  metadata: SessionMetadataOptional = {},
+  metadata?: RequestMetadata,
 ): Promise<TokensPair> {
   const redis = useRedis()
   const runtimeConfig = useRuntimeConfig()
+
   const accessToken = createAccessToken({ uid })
   const refreshToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
-
-  const sessionMetadata = createMetadata(uid, metadata)
+  const sessionMetadata = { uid, uuid: uuidv4(), ...metadata }
 
   await redis.set(
     `${REDIS_SESSION_NAMESPACE}:${refreshToken}`,
@@ -121,9 +89,10 @@ export async function createAuthenticationSession(
  */
 export async function updateAuthenticationSession(
   refreshToken: RefreshToken,
-  metadata: SessionMetadataOptional = {},
+  metadata?: RequestMetadata,
 ): Promise<TokensPair> {
   const redis = useRedis()
+  const runtimeConfig = useRuntimeConfig()
 
   const session = await getAuthenticationSession(refreshToken)
 
@@ -133,9 +102,9 @@ export async function updateAuthenticationSession(
   const uid = session.uid
   const newAccessToken = createAccessToken({ uid })
   const newRefreshToken = uuidv4()
-  const refreshTokenTTL = +useRuntimeConfig().jwt.refreshTTL
+  const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
 
-  const sessionMetadata = createMetadata(uid, metadata)
+  const sessionMetadata = { uid, uuid: uuidv4(), ...metadata }
 
   await redis.srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
 

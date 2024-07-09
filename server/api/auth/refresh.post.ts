@@ -26,10 +26,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const session = await updateAuthenticationSession(refreshToken, {
-    ip: getRequestIP(event),
-    ua: getRequestHeader(event, 'user-agent'),
-  })
+  const metadata = createRequestMetadata(event)
+
+  const session = await updateAuthenticationSession(refreshToken, metadata)
 
   setRefreshToken(event, session.refreshToken)
 
