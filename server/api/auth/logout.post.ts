@@ -24,6 +24,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (session.uid !== event.context.auth.uid) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Refresh token not found!',
+    })
+  }
+
   await deleteAuthenticationSession(session.uid, refreshToken)
 
   deleteRefreshToken(event)
