@@ -1,7 +1,7 @@
 import type { RefreshToken } from '../services/authentication'
 
-const COOKIE_REFRESH_TOKEN_NAME = 'jwt'
-const COOKIE_REFRESH_TOKEN_BODY_NAME = 'refresh_token'
+const REFRESH_TOKEN_COOKIE_NAME = 'jwt'
+const REFRESH_TOKEN_BODY_NAME = 'refresh_token'
 
 /**
  * Returns refresh token from cookie or request body.
@@ -15,10 +15,10 @@ export async function getRefreshToken(
   let refreshToken
 
   if (!refreshToken)
-    refreshToken = getCookie(event, COOKIE_REFRESH_TOKEN_NAME)
+    refreshToken = getCookie(event, REFRESH_TOKEN_COOKIE_NAME)
 
   if (!refreshToken)
-    refreshToken = (await readBody(event))[COOKIE_REFRESH_TOKEN_BODY_NAME]
+    refreshToken = ((await readBody(event) || {}))[REFRESH_TOKEN_BODY_NAME]
 
   return refreshToken
 }
@@ -35,7 +35,7 @@ export function setRefreshToken(
 ): void {
   const ttl = +useRuntimeConfig(event).jwt.refreshTTL
 
-  setCookie(event, COOKIE_REFRESH_TOKEN_NAME, refreshToken, {
+  setCookie(event, REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
     maxAge: ttl,
     httpOnly: true,
     sameSite: true,
@@ -49,5 +49,5 @@ export function setRefreshToken(
  * @param event H3Event
  */
 export function deleteRefreshToken(event: H3Event): void {
-  deleteCookie(event, COOKIE_REFRESH_TOKEN_NAME)
+  deleteCookie(event, REFRESH_TOKEN_COOKIE_NAME)
 }
