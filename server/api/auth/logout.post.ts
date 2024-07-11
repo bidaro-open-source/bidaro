@@ -1,4 +1,7 @@
-import { deleteAuthenticationSession } from '~/server/services/authentication'
+import {
+  deleteAuthenticationSession,
+  getAuthenticationSession,
+} from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -12,7 +15,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await deleteAuthenticationSession(refreshToken)
+  const session = await getAuthenticationSession(refreshToken)
+
+  if (!session) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Refresh token not found!',
+    })
+  }
+
+  await deleteAuthenticationSession(session.uid, refreshToken)
 
   deleteRefreshToken(event)
 
