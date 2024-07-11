@@ -4,9 +4,9 @@ import { Op } from 'sequelize'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
 const registerSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-  email: z.string().email(),
+  username: z.string().max(24).regex(/^(?=.*[a-z])\w+$/i),
+  password: z.string().max(64),
+  email: z.string().max(255).email(),
 })
 
 export default defineEventHandler(async (event) => {
