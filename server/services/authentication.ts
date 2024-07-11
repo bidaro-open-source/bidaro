@@ -129,22 +129,17 @@ export async function updateAuthenticationSession(
 }
 
 /**
- * Deletes refresh session from the whitelist and cookie.
+ * Deletes refresh session from the whitelist.
  *
+ * @param uid user id
  * @param refreshToken refresh token
  * @throw if the refresh token is not whitelisted
  */
 export async function deleteAuthenticationSession(
+  uid: number,
   refreshToken: RefreshToken,
 ): Promise<void> {
   const redis = useRedis()
-
-  const session = await getAuthenticationSession(refreshToken)
-
-  if (!session)
-    throw new Error('Refresh token not found!')
-
-  const uid = session.uid
 
   await redis.del(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`)
 
