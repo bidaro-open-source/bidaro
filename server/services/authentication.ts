@@ -72,6 +72,7 @@ export async function createAuthenticationSession(
       refreshTokenTTL,
     )
     .sadd(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
+    .pexpire(`${REDIS_SESSION_NAMESPACE}:${uid}`, refreshTokenTTL * 1000)
     .exec()
 
   return {
@@ -113,6 +114,7 @@ export async function updateAuthenticationSession(
     .multi()
     .srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
     .sadd(`${REDIS_SESSION_NAMESPACE}:${uid}`, [newRefreshToken])
+    .pexpire(`${REDIS_SESSION_NAMESPACE}:${uid}`, refreshTokenTTL * 1000)
     .rename(
       `${REDIS_SESSION_NAMESPACE}:${refreshToken}`,
       `${REDIS_SESSION_NAMESPACE}:${newRefreshToken}`,
