@@ -1,27 +1,18 @@
-import { z } from 'zod'
-import { hash } from 'bcrypt'
 import { Op } from 'sequelize'
+import { hash } from 'bcrypt'
+import { parseRequest } from '~/server/requests/auth/register.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
-
-const registerSchema = z.object({
-  username: z.string().max(24).regex(/^(?=.*[a-z])\w+$/i),
-  password: z.string().max(64),
-  email: z.string().max(255).email(),
-})
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
 
-  const validatedBody = await readValidatedBody(
-    event,
-    body => registerSchema.parse(body),
-  )
+  const data = await parseRequest(event)
 
   const userInDB = await db.User.findOne({
     where: {
       [Op.or]: [
-        { email: validatedBody.email },
-        { username: validatedBody.username },
+        { email: data.email },
+        { username: data.username },
       ],
     },
   })
@@ -34,9 +25,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await db.User.create({
-    email: validatedBody.email,
-    username: validatedBody.username,
-    password: await hash(validatedBody.password, 10),
+    email: data.email,
+    username: data.username,
+    password: await hash(data.password, 10),
   })
 
   const metadata = createRequestMetadata(event)
