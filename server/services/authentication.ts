@@ -23,8 +23,9 @@ export const REDIS_SESSION_NAMESPACE = 'refresh-session'
 export async function getAuthenticationSession(
   refreshToken: RefreshToken,
 ): Promise<SessionMetadata | null> {
-  const data = await useRedis()
-    .get(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`)
+  const redis = useRedis()
+
+  const data = await redis.get(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`)
 
   return data ? JSON.parse(data) : null
 }
@@ -62,14 +63,16 @@ export async function createAuthenticationSession(
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
   const sessionMetadata = { uid, uuid: uuidv4(), ...metadata }
 
-  await redis.set(
-    `${REDIS_SESSION_NAMESPACE}:${refreshToken}`,
-    JSON.stringify(sessionMetadata),
-    'EX',
-    refreshTokenTTL,
-  )
-
-  await redis.sadd(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
+  await redis
+    .multi()
+    .set(
+      `${REDIS_SESSION_NAMESPACE}:${refreshToken}`,
+      JSON.stringify(sessionMetadata),
+      'EX',
+      refreshTokenTTL,
+    )
+    .sadd(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
+    .exec()
 
   return {
     accessToken,
@@ -106,21 +109,21 @@ export async function updateAuthenticationSession(
 
   const sessionMetadata = { uid, uuid: uuidv4(), ...metadata }
 
-  await redis.srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
-
-  await redis.sadd(`${REDIS_SESSION_NAMESPACE}:${uid}`, [newRefreshToken])
-
-  await redis.rename(
-    `${REDIS_SESSION_NAMESPACE}:${refreshToken}`,
-    `${REDIS_SESSION_NAMESPACE}:${newRefreshToken}`,
-  )
-
-  await redis.set(
-    `${REDIS_SESSION_NAMESPACE}:${newRefreshToken}`,
-    JSON.stringify(sessionMetadata),
-    'EX',
-    refreshTokenTTL,
-  )
+  await redis
+    .multi()
+    .srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
+    .sadd(`${REDIS_SESSION_NAMESPACE}:${uid}`, [newRefreshToken])
+    .rename(
+      `${REDIS_SESSION_NAMESPACE}:${refreshToken}`,
+      `${REDIS_SESSION_NAMESPACE}:${newRefreshToken}`,
+    )
+    .set(
+      `${REDIS_SESSION_NAMESPACE}:${newRefreshToken}`,
+      JSON.stringify(sessionMetadata),
+      'EX',
+      refreshTokenTTL,
+    )
+    .exec()
 
   return {
     accessToken: newAccessToken,
@@ -141,7 +144,9 @@ export async function deleteAuthenticationSession(
 ): Promise<void> {
   const redis = useRedis()
 
-  await redis.del(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`)
-
-  await redis.srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
+  await redis
+    .multi()
+    .del(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`)
+    .srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
+    .exec()
 }
