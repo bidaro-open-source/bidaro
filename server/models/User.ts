@@ -24,7 +24,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare updatedAt: CreationOptional<Date>
 }
 
-export function UserFactory(sequelize: Sequelize) {
+export function InitializeUser(sequelize: Sequelize) {
   User.init(
     {
       id: {

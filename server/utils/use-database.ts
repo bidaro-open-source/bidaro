@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize'
-import { UserFactory } from '../database'
+import { InitializeUser } from '../models'
 
 interface Database {
   sequelize?: Sequelize
-  User?: ReturnType<typeof UserFactory>
+  User?: ReturnType<typeof InitializeUser>
 }
 
 const db: Database = {}
@@ -29,7 +29,7 @@ export default function (event?: H3Event): Required<Database> {
         dialect: runtimeConfig.db.connection as any,
       })
 
-      db.User = UserFactory(db.sequelize)
+      db.User = InitializeUser(db.sequelize)
     }
 
     db.sequelize.authenticate()
