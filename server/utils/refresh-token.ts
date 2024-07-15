@@ -1,7 +1,7 @@
 import type { RefreshToken } from '../services/authentication'
 
-const REFRESH_TOKEN_COOKIE_NAME = 'jwt'
-const REFRESH_TOKEN_BODY_NAME = 'refresh_token'
+export const REFRESH_TOKEN_COOKIE_NAME = 'jwt'
+export const REFRESH_TOKEN_BODY_NAME = 'refresh_token'
 
 /**
  * Returns refresh token from cookie or request body.
