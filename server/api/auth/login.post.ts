@@ -1,4 +1,5 @@
 import { compare } from 'bcrypt'
+import { z } from 'zod'
 import { parseRequest } from '~/server/requests/auth/login.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
@@ -13,17 +14,24 @@ export default defineEventHandler(async (event) => {
 
   if (!user) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Account not found!',
+      statusCode: 404,
+      message: 'Аккаунт не знайдено',
     })
   }
 
   const passwordsEqual = await compare(data.password, user.password)
 
   if (!passwordsEqual) {
+    const issues: z.ZodIssue[] = [{
+      code: 'custom',
+      path: ['password'],
+      message: 'Пароль неправильний',
+    }]
+
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Password is incorrect!',
+      statusCode: 422,
+      message: 'Неправильні дані запиту',
+      data: new z.ZodError(issues).flatten(),
     })
   }
 

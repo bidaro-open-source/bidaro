@@ -7,19 +7,12 @@ import {
 export default defineEventHandler(async (event) => {
   const { refresh_token: refreshToken } = await parseRequest(event)
 
-  if (!refreshToken) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Refresh token not found!',
-    })
-  }
-
   const verifed = await verifyAuthenticationSession(refreshToken)
 
   if (!verifed) {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Refresh token is invalid!',
+      statusCode: 404,
+      message: 'Токен оновлення не знайдено',
     })
   }
 

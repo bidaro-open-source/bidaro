@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { Op } from 'sequelize'
 import { hash } from 'bcrypt'
 import { parseRequest } from '~/server/requests/auth/register.post'
@@ -8,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const data = await parseRequest(event)
 
-  const userInDB = await db.User.findOne({
+  const userInDB = await db.User.findAll({
     where: {
       [Op.or]: [
         { email: data.email },
@@ -17,10 +18,29 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  if (userInDB) {
+  if (userInDB.length) {
+    const issues: z.ZodIssue[] = []
+
+    if (userInDB.findIndex(u => u.email === data.email) !== -1) {
+      issues.push({
+        code: 'custom',
+        path: ['email'],
+        message: 'Електронна пошта вже зайнята',
+      })
+    }
+
+    if (userInDB.findIndex(u => u.username === data.username) !== -1) {
+      issues.push({
+        code: 'custom',
+        path: ['username'],
+        message: 'Ім\'я користувача вже зайняте',
+      })
+    }
+
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Account already exists.',
+      statusCode: 422,
+      message: 'Неправильні дані запиту',
+      data: new z.ZodError(issues).flatten(),
     })
   }
 
