@@ -9,26 +9,19 @@ export default defineEventHandler(async (event) => {
 
   const { refresh_token: refreshToken } = await parseRequest(event)
 
-  if (!refreshToken) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Refresh token not found!',
-    })
-  }
-
   const session = await getAuthenticationSession(refreshToken)
 
   if (!session) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Refresh token not found!',
+      statusCode: 404,
+      message: 'Токен оновлення не знайдено',
     })
   }
 
   if (session.uid !== event.context.auth.uid) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Refresh token not found!',
+      statusCode: 403,
+      message: 'Немає доступу до цього токену',
     })
   }
 

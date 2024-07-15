@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { Sequelize } from 'sequelize'
 import { InitializeUser } from '../models'
 
@@ -27,6 +28,7 @@ export default function (event?: H3Event): Required<Database> {
         username: runtimeConfig.db.username,
         password: runtimeConfig.db.password,
         dialect: runtimeConfig.db.connection as any,
+        logging: process.env.NODE_ENV === 'development',
       })
 
       db.User = InitializeUser(db.sequelize)

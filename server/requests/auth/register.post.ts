@@ -1,13 +1,24 @@
 import { z } from 'zod'
+import { emailSchema, passwordSchema, usernameSchema } from '~/server/schemas'
 
 export const schema = z.object({
-  username: z.string().trim().min(2).max(24).regex(/^(?=.*[a-z])\w+$/i),
-  password: z.string().trim().min(1).max(64),
-  email: z.string().trim().min(1).max(254).email(),
+  email: emailSchema,
+  username: usernameSchema,
+  password: passwordSchema,
 })
 
 export type RequestBody = z.infer<typeof schema>
 
-export function parseRequest(event: H3Event) {
-  return readValidatedBody(event, body => schema.parse(body))
+export async function parseRequest(event: H3Event) {
+  const result = await readValidatedBody(event, body => schema.safeParse(body))
+
+  if (!result.success) {
+    throw createError({
+      statusCode: 422,
+      message: 'Неправильні дані запиту',
+      data: result.error.flatten(),
+    })
+  }
+
+  return result.data
 }
