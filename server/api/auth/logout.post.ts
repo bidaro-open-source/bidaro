@@ -1,3 +1,4 @@
+import { parseRequest } from '~/server/requests/auth/logout.post'
 import {
   deleteAuthenticationSession,
   getAuthenticationSession,
@@ -6,7 +7,7 @@ import {
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const refreshToken = await getRefreshToken(event)
+  const { refresh_token: refreshToken } = await parseRequest(event)
 
   if (!refreshToken) {
     throw createError({
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
 
   await deleteAuthenticationSession(session.uid, refreshToken)
 
-  deleteRefreshToken(event)
+  deleteRefreshTokenCookie(event)
 
   return { ok: true }
 })

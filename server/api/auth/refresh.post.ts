@@ -1,10 +1,11 @@
+import { parseRequest } from '~/server/requests/auth/refresh.post'
 import {
   updateAuthenticationSession,
   verifyAuthenticationSession,
 } from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
-  const refreshToken = await getRefreshToken(event)
+  const { refresh_token: refreshToken } = await parseRequest(event)
 
   if (!refreshToken) {
     throw createError({
@@ -26,7 +27,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await updateAuthenticationSession(refreshToken, metadata)
 
-  setRefreshToken(event, session.refreshToken)
+  setRefreshTokenCookie(event, session.refreshToken)
 
   return {
     token_type: 'bearer',
