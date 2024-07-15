@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await createAuthenticationSession(user.id, metadata)
 
-  setRefreshToken(event, session.refreshToken)
+  setRefreshTokenCookie(event, session.refreshToken)
 
   return {
     access_token: session.accessToken,

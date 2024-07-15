@@ -9,18 +9,10 @@ export const REFRESH_TOKEN_BODY_NAME = 'refresh_token'
  * @param event H3Event
  * @returns refresh token or undefined
  */
-export async function getRefreshToken(
+export function getRefreshTokenCookie(
   event: H3Event,
-): Promise<RefreshToken | undefined> {
-  let refreshToken
-
-  if (!refreshToken)
-    refreshToken = getCookie(event, REFRESH_TOKEN_COOKIE_NAME)
-
-  if (!refreshToken)
-    refreshToken = ((await readBody(event) || {}))[REFRESH_TOKEN_BODY_NAME]
-
-  return refreshToken
+): RefreshToken | undefined {
+  return getCookie(event, REFRESH_TOKEN_COOKIE_NAME)
 }
 
 /**
@@ -29,7 +21,7 @@ export async function getRefreshToken(
  * @param event H3Event
  * @param refreshToken refresh token
  */
-export function setRefreshToken(
+export function setRefreshTokenCookie(
   event: H3Event,
   refreshToken: RefreshToken,
 ): void {
@@ -48,6 +40,6 @@ export function setRefreshToken(
  *
  * @param event H3Event
  */
-export function deleteRefreshToken(event: H3Event): void {
+export function deleteRefreshTokenCookie(event: H3Event): void {
   deleteCookie(event, REFRESH_TOKEN_COOKIE_NAME)
 }
