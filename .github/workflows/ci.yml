@@ -38,6 +38,10 @@ env:
   NUXT_MAILER_FROM_ADDRESS: noreply@example.dev
   NUXT_MAILER_FROM_NAME: Fake Company
 
+  NUXT_JWT_SECRET: secret
+  NUXT_JWT_ACCESS_TTL: 3600
+  NUXT_JWT_REFRESH_TTL: 5184000
+
 jobs:
   ci:
     name: Testing pull request
