@@ -18,6 +18,10 @@ export default antfu({
     },
   },
   ignores: [
+    '.github/**',
+    '.hooks/**',
+    '.nuxt/**',
+    '.vscode/**',
     'public/**',
   ],
   rules: {
