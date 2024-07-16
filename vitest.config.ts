@@ -3,10 +3,10 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 export default defineVitestConfig({
   test: {
     passWithNoTests: true,
-    globalSetup: 'tests/setup.ts',
+    globalSetup: 'test/setup.ts',
     setupFiles: [
-      'tests/setup-database.ts',
-      'tests/setup-redis.ts',
+      'test/setup-database.ts',
+      'test/setup-redis.ts',
     ],
   },
 })
