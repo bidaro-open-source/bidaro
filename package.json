@@ -9,10 +9,9 @@
     "preview": "nuxt preview",
     "prepare": "git config core.hooksPath .hooks",
     "postinstall": "nuxt prepare",
-    "test": "bun run test:unit && bun run test:integration && bun run test:e2e",
-    "test:e2e": "vitest run --dir tests/e2e",
-    "test:integration": "vitest run --dir tests/integration",
-    "test:unit": "vitest run --dir tests/unit",
+    "test": "bun --env-file=.env.test vitest run",
+    "test:api": "bun --env-file=.env.test vitest run test/api",
+    "test:unit": "bun --env-file=.env.test vitest run test/unit",
     "lint": "eslint --cache .",
     "lint:fix": "eslint . --fix",
     "lint:staged": "lint-staged"
