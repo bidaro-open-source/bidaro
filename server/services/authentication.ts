@@ -14,6 +14,10 @@ export interface SessionMetadata extends RequestMetadata {
   uid: number
 }
 
+export interface SessionMetadataCollection {
+  [key: RefreshToken]: SessionMetadata
+}
+
 export const REDIS_SESSION_NAMESPACE = 'refresh-session'
 
 /**
@@ -30,6 +34,44 @@ export async function getAuthenticationSession(
   const data = await redis.get(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`)
 
   return data ? JSON.parse(data) : null
+}
+
+/**
+ * Returns user sessions. When gets session metadata, clear
+ * old tokens, which not exists.
+ *
+ * @param uid user id
+ * @returns array of user session data
+ */
+export async function getAuthenticationSessions(
+  uid: number,
+): Promise<SessionMetadataCollection> {
+  const redis = useRedis()
+
+  const tokens = await redis.smembers(`${REDIS_SESSION_NAMESPACE}:${uid}`)
+  const sessions: SessionMetadataCollection = {}
+  const inactiveSessions: SessionToken[] = []
+
+  if (tokens.length) {
+    const allSessions = await redis.mget(
+      tokens.map(token => `${REDIS_SESSION_NAMESPACE}:${token}`),
+    )
+
+    for (let i = 0; i < tokens.length; i++) {
+      const currectToken = tokens[i]
+      const currectSession = allSessions[i]
+
+      currectSession !== null
+        ? sessions[currectToken] = JSON.parse(currectSession)
+        : inactiveSessions.push(currectToken)
+    }
+  }
+
+  if (inactiveSessions.length) {
+    await redis.srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, inactiveSessions)
+  }
+
+  return sessions
 }
 
 /**
