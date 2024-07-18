@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
   return {
     access_token: session.accessToken,
     refresh_token: session.refreshToken,
+    session_token: session.sessionToken,
     user: {
       id: user.id,
       email: user.email,

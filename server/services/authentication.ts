@@ -1,10 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 
 export type RefreshToken = string
+export type SessionToken = string
 
-export interface TokensPair {
+export interface SessionData {
   accessToken: JsonWebToken
   refreshToken: RefreshToken
+  sessionToken: SessionToken
 }
 
 export interface SessionMetadata extends RequestMetadata {
@@ -54,14 +56,15 @@ export async function verifyAuthenticationSession(
 export async function createAuthenticationSession(
   uid: number,
   metadata?: RequestMetadata,
-): Promise<TokensPair> {
+): Promise<SessionData> {
   const redis = useRedis()
   const runtimeConfig = useRuntimeConfig()
 
   const accessToken = createAccessToken({ uid })
   const refreshToken = uuidv4()
+  const sessionToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
-  const sessionMetadata = { uid, uuid: uuidv4(), ...metadata }
+  const sessionMetadata = { uid, uuid: sessionToken, ...metadata }
 
   await redis
     .multi()
@@ -78,6 +81,7 @@ export async function createAuthenticationSession(
   return {
     accessToken,
     refreshToken,
+    sessionToken,
   }
 }
 
@@ -94,7 +98,7 @@ export async function createAuthenticationSession(
 export async function updateAuthenticationSession(
   refreshToken: RefreshToken,
   metadata?: RequestMetadata,
-): Promise<TokensPair> {
+): Promise<SessionData> {
   const redis = useRedis()
   const runtimeConfig = useRuntimeConfig()
 
@@ -106,9 +110,10 @@ export async function updateAuthenticationSession(
   const uid = session.uid
   const newAccessToken = createAccessToken({ uid })
   const newRefreshToken = uuidv4()
+  const newSessionToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
 
-  const sessionMetadata = { uid, uuid: uuidv4(), ...metadata }
+  const sessionMetadata = { uid, uuid: newSessionToken, ...metadata }
 
   await redis
     .multi()
@@ -130,6 +135,7 @@ export async function updateAuthenticationSession(
   return {
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
+    sessionToken: newSessionToken,
   }
 }
 
