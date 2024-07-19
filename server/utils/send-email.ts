@@ -18,7 +18,7 @@ export interface EmailSenderPayload {
  * @param payload email
  * @returns message info
  */
-export function sendEmail(event: H3Event, payload: EmailSenderPayload) {
+export default function (event: H3Event, payload: EmailSenderPayload) {
   const runtimeConfig = useRuntimeConfig(event)
 
   const fromName = runtimeConfig.mailer.fromName

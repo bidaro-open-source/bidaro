@@ -10,7 +10,7 @@ export interface RequestMetadata {
  * @param event H3Event
  * @returns request metadata
  */
-export function createRequestMetadata(event: H3Event): RequestMetadata {
+export default function (event: H3Event): RequestMetadata {
   return {
     date: new Date(),
     ip: getRequestIP(event),
