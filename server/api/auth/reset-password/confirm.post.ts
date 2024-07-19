@@ -1,6 +1,6 @@
 import { hash } from 'bcrypt'
 import {
-  parseRequest,
+  confirmResetPasswordRequest,
 } from '~/server/requests/auth/reset-password/confirm.post'
 import {
   deletePasswordResetToken,
@@ -10,9 +10,9 @@ import {
 export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
-  const body = await parseRequest(event)
+  const request = await validateRequest(event, confirmResetPasswordRequest)
 
-  const uid = await getUserIdByResetToken(body.token)
+  const uid = await getUserIdByResetToken(request.body.token)
 
   if (!uid) {
     throw createError({
@@ -31,10 +31,10 @@ export default defineEventHandler(async (event) => {
   }
 
   await user.update({
-    password: await hash(body.password, 10),
+    password: await hash(request.body.password, 10),
   })
 
-  await deletePasswordResetToken(body.token)
+  await deletePasswordResetToken(request.body.token)
 
   return {
     ok: true,

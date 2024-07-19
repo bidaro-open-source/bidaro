@@ -7,19 +7,8 @@ export const bodySchema = z.object({
 
 export type RequestBody = z.infer<typeof bodySchema>
 
-export async function parseRequest(event: H3Event) {
-  const result = await readValidatedBody(
-    event,
-    body => bodySchema.safeParse(body),
-  )
-
-  if (!result.success) {
-    throw createError({
-      statusCode: 422,
-      message: 'Неправильні дані запиту',
-      data: result.error.flatten(),
-    })
+export async function resetPasswordRequest(event: H3Event) {
+  return {
+    body: await readValidatedBody(event, body => bodySchema.parse(body)),
   }
-
-  return result.data
 }

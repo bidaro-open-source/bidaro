@@ -2,30 +2,27 @@ import { z } from 'zod'
 import { refreshTokenSchema } from '~/server/schemas'
 import { getRefreshTokenCookie } from '~/server/utils/refresh-token-cookie'
 
-export const schema = z.object({
+export const bodySchema = z.object({
   refresh_token: refreshTokenSchema,
 })
 
-export type RequestBody = z.infer<typeof schema>
+export type RequestBody = z.infer<typeof bodySchema>
 
-export async function parseRequest(event: H3Event) {
+export async function refreshRequest(event: H3Event) {
   const refreshTokenCookie = getRefreshTokenCookie(event)
-  let result
+  let body
 
   if (refreshTokenCookie) {
-    result = schema.safeParse({ refresh_token: refreshTokenCookie })
+    body = bodySchema.parse({ refresh_token: refreshTokenCookie })
   }
   else {
-    result = await readValidatedBody(event, body => schema.safeParse(body))
+    body = await readValidatedBody(
+      event,
+      body => bodySchema.parse(body || {}),
+    )
   }
 
-  if (!result.success) {
-    throw createError({
-      statusCode: 422,
-      message: 'Неправильні дані запиту',
-      data: result.error.flatten(),
-    })
+  return {
+    body,
   }
-
-  return result.data
 }
