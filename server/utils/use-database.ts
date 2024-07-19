@@ -18,9 +18,9 @@ const db: Database = {}
  */
 export default function (event?: H3Event): Required<Database> {
   try {
-    const runtimeConfig = useRuntimeConfig(event)
-
     if (!db.sequelize) {
+      const runtimeConfig = useRuntimeConfig(event)
+
       db.sequelize = new Sequelize({
         host: runtimeConfig.db.host,
         port: +runtimeConfig.db.port,
