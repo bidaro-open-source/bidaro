@@ -34,8 +34,6 @@ export default function (event?: H3Event): Required<Database> {
       db.User = InitializeUser(db.sequelize)
     }
 
-    db.sequelize.authenticate()
-
     return db as Required<Database>
   }
   catch (e) {
