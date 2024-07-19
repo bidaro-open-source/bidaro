@@ -11,9 +11,9 @@ let instance: Redis | undefined
  */
 export default function (event?: H3Event) {
   try {
-    const runtimeConfig = useRuntimeConfig(event)
-
     if (!instance) {
+      const runtimeConfig = useRuntimeConfig(event)
+
       instance = new Redis({
         host: runtimeConfig.redis.host,
         port: +runtimeConfig.redis.port,
