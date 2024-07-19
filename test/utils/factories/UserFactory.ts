@@ -9,6 +9,8 @@ import type {
 export class UserFactory extends Factory<User> {
   public static readonly password: string = 'password'
 
+  public static readonly newPassword: string = 'new-password'
+
   public static readonly invalidPassword: string = 'password_invalid'
 
   public static readonly invalidUsername: string = 'username_invalid'
