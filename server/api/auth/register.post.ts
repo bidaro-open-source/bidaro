@@ -1,19 +1,19 @@
 import { z } from 'zod'
 import { Op } from 'sequelize'
 import { hash } from 'bcrypt'
-import { parseRequest } from '~/server/requests/auth/register.post'
+import { registerRequest } from '~/server/requests/auth/register.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
 
-  const data = await parseRequest(event)
+  const request = await validateRequest(event, registerRequest)
 
   const userInDB = await db.User.findAll({
     where: {
       [Op.or]: [
-        { email: data.email },
-        { username: data.username },
+        { email: request.body.email },
+        { username: request.body.username },
       ],
     },
   })
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   if (userInDB.length) {
     const issues: z.ZodIssue[] = []
 
-    if (userInDB.findIndex(u => u.email === data.email) !== -1) {
+    if (userInDB.findIndex(u => u.email === request.body.email) !== -1) {
       issues.push({
         code: 'custom',
         path: ['email'],
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    if (userInDB.findIndex(u => u.username === data.username) !== -1) {
+    if (userInDB.findIndex(u => u.username === request.body.username) !== -1) {
       issues.push({
         code: 'custom',
         path: ['username'],
@@ -45,9 +45,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await db.User.create({
-    email: data.email,
-    username: data.username,
-    password: await hash(data.password, 10),
+    email: request.body.email,
+    username: request.body.username,
+    password: await hash(request.body.password, 10),
   })
 
   const metadata = createRequestMetadata(event)

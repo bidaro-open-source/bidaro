@@ -1,15 +1,15 @@
-import { compare } from 'bcrypt'
 import { z } from 'zod'
-import { parseRequest } from '~/server/requests/auth/login.post'
+import { compare } from 'bcrypt'
+import { loginRequest } from '~/server/requests/auth/login.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
 
-  const data = await parseRequest(event)
+  const request = await validateRequest(event, loginRequest)
 
   const user = await db.User.findOne({
-    where: { username: data.username },
+    where: { username: request.body.username },
   })
 
   if (!user) {
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const passwordsEqual = await compare(data.password, user.password)
+  const passwordsEqual = await compare(request.body.password, user.password)
 
   if (!passwordsEqual) {
     const issues: z.ZodIssue[] = [{
