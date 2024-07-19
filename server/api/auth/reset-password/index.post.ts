@@ -1,0 +1,34 @@
+import { parseRequest } from '~/server/requests/auth/reset-password/index.post'
+import { createPasswordResetToken } from '~/server/services/password-reset'
+
+export default defineEventHandler(async (event) => {
+  const db = useDatabase(event)
+
+  const body = await parseRequest(event)
+
+  const user = await db.User.findOne({
+    where: { email: body.email },
+  })
+
+  if (!user) {
+    throw createError({
+      statusCode: 404,
+      message: 'Аккаунт не знайдено',
+    })
+  }
+
+  const token = await createPasswordResetToken(user.id)
+
+  await sendEmail(event, {
+    to: body.email,
+    subject: 'Reset password',
+    template: {
+      html: `Reset token: ${token}`,
+      text: `Reset token: ${token}`,
+    },
+  })
+
+  return {
+    ok: true,
+  }
+})
