@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { idSchema } from '~/server/schemas'
+import { idSchema } from '~/server/zod'
 
 export const paramsSchema = z.object({
   uid: idSchema,

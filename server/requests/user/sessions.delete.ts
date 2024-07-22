@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { idSchema, refreshTokenSchema } from '~/server/schemas'
+import { idSchema, refreshTokenSchema } from '~/server/zod'
 
 export const bodySchema = z.object({
   uuids: refreshTokenSchema.array().nonempty(),
