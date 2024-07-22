@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { passwordSchema } from '~/server/schemas'
+import { passwordSchema } from '~/server/zod'
 
 export const bodySchema = z.object({
   token: z.string(),
