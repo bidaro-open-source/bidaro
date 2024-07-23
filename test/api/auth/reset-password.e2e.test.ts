@@ -1,74 +1,51 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import type {
-  RequestBody as ConfirmRequestBody,
-} from '~/server/requests/auth/reset-password/confirm.post'
-import type {
-  RequestBody,
-} from '~/server/requests/auth/reset-password/index.post'
+import { destroyUser, registerUser } from '~/test/utils/requests/authentication'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
 } from '~/server/services/password-reset'
-
-async function makeResetPasswordRequest(body: RequestBody) {
-  return await fetch('/api/auth/reset-password', {
-    body: JSON.stringify(body),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
-
-async function makeConfirmResetPasswordRequest(body: ConfirmRequestBody) {
-  return await fetch('/api/auth/reset-password/confirm', {
-    body: JSON.stringify(body),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
+import {
+  confirmResetPasswordRequest,
+  resetPasswordRequest,
+} from '~/test/utils/requests/reset-password'
 
 describe('reset password', async () => {
   await setup()
 
   it('should reset password', async () => {
-    const user = await db.UserFactory.new().create()
+    const data = await registerUser()
 
-    const response = await makeResetPasswordRequest({
-      email: user.email,
+    const user = await db.User.findByPk(data.user.id)
+
+    const resetResponse = await resetPasswordRequest({
+      email: data.user.email,
     })
 
-    const body = await response.json()
-
-    expect(body.ok).toBeTruthy()
+    expect(resetResponse.status).toBe(200)
 
     const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
     const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
 
-    const confirmResponse = await makeConfirmResetPasswordRequest({
+    const confirmResponse = await confirmResetPasswordRequest({
       password: db.UserFactory.newPassword,
       token,
     })
 
-    const confirmBody = await confirmResponse.json()
+    expect(confirmResponse.status).toBe(200)
 
-    expect(confirmBody.ok).toBeTruthy()
+    const updatedUser = await db.User.findByPk(data.user.id)
 
-    const updatedUser = await db.User.findByPk(user.id)
-
-    expect(user.password).not.toBe(updatedUser!.password)
+    expect(user!.password).not.toBe(updatedUser!.password)
 
     await redis.del(`${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`)
-    await updatedUser!.destroy()
+    await destroyUser(data.user.id)
   })
 
   describe('error handling', () => {
     it('should return error if email not found', async () => {
       const userData = db.UserFactory.new().make()
 
-      const response = await makeResetPasswordRequest({
+      const response = await resetPasswordRequest({
         email: userData.email,
       })
 
@@ -76,33 +53,31 @@ describe('reset password', async () => {
     })
 
     it('should return error if token not found', async () => {
-      const response = await makeConfirmResetPasswordRequest({
-        token: '936acb91-9837-4d4c-a6ec-a6d02a72eb52',
+      const response = await confirmResetPasswordRequest({
         password: db.UserFactory.newPassword,
+        token: 'fff',
       })
 
       expect(response.status).toBe(404)
     })
 
     it('should return error if account not found', async () => {
-      const user = await db.UserFactory.new().create()
+      const data = await registerUser()
 
-      const response = await makeResetPasswordRequest({
-        email: user.email,
+      const response = await resetPasswordRequest({
+        email: data.user.email,
       })
 
-      const body = await response.json()
+      expect(response.status).toBe(200)
 
-      expect(body.ok).toBeTruthy()
-
-      await user.destroy()
+      await destroyUser(data.user.id)
 
       const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
       const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
 
-      const confirmResponse = await makeConfirmResetPasswordRequest({
-        token,
+      const confirmResponse = await confirmResetPasswordRequest({
         password: db.UserFactory.newPassword,
+        token,
       })
 
       expect(confirmResponse.status).toBe(404)

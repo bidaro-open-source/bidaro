@@ -1,21 +1,10 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~/server/utils/refresh-token-cookie'
-import type { RequestBody } from '~/server/requests/auth/register.post'
-
-async function destroyUser(uid: number) {
-  (await db.User.findByPk(uid))!.destroy()
-}
-
-async function makeRegisterRequest(body: RequestBody) {
-  return await fetch('/api/auth/register', {
-    body: JSON.stringify(body),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
+import {
+  destroyUser,
+  registerRequest,
+} from '~/test/utils/requests/authentication'
 
 describe('register', async () => {
   await setup()
@@ -23,7 +12,7 @@ describe('register', async () => {
   it('should register user and return user data', async () => {
     const userData = db.UserFactory.new().make()
 
-    const response = await makeRegisterRequest({
+    const response = await registerRequest({
       email: userData.email,
       username: userData.username,
       password: db.UserFactory.password,
@@ -36,13 +25,13 @@ describe('register', async () => {
     expect(body.user.email).toBe(userData.email)
     expect(body.user.username).toBe(userData.username)
 
-    destroyUser(body.user.id)
+    await destroyUser(body.user.id)
   })
 
   it('should register user and return pair of tokens', async () => {
     const userData = db.UserFactory.new().make()
 
-    const response = await makeRegisterRequest({
+    const response = await registerRequest({
       email: userData.email,
       username: userData.username,
       password: db.UserFactory.password,
@@ -54,13 +43,13 @@ describe('register', async () => {
     expect(typeof body.access_token).toBe('string')
     expect(typeof body.refresh_token).toBe('string')
 
-    destroyUser(body.user.id)
+    await destroyUser(body.user.id)
   })
 
   it('should register user and return refresh token in cookie', async () => {
     const userData = db.UserFactory.new().make()
 
-    const response = await makeRegisterRequest({
+    const response = await registerRequest({
       email: userData.email,
       username: userData.username,
       password: db.UserFactory.password,
@@ -73,7 +62,7 @@ describe('register', async () => {
 
     const body = await response.json()
 
-    destroyUser(body.user.id)
+    await destroyUser(body.user.id)
   })
 
   describe('registration with valid email', () => {
@@ -85,7 +74,7 @@ describe('register', async () => {
     ])('should register user when email is "%s"', async (email) => {
       const userData = db.UserFactory.new().make()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         password: db.UserFactory.password,
         username: userData.username,
         email,
@@ -95,7 +84,7 @@ describe('register', async () => {
 
       expect(response.status).toBe(200)
 
-      destroyUser(body.user.id)
+      await destroyUser(body.user.id)
     })
   })
 
@@ -113,7 +102,7 @@ describe('register', async () => {
     ])('should register user when username is "%s"', async (username) => {
       const userData = db.UserFactory.new().make()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         password: db.UserFactory.password,
         email: userData.email,
         username,
@@ -123,7 +112,7 @@ describe('register', async () => {
 
       expect(response.status).toBe(200)
 
-      destroyUser(body.user.id)
+      await destroyUser(body.user.id)
     })
   })
 
@@ -132,7 +121,7 @@ describe('register', async () => {
       const userData = db.UserFactory.new().make()
       const userCreated = await db.UserFactory.new().create()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         email: userCreated.email,
         username: userData.username,
         password: userData.password,
@@ -145,7 +134,7 @@ describe('register', async () => {
       const userData = db.UserFactory.new().make()
       const userCreated = await db.UserFactory.new().create()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         email: userData.email,
         username: userCreated.username,
         password: userData.password,
@@ -196,7 +185,7 @@ describe('register', async () => {
     ])('should return error when email is "%s"', async (email) => {
       const userData = db.UserFactory.new().make()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         username: userData.username,
         password: userData.password,
         email: email as string,
@@ -227,7 +216,7 @@ describe('register', async () => {
     ])('should return error when username is "%s"', async (username) => {
       const userData = db.UserFactory.new().make()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         email: userData.email,
         password: userData.password,
         username: username as string,
@@ -247,7 +236,7 @@ describe('register', async () => {
     ])('should return error when password is "%s"', async (password) => {
       const userData = db.UserFactory.new().make()
 
-      const response = await makeRegisterRequest({
+      const response = await registerRequest({
         email: userData.email,
         username: userData.username,
         password: password as string,

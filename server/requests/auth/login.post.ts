@@ -6,7 +6,7 @@ export const bodySchema = z.object({
   password: passwordSchema,
 })
 
-export type LoginRequestBody = z.infer<typeof bodySchema>
+export type RequestBody = z.infer<typeof bodySchema>
 
 export async function loginRequest(event: H3Event) {
   return {

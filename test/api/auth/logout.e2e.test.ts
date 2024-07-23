@@ -1,146 +1,79 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-
-interface LoginRequestBody {
-  username: string
-  password: string
-}
-
-interface LogoutRequestBody {
-  accessToken: string
-  refreshToken: string
-}
-
-async function makeLoginRequest(body: LoginRequestBody) {
-  return await fetch('/api/auth/login', {
-    body: JSON.stringify(body),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
-
-async function makeLogoutRequest(body: LogoutRequestBody) {
-  return await fetch('/api/auth/logout', {
-    body: JSON.stringify({ refresh_token: body.refreshToken }),
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${body.accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  })
-}
+import {
+  destroyUser,
+  logoutRequest,
+  registerUser,
+} from '~/test/utils/requests/authentication'
 
 describe('logout', async () => {
   await setup()
 
   it('should logout user', async () => {
-    const user = await db.UserFactory.new().create()
+    const data = await registerUser()
 
-    const loginResponse = await makeLoginRequest({
-      username: user.username,
-      password: db.UserFactory.password,
-    })
-
-    const loginBody = await loginResponse.json()
-
-    const response = await makeLogoutRequest({
-      accessToken: loginBody.access_token,
-      refreshToken: loginBody.refresh_token,
-    })
+    const response = await logoutRequest(
+      { refresh_token: data.refresh_token },
+      { accessToken: data.access_token },
+    )
 
     expect(response.status).toBe(200)
 
-    await user.destroy()
+    await destroyUser(data.user.id)
   })
 
   describe('error handling', () => {
     it('should return error if no access token is provided', async () => {
-      const user = await db.UserFactory.new().create()
+      const data = await registerUser()
 
-      const loginResponse = await makeLoginRequest({
-        username: user.username,
-        password: db.UserFactory.password,
-      })
-
-      const loginBody = await loginResponse.json()
-
-      const response = await makeLogoutRequest({
-        accessToken: '',
-        refreshToken: loginBody.refresh_token,
-      })
+      const response = await logoutRequest(
+        { refresh_token: data.refresh_token },
+        // @ts-expect-error not provide
+        { accessToken: undefined },
+      )
 
       expect(response.status).toBe(401)
 
-      await user.destroy()
+      await destroyUser(data.user.id)
     })
 
     it('should return error if no refresh token is provided', async () => {
-      const user = await db.UserFactory.new().create()
+      const data = await registerUser()
 
-      const loginResponse = await makeLoginRequest({
-        username: user.username,
-        password: db.UserFactory.password,
-      })
-
-      const loginBody = await loginResponse.json()
-
-      const response = await makeLogoutRequest({
-        accessToken: loginBody.access_token,
-        // @ts-expect-error temp line
-        refreshToken: undefined,
-      })
+      const response = await logoutRequest(
+        // @ts-expect-error not provide
+        { refresh_token: undefined },
+        { accessToken: data.access_token },
+      )
 
       expect(response.status).toBe(422)
 
-      await user.destroy()
+      await destroyUser(data.user.id)
     })
 
     it('should return error if refresh token not found', async () => {
-      const user = await db.UserFactory.new().create()
+      const data = await registerUser()
 
-      const loginResponse = await makeLoginRequest({
-        username: user.username,
-        password: db.UserFactory.password,
-      })
-
-      const loginBody = await loginResponse.json()
-
-      const response = await makeLogoutRequest({
-        accessToken: loginBody.access_token,
-        refreshToken: `936acb91-9837-4d4c-a6ec-a6d02a72eb52`,
-      })
+      const response = await logoutRequest(
+        { refresh_token: 'fff' },
+        { accessToken: data.access_token },
+      )
 
       expect(response.status).toBe(404)
 
-      await user.destroy()
+      await destroyUser(data.user.id)
     })
 
     it(
       'should return error if refresh token belongs to another user',
       async () => {
-        const user1 = await db.UserFactory.new().create()
-        const user2 = await db.UserFactory.new().create()
+        const user1 = await registerUser()
+        const user2 = await registerUser()
 
-        const login1Response = await makeLoginRequest({
-          username: user1.username,
-          password: db.UserFactory.password,
-        })
-
-        const login2Response = await makeLoginRequest({
-          username: user2.username,
-          password: db.UserFactory.password,
-        })
-
-        const login1Body = await login1Response.json()
-
-        const login2Body = await login2Response.json()
-
-        const response = await makeLogoutRequest({
-          accessToken: login1Body.access_token,
-          refreshToken: login2Body.refresh_token,
-        })
+        const response = await logoutRequest(
+          { refresh_token: user2.refresh_token },
+          { accessToken: user1.access_token },
+        )
 
         expect(response.status).toBe(403)
       },
