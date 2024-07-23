@@ -199,3 +199,40 @@ export async function deleteAuthenticationSession(
     .srem(`${REDIS_SESSION_NAMESPACE}:${uid}`, [refreshToken])
     .exec()
 }
+
+/**
+ * Deletes refresh session from the whitelist by uuid.
+ *
+ * @param uid user id
+ * @param uuids array of session uuid
+ * @returns array of action status
+ * @throw if the refresh token is not whitelisted
+ */
+export async function deleteAuthenticationSessions(
+  uid: number,
+  uuids: SessionUUID[],
+): Promise<boolean[]> {
+  const sessions = await getAuthenticationSessions(uid)
+
+  const handledSessions = Array
+    .from<boolean>({ length: uuids.length })
+    .fill(false)
+
+  for (const refreshToken in sessions) {
+    const session = sessions[refreshToken]
+
+    const sessionIndex = uuids.findIndex(uuid => uuid === session.uuid)
+
+    if (sessionIndex !== -1) {
+      try {
+        await deleteAuthenticationSession(uid, refreshToken)
+        handledSessions[sessionIndex] = true
+      }
+      catch (e) {
+        handledSessions[sessionIndex] = false
+      }
+    }
+  }
+
+  return handledSessions
+}
