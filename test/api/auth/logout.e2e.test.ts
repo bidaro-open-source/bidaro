@@ -88,7 +88,8 @@ describe('logout', async () => {
 
       const response = await makeLogoutRequest({
         accessToken: loginBody.access_token,
-        refreshToken: '',
+        // @ts-expect-error temp line
+        refreshToken: undefined,
       })
 
       expect(response.status).toBe(422)

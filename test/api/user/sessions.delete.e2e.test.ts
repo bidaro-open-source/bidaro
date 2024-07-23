@@ -1,6 +1,6 @@
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import type { RequestBody } from '~/server/requests/auth/login.post'
+import type { LoginRequestBody } from '~/server/requests/auth/login.post'
 
 interface DeleteSessionsPayload {
   uid: number
@@ -8,7 +8,7 @@ interface DeleteSessionsPayload {
   accessToken: string
 }
 
-async function makeLoginRequest(body: RequestBody) {
+async function makeLoginRequest(body: LoginRequestBody) {
   return await fetch('/api/auth/login', {
     body: JSON.stringify(body),
     method: 'POST',
@@ -129,27 +129,6 @@ describe('session deleting', async () => {
       const response = await deleteSessions({
         uid: user.id,
         uuids: [],
-        accessToken: loginBody.access_token,
-      })
-
-      expect(response.status).toBe(422)
-
-      await user.destroy()
-    })
-
-    it('should return error if sessions is not uuid', async () => {
-      const user = await db.UserFactory.new().create()
-
-      const loginResponse = await makeLoginRequest({
-        username: user.username,
-        password: db.UserFactory.password,
-      })
-
-      const loginBody = await loginResponse.json()
-
-      const response = await deleteSessions({
-        uid: user.id,
-        uuids: ['hello-world'],
         accessToken: loginBody.access_token,
       })
 

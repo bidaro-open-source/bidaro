@@ -1,10 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
 
-export type RefreshToken = string
 export type SessionToken = string
 
 export interface SessionData {
-  accessToken: JsonWebToken
+  accessToken: AccessToken
   refreshToken: RefreshToken
   sessionToken: SessionToken
 }
@@ -103,7 +102,7 @@ export async function createAuthenticationSession(
   const runtimeConfig = useRuntimeConfig()
 
   const accessToken = createAccessToken({ uid })
-  const refreshToken = uuidv4()
+  const refreshToken = createRefreshToken()
   const sessionToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
   const sessionMetadata = { uid, uuid: sessionToken, ...metadata }
@@ -151,7 +150,7 @@ export async function updateAuthenticationSession(
 
   const uid = session.uid
   const newAccessToken = createAccessToken({ uid })
-  const newRefreshToken = uuidv4()
+  const newRefreshToken = createRefreshToken()
   const newSessionToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
 

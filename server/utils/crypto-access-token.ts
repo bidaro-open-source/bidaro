@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 
-export type JsonWebToken = string
+export type AccessToken = string
 
-export interface JsonWebTokenPayload {
+export interface AccessTokenPayload {
   uid: number
 }
 
@@ -10,9 +10,9 @@ export interface JsonWebTokenPayload {
  * Returns signed access token.
  *
  * @param payload token data
- * @returns json web token
+ * @returns assess token
  */
-export function createAccessToken(payload: JsonWebTokenPayload): JsonWebToken {
+export function createAccessToken(payload: AccessTokenPayload): AccessToken {
   const runtimeConfig = useRuntimeConfig()
 
   return jwt.sign(
@@ -25,10 +25,10 @@ export function createAccessToken(payload: JsonWebTokenPayload): JsonWebToken {
 /**
  * Returns token verifed status.
  *
- * @param token json web token
+ * @param token assess token
  * @returns token verifed or not
  */
-export function verifyAccessToken(token: JsonWebToken): boolean {
+export function verifyAccessToken(token: AccessToken): boolean {
   try {
     jwt.verify(token, useRuntimeConfig().jwt.secret)
     return true
@@ -41,9 +41,9 @@ export function verifyAccessToken(token: JsonWebToken): boolean {
 /**
  * Returns token payload without verification.
  *
- * @param token json web token
+ * @param token assess token
  * @returns token data
  */
-export function decodeAccessToken(token: JsonWebToken): JsonWebTokenPayload {
-  return jwt.decode(token) as JsonWebTokenPayload
+export function decodeAccessToken(token: AccessToken): AccessTokenPayload {
+  return jwt.decode(token) as AccessTokenPayload
 }

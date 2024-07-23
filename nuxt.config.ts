@@ -44,6 +44,10 @@ export default defineNuxtConfig({
       secret: '',
       accessTTL: '',
       refreshTTL: '',
+      refreshSize: '',
+    },
+    password: {
+      resetSize: '',
     },
   },
 })
