@@ -44,7 +44,7 @@ describe('session deleting', async () => {
 
     const response = await deleteSessions({
       uid: user.id,
-      uuids: [loginBody.session_token],
+      uuids: [loginBody.session_uuid],
       accessToken: loginBody.access_token,
     })
 
@@ -70,11 +70,11 @@ describe('session deleting', async () => {
 
     const sessionToken1 = (await (
       await makeLoginRequest(loginRequestBody)
-    ).json()).session_token
+    ).json()).session_uuid
 
     const sessionToken2 = (await (
       await makeLoginRequest(loginRequestBody)
-    ).json()).session_token
+    ).json()).session_uuid
 
     const response = await deleteSessions({
       uid: user.id,
