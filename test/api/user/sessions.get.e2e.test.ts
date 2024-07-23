@@ -48,7 +48,7 @@ describe('session fetching', async () => {
     const sessions = await response.json()
 
     expect(response.status).toBe(200)
-    expect(sessions[0].uuid).toBe(loginBody.session_token)
+    expect(sessions[0].uuid).toBe(loginBody.session_uuid)
 
     await user.destroy()
   })

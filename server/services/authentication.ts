@@ -1,15 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
 
-export type SessionToken = string
+export type SessionUUID = string
 
 export interface SessionData {
+  uuid: SessionUUID
   accessToken: AccessToken
   refreshToken: RefreshToken
-  sessionToken: SessionToken
 }
 
 export interface SessionMetadata extends RequestMetadata {
-  uuid: string
+  uuid: SessionUUID
   uid: number
 }
 
@@ -49,7 +49,7 @@ export async function getAuthenticationSessions(
 
   const tokens = await redis.smembers(`${REDIS_SESSION_NAMESPACE}:${uid}`)
   const sessions: SessionMetadataCollection = {}
-  const inactiveSessions: SessionToken[] = []
+  const inactiveSessions: SessionUUID[] = []
 
   if (tokens.length) {
     const allSessions = await redis.mget(
@@ -101,11 +101,11 @@ export async function createAuthenticationSession(
   const redis = useRedis()
   const runtimeConfig = useRuntimeConfig()
 
+  const uuid = uuidv4()
   const accessToken = createAccessToken({ uid })
   const refreshToken = createRefreshToken()
-  const sessionToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
-  const sessionMetadata = { uid, uuid: sessionToken, ...metadata }
+  const sessionMetadata = { uid, uuid, ...metadata }
 
   await redis
     .multi()
@@ -120,9 +120,9 @@ export async function createAuthenticationSession(
     .exec()
 
   return {
+    uuid,
     accessToken,
     refreshToken,
-    sessionToken,
   }
 }
 
@@ -149,12 +149,12 @@ export async function updateAuthenticationSession(
     throw new Error('Refresh token not found!')
 
   const uid = session.uid
+  const uuid = uuidv4()
   const newAccessToken = createAccessToken({ uid })
   const newRefreshToken = createRefreshToken()
-  const newSessionToken = uuidv4()
   const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
 
-  const sessionMetadata = { uid, uuid: newSessionToken, ...metadata }
+  const sessionMetadata = { uid, uuid, ...metadata }
 
   await redis
     .multi()
@@ -174,9 +174,9 @@ export async function updateAuthenticationSession(
     .exec()
 
   return {
+    uuid,
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
-    sessionToken: newSessionToken,
   }
 }
 

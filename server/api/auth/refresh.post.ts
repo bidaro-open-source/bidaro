@@ -29,6 +29,6 @@ export default defineEventHandler(async (event) => {
     token_type: 'bearer',
     access_token: session.accessToken,
     refresh_token: session.refreshToken,
-    session_token: session.sessionToken,
+    session_uuid: session.uuid,
   }
 })
