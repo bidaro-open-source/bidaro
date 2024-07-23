@@ -47,7 +47,9 @@ export default defineNuxtConfig({
       refreshSize: '',
     },
     password: {
+      resetTTL: '',
       resetSize: '',
+      hashRounds: '',
     },
   },
 })

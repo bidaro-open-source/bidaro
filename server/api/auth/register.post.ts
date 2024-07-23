@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { Op } from 'sequelize'
-import { hash } from 'bcrypt'
 import { registerRequest } from '~/server/requests/auth/register.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
@@ -47,7 +46,7 @@ export default defineEventHandler(async (event) => {
   const user = await db.User.create({
     email: request.body.email,
     username: request.body.username,
-    password: await hash(request.body.password, 10),
+    password: await hashPassword(event, request.body.password),
   })
 
   const metadata = createRequestMetadata(event)

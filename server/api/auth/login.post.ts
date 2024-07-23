@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { compare } from 'bcrypt'
 import { loginRequest } from '~/server/requests/auth/login.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
@@ -19,7 +18,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const passwordsEqual = await compare(request.body.password, user.password)
+  const passwordsEqual = await comparePassword(
+    event,
+    request.body.password,
+    user.password,
+  )
 
   if (!passwordsEqual) {
     const issues: z.ZodIssue[] = [{
