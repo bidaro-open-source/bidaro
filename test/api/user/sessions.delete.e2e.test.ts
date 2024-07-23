@@ -1,51 +1,22 @@
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import type { LoginRequestBody } from '~/server/requests/auth/login.post'
-
-interface DeleteSessionsPayload {
-  uid: number
-  uuids: string[]
-  accessToken: string
-}
-
-async function makeLoginRequest(body: LoginRequestBody) {
-  return await fetch('/api/auth/login', {
-    body: JSON.stringify(body),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
-
-async function deleteSessions(payload: DeleteSessionsPayload) {
-  return await fetch(`/api/user/${payload.uid}/sessions`, {
-    method: 'DELETE',
-    body: JSON.stringify({ uuids: payload.uuids }),
-    headers: {
-      'Authorization': `Bearer ${payload.accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  })
-}
+import { deleteSessionsRequest } from '~/test/utils/requests/sessions'
+import {
+  destroyUser,
+  loginRequest,
+  registerUser,
+} from '~/test/utils/requests/authentication'
 
 describe('session deleting', async () => {
   await setup()
 
   it('should delete session', async () => {
-    const user = await db.UserFactory.new().create()
+    const data = await registerUser()
 
-    const loginResponse = await makeLoginRequest({
-      username: user.username,
-      password: db.UserFactory.password,
-    })
-
-    const loginBody = await loginResponse.json()
-
-    const response = await deleteSessions({
-      uid: user.id,
-      uuids: [loginBody.session_uuid],
-      accessToken: loginBody.access_token,
+    const response = await deleteSessionsRequest({
+      uid: data.user.id,
+      uuids: [data.session_uuid],
+      accessToken: data.access_token,
     })
 
     const sessions = await response.json()
@@ -53,33 +24,29 @@ describe('session deleting', async () => {
     expect(response.status).toBe(200)
     expect(sessions[0]).toBeTruthy()
 
-    await user.destroy()
+    await destroyUser(data.user.id)
   })
 
   it('should delete multiply sessions', async () => {
-    const user = await db.UserFactory.new().create()
+    const data = await registerUser()
 
     const loginRequestBody = {
-      username: user.username,
+      username: data.user.username,
       password: db.UserFactory.password,
     }
 
-    const accessToken = (await (
-      await makeLoginRequest(loginRequestBody)
-    ).json()).access_token
-
-    const sessionToken1 = (await (
-      await makeLoginRequest(loginRequestBody)
+    const sessionUUID1 = (await (
+      await loginRequest(loginRequestBody)
     ).json()).session_uuid
 
-    const sessionToken2 = (await (
-      await makeLoginRequest(loginRequestBody)
+    const sessionUUID2 = (await (
+      await loginRequest(loginRequestBody)
     ).json()).session_uuid
 
-    const response = await deleteSessions({
-      uid: user.id,
-      uuids: [sessionToken1, sessionToken2],
-      accessToken,
+    const response = await deleteSessionsRequest({
+      uid: data.user.id,
+      uuids: [sessionUUID1, sessionUUID2],
+      accessToken: data.access_token,
     })
 
     const sessions = await response.json()
@@ -88,23 +55,16 @@ describe('session deleting', async () => {
     expect(sessions[0]).toBeTruthy()
     expect(sessions[1]).toBeTruthy()
 
-    await user.destroy()
+    await destroyUser(data.user.id)
   })
 
   it('should return false statuses when session not exists', async () => {
-    const user = await db.UserFactory.new().create()
+    const data = await registerUser()
 
-    const loginResponse = await makeLoginRequest({
-      username: user.username,
-      password: db.UserFactory.password,
-    })
-
-    const loginBody = await loginResponse.json()
-
-    const response = await deleteSessions({
-      uid: user.id,
-      uuids: ['936acb91-9837-4d4c-a6ec-a6d02a72eb52'],
-      accessToken: loginBody.access_token,
+    const response = await deleteSessionsRequest({
+      uid: data.user.id,
+      uuids: ['fff'],
+      accessToken: data.access_token,
     })
 
     const sessions = await response.json()
@@ -112,52 +72,38 @@ describe('session deleting', async () => {
     expect(response.status).toBe(200)
     expect(sessions[0]).toBeFalsy()
 
-    await user.destroy()
+    await destroyUser(data.user.id)
   })
 
   describe('error handling', () => {
     it('should return error if sessions is empty', async () => {
-      const user = await db.UserFactory.new().create()
+      const data = await registerUser()
 
-      const loginResponse = await makeLoginRequest({
-        username: user.username,
-        password: db.UserFactory.password,
-      })
-
-      const loginBody = await loginResponse.json()
-
-      const response = await deleteSessions({
-        uid: user.id,
+      const response = await deleteSessionsRequest({
+        uid: data.user.id,
         uuids: [],
-        accessToken: loginBody.access_token,
+        accessToken: data.access_token,
       })
 
       expect(response.status).toBe(422)
 
-      await user.destroy()
+      await destroyUser(data.user.id)
     })
 
     it('should return error if sessions belongs to another user', async () => {
-      const user1 = await db.UserFactory.new().create()
-      const user2 = await db.UserFactory.new().create()
+      const data1 = await registerUser()
+      const data2 = await registerUser()
 
-      const loginResponse = await makeLoginRequest({
-        username: user1.username,
-        password: db.UserFactory.password,
-      })
-
-      const loginBody = await loginResponse.json()
-
-      const response = await deleteSessions({
-        uid: user2.id,
-        uuids: ['936acb91-9837-4d4c-a6ec-a6d02a72eb52'],
-        accessToken: loginBody.access_token,
+      const response = await deleteSessionsRequest({
+        uid: data2.user.id,
+        uuids: [data2.session_uuid],
+        accessToken: data1.access_token,
       })
 
       expect(response.status).toBe(403)
 
-      await user1.destroy()
-      await user2.destroy()
+      await destroyUser(data1.user.id)
+      await destroyUser(data2.user.id)
     })
   })
 })
