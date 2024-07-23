@@ -1,4 +1,3 @@
-import { hash } from 'bcrypt'
 import {
   confirmResetPasswordRequest,
 } from '~/server/requests/auth/reset-password/confirm.post'
@@ -31,7 +30,7 @@ export default defineEventHandler(async (event) => {
   }
 
   await user.update({
-    password: await hash(request.body.password, 10),
+    password: await hashPassword(event, request.body.password),
   })
 
   await deletePasswordResetToken(request.body.token)
