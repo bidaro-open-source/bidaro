@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
-
 export const REDIS_PASSWORD_RESET_NAMESPACE = 'password-reset-token'
 
 /**
@@ -31,7 +29,7 @@ export async function createPasswordResetToken(
 ): Promise<string> {
   const redis = useRedis()
 
-  const token = uuidv4()
+  const token = createResetToken()
 
   await redis.set(
     `${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`,
