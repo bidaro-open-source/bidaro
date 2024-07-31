@@ -9,7 +9,7 @@ import {
 describe('register', async () => {
   await setup()
 
-  it('should register user and return user data', async () => {
+  it('should register user', async () => {
     const userData = db.UserFactory.new().make()
 
     const response = await registerRequest({
@@ -28,7 +28,7 @@ describe('register', async () => {
     await destroyUser(body.user.id)
   })
 
-  it('should register user and return pair of tokens', async () => {
+  it('should return pair of tokens', async () => {
     const userData = db.UserFactory.new().make()
 
     const response = await registerRequest({
@@ -46,7 +46,7 @@ describe('register', async () => {
     await destroyUser(body.user.id)
   })
 
-  it('should register user and return refresh token in cookie', async () => {
+  it('should return refresh token in cookie', async () => {
     const userData = db.UserFactory.new().make()
 
     const response = await registerRequest({

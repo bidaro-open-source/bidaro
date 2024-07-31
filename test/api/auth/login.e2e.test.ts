@@ -10,7 +10,7 @@ import {
 describe('login', async () => {
   await setup()
 
-  it('should return user fields', async () => {
+  it('should login user', async () => {
     const data = await registerUser()
 
     const response = await loginRequest({
@@ -45,7 +45,7 @@ describe('login', async () => {
     await destroyUser(data.user.id)
   })
 
-  it('should returns refresh token in cookie', async () => {
+  it('should return refresh token in cookie', async () => {
     const data = await registerUser()
 
     const response = await loginRequest({
