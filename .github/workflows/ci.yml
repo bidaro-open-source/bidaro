@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+      - develop
+
+env:
+  NUXT_DB_CONNECTION: postgres
+  NUXT_DB_HOST: localhost
+  NUXT_DB_PORT: 5432
+  NUXT_DB_DATABASE: postgres
+  NUXT_DB_USERNAME: postgres
+  NUXT_DB_PASSWORD: postgres
+
+  NUXT_REDIS_HOST: localhost
+  NUXT_REDIS_PORT: 6379
+  NUXT_REDIS_USER:
+  NUXT_REDIS_PASS:
+
+  NUXT_S3_ACCESS_KEY_ID: minio
+  NUXT_S3_SECRET_ACCESS_KEY: miniosecret
+  NUXT_S3_ENDPOINT: http://localhost:9000
+  NUXT_S3_REGION: auto
+  NUXT_S3_BUCKET: bidaro
+
+  NUXT_MAILER_HOST: localhost
+  NUXT_MAILER_PORT: 1025
+  NUXT_MAILER_USER: null
+  NUXT_MAILER_PASS: null
+  NUXT_MAILER_ENCRYPTION: null
+  NUXT_MAILER_FROM_ADDRESS: noreply@example.dev
+  NUXT_MAILER_FROM_NAME: Fake Company
+
+  NUXT_JWT_SECRET: secret
+  NUXT_JWT_ACCESS_TTL: 3600
+  NUXT_JWT_REFRESH_TTL: 5184000
+  NUXT_JWT_REFRESH_SIZE: 128
+
+  NUXT_PASSWORD_HASH_ROUNDS: 1
+  NUXT_PASSWORD_RESET_TTL: 86400
+  NUXT_PASSWORD_RESET_SIZE: 128
+
+jobs:
+  ci:
+    name: Testing pull request
+    runs-on: ubuntu-latest
+    services:
+      database:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ${{ env.NUXT_DB_DATABASE }}
+          POSTGRES_USER: ${{ env.NUXT_DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.NUXT_DB_PASSWORD }}
+        ports:
+          - 5432:5432
+
+      minio:
+        image: bitnami/minio:latest
+        env:
+          MINIO_ROOT_USER: ${{ env.NUXT_S3_ACCESS_KEY_ID }}
+          MINIO_ROOT_PASSWORD: ${{ env.NUXT_S3_SECRET_ACCESS_KEY }}
+          MINIO_DEFAULT_BUCKETS: ${{ env.NUXT_S3_BUCKET }}
+        ports:
+          - 9000:9000
+          - 9001:9001
+
+      redis:
+        image: redis:latest
+        env:
+          ALLOW_EMPTY_PASSWORD: yes
+          REDIS_DISABLE_COMMANDS: FLUSHDB,FLUSHALL
+        ports:
+          - 6379:6379
+
+      mailhog:
+        image: mailhog/mailhog:latest
+        ports:
+          - 1025:1025
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run linters
+        run: bun run lint
+
+      - name: Run tests
+        run: bun run test
+
+      - name: Run build
+        run: bun run build

@@ -18,11 +18,16 @@ export default antfu({
     },
   },
   ignores: [
+    '.github/**',
+    '.hooks/**',
+    '.nuxt/**',
+    '.vscode/**',
     'public/**',
   ],
   rules: {
     'no-console': 'off',
     'vue/html-indent': 'warn',
     'vue/html-self-closing': 'off',
+    'max-len': ['error', { code: 80 }],
   },
 })

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+msg=${1}
+regex="^(release|build|ci|feat|fix|ref|perf|style|test)(\(.+\))?: .{1,72}$"
+
+if [[ ${1} == ".git/COMMIT_EDITMSG" ]]; then
+  msg=$(cat ${1} | awk 'NR == 1')
+fi
+
+if ! [[ $msg =~ $regex ]]; then
+  echo "The commit message is not correct. Please refer to the docs."
+  exit 1
+fi
