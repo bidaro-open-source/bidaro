@@ -11,6 +11,6 @@ export function useRedis() {
     })
   }
   catch (e) {
-    throw new Error('Redis is not connected.')
+    throw new Error(`Redis is not connected. ${e}`)
   }
 }

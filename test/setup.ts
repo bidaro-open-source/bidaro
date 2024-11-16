@@ -1,11 +1,9 @@
-import { useRedis } from './utils/use-redis'
 import { useDatabase } from './utils/use-database'
+import { useRedis } from './utils/use-redis'
 
 export default async function setup() {
   const db = useDatabase()
   const redis = useRedis()
-
-  await db.User.sync({ force: true })
 
   const redisKeys = await redis.keys('*')
 

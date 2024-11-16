@@ -1,21 +1,16 @@
-import { DataTypes, Model } from 'sequelize'
-import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
-  Sequelize,
 } from 'sequelize'
+import type { MakeNullishOptional } from 'sequelize/lib/utils'
+import type { DatabaseOptional } from '../types.js'
+import { DataTypes, Model } from 'sequelize'
 
 export type UserModel = typeof User
-
 export type UserAttributes = InferAttributes<User>
-
-export type UserAttributesOptional = MakeNullishOptional<
-  InferCreationAttributes<User>
->
-
 export type UserCreationAttributes = InferCreationAttributes<User>
+export type UserAttributesOptional = MakeNullishOptional<UserCreationAttributes>
 
 export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare id: CreationOptional<number>
@@ -26,7 +21,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare updatedAt: CreationOptional<Date>
 }
 
-export function InitializeUser(sequelize: Sequelize) {
+export function InitializeUser(database: DatabaseOptional) {
   User.init(
     {
       id: {
@@ -55,12 +50,11 @@ export function InitializeUser(sequelize: Sequelize) {
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
-      sequelize,
+      sequelize: database.sequelize,
       modelName: 'User',
       tableName: 'users',
       timestamps: true,

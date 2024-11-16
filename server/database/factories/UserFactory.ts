@@ -1,10 +1,14 @@
 import { hashSync } from 'bcrypt'
-import { Factory } from './Factory'
 import type {
   User,
+  UserAttributes,
   UserAttributesOptional,
   UserModel,
-} from '~/server/models'
+} from '~/server/database'
+import { Factory } from '../class/Factory'
+
+type PartialAttributes = Partial<UserAttributes>
+type CreationAttributes = UserAttributesOptional
 
 export class UserFactory extends Factory<User> {
   public static readonly password: string = 'password'
@@ -15,13 +19,13 @@ export class UserFactory extends Factory<User> {
 
   public static readonly invalidUsername: string = 'username_invalid'
 
-  protected definition(): UserAttributesOptional {
+  protected definition(attr: PartialAttributes = {}): CreationAttributes {
     const user = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
 
     return {
-      email: `u${user}@example.com`,
-      username: `u${user}`,
-      password: hashSync(UserFactory.password, 10),
+      email: attr.email ?? `u${user}@example.com`,
+      username: attr.username ?? `u${user}`,
+      password: hashSync(attr.password ?? UserFactory.password, 10),
     }
   }
 }
