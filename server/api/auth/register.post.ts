@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { Op } from 'sequelize'
+import { z } from 'zod'
 import { registerRequest } from '~/server/requests/auth/register.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 

@@ -7,8 +7,8 @@ declare module 'h3' {
   interface H3EventContext {
     auth: {
       isAuthenticated: boolean
-      assessToken?: JsonWebToken
-      uid?: JsonWebTokenPayload['uid']
+      assessToken?: AccessToken
+      uid?: AccessTokenPayload['uid']
     }
   }
 }

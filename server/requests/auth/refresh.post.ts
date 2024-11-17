@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { refreshTokenSchema } from '~/server/zod'
 import { getRefreshTokenCookie } from '~/server/utils/refresh-token-cookie'
+import { refreshTokenSchema } from '~/server/zod'
 
 export const bodySchema = z.object({
   refresh_token: refreshTokenSchema,

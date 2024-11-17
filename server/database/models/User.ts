@@ -8,9 +8,9 @@ import type {
   NonAttribute,
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
-import { DataTypes, Model } from 'sequelize'
 import type { Database, DatabaseOptional } from '../types'
 import type { Role } from './Role'
+import { DataTypes, Model } from 'sequelize'
 
 export type UserModel = typeof User
 export type UserAttributes = InferAttributes<User>

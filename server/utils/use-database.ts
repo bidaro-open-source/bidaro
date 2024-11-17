@@ -1,6 +1,6 @@
+import type { Database } from '../database'
 import process from 'node:process'
 import { Sequelize } from 'sequelize'
-import type { Database } from '../database'
 import { BootstrapDatabase } from '../database'
 
 let db: Database | undefined

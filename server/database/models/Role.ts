@@ -13,10 +13,10 @@ import type {
   InferCreationAttributes,
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
-import { DataTypes, Model } from 'sequelize'
 import type { Database, DatabaseOptional } from '../types'
 import type { Permission } from './Permission'
 import type { User } from './User'
+import { DataTypes, Model } from 'sequelize'
 
 export type RoleModel = typeof Role
 export type RoleAttributes = InferAttributes<Role>

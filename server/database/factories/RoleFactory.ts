@@ -1,10 +1,10 @@
-import { Factory } from '../class/Factory'
 import type {
   Role,
   RoleAttributes,
   RoleAttributesOptional,
   RoleModel,
 } from '~/server/database'
+import { Factory } from '../class/Factory'
 
 type PartialAttributes = Partial<RoleAttributes>
 type CreationAttributes = RoleAttributesOptional
