@@ -76,6 +76,9 @@ describe('logout', async () => {
         )
 
         expect(response.status).toBe(403)
+
+        await destroyUser(user1.user.id)
+        await destroyUser(user2.user.id)
       },
     )
   })

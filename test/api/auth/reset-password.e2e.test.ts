@@ -1,9 +1,9 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { destroyUser, registerUser } from '~/test/utils/requests/authentication'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
 } from '~/server/services/password-reset'
+import { destroyUser, registerUser } from '~/test/utils/requests/authentication'
 import {
   confirmResetPasswordRequest,
   resetPasswordRequest,
