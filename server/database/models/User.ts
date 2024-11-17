@@ -1,11 +1,16 @@
 import type {
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
   CreationOptional,
+  ForeignKey,
   InferAttributes,
   InferCreationAttributes,
+  NonAttribute,
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
-import type { DatabaseOptional } from '../types.js'
 import { DataTypes, Model } from 'sequelize'
+import type { Database, DatabaseOptional } from '../types'
+import type { Role } from './Role'
 
 export type UserModel = typeof User
 export type UserAttributes = InferAttributes<User>
@@ -19,6 +24,18 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare password: string
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date>
+
+  // Role association
+  declare role?: NonAttribute<Role>
+  declare roleId: ForeignKey<Role['id']> | null
+  declare setRole: BelongsToSetAssociationMixin<Role, number>
+  declare getRole: BelongsToGetAssociationMixin<Role>
+
+  static associate(database: Database) {
+    database.User.belongsTo(database.Role, {
+      as: 'role',
+    })
+  }
 }
 
 export function InitializeUser(database: DatabaseOptional) {
