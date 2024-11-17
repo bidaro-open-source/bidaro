@@ -1,11 +1,11 @@
 import { hashSync } from 'bcrypt'
+import { Factory } from '../class/Factory'
 import type {
   User,
   UserAttributes,
   UserAttributesOptional,
   UserModel,
 } from '~/server/database'
-import { Factory } from '../class/Factory'
 
 type PartialAttributes = Partial<UserAttributes>
 type CreationAttributes = UserAttributesOptional

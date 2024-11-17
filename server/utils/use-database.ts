@@ -1,6 +1,6 @@
-import type { Database } from '../database'
 import process from 'node:process'
 import { Sequelize } from 'sequelize'
+import type { Database } from '../database'
 import { BootstrapDatabase } from '../database'
 
 let db: Database | undefined
@@ -33,6 +33,6 @@ export default function (event?: H3Event): Database {
     return db
   }
   catch (e) {
-    throw new Error(`Database is not connected. ${e}`)
+    throw new Error(`Database is not connected.`)
   }
 }

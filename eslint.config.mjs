@@ -29,5 +29,20 @@ export default antfu({
     'vue/html-indent': 'warn',
     'vue/html-self-closing': 'off',
     'max-len': ['error', { code: 80 }],
+    'ts/no-unused-expressions': [
+      'off',
+      {
+        allowShortCircuit: true,
+        allowTernary: true,
+        allowTaggedTemplates: true,
+        enforceForJSX: false,
+      },
+    ],
+    'unused-imports/no-unused-vars': [
+      'error',
+      {
+        caughtErrors: 'none',
+      },
+    ],
   },
 })
