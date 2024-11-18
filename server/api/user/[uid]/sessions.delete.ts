@@ -1,4 +1,4 @@
-import { deleteSessionsPolicy } from '~/server/policies/user/sessions.delete'
+import { deleteSessionsPolicy } from '~/server/policies/user/sessions'
 import { deleteSessionsRequest } from '~/server/requests/user/sessions'
 import { deleteAuthenticationSessions } from '~/server/services/authentication'
 

@@ -1,4 +1,4 @@
-import { getSessionsPolicy } from '~/server/policies/user/sessions.get'
+import { getSessionsPolicy } from '~/server/policies/user/sessions'
 import { getSessionsRequest } from '~/server/requests/user/sessions'
 import { getAuthenticationSessions } from '~/server/services/authentication'
 
