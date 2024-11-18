@@ -1,6 +1,6 @@
 import { loginRequest } from '../requests/authentication'
 
-export async function createUser(permissions: number | number[]) {
+export async function createUser(permissions: number | number[] = []) {
   const role = await db.RoleFactory.new().create()
   const user = await db.UserFactory.new().create({ roleId: role.id })
 

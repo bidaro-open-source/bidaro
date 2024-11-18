@@ -1,12 +1,13 @@
 import { z } from 'zod'
-import { idSchema, refreshTokenSchema } from '~/server/zod'
+import { refreshTokenSchema } from '~/server/zod'
+import { primaryKeySchema } from '~/server/zod/primary-key'
 
 export const bodySchema = z.object({
   uuids: refreshTokenSchema.array().nonempty(),
 })
 
 export const paramsSchema = z.object({
-  uid: idSchema,
+  uid: primaryKeySchema,
 })
 
 export type SessionsRequestBody = z.infer<typeof bodySchema>
