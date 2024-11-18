@@ -15,10 +15,14 @@ describe('roles fetching', async () => {
   it('should return all roles', async () => {
     const permissions = await usePermissions(db)
 
-    const data = await createUser(permissions.VIEW_ALL_ROLES)
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.VIEW_ALL_ROLES],
+    })
 
     const response = await getRolesRequest({
-      accessToken: data.loginData.access_token,
+      accessToken: data.access_token,
     })
 
     const roles: Role[] = await response.json()
@@ -27,18 +31,21 @@ describe('roles fetching', async () => {
     expect(response.status).toBe(200)
     expect(role && role.id).toBe(data.role.id)
 
-    await data.user.destroy()
-    await data.role.destroy()
+    await data.clear()
   })
 
   it('should return one role', async () => {
     const permissions = await usePermissions(db)
 
-    const data = await createUser(permissions.VIEW_ALL_ROLES)
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.VIEW_ALL_ROLES],
+    })
 
     const response = await getRoleRequest({
       id: data.role.id,
-      accessToken: data.loginData.access_token,
+      accessToken: data.access_token,
     })
 
     const role = await response.json()
@@ -46,38 +53,43 @@ describe('roles fetching', async () => {
     expect(response.status).toBe(200)
     expect(role && role.id).toBe(data.role.id)
 
-    await data.user.destroy()
-    await data.role.destroy()
+    await data.clear()
   })
 
   it('should return permissions of role', async () => {
     const permissions = await usePermissions(db)
 
-    const data = await createUser(permissions.VIEW_ALL_ROLES)
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.VIEW_ALL_ROLES],
+    })
 
     const response = await getRolePermissionsRequest({
       id: data.role.id,
-      accessToken: data.loginData.access_token,
+      accessToken: data.access_token,
     })
 
     expect(response.status).toBe(200)
 
-    await data.user.destroy()
-    await data.role.destroy()
+    await data.clear()
   })
 
   describe('error handling', () => {
     it('should return error if user have not permission', async () => {
-      const data = await createUser()
+      const data = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
 
       const response = await getRolesRequest({
-        accessToken: data.loginData.access_token,
+        accessToken: data.access_token,
       })
 
       expect(response.status).toBe(403)
 
-      await data.user.destroy()
-      await data.role.destroy()
+      await data.clear()
     })
   })
 })
