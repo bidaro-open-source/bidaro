@@ -1,3 +1,5 @@
+import { syncDatabase } from './utils/sync/sync-database'
+import { syncPermissions } from './utils/sync/sync-permissions'
 import { useDatabase } from './utils/use-database'
 import { useRedis } from './utils/use-redis'
 
@@ -5,7 +7,8 @@ export default async function setup() {
   const db = useDatabase()
   const redis = useRedis()
 
-  await db.sequelize.sync({ force: true })
+  await syncDatabase(db)
+  await syncPermissions(db)
 
   const redisKeys = await redis.keys('*')
 

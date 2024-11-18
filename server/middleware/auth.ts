@@ -1,6 +1,7 @@
 export default defineEventHandler(async (event) => {
   event.context.auth = { isAuthenticated: false }
 
+  const db = useDatabase(event)
   const authorization = getRequestHeader(event, 'Authorization')
 
   if (authorization) {
@@ -24,7 +25,32 @@ export default defineEventHandler(async (event) => {
 
     const payload = decodeAccessToken(token)
 
+    const user = await db.User.findOne({
+      where: { id: payload.uid },
+      include: [
+        {
+          model: db.Role,
+          as: 'role',
+          include: [
+            {
+              model: db.Permission,
+              as: 'permissions',
+              attributes: ['name'],
+            },
+          ],
+        },
+      ],
+    })
+
+    if (!user) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'User not found.',
+      })
+    }
+
     event.context.auth.uid = payload.uid
+    event.context.auth.user = user
     event.context.auth.assessToken = token
     event.context.auth.isAuthenticated = true
   }
