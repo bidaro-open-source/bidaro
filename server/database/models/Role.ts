@@ -11,6 +11,7 @@ import type {
   HasManySetAssociationsMixin,
   InferAttributes,
   InferCreationAttributes,
+  NonAttribute,
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
@@ -30,6 +31,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
   declare updatedAt: CreationOptional<Date>
 
   // User associations
+  declare users?: NonAttribute<User[]>
   declare getUsers: HasManyGetAssociationsMixin<User>
   declare addUser: HasManyAddAssociationMixin<User, number>
   declare addUsers: HasManyAddAssociationsMixin<User, number>
@@ -41,6 +43,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
   declare countUsers: HasManyCountAssociationsMixin
 
   // Permission associations
+  declare permissions?: NonAttribute<Permission[]>
   declare getPermissions: HasManyGetAssociationsMixin<Permission>
   declare addPermission: HasManyAddAssociationMixin<Permission, number>
   declare addPermissions: HasManyAddAssociationsMixin<Permission, number>
@@ -61,6 +64,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
       foreignKey: 'roleId',
       otherKey: 'permissionId',
       timestamps: false,
+      as: 'permissions',
     })
   }
 }
