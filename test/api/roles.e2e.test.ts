@@ -13,12 +13,12 @@ describe('roles fetching', async () => {
   await setup()
 
   it('should return all roles', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.VIEW_ALL_ROLES],
+      withPermissions: [mappedPermissionsId.VIEW_ALL_ROLES],
     })
 
     const response = await getRolesRequest({
@@ -35,12 +35,12 @@ describe('roles fetching', async () => {
   })
 
   it('should return one role', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.VIEW_ALL_ROLES],
+      withPermissions: [mappedPermissionsId.VIEW_ALL_ROLES],
     })
 
     const response = await getRoleRequest({
@@ -57,12 +57,12 @@ describe('roles fetching', async () => {
   })
 
   it('should return permissions of role', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.VIEW_ALL_ROLES],
+      withPermissions: [mappedPermissionsId.VIEW_ALL_ROLES],
     })
 
     const response = await getRolePermissionsRequest({
@@ -70,7 +70,12 @@ describe('roles fetching', async () => {
       accessToken: data.access_token,
     })
 
+    const permissions = await response.json()
+
     expect(response.status).toBe(200)
+    expect(permissions[0] && permissions[0].id).toEqual(
+      mappedPermissionsId.VIEW_ALL_ROLES,
+    )
 
     await data.clear()
   })
