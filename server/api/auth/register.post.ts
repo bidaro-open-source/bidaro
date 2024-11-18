@@ -1,5 +1,6 @@
 import { Op } from 'sequelize'
 import { z } from 'zod'
+import { roles } from '~/server/constants'
 import { registerRequest } from '~/server/requests/auth/register.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
@@ -43,7 +44,20 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const defaultRole = await db.Role.findOne({
+    where: { name: roles.USER },
+    attributes: ['id', 'name'],
+  })
+
+  if (!defaultRole) {
+    throw createError({
+      statusCode: 500,
+      message: 'Default role not found.',
+    })
+  }
+
   const user = await db.User.create({
+    roleId: defaultRole.id,
     email: request.body.email,
     username: request.body.username,
     password: await hashPassword(event, request.body.password),
@@ -63,6 +77,7 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       username: user.username,
+      role: defaultRole,
     },
   }
 })
