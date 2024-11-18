@@ -11,12 +11,16 @@ describe('session deleting', async () => {
   it('should delete session', async () => {
     const permissions = await usePermissions(db)
 
-    const data = await createUser(permissions.DELETE_OWN_SESSIONS)
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_OWN_SESSIONS],
+    })
 
     const response = await deleteSessionsRequest({
       uid: data.user.id,
-      uuids: [data.loginData.session_uuid],
-      accessToken: data.loginData.access_token,
+      uuids: [data.session_uuid],
+      accessToken: data.access_token,
     })
 
     const sessions = await response.json()
@@ -24,14 +28,17 @@ describe('session deleting', async () => {
     expect(response.status).toBe(200)
     expect(sessions[0]).toBeTruthy()
 
-    await data.user.destroy()
-    await data.role.destroy()
+    await data.clear()
   })
 
   it('should delete multiply sessions', async () => {
     const permissions = await usePermissions(db)
 
-    const data = await createUser(permissions.DELETE_OWN_SESSIONS)
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_OWN_SESSIONS],
+    })
 
     const loginRequestBody = {
       username: data.user.username,
@@ -49,7 +56,7 @@ describe('session deleting', async () => {
     const response = await deleteSessionsRequest({
       uid: data.user.id,
       uuids: [sessionUUID1, sessionUUID2],
-      accessToken: data.loginData.access_token,
+      accessToken: data.access_token,
     })
 
     const sessions = await response.json()
@@ -58,19 +65,22 @@ describe('session deleting', async () => {
     expect(sessions[0]).toBeTruthy()
     expect(sessions[1]).toBeTruthy()
 
-    await data.user.destroy()
-    await data.role.destroy()
+    await data.clear()
   })
 
   it('should return false statuses when session not exists', async () => {
     const permissions = await usePermissions(db)
 
-    const data = await createUser(permissions.DELETE_OWN_SESSIONS)
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_OWN_SESSIONS],
+    })
 
     const response = await deleteSessionsRequest({
       uid: data.user.id,
       uuids: ['fff'],
-      accessToken: data.loginData.access_token,
+      accessToken: data.access_token,
     })
 
     const sessions = await response.json()
@@ -78,46 +88,53 @@ describe('session deleting', async () => {
     expect(response.status).toBe(200)
     expect(sessions[0]).toBeFalsy()
 
-    await data.user.destroy()
-    await data.role.destroy()
+    await data.clear()
   })
 
   describe('error handling', () => {
     it('should return error if sessions is empty', async () => {
       const permissions = await usePermissions(db)
 
-      const data = await createUser(permissions.DELETE_OWN_SESSIONS)
+      const data = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_OWN_SESSIONS],
+      })
 
       const response = await deleteSessionsRequest({
         uid: data.user.id,
         uuids: [],
-        accessToken: data.loginData.access_token,
+        accessToken: data.access_token,
       })
 
       expect(response.status).toBe(422)
 
-      await data.user.destroy()
-      await data.role.destroy()
+      await data.clear()
     })
 
     it('should return error if sessions belongs to another user', async () => {
       const permissions = await usePermissions(db)
 
-      const data1 = await createUser(permissions.DELETE_OWN_SESSIONS)
-      const data2 = await createUser(permissions.DELETE_OWN_SESSIONS)
+      const data1 = await createUser({
+        withSession: true,
+      })
+
+      const data2 = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_OWN_SESSIONS],
+      })
 
       const response = await deleteSessionsRequest({
-        uid: data2.user.id,
-        uuids: [data2.loginData.session_uuid],
-        accessToken: data1.loginData.access_token,
+        uid: data1.user.id,
+        uuids: [data1.session_uuid],
+        accessToken: data2.access_token,
       })
 
       expect(response.status).toBe(403)
 
-      await data1.user.destroy()
-      await data1.role.destroy()
-      await data2.user.destroy()
-      await data2.role.destroy()
+      await data1.clear()
+      await data2.clear()
     })
   })
 })
