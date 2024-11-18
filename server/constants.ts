@@ -1,3 +1,8 @@
+export const roles = {
+  USER: 'user',
+  SUPERUSER: 'superuser',
+} as const
+
 export const permissions = {
   VIEW_ALL_ROLES: 'view_all_roles',
   VIEW_ALL_PERMISSIONS: 'view_all_permissions',

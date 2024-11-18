@@ -56,7 +56,10 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
 
   static associate(database: Database) {
     database.Role.hasMany(database.User, {
-      foreignKey: 'roleId',
+      foreignKey: {
+        name: 'roleId',
+        allowNull: false,
+      },
     })
 
     database.Role.belongsToMany(database.Permission, {
