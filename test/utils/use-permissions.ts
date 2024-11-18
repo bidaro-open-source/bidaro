@@ -1,18 +1,33 @@
 import { Op } from 'sequelize'
-import { permissions } from '~/server/constants'
-import type { Database } from '~/server/database'
+import { permissions as originalPermissions } from '~/server/constants'
 
-type PermissionNameMap = {
-  [K in string]: number
+type PermissionKeys = keyof typeof originalPermissions
+
+type PermissionNames = (typeof originalPermissions)[PermissionKeys]
+
+type MappedPermissions = {
+  -readonly [K in PermissionNames]: number
 }
 
-type PermissionIdMap = {
-  -readonly [K in keyof typeof permissions]: number
+type MappedPermissionsId = {
+  -readonly [K in PermissionKeys]: number
 }
 
-export async function usePermissions(db: Database): Promise<PermissionIdMap> {
-  const recordMap: Partial<PermissionNameMap> = {}
-  const permissionMap: Partial<PermissionIdMap> = {} as PermissionIdMap
+interface UsePermissionsResult {
+  permissions: PermissionNames[]
+  mappedPermissions: MappedPermissions
+  mappedPermissionsId: MappedPermissionsId
+}
+
+let cache: UsePermissionsResult | undefined
+
+export async function usePermissions(): Promise<UsePermissionsResult> {
+  if (cache)
+    return cache
+
+  const permissions = Object.values(originalPermissions)
+  const mappedPermissions: Partial<MappedPermissions> = {}
+  const mappedPermissionsId: Partial<MappedPermissionsId> = {}
 
   const records = await db.Permission.findAll({
     where: {
@@ -23,21 +38,28 @@ export async function usePermissions(db: Database): Promise<PermissionIdMap> {
   })
 
   for (const record of records) {
-    recordMap[record.name] = record.id
+    mappedPermissions[record.name as PermissionNames] = record.id
   }
 
-  for (const key in permissions) {
-    const permissionName = permissions[key as keyof typeof permissions]
-    const permissionId = recordMap[permissionName]
+  for (const key in originalPermissions) {
+    const name = originalPermissions[key as PermissionKeys]
 
-    if (!permissionId) {
-      throw new Error(`Permission with id "${permissionId}" not found.`
-        + `Permission name is "${permissionName}", key is "${key}"`,
+    const id = mappedPermissions[name]
+
+    if (!id) {
+      throw new Error(`Permission with id "${id}" not found.`
+        + `Permission name is "${name}", key is "${key}"`,
       )
     }
 
-    permissionMap[key as keyof PermissionIdMap] = permissionId
+    mappedPermissionsId[key as PermissionKeys] = id
   }
 
-  return permissionMap as PermissionIdMap
+  cache = {
+    permissions,
+    mappedPermissions,
+    mappedPermissionsId,
+  } as UsePermissionsResult
+
+  return cache
 }

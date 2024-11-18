@@ -9,12 +9,12 @@ describe('session deleting', async () => {
   await setup()
 
   it('should delete session', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.DELETE_OWN_SESSIONS],
+      withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
     })
 
     const response = await deleteSessionsRequest({
@@ -32,12 +32,12 @@ describe('session deleting', async () => {
   })
 
   it('should delete multiply sessions', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.DELETE_OWN_SESSIONS],
+      withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
     })
 
     const loginRequestBody = {
@@ -69,12 +69,12 @@ describe('session deleting', async () => {
   })
 
   it('should return false statuses when session not exists', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.DELETE_OWN_SESSIONS],
+      withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
     })
 
     const response = await deleteSessionsRequest({
@@ -93,12 +93,12 @@ describe('session deleting', async () => {
 
   describe('error handling', () => {
     it('should return error if sessions is empty', async () => {
-      const permissions = await usePermissions(db)
+      const { mappedPermissionsId } = await usePermissions()
 
       const data = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [permissions.DELETE_OWN_SESSIONS],
+        withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
       })
 
       const response = await deleteSessionsRequest({
@@ -113,7 +113,7 @@ describe('session deleting', async () => {
     })
 
     it('should return error if sessions belongs to another user', async () => {
-      const permissions = await usePermissions(db)
+      const { mappedPermissionsId } = await usePermissions()
 
       const data1 = await createUser({
         withSession: true,
@@ -122,7 +122,7 @@ describe('session deleting', async () => {
       const data2 = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [permissions.DELETE_OWN_SESSIONS],
+        withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
       })
 
       const response = await deleteSessionsRequest({

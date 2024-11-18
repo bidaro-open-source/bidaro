@@ -8,12 +8,12 @@ describe('session fetching', async () => {
   await setup()
 
   it('should return user sessions', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.VIEW_OWN_SESSIONS],
+      withPermissions: [mappedPermissionsId.VIEW_OWN_SESSIONS],
     })
 
     const response = await getSessionsRequest({
@@ -30,7 +30,7 @@ describe('session fetching', async () => {
   })
 
   it('should return user sessions when user have permission', async () => {
-    const permissions = await usePermissions(db)
+    const { mappedPermissionsId } = await usePermissions()
 
     const data1 = await createUser({
       withSession: true,
@@ -39,7 +39,7 @@ describe('session fetching', async () => {
     const data2 = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [permissions.VIEW_ALL_SESSIONS],
+      withPermissions: [mappedPermissionsId.VIEW_ALL_SESSIONS],
     })
 
     const response = await getSessionsRequest({
@@ -58,7 +58,7 @@ describe('session fetching', async () => {
 
   describe('error handling', () => {
     it('should return error if sessions belongs to another user', async () => {
-      const permissions = await usePermissions(db)
+      const { mappedPermissionsId } = await usePermissions()
 
       const data1 = await createUser({
         withSession: true,
@@ -67,7 +67,7 @@ describe('session fetching', async () => {
       const data2 = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [permissions.VIEW_OWN_SESSIONS],
+        withPermissions: [mappedPermissionsId.VIEW_OWN_SESSIONS],
       })
 
       const response = await getSessionsRequest({
