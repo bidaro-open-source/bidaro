@@ -1,10 +1,10 @@
 import { fetch } from '@nuxt/test-utils/e2e'
 import type {
-  RequestBody,
-} from '~/server/requests/auth/reset-password/index.post'
-import type {
   RequestBody as ConfirmRequestBody,
 } from '~/server/requests/auth/reset-password/confirm.post'
+import type {
+  RequestBody,
+} from '~/server/requests/auth/reset-password/index.post'
 
 export async function resetPasswordRequest(body: RequestBody) {
   return await fetch('/api/auth/reset-password', {

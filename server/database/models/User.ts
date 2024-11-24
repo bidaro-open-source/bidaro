@@ -1,21 +1,21 @@
-import { DataTypes, Model } from 'sequelize'
-import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type {
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
   CreationOptional,
+  ForeignKey,
   InferAttributes,
   InferCreationAttributes,
-  Sequelize,
+  NonAttribute,
 } from 'sequelize'
+import type { MakeNullishOptional } from 'sequelize/lib/utils'
+import type { Database, DatabaseOptional } from '../types'
+import type { Role } from './Role'
+import { DataTypes, Model } from 'sequelize'
 
 export type UserModel = typeof User
-
 export type UserAttributes = InferAttributes<User>
-
-export type UserAttributesOptional = MakeNullishOptional<
-  InferCreationAttributes<User>
->
-
 export type UserCreationAttributes = InferCreationAttributes<User>
+export type UserAttributesOptional = MakeNullishOptional<UserCreationAttributes>
 
 export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare id: CreationOptional<number>
@@ -24,9 +24,21 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare password: string
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date>
+
+  // Role association
+  declare role?: NonAttribute<Role>
+  declare roleId: ForeignKey<Role['id']> | null
+  declare setRole: BelongsToSetAssociationMixin<Role, number>
+  declare getRole: BelongsToGetAssociationMixin<Role>
+
+  static associate(database: Database) {
+    database.User.belongsTo(database.Role, {
+      as: 'role',
+    })
+  }
 }
 
-export function InitializeUser(sequelize: Sequelize) {
+export function InitializeUser(database: DatabaseOptional) {
   User.init(
     {
       id: {
@@ -55,12 +67,11 @@ export function InitializeUser(sequelize: Sequelize) {
       },
       updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
-      sequelize,
+      sequelize: database.sequelize,
       modelName: 'User',
       tableName: 'users',
       timestamps: true,

@@ -1,18 +1,18 @@
 import { fetch } from '@nuxt/test-utils/e2e'
-import type { AccessToken } from '~/server/utils/crypto-access-token'
 import type registerApi from '~/server/api/auth/register.post'
 import type {
   RequestBody as LoginRequestBody,
 } from '~/server/requests/auth/login.post'
-import type {
-  RequestBody as RegisterRequestBody,
-} from '~/server/requests/auth/register.post'
 import type {
   RequestBody as LogoutRequestBody,
 } from '~/server/requests/auth/logout.post'
 import type {
   RequestBody as RefreshRequestBody,
 } from '~/server/requests/auth/refresh.post'
+import type {
+  RequestBody as RegisterRequestBody,
+} from '~/server/requests/auth/register.post'
+import type { AccessToken } from '~/server/utils/crypto-access-token'
 
 export async function registerUser() {
   const user = db.UserFactory.new().make()

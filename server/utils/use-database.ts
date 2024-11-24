@@ -1,13 +1,9 @@
+import type { Database } from '../database'
 import process from 'node:process'
 import { Sequelize } from 'sequelize'
-import { InitializeUser } from '../models'
+import { BootstrapDatabase } from '../database'
 
-interface Database {
-  sequelize?: Sequelize
-  User?: ReturnType<typeof InitializeUser>
-}
-
-const db: Database = {}
+let db: Database | undefined
 
 /**
  * Returns Sequelize ORM instance.
@@ -16,27 +12,27 @@ const db: Database = {}
  * @returns sequelize instance
  * @throws if connection is not success
  */
-export default function (event?: H3Event): Required<Database> {
+export default function (event?: H3Event): Database {
   try {
-    if (!db.sequelize) {
+    if (!db) {
       const runtimeConfig = useRuntimeConfig(event)
 
-      db.sequelize = new Sequelize({
-        host: runtimeConfig.db.host,
-        port: +runtimeConfig.db.port,
-        database: runtimeConfig.db.database,
-        username: runtimeConfig.db.username,
-        password: runtimeConfig.db.password,
-        dialect: runtimeConfig.db.connection as any,
-        logging: process.env.NODE_ENV === 'development',
-      })
-
-      db.User = InitializeUser(db.sequelize)
+      db = BootstrapDatabase(
+        new Sequelize({
+          host: runtimeConfig.db.host,
+          port: +runtimeConfig.db.port,
+          database: runtimeConfig.db.database,
+          username: runtimeConfig.db.username,
+          password: runtimeConfig.db.password,
+          dialect: runtimeConfig.db.connection as any,
+          logging: process.env.NODE_ENV === 'development',
+        }),
+      )
     }
 
-    return db as Required<Database>
+    return db
   }
   catch (e) {
-    throw new Error('Database is not connected.')
+    throw new Error(`Database is not connected.`)
   }
 }

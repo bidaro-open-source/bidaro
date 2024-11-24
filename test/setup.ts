@@ -1,11 +1,16 @@
-import { useRedis } from './utils/use-redis'
+import { syncDatabase } from './utils/sync/sync-database'
+import { syncPermissions } from './utils/sync/sync-permissions'
+import { syncRoles } from './utils/sync/sync-roles'
 import { useDatabase } from './utils/use-database'
+import { useRedis } from './utils/use-redis'
 
 export default async function setup() {
   const db = useDatabase()
   const redis = useRedis()
 
-  await db.User.sync({ force: true })
+  await syncDatabase(db)
+  await syncRoles(db)
+  await syncPermissions(db)
 
   const redisKeys = await redis.keys('*')
 

@@ -1,3 +1,4 @@
+import { deleteSessionsPolicy } from '~/server/policies/user/sessions'
 import { deleteSessionsRequest } from '~/server/requests/user/sessions'
 import { deleteAuthenticationSessions } from '~/server/services/authentication'
 
@@ -6,12 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await validateRequest(event, deleteSessionsRequest)
 
-  if (event.context.auth.uid !== request.params.uid) {
-    throw createError({
-      statusCode: 403,
-      message: 'Немає доступу',
-    })
-  }
+  mustBeAuthorized(event, deleteSessionsPolicy, request.params.uid)
 
   return await deleteAuthenticationSessions(
     request.params.uid,

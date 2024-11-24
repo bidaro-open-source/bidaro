@@ -128,6 +128,8 @@ describe('register', async () => {
       })
 
       expect(response.status).toBe(422)
+
+      await destroyUser(userCreated.id)
     })
 
     it('should return error when username already taken', async () => {
@@ -141,6 +143,8 @@ describe('register', async () => {
       })
 
       expect(response.status).toBe(422)
+
+      await destroyUser(userCreated.id)
     })
   })
 

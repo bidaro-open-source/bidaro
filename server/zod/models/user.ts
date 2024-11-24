@@ -1,20 +1,5 @@
 import { z } from 'zod'
 
-export const idSchema = z.union([
-  z.string().transform((val, ctx) => {
-    const parsed = Number(val)
-    if (!Number.isInteger(parsed)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'ID користувача має бути числом.',
-      })
-      return z.NEVER
-    }
-    return parsed
-  }),
-  z.number(),
-])
-
 export const emailSchema = z
   .string({
     required_error: 'Електронна пошта є обов\'язковою',

@@ -1,19 +1,14 @@
 import { env } from 'node:process'
 import { Sequelize } from 'sequelize'
-import { InitializeUserFactroy } from './factories'
-import { InitializeUser } from '~/server/models'
-
-interface Database {
-  sequelize?: Sequelize
-  User?: ReturnType<typeof InitializeUser>
-  UserFactory?: ReturnType<typeof InitializeUserFactroy>
-}
+import {
+  BootstrapDatabase,
+  BootstrapFactories,
+} from '~/server/database'
+import type { Database } from '~/server/database'
 
 export function useDatabase() {
   try {
-    const db: Database = {}
-
-    db.sequelize = new Sequelize({
+    const connection = new Sequelize({
       host: env.NUXT_DB_HOST,
       port: +(env.NUXT_DB_PORT || ''),
       database: env.NUXT_DB_DATABASE,
@@ -23,12 +18,11 @@ export function useDatabase() {
       logging: false,
     })
 
-    db.User = InitializeUser(db.sequelize)
-    db.UserFactory = InitializeUserFactroy(db.User)
+    const database: Database = BootstrapDatabase(connection)
 
-    return db as Required<Database>
+    return BootstrapFactories(database)
   }
   catch (e) {
-    throw new Error('Database is not connected.')
+    throw new Error(`Database is not connected. Error: ${e}`)
   }
 }
