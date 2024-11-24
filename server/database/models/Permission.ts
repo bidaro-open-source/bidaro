@@ -31,6 +31,8 @@ export class Permission extends Model<
 > {
   declare id: CreationOptional<number>
   declare name: string
+  declare displayName: string | null
+  declare description: string | null
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date>
 
@@ -69,6 +71,14 @@ export function InitializePermission(database: DatabaseOptional) {
         type: DataTypes.STRING(64),
         unique: true,
         allowNull: false,
+      },
+      displayName: {
+        type: DataTypes.STRING(64),
+        allowNull: true,
+      },
+      description: {
+        type: DataTypes.STRING(1024),
+        allowNull: true,
       },
       createdAt: {
         type: DataTypes.DATE,
