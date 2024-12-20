@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+/**
+ * Request data of validator
+ */
 export interface RequestData {
   body?: unknown
   query?: unknown
@@ -7,10 +10,19 @@ export interface RequestData {
   multipart?: unknown
 }
 
+/**
+ * Request validator policy function
+ */
 export interface RequestValidator<T> {
   (event: H3Event): Promise<T>
 }
 
+/**
+ * Validate request data and return it
+ *
+ * @param event H3Event
+ * @returns validated request data
+ */
 export default async function<T extends RequestData>(
   event: H3Event,
   validator: RequestValidator<T>,
