@@ -61,9 +61,9 @@ export async function createUser<T extends CreateUserOptions>(
   }
 
   const clear = async () => {
+    await user.destroy()
     if (role)
       await role.destroy()
-    await user.destroy()
   }
 
   return {

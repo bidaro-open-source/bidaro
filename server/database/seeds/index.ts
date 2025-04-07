@@ -7,7 +7,6 @@ import { createUmzug } from '../umzug'
 export const seeder = createUmzug({
   directory: 'server/database/seeds',
   modelName: 'seeders',
-  templateName: 'seed.ts',
 })
 
 export type Seeder = typeof seeder._types.migration

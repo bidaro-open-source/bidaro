@@ -60,7 +60,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
     database.Role.hasMany(database.User, {
       foreignKey: {
         name: 'roleId',
-        allowNull: false,
+        allowNull: true,
       },
     })
 

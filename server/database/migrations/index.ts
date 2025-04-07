@@ -7,7 +7,6 @@ import { createUmzug } from '../umzug'
 export const migrator = createUmzug({
   directory: 'server/database/migrations',
   modelName: 'migrations',
-  templateName: 'migration.ts',
 })
 
 export type Migration = typeof migrator._types.migration

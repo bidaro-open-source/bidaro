@@ -8,7 +8,6 @@ import { BootstrapDatabase, BootstrapFactories } from './bootstrap'
 
 interface UmzugOptions {
   directory: string
-  templateName: string
   modelName: string
 }
 

@@ -15,6 +15,8 @@ export class RoleFactory extends Factory<Role> {
 
     return {
       name: attr.name ?? `#${role}`,
+      displayName: attr.displayName ?? null,
+      description: attr.description ?? null,
     }
   }
 }

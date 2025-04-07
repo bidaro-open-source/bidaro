@@ -1,4 +1,5 @@
 import type { Sequelize } from 'sequelize'
+import type { InitializePermissionFactroy } from './factories/PermissionFactory'
 import type { InitializeRoleFactroy } from './factories/RoleFactory'
 import type { InitializeUserFactroy } from './factories/UserFactory'
 import type { InitializePermission } from './models/Permission'
@@ -12,6 +13,7 @@ export interface DatabaseModels {
 }
 
 export interface DatabaseFactories {
+  PermissionFactory: ReturnType<typeof InitializePermissionFactroy>
   RoleFactory: ReturnType<typeof InitializeRoleFactroy>
   UserFactory: ReturnType<typeof InitializeUserFactroy>
 }

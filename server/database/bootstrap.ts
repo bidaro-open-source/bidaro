@@ -5,6 +5,7 @@ import type {
   DatabaseWithFactories,
   DatabaseWithFactoriesOptional,
 } from './types.js'
+import { InitializePermissionFactroy } from './factories/PermissionFactory.js'
 import { InitializeRoleFactroy } from './factories/RoleFactory.js'
 import { InitializeUserFactroy } from './factories/UserFactory'
 import { InitializePermission } from './models/Permission'
@@ -46,6 +47,9 @@ export function BootstrapFactories(
 ): DatabaseWithFactories {
   const databaseWithFactories: DatabaseWithFactoriesOptional = database
 
+  databaseWithFactories.PermissionFactory = InitializePermissionFactroy(
+    database.Permission,
+  )
   databaseWithFactories.RoleFactory = InitializeRoleFactroy(database.Role)
   databaseWithFactories.UserFactory = InitializeUserFactroy(database.User)
 
