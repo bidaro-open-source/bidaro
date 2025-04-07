@@ -1,5 +1,5 @@
-import { permissions } from '~/server/constants'
 import type { Database } from '~/server/database'
+import { permissions } from '~/server/constants'
 
 /**
  * Creates required permissions in the empty database.

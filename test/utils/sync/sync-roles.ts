@@ -1,5 +1,5 @@
-import { roles } from '~/server/constants'
 import type { Database } from '~/server/database'
+import { roles } from '~/server/constants'
 
 /**
  * Creates required roles in the empty database.

@@ -1,6 +1,6 @@
+import type { Permission } from '~/server/database'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import type { Permission } from '~/server/database'
 import { createUser } from '~/test/utils/creations/create-user'
 import { usePermissions } from '~/test/utils/use-permissions'
 import {

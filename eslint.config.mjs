@@ -23,6 +23,7 @@ export default antfu({
     '.nuxt/**',
     '.vscode/**',
     'public/**',
+    'package.json',
   ],
   rules: {
     'no-console': 'off',
