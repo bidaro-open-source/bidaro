@@ -1,9 +1,15 @@
+import { env } from 'node:process'
+import { Redis } from 'ioredis'
 import { afterAll, beforeAll } from 'vitest'
-import { useRedis } from './utils/use-redis'
 
 beforeAll(() => {
   // @ts-expect-error type
-  globalThis.redis = useRedis()
+  globalThis.redis = new Redis({
+    host: env.NUXT_REDIS_HOST,
+    port: +(env.NUXT_REDIS_PORT || ''),
+    username: env.NUXT_REDIS_USER,
+    password: env.NUXT_REDIS_PASS,
+  })
 })
 
 afterAll(async () => {
@@ -14,5 +20,5 @@ afterAll(async () => {
 })
 
 declare global {
-  let redis: ReturnType<typeof useRedis>
+  let redis: Redis
 }
