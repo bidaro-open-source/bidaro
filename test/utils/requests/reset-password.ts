@@ -1,12 +1,14 @@
 import type {
-  RequestBody as ConfirmRequestBody,
+  ConfirmPasswordRequest,
 } from '~/server/requests/auth/reset-password/confirm.post'
 import type {
-  RequestBody,
+  ResetPasswordRequest,
 } from '~/server/requests/auth/reset-password/index.post'
 import { fetch } from '@nuxt/test-utils/e2e'
 
-export async function resetPasswordRequest(body: RequestBody) {
+export async function resetPasswordRequest(
+  body: ResetPasswordRequest['body'],
+) {
   return await fetch('/api/auth/reset-password', {
     body: JSON.stringify({
       email: body.email,
@@ -18,7 +20,9 @@ export async function resetPasswordRequest(body: RequestBody) {
   })
 }
 
-export async function confirmResetPasswordRequest(body: ConfirmRequestBody) {
+export async function confirmResetPasswordRequest(
+  body: ConfirmPasswordRequest['body'],
+) {
   return await fetch('/api/auth/reset-password/confirm', {
     body: JSON.stringify({
       token: body.token,

@@ -6,10 +6,12 @@ export const bodySchema = z.object({
   password: passwordSchema,
 })
 
-export type RequestBody = z.infer<typeof bodySchema>
+export type ConfirmPasswordRequest = Awaited<
+  ReturnType<typeof confirmResetPasswordRequest>
+>
 
 export async function confirmResetPasswordRequest(event: H3Event) {
   return {
-    body: await readValidatedBody(event, body => bodySchema.parse(body)),
+    body: await readValidatedBody(event, bodySchema.parse),
   }
 }

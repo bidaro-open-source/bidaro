@@ -10,28 +10,23 @@ export const paramsSchema = z.object({
   uid: primaryKeySchema,
 })
 
-export type SessionsRequestBody = z.infer<typeof bodySchema>
-
-export type SessionsRequestParams = z.infer<typeof paramsSchema>
+export type GetSessionsRequest = Awaited<
+  ReturnType<typeof getSessionsRequest>
+>
 
 export async function getSessionsRequest(event: H3Event) {
   return {
-    params: await getValidatedRouterParams(
-      event,
-      body => paramsSchema.parse(body),
-    ),
+    params: await getValidatedRouterParams(event, paramsSchema.parse),
   }
 }
 
+export type DeleteSessionsRequest = Awaited<
+  ReturnType<typeof deleteSessionsRequest>
+>
+
 export async function deleteSessionsRequest(event: H3Event) {
   return {
-    body: await readValidatedBody(
-      event,
-      body => bodySchema.parse(body),
-    ),
-    params: await getValidatedRouterParams(
-      event,
-      body => paramsSchema.parse(body),
-    ),
+    body: await readValidatedBody(event, bodySchema.parse),
+    params: await getValidatedRouterParams(event, paramsSchema.parse),
   }
 }

@@ -1,16 +1,8 @@
 import type registerApi from '~/server/api/auth/register.post'
-import type {
-  RequestBody as LoginRequestBody,
-} from '~/server/requests/auth/login.post'
-import type {
-  RequestBody as LogoutRequestBody,
-} from '~/server/requests/auth/logout.post'
-import type {
-  RequestBody as RefreshRequestBody,
-} from '~/server/requests/auth/refresh.post'
-import type {
-  RequestBody as RegisterRequestBody,
-} from '~/server/requests/auth/register.post'
+import type { LoginRequest } from '~/server/requests/auth/login.post'
+import type { LogoutRequest } from '~/server/requests/auth/logout.post'
+import type { RefreshRequest } from '~/server/requests/auth/refresh.post'
+import type { RegisterRequest } from '~/server/requests/auth/register.post'
 import type { AccessToken } from '~/server/utils/crypto-access-token'
 import { fetch } from '@nuxt/test-utils/e2e'
 
@@ -30,7 +22,7 @@ export async function destroyUser(uid: number) {
   return (await db.User.findByPk(uid))!.destroy()
 }
 
-export async function registerRequest(body: RegisterRequestBody) {
+export async function registerRequest(body: RegisterRequest['body']) {
   return await fetch('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({
@@ -44,7 +36,7 @@ export async function registerRequest(body: RegisterRequestBody) {
   })
 }
 
-export async function loginRequest(body: LoginRequestBody) {
+export async function loginRequest(body: LoginRequest['body']) {
   return await fetch('/api/auth/login', {
     body: JSON.stringify({
       username: body.username,
@@ -58,7 +50,7 @@ export async function loginRequest(body: LoginRequestBody) {
 }
 
 export async function logoutRequest(
-  body: LogoutRequestBody,
+  body: LogoutRequest['body'],
   options: { accessToken: AccessToken },
 ) {
   return await fetch('/api/auth/logout', {
@@ -74,7 +66,7 @@ export async function logoutRequest(
 }
 
 export async function refreshRequest(
-  body: RefreshRequestBody,
+  body: RefreshRequest['body'],
   options: { useBody?: boolean, useCookie?: boolean },
 ) {
   return await fetch('/api/auth/refresh', {

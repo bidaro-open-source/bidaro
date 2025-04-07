@@ -5,10 +5,12 @@ export const bodySchema = z.object({
   email: emailSchema,
 })
 
-export type RequestBody = z.infer<typeof bodySchema>
+export type ResetPasswordRequest = Awaited<
+  ReturnType<typeof resetPasswordRequest>
+>
 
 export async function resetPasswordRequest(event: H3Event) {
   return {
-    body: await readValidatedBody(event, body => bodySchema.parse(body)),
+    body: await readValidatedBody(event, bodySchema.parse),
   }
 }

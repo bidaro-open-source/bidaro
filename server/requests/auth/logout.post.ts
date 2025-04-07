@@ -6,7 +6,7 @@ export const bodySchema = z.object({
   refresh_token: refreshTokenSchema,
 })
 
-export type RequestBody = z.infer<typeof bodySchema>
+export type LogoutRequest = Awaited<ReturnType<typeof logoutRequest>>
 
 export async function logoutRequest(event: H3Event) {
   const refreshTokenCookie = getRefreshTokenCookie(event)
@@ -16,10 +16,7 @@ export async function logoutRequest(event: H3Event) {
     body = bodySchema.parse({ refresh_token: refreshTokenCookie })
   }
   else {
-    body = await readValidatedBody(
-      event,
-      body => bodySchema.parse(body || {}),
-    )
+    body = await readValidatedBody(event, body => bodySchema.parse(body || {}))
   }
 
   return {
