@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
   const defaultRole = await db.Role.findOne({
     where: { name: roles.USER },
-    attributes: ['id', 'name'],
+    attributes: ['name'],
   })
 
   if (!defaultRole) {
@@ -57,10 +57,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await db.User.create({
-    roleId: defaultRole.id,
     email: request.body.email,
     username: request.body.username,
     password: await hashPassword(event, request.body.password),
+    roleName: defaultRole.name,
   })
 
   const metadata = createRequestMetadata(event)
@@ -77,7 +77,6 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       username: user.username,
-      role: defaultRole,
     },
   }
 })

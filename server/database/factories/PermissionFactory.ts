@@ -14,7 +14,7 @@ export class PermissionFactory extends Factory<Permission> {
     const permission = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
 
     return {
-      name: attr.name ?? `#${permission}`,
+      name: attr.name ?? `p${permission}`,
       displayName: attr.displayName ?? null,
       description: attr.description ?? null,
     }

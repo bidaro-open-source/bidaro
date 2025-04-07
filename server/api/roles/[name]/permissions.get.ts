@@ -10,14 +10,20 @@ export default defineEventHandler(async (event) => {
 
   const db = useDatabase()
 
-  const role = await db.Role.findByPk(request.params.id)
+  const role = await db.Role.findByPk(request.params.name, {
+    include: {
+      model: db.Permission,
+      through: { attributes: [] },
+      as: 'permissions',
+    },
+  })
 
-  if (!role) {
+  if (!role || !role.permissions) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Role not found',
     })
   }
 
-  return role
+  return role.permissions
 })

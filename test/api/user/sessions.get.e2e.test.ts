@@ -1,19 +1,17 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~/server/constants'
 import { createUser } from '~/test/utils/creations/create-user'
 import { getSessionsRequest } from '~/test/utils/requests/sessions'
-import { usePermissions } from '~/test/utils/use-permissions'
 
 describe('session fetching', async () => {
   await setup()
 
   it('should return user sessions', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.VIEW_OWN_SESSIONS],
+      withPermissions: [permissions.VIEW_OWN_SESSIONS],
     })
 
     const response = await getSessionsRequest({
@@ -30,8 +28,6 @@ describe('session fetching', async () => {
   })
 
   it('should return user sessions when user have permission', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data1 = await createUser({
       withSession: true,
     })
@@ -39,7 +35,7 @@ describe('session fetching', async () => {
     const data2 = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.VIEW_ALL_SESSIONS],
+      withPermissions: [permissions.VIEW_ALL_SESSIONS],
     })
 
     const response = await getSessionsRequest({
@@ -58,8 +54,6 @@ describe('session fetching', async () => {
 
   describe('error handling', () => {
     it('should return error if sessions belongs to another user', async () => {
-      const { mappedPermissionsId } = await usePermissions()
-
       const data1 = await createUser({
         withSession: true,
       })
@@ -67,7 +61,7 @@ describe('session fetching', async () => {
       const data2 = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [mappedPermissionsId.VIEW_OWN_SESSIONS],
+        withPermissions: [permissions.VIEW_OWN_SESSIONS],
       })
 
       const response = await getSessionsRequest({

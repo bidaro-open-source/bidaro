@@ -14,7 +14,7 @@ export class RoleFactory extends Factory<Role> {
     const role = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
 
     return {
-      name: attr.name ?? `#${role}`,
+      name: attr.name ?? `r${role}`,
       displayName: attr.displayName ?? null,
       description: attr.description ?? null,
     }

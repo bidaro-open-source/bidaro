@@ -1,20 +1,18 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~/server/constants'
 import { createUser } from '~/test/utils/creations/create-user'
 import { loginRequest } from '~/test/utils/requests/authentication'
 import { deleteSessionsRequest } from '~/test/utils/requests/sessions'
-import { usePermissions } from '~/test/utils/use-permissions'
 
 describe('session deleting', async () => {
   await setup()
 
   it('should delete session', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
+      withPermissions: [permissions.DELETE_OWN_SESSIONS],
     })
 
     const response = await deleteSessionsRequest({
@@ -32,12 +30,10 @@ describe('session deleting', async () => {
   })
 
   it('should delete multiply sessions', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
+      withPermissions: [permissions.DELETE_OWN_SESSIONS],
     })
 
     const loginRequestBody = {
@@ -69,12 +65,10 @@ describe('session deleting', async () => {
   })
 
   it('should return false statuses when session not exists', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
+      withPermissions: [permissions.DELETE_OWN_SESSIONS],
     })
 
     const response = await deleteSessionsRequest({
@@ -93,12 +87,10 @@ describe('session deleting', async () => {
 
   describe('error handling', () => {
     it('should return error if sessions is empty', async () => {
-      const { mappedPermissionsId } = await usePermissions()
-
       const data = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
+        withPermissions: [permissions.DELETE_OWN_SESSIONS],
       })
 
       const response = await deleteSessionsRequest({
@@ -113,8 +105,6 @@ describe('session deleting', async () => {
     })
 
     it('should return error if sessions belongs to another user', async () => {
-      const { mappedPermissionsId } = await usePermissions()
-
       const data1 = await createUser({
         withSession: true,
       })
@@ -122,7 +112,7 @@ describe('session deleting', async () => {
       const data2 = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [mappedPermissionsId.DELETE_OWN_SESSIONS],
+        withPermissions: [permissions.DELETE_OWN_SESSIONS],
       })
 
       const response = await deleteSessionsRequest({

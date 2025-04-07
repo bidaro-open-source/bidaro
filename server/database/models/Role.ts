@@ -25,7 +25,6 @@ export type RoleCreationAttributes = InferCreationAttributes<Role>
 export type RoleAttributesOptional = MakeNullishOptional<RoleCreationAttributes>
 
 export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
-  declare id: CreationOptional<number>
   declare name: string
   declare displayName: string | null
   declare description: string | null
@@ -47,27 +46,27 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
   // Permission associations
   declare permissions?: NonAttribute<Permission[]>
   declare getPermissions: HasManyGetAssociationsMixin<Permission>
-  declare addPermission: HasManyAddAssociationMixin<Permission, number>
-  declare addPermissions: HasManyAddAssociationsMixin<Permission, number>
-  declare setPermissions: HasManySetAssociationsMixin<Permission, number>
-  declare removePermission: HasManyRemoveAssociationMixin<Permission, number>
-  declare removePermissions: HasManyRemoveAssociationsMixin<Permission, number>
-  declare hasPermission: HasManyHasAssociationMixin<Permission, number>
-  declare hasPermissions: HasManyHasAssociationsMixin<Permission, number>
+  declare addPermission: HasManyAddAssociationMixin<Permission, string>
+  declare addPermissions: HasManyAddAssociationsMixin<Permission, string>
+  declare setPermissions: HasManySetAssociationsMixin<Permission, string>
+  declare removePermission: HasManyRemoveAssociationMixin<Permission, string>
+  declare removePermissions: HasManyRemoveAssociationsMixin<Permission, string>
+  declare hasPermission: HasManyHasAssociationMixin<Permission, string>
+  declare hasPermissions: HasManyHasAssociationsMixin<Permission, string>
   declare countPermissions: HasManyCountAssociationsMixin
 
   static associate(database: Database) {
     database.Role.hasMany(database.User, {
       foreignKey: {
-        name: 'roleId',
+        name: 'roleName',
         allowNull: true,
       },
     })
 
     database.Role.belongsToMany(database.Permission, {
       through: 'roles_has_permissions',
-      foreignKey: 'roleId',
-      otherKey: 'permissionId',
+      foreignKey: 'role',
+      otherKey: 'permission',
       timestamps: false,
       as: 'permissions',
     })
@@ -77,15 +76,9 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
 export function InitializeRole(database: DatabaseOptional) {
   Role.init(
     {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       name: {
         type: DataTypes.STRING(64),
-        unique: true,
-        allowNull: false,
+        primaryKey: true,
       },
       displayName: {
         type: DataTypes.STRING(64),

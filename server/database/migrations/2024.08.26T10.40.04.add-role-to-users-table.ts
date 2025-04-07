@@ -5,14 +5,14 @@ export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
 
   try {
-    await queryInterface.addColumn('users', 'roleId', {
-      type: DataTypes.INTEGER,
+    await queryInterface.addColumn('users', 'roleName', {
+      type: DataTypes.STRING(64),
       defaultValue: null,
       allowNull: true,
       onUpdate: 'CASCADE',
       references: {
         model: 'roles',
-        key: 'id',
+        key: 'name',
       },
     })
   }
@@ -24,5 +24,5 @@ export const up: Migration = async ({ context }) => {
 export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
 
-  await queryInterface.removeColumn('users', 'roleId')
+  await queryInterface.removeColumn('users', 'roleName')
 }

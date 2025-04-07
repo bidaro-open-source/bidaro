@@ -8,15 +8,9 @@ export const up: Migration = async ({ context }) => {
 
   try {
     await queryInterface.createTable('roles', {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       name: {
         type: DataTypes.STRING(64),
-        unique: true,
-        allowNull: false,
+        primaryKey: true,
       },
       displayName: {
         type: DataTypes.STRING(64),
@@ -38,16 +32,9 @@ export const up: Migration = async ({ context }) => {
     }, { transaction })
 
     await queryInterface.createTable('permissions', {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false,
-      },
       name: {
         type: DataTypes.STRING(64),
-        unique: true,
-        allowNull: false,
+        primaryKey: true,
       },
       displayName: {
         type: DataTypes.STRING(64),
@@ -75,24 +62,24 @@ export const up: Migration = async ({ context }) => {
         autoIncrement: true,
         allowNull: false,
       },
-      roleId: {
-        type: DataTypes.INTEGER,
+      role: {
+        type: DataTypes.STRING(64),
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
         allowNull: false,
         references: {
           model: 'roles',
-          key: 'id',
+          key: 'name',
         },
       },
-      permissionId: {
-        type: DataTypes.INTEGER,
+      permission: {
+        type: DataTypes.STRING(64),
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
         allowNull: false,
         references: {
           model: 'permissions',
-          key: 'id',
+          key: 'name',
         },
       },
     }, { transaction })

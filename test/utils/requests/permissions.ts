@@ -13,9 +13,9 @@ export async function getPermissionsRequest(
 }
 
 export async function getPermissionRequest(
-  options: { id: number, accessToken: string },
+  options: { name: string, accessToken: string },
 ) {
-  return await fetch(`/api/permissions/${options.id}`, {
+  return await fetch(`/api/permissions/${options.name}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${options.accessToken}`,
@@ -25,9 +25,9 @@ export async function getPermissionRequest(
 }
 
 export async function getPermissionRolesRequest(
-  options: { id: number, accessToken: string },
+  options: { name: string, accessToken: string },
 ) {
-  return await fetch(`/api/permissions/${options.id}/roles`, {
+  return await fetch(`/api/permissions/${options.name}/roles`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${options.accessToken}`,

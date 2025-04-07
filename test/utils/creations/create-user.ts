@@ -4,7 +4,7 @@ import { loginRequest } from '../requests/authentication'
 interface CreateUserOptions {
   withRole?: boolean
   withSession?: boolean
-  withPermissions?: number[]
+  withPermissions?: string[]
 }
 
 interface BaseResult {
@@ -38,7 +38,7 @@ export async function createUser<T extends CreateUserOptions>(
 
   if (options.withRole || options.withPermissions) {
     role = await db.RoleFactory.new().create()
-    attributes.roleId = role.id
+    attributes.roleName = role.name
   }
 
   if (options.withPermissions && role) {

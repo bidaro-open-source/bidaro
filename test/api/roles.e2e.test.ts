@@ -1,8 +1,8 @@
 import type { Role } from '~/server/database'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~/server/constants'
 import { createUser } from '~/test/utils/creations/create-user'
-import { usePermissions } from '~/test/utils/use-permissions'
 import {
   getRolePermissionsRequest,
   getRoleRequest,
@@ -13,12 +13,10 @@ describe('roles fetching', async () => {
   await setup()
 
   it('should return all roles', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.VIEW_ALL_ROLES],
+      withPermissions: [permissions.VIEW_ALL_ROLES],
     })
 
     const response = await getRolesRequest({
@@ -26,55 +24,51 @@ describe('roles fetching', async () => {
     })
 
     const roles: Role[] = await response.json()
-    const role = roles.find(role => role.id === data.role.id)
+    const role = roles.find(role => role.name === data.role.name)
 
     expect(response.status).toBe(200)
-    expect(role && role.id).toBe(data.role.id)
+    expect(role && role.name).toBe(data.role.name)
 
     await data.clear()
   })
 
   it('should return one role', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.VIEW_ALL_ROLES],
+      withPermissions: [permissions.VIEW_ALL_ROLES],
     })
 
     const response = await getRoleRequest({
-      id: data.role.id,
+      name: data.role.name,
       accessToken: data.access_token,
     })
 
     const role = await response.json()
 
     expect(response.status).toBe(200)
-    expect(role && role.id).toBe(data.role.id)
+    expect(role && role.name).toBe(data.role.name)
 
     await data.clear()
   })
 
   it('should return permissions of role', async () => {
-    const { mappedPermissionsId } = await usePermissions()
-
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: [mappedPermissionsId.VIEW_ALL_ROLES],
+      withPermissions: [permissions.VIEW_ALL_ROLES],
     })
 
     const response = await getRolePermissionsRequest({
-      id: data.role.id,
+      name: data.role.name,
       accessToken: data.access_token,
     })
 
-    const permissions = await response.json()
+    const _permissions = await response.json()
 
     expect(response.status).toBe(200)
-    expect(permissions[0] && permissions[0].id).toEqual(
-      mappedPermissionsId.VIEW_ALL_ROLES,
+    expect(_permissions[0] && _permissions[0].name).toEqual(
+      permissions.VIEW_ALL_ROLES,
     )
 
     await data.clear()

@@ -29,7 +29,6 @@ export class Permission extends Model<
   PermissionAttributes,
   PermissionCreationAttributes
 > {
-  declare id: CreationOptional<number>
   declare name: string
   declare displayName: string | null
   declare description: string | null
@@ -39,20 +38,20 @@ export class Permission extends Model<
   // Role associations
   declare roles?: NonAttribute<Role[]>
   declare getRoles: HasManyGetAssociationsMixin<Role>
-  declare addRole: HasManyAddAssociationMixin<Role, number>
-  declare addRoles: HasManyAddAssociationsMixin<Role, number>
-  declare setRoles: HasManySetAssociationsMixin<Role, number>
-  declare removeRole: HasManyRemoveAssociationMixin<Role, number>
-  declare removeRoles: HasManyRemoveAssociationsMixin<Role, number>
-  declare hasRole: HasManyHasAssociationMixin<Role, number>
-  declare hasRoles: HasManyHasAssociationsMixin<Role, number>
+  declare addRole: HasManyAddAssociationMixin<Role, string>
+  declare addRoles: HasManyAddAssociationsMixin<Role, string>
+  declare setRoles: HasManySetAssociationsMixin<Role, string>
+  declare removeRole: HasManyRemoveAssociationMixin<Role, string>
+  declare removeRoles: HasManyRemoveAssociationsMixin<Role, string>
+  declare hasRole: HasManyHasAssociationMixin<Role, string>
+  declare hasRoles: HasManyHasAssociationsMixin<Role, string>
   declare countRoles: HasManyCountAssociationsMixin
 
   static associate(database: Database) {
     database.Permission.belongsToMany(database.Role, {
       through: 'roles_has_permissions',
-      foreignKey: 'permissionId',
-      otherKey: 'roleId',
+      foreignKey: 'permission',
+      otherKey: 'role',
       timestamps: false,
       as: 'roles',
     })
@@ -62,15 +61,9 @@ export class Permission extends Model<
 export function InitializePermission(database: DatabaseOptional) {
   Permission.init(
     {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       name: {
         type: DataTypes.STRING(64),
-        unique: true,
-        allowNull: false,
+        primaryKey: true,
       },
       displayName: {
         type: DataTypes.STRING(64),

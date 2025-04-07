@@ -27,7 +27,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
 
   // Role association
   declare role?: NonAttribute<Role>
-  declare roleId: ForeignKey<Role['id']> | null
+  declare roleName: ForeignKey<Role['name']> | null
   declare setRole: BelongsToSetAssociationMixin<Role, number>
   declare getRole: BelongsToGetAssociationMixin<Role>
 

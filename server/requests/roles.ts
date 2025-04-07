@@ -1,8 +1,7 @@
 import { z } from 'zod'
-import { primaryKeySchema } from '../zod/primary-key'
 
 export const paramsSchema = z.object({
-  id: primaryKeySchema,
+  name: z.string().min(1).max(64),
 })
 
 export async function getRoleRequest(event: H3Event) {
