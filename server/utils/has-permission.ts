@@ -1,4 +1,4 @@
-import type { Permission } from '../database'
+import type { permissions } from '../constants'
 
 /**
  * Returns true if the authenticated user have permission.
@@ -10,7 +10,7 @@ import type { Permission } from '../database'
  */
 export default function (
   event: H3Event,
-  permission: string,
+  permission: typeof permissions[keyof typeof permissions],
 ): boolean {
   const user = event.context.auth.user
 
@@ -26,9 +26,11 @@ export default function (
     return false
   }
 
-  const userPermissions = user.role.permissions.map(
-    (permissionItem: Permission) => permissionItem.name,
-  )
+  for (const userPermission of user.role.permissions) {
+    if (userPermission.name === permission) {
+      return true
+    }
+  }
 
-  return userPermissions.includes(permission)
+  return false
 }
