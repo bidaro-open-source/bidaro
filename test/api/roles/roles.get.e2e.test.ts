@@ -7,7 +7,7 @@ import {
   getRolePermissionsRequest,
   getRoleRequest,
   getRolesRequest,
-} from '../utils/requests/roles'
+} from '../../utils/requests/roles'
 
 describe('roles fetching', async () => {
   await setup()
