@@ -1,5 +1,5 @@
-import { getSessionsPolicy } from '~/server/policies/user/sessions'
-import { getSessionsRequest } from '~/server/requests/user/sessions'
+import { getSessionsPolicy } from '~/server/policies/users/sessions'
+import { getSessionsRequest } from '~/server/requests/users/sessions'
 import { getAuthenticationSessions } from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {

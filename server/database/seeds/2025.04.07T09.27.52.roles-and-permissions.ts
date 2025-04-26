@@ -2,32 +2,6 @@ import type { Seeder } from '.'
 import { permissions, roles } from '~/server/constants'
 
 export const up: Seeder = async ({ context }) => {
-  const view_all_roles = await context.PermissionFactory.new().create({
-    name: permissions.VIEW_ALL_ROLES,
-    displayName: 'Переглядати всі ролі',
-    description: 'Дозволяє переглядати ролі системи',
-  })
-
-  const create_role = await context.PermissionFactory.new().create({
-    name: permissions.CREATE_ROLE,
-  })
-
-  const update_role = await context.PermissionFactory.new().create({
-    name: permissions.UPDATE_ROLE,
-  })
-
-  const delete_role = await context.PermissionFactory.new().create({
-    name: permissions.DELETE_ROLE,
-  })
-
-  const assign_permission = await context.PermissionFactory.new().create({
-    name: permissions.ASSIGN_PERMISSION,
-  })
-
-  const view_all_permissions = await context.PermissionFactory.new().create({
-    name: permissions.VIEW_ALL_PERMISSIONS,
-  })
-
   const view_all_sessions = await context.PermissionFactory.new().create({
     name: permissions.VIEW_ALL_SESSIONS,
   })
@@ -61,12 +35,6 @@ export const up: Seeder = async ({ context }) => {
   })
 
   superuser.addPermissions([
-    view_all_permissions,
-    assign_permission,
-    view_all_roles,
-    create_role,
-    update_role,
-    delete_role,
     view_all_sessions,
     view_own_sessions,
     delete_all_sessions,
