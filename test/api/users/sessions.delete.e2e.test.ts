@@ -16,7 +16,6 @@ describe('session deleting', async () => {
     })
 
     const response = await deleteSessionsRequest({
-      uid: data.user.id,
       uuids: [data.session_uuid],
       accessToken: data.access_token,
     })
@@ -50,7 +49,6 @@ describe('session deleting', async () => {
     ).json()).session_uuid
 
     const response = await deleteSessionsRequest({
-      uid: data.user.id,
       uuids: [sessionUUID1, sessionUUID2],
       accessToken: data.access_token,
     })
@@ -72,7 +70,6 @@ describe('session deleting', async () => {
     })
 
     const response = await deleteSessionsRequest({
-      uid: data.user.id,
       uuids: ['fff'],
       accessToken: data.access_token,
     })
@@ -94,7 +91,6 @@ describe('session deleting', async () => {
       })
 
       const response = await deleteSessionsRequest({
-        uid: data.user.id,
         uuids: [],
         accessToken: data.access_token,
       })
@@ -104,27 +100,21 @@ describe('session deleting', async () => {
       await data.clear()
     })
 
-    it('should return error if sessions belongs to another user', async () => {
-      const data1 = await createUser({
-        withSession: true,
-      })
-
-      const data2 = await createUser({
+    it('should return error if user have not permissions', async () => {
+      const data = await createUser({
         withRole: true,
         withSession: true,
-        withPermissions: [permissions.DELETE_OWN_SESSIONS],
+        withPermissions: [],
       })
 
       const response = await deleteSessionsRequest({
-        uid: data1.user.id,
-        uuids: [data1.session_uuid],
-        accessToken: data2.access_token,
+        uuids: [data.session_uuid],
+        accessToken: data.access_token,
       })
 
       expect(response.status).toBe(403)
 
-      await data1.clear()
-      await data2.clear()
+      await data.clear()
     })
   })
 })

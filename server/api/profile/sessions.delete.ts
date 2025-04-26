@@ -3,14 +3,16 @@ import { deleteSessionsRequest } from '~/server/requests/users/sessions'
 import { deleteAuthenticationSessions } from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
-  mustBeAuthenticated(event)
+  const user = mustBeAuthenticated(event)
 
   const request = await validateRequest(event, deleteSessionsRequest)
 
-  mustBeAuthorized(event, deleteSessionsPolicy, request.params.uid)
+  mustBeAuthorized(event, deleteSessionsPolicy)
 
-  return await deleteAuthenticationSessions(
-    request.params.uid,
+  const sessions = await deleteAuthenticationSessions(
+    user.id,
     request.body.uuids,
   )
+
+  return sessions
 })
