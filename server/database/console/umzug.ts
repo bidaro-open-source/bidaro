@@ -45,6 +45,37 @@ export function createUmzug(options: UmzugOptions) {
       sequelize: context.sequelize,
       modelName: `${options.modelName}_meta`,
     }),
-    logger: console,
+    logger: {
+      info: (message: any) => {
+        const gray = '\x1B[90m'
+        const green = '\x1B[32m'
+        const white = '\x1B[37m'
+        const reset = '\x1B[0m'
+
+        if (typeof message !== 'object' || message === null) {
+          console.log(`${gray}[info] ${message}${reset}`)
+          return
+        }
+
+        const highlightEvents = ['up', 'down', 'reverted', 'migrated']
+        const isHighlight = highlightEvents.includes(message.event)
+        const textColor = isHighlight ? white : gray
+        const valueColor = isHighlight ? green : gray
+        const parts = []
+
+        for (const key in message) {
+          if (Object.prototype.hasOwnProperty.call(message, key)) {
+            const event = `${textColor}${key}${reset}`
+            const value = `${valueColor}${message[key]}${reset}`
+            parts.push(`${event}: ${value}`)
+          }
+        }
+
+        console.log(`${gray}[INFO]${reset} ${parts.join(`${gray}, ${reset}`)}`)
+      },
+      warn: message => console.warn(message),
+      error: message => console.error(message),
+      debug: message => console.debug(message),
+    },
   })
 }
