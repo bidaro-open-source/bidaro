@@ -57,6 +57,7 @@
     "vitest": "^3.1.1"
   },
   "trustedDependencies": [
-    "@parcel/watcher"
+    "@parcel/watcher",
+    "bcrypt"
   ]
 }

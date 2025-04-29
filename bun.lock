@@ -36,6 +36,7 @@
     },
   },
   "trustedDependencies": [
+    "bcrypt",
     "@parcel/watcher",
   ],
   "packages": {
