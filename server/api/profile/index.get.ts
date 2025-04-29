@@ -1,7 +1,9 @@
 export default defineEventHandler(async (event) => {
-  const user = mustBeAuthenticated(event)
+  mustBeAuthenticated(event)
 
   const db = useDatabase(event)
+
+  const user = getAuthenticatedUser(event)
 
   const userInDB = await db.User.findOne({
     where: { id: user.id },

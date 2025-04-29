@@ -7,6 +7,8 @@ import {
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  const user = getAuthenticatedUser(event)
+
   const request = await validateRequest(event, logoutRequest)
 
   const session = await getAuthenticationSession(request.body.refresh_token)
@@ -18,7 +20,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (session.uid !== event.context.auth.uid) {
+  if (session.uid !== user.id) {
     throw createError({
       statusCode: 403,
       message: 'Немає доступу до цього токену',

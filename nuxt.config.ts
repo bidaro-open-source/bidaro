@@ -2,13 +2,16 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
+
   modules: [
     '@bg-dev/nuxt-s3',
   ],
+
   s3: {
     driver: 's3',
     server: false,
   },
+
   runtimeConfig: {
     db: {
       host: '',
@@ -52,4 +55,6 @@ export default defineNuxtConfig({
       hashRounds: '',
     },
   },
+
+  compatibilityDate: '2025-04-29',
 })

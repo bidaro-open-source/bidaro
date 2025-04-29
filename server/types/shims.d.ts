@@ -7,11 +7,8 @@ declare global {
 
 declare module 'h3' {
   interface H3EventContext {
-    auth: {
-      isAuthenticated: boolean
-      assessToken?: AccessToken
-      user?: User
-      uid?: AccessTokenPayload['uid']
+    auth?: {
+      user: User
     }
   }
 }

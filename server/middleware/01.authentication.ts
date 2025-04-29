@@ -1,7 +1,24 @@
+/**
+ * Checks the request for an access token in the `Authorization` header.
+ *
+ * If the `Authorization` header is not present, skip the middleware.
+ *
+ * Otherwise checks:
+ * - authorization method is allowed
+ * - access token is present, valid and not expired
+ * - user exists in the database
+ *
+ * After checking the request, modifies the request context with the
+ * authenticated user data.
+ *
+ * Context data:
+ * - `User` inctance with all attributes
+ * - `User` include `Role` association with all attributes
+ * - `Role` include `Permission` association with all attributes
+ *
+ * @throws 401 Unauthorized
+ */
 export default defineEventHandler(async (event) => {
-  event.context.auth = { isAuthenticated: false }
-
-  const db = useDatabase(event)
   const authorization = getRequestHeader(event, 'Authorization')
 
   if (!authorization)
@@ -27,6 +44,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const db = useDatabase(event)
+
   const payload = decodeAccessToken(token)
 
   const user = await db.User.findOne({
@@ -39,7 +58,6 @@ export default defineEventHandler(async (event) => {
           {
             model: db.Permission,
             as: 'permissions',
-            attributes: ['name'],
           },
         ],
       },
@@ -48,14 +66,11 @@ export default defineEventHandler(async (event) => {
 
   if (!user) {
     throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
       message: 'Користувач до якого є доступ не існує',
     })
   }
 
-  event.context.auth.uid = payload.uid
-  event.context.auth.user = user
-  event.context.auth.assessToken = token
-  event.context.auth.isAuthenticated = true
+  event.context.auth = { user }
 })
