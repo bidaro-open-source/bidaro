@@ -2,10 +2,11 @@
 
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { createUmzug } from '../umzug'
+import { createUmzug } from './umzug'
 
 export const migrator = createUmzug({
   directory: 'server/database/migrations',
+  template: 'server/database/console/template-migration.ts',
   modelName: 'migrations',
 })
 

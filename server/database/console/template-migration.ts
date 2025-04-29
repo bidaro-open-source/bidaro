@@ -1,4 +1,4 @@
-import type { Migration } from '.'
+import type { Migration } from '../console/migrator-cli'
 
 export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()

@@ -4,13 +4,13 @@ import type {
   DatabaseOptional,
   DatabaseWithFactories,
   DatabaseWithFactoriesOptional,
-} from './types.js'
+} from './types'
 
 import { factories } from './factories'
 import { models } from './models'
 
 /**
- * Bootstrap database.
+ * Bootstrap database. Import all models and associate them.
  *
  * @param sequelize sequelize instance
  * @returns database object with models
@@ -35,7 +35,8 @@ export function BootstrapDatabase(sequelize: Sequelize): Database {
 }
 
 /**
- * Bootstrap factories.
+ * Bootstrap factories. Import all factories and associate them
+ * with the database.
  *
  * @param database database with models
  * @returns database object with factories

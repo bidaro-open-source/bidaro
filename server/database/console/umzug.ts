@@ -1,20 +1,21 @@
-import type { Database, DatabaseWithFactories } from './types'
+import type { Database, DatabaseWithFactories } from '../types'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { Sequelize } from 'sequelize'
 import { SequelizeStorage, Umzug } from 'umzug'
-import { BootstrapDatabase, BootstrapFactories } from './bootstrap'
+import { BootstrapDatabase, BootstrapFactories } from '../bootstrap'
 
 interface UmzugOptions {
   directory: string
   modelName: string
+  template: string
 }
 
 export function createUmzug(options: UmzugOptions) {
-  const ROOT_DIR = path.join(__dirname, '..', '..')
+  const ROOT_DIR = path.join(__dirname, '..', '..', '..')
   const TARGET_DIR = path.join(ROOT_DIR, options.directory)
-  const TEMPLATE_FILE = path.join(ROOT_DIR, options.directory, 'template.ts')
+  const TEMPLATE_FILE = path.join(ROOT_DIR, options.template)
   const GLOB = path.join(TARGET_DIR, '[0-9]*.ts')
 
   const connection = new Sequelize({

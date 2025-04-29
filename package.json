@@ -15,12 +15,15 @@
     "lint": "eslint --cache .",
     "lint:fix": "eslint . --fix",
     "lint:staged": "lint-staged",
-    "db": "bun run db:undo && bun run db:migrate && bun run db:seed",
-    "db:undo": "bun server/database/seeds down --to 0 && bun server/database/migrations down --to 0",
-    "db:seed": "bun server/database/seeds up",
-    "db:migrate": "bun server/database/migrations up",
-    "db:seed:create": "bun server/database/seeds create --name",
-    "db:migrate:create": "bun server/database/migrations create --name"
+    "db": "bun run db:reset && bun run db:seed",
+    "db:reset": "bun run db:undo && bun run db:migrate",
+    "db:undo": "bun run db:undo:seed && bun run db:undo:migrate",
+    "db:undo:seed": "bun server/database/console/seeder-cli down --to 0",
+    "db:undo:migrate": "bun server/database/console/migrator-cli down --to 0",
+    "db:seed": "bun server/database/console/seeder-cli up",
+    "db:migrate": "bun server/database/console/migrator-cli up",
+    "db:create:seed": "bun server/database/console/seeder-cli create --name",
+    "db:create:migrate": "bun server/database/console/migrator-cli create --name"
   },
   "dependencies": {
     "@bg-dev/nuxt-s3": "^2.0.2",

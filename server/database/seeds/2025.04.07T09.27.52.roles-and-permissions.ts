@@ -1,4 +1,4 @@
-import type { Seeder } from '.'
+import type { Seeder } from '../console/seeder-cli'
 import { permissions, roles } from '~/server/constants'
 
 export const up: Seeder = async ({ context }) => {

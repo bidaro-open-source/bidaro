@@ -1,4 +1,4 @@
-import type { Migration } from '.'
+import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
 
 export const up: Migration = async ({ context }) => {

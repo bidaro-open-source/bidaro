@@ -2,10 +2,11 @@
 
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { createUmzug } from '../umzug'
+import { createUmzug } from './umzug'
 
 export const seeder = createUmzug({
   directory: 'server/database/seeds',
+  template: 'server/database/console/template-seed.ts',
   modelName: 'seeders',
 })
 
