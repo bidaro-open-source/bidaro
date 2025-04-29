@@ -1,8 +1,8 @@
 import type {
+  Database,
   Role,
   RoleAttributes,
   RoleAttributesOptional,
-  RoleModel,
 } from '~/server/database'
 import { Factory } from '../class/Factory'
 
@@ -21,7 +21,7 @@ export class RoleFactory extends Factory<Role> {
   }
 }
 
-export function InitializeRoleFactroy(model: RoleModel): typeof RoleFactory {
-  RoleFactory.init(model)
+export function InitializeRoleFactroy(database: Database) {
+  RoleFactory.init(database.Role)
   return RoleFactory
 }

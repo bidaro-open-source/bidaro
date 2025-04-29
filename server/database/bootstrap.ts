@@ -5,12 +5,9 @@ import type {
   DatabaseWithFactories,
   DatabaseWithFactoriesOptional,
 } from './types.js'
-import { InitializePermissionFactroy } from './factories/PermissionFactory.js'
-import { InitializeRoleFactroy } from './factories/RoleFactory.js'
-import { InitializeUserFactroy } from './factories/UserFactory'
-import { InitializePermission } from './models/Permission'
-import { InitializeRole } from './models/Role'
-import { InitializeUser } from './models/User'
+
+import { factories } from './factories'
+import { models } from './models'
 
 /**
  * Bootstrap database.
@@ -21,9 +18,10 @@ import { InitializeUser } from './models/User'
 export function BootstrapDatabase(sequelize: Sequelize): Database {
   const database: DatabaseOptional = { sequelize }
 
-  database.Permission = InitializePermission(database)
-  database.Role = InitializeRole(database)
-  database.User = InitializeUser(database)
+  for (const key in models) {
+    // @ts-expect-error typescript error
+    database[key] = models[key](database)
+  }
 
   for (const key in database) {
     const Model = database[key as keyof typeof database]
@@ -47,11 +45,10 @@ export function BootstrapFactories(
 ): DatabaseWithFactories {
   const databaseWithFactories: DatabaseWithFactoriesOptional = database
 
-  databaseWithFactories.PermissionFactory = InitializePermissionFactroy(
-    database.Permission,
-  )
-  databaseWithFactories.RoleFactory = InitializeRoleFactroy(database.Role)
-  databaseWithFactories.UserFactory = InitializeUserFactroy(database.User)
+  for (const key in factories) {
+    // @ts-expect-error typescript error
+    databaseWithFactories[key] = factories[key](databaseWithFactories)
+  }
 
   return databaseWithFactories as DatabaseWithFactories
 }

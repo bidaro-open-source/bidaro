@@ -1,8 +1,8 @@
 import type {
+  Database,
   User,
   UserAttributes,
   UserAttributesOptional,
-  UserModel,
 } from '~/server/database'
 import { hashSync } from 'bcrypt'
 import { Factory } from '../class/Factory'
@@ -31,7 +31,7 @@ export class UserFactory extends Factory<User> {
   }
 }
 
-export function InitializeUserFactroy(model: UserModel): typeof UserFactory {
-  UserFactory.init(model)
+export function InitializeUserFactroy(database: Database) {
+  UserFactory.init(database.User)
   return UserFactory
 }

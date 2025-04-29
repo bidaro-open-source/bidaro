@@ -1,8 +1,8 @@
 import type {
+  Database,
   Permission,
   PermissionAttributes,
   PermissionAttributesOptional,
-  PermissionModel,
 } from '~/server/database'
 import { Factory } from '../class/Factory'
 
@@ -22,8 +22,8 @@ export class PermissionFactory extends Factory<Permission> {
 }
 
 export function InitializePermissionFactroy(
-  model: PermissionModel,
+  database: Database,
 ): typeof PermissionFactory {
-  PermissionFactory.init(model)
+  PermissionFactory.init(database.Permission)
   return PermissionFactory
 }

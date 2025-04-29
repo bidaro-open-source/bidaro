@@ -1,21 +1,18 @@
 import type { Sequelize } from 'sequelize'
-import type { InitializePermissionFactroy } from './factories/PermissionFactory'
-import type { InitializeRoleFactroy } from './factories/RoleFactory'
-import type { InitializeUserFactroy } from './factories/UserFactory'
-import type { InitializePermission } from './models/Permission'
-import type { InitializeRole } from './models/Role'
-import type { InitializeUser } from './models/User'
 
-export interface DatabaseModels {
-  Permission: ReturnType<typeof InitializePermission>
-  Role: ReturnType<typeof InitializeRole>
-  User: ReturnType<typeof InitializeUser>
+import type { factories } from './factories'
+import type { models } from './models'
+
+export type Models = typeof models
+
+export type Factories = typeof factories
+
+export type DatabaseModels = {
+  -readonly [K in keyof Models]: ReturnType<Models[K]>;
 }
 
-export interface DatabaseFactories {
-  PermissionFactory: ReturnType<typeof InitializePermissionFactroy>
-  RoleFactory: ReturnType<typeof InitializeRoleFactroy>
-  UserFactory: ReturnType<typeof InitializeUserFactroy>
+export type DatabaseFactories = {
+  -readonly [K in keyof Factories]: ReturnType<Factories[K]>;
 }
 
 export interface DatabaseOptional extends Partial<DatabaseModels> {
