@@ -3,9 +3,7 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
-  modules: [
-    '@bg-dev/nuxt-s3',
-  ],
+  modules: ['@bg-dev/nuxt-s3', '@pinia/nuxt'],
 
   s3: {
     driver: 's3',
