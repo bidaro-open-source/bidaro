@@ -9,7 +9,7 @@ import type { Permission, Role, User } from '../database'
  * @throws 401 Unauthorized
  */
 export function mustBeAuthenticated(event: H3Event): void {
-  if (event.context.auth && !event.context.auth.user) {
+  if (!event.context.auth || !event.context.auth.user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Необхідна авторизація',
