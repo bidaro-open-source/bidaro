@@ -1,6 +1,5 @@
 export const roles = {
   USER: 'user',
-  SUPERUSER: 'superuser',
 } as const
 
 export const permissions = {

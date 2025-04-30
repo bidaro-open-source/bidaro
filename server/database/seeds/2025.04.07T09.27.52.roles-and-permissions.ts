@@ -20,14 +20,4 @@ export const up: Seeder = async ({ context }) => {
     view_own_sessions,
     delete_own_sessions,
   ])
-
-  const superuser = await context.RoleFactory.new().create({
-    name: roles.SUPERUSER,
-    displayName: 'Супер користувач',
-  })
-
-  superuser.addPermissions([
-    view_own_sessions,
-    delete_own_sessions,
-  ])
 }
