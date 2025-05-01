@@ -10,9 +10,8 @@ const loginFormPassword = ref('password')
     <div>User authed: {{ auth.isAuthenticated }}</div>
 
     <div v-if="auth.isAuthenticated">
-      <div>Auth access token: {{ auth.access_token }}</div>
-      <div>Auth refresh token: {{ auth.refresh_token }}</div>
-      <div>Auth session token: {{ auth.session_uuid }}</div>
+      <div>Auth access token: {{ auth.accessToken }}</div>
+      <div>Auth session token: {{ auth.sessionUuid }}</div>
 
       <button @click="auth.refresh">
         Refresh

@@ -1,12 +1,18 @@
 import { defineStore } from 'pinia'
+import { decodeJwt } from '~/uitls/decode-jwt'
 
-export interface AuthStoreState {
+interface AuthResponse {
+  access_token: string
+  session_uuid: string
+}
+
+interface AuthStoreState {
   isLogouting: boolean
   isRefreshing: boolean
   isAuthenticating: boolean
-  access_token: string | null
-  refresh_token: string | null
-  session_uuid: string | null
+  sessionUuid: string | null
+  accessToken: string | null
+  accessTokenExp: number | null
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -14,14 +20,35 @@ export const useAuthStore = defineStore('auth', {
     isLogouting: false,
     isRefreshing: false,
     isAuthenticating: false,
-    access_token: null,
-    refresh_token: null,
-    session_uuid: null,
+    accessToken: null,
+    accessTokenExp: null,
+    sessionUuid: null,
   }),
   getters: {
-    isAuthenticated: state => !!state.access_token,
+    isAuthenticated: state => !!state.accessToken,
+
+    isTokenExpiring(): boolean {
+      if (this.accessTokenExp) {
+        const accessTokenExpDate = this.accessTokenExp - 30
+        const nowTime = Math.floor(Date.now() / 1000)
+        return accessTokenExpDate <= nowTime
+      }
+
+      return false
+    },
   },
   actions: {
+    setStore(data: AuthResponse) {
+      const payload = decodeJwt<{ uid: number, exp: number }>(data.access_token)
+
+      if (!payload)
+        throw new Error('Invalid jwt access token')
+
+      this.accessToken = data.access_token
+      this.accessTokenExp = payload.exp
+      this.sessionUuid = data.session_uuid
+    },
+
     async register({ email, username, password }: any) {
       try {
         this.isAuthenticating = true
@@ -35,9 +62,7 @@ export const useAuthStore = defineStore('auth', {
           },
         })
 
-        this.access_token = data.access_token
-        this.refresh_token = data.refresh_token
-        this.session_uuid = data.session_uuid
+        this.setStore(data)
       }
       finally {
         this.isAuthenticating = false
@@ -56,9 +81,7 @@ export const useAuthStore = defineStore('auth', {
           },
         })
 
-        this.access_token = data.access_token
-        this.refresh_token = data.refresh_token
-        this.session_uuid = data.session_uuid
+        this.setStore(data)
       }
       finally {
         this.isAuthenticating = false
@@ -69,13 +92,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.isRefreshing = true
 
-        const data = await useApi('/api/auth/refresh', {
-          method: 'POST',
-        })
+        const data = await useApi('/api/auth/refresh', { method: 'POST' })
 
-        this.access_token = data.access_token
-        this.refresh_token = data.refresh_token
-        this.session_uuid = data.session_uuid
+        this.setStore(data)
       }
       catch (err: any) {
         if (err.status !== 422)
@@ -90,15 +109,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.isLogouting = true
 
-        await useApi('/api/auth/logout', {
-          method: 'POST',
-        })
+        await useApi('/api/auth/logout', { method: 'POST' })
 
-        console.log('Logout successful')
-
-        this.access_token = null
-        this.refresh_token = null
-        this.session_uuid = null
+        this.$reset()
       }
       finally {
         this.isLogouting = false
