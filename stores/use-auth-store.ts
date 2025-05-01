@@ -44,15 +44,12 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async register({ email, username, password }: any) {
       try {
+        const api = useApiStore()
+
         this.isAuthenticating = true
 
-        const data = await useApi('/api/auth/register', {
-          method: 'POST',
-          body: {
-            email,
-            username,
-            password,
-          },
+        const data = await api.auth.register({
+          body: { email, username, password },
         })
 
         this.setStore(data)
@@ -65,14 +62,12 @@ export const useAuthStore = defineStore('auth', {
 
     async login({ username, password }: any) {
       try {
+        const api = useApiStore()
+
         this.isAuthenticating = true
 
-        const data = await useApi('/api/auth/login', {
-          method: 'POST',
-          body: {
-            username,
-            password,
-          },
+        const data = await api.auth.login({
+          body: { username, password },
         })
 
         this.setStore(data)
@@ -85,9 +80,11 @@ export const useAuthStore = defineStore('auth', {
 
     async refresh() {
       try {
+        const api = useApiStore()
+
         this.isRefreshing = true
 
-        const data = await useApi('/api/auth/refresh', { method: 'POST' })
+        const data = await api.auth.refresh()
 
         this.setStore(data)
       }
@@ -103,9 +100,11 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
+        const api = useApiStore()
+
         this.isLogouting = true
 
-        await useApi('/api/auth/logout', { method: 'POST' })
+        await api.auth.logout()
 
         this.$reset()
       }
