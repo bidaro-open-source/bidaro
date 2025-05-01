@@ -3,6 +3,7 @@ useAuthInitialize()
 useAuthRepeatReqestFeature()
 useAuthHeadersRequestFeature()
 useAuthAutorefreshFeature()
+useAuthMultitabsFeature()
 </script>
 
 <template>

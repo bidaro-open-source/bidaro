@@ -77,3 +77,26 @@ export function useAuthAutorefreshFeature() {
       auth.refresh()
   }, 30000)
 }
+
+/**
+ * Automatically syncing the auth store state between browser tabs
+ * by Broadcast Channel.
+ */
+export function useAuthMultitabsFeature() {
+  const auth = useAuthStore()
+  const broadcast = useBroadcast(auth.$id)
+
+  const { onMessage, setEmmiter, unsetEmmiter } = auth.useSynchronize()
+
+  const onBroadcastMessage = (event: MessageEvent) => onMessage(event.data)
+
+  onMounted(() => {
+    setEmmiter((data: string) => broadcast.postMessage(data))
+    broadcast.addEventListener('message', onBroadcastMessage)
+  })
+
+  onUnmounted(() => {
+    unsetEmmiter()
+    broadcast.removeEventListener('message', onBroadcastMessage)
+  })
+}

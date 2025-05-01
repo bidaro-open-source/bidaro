@@ -15,6 +15,8 @@ interface AuthStoreState {
   accessTokenExp: number | null
 }
 
+let authStoreSync = () => {}
+
 export const useAuthStore = defineStore('auth', {
   state: (): AuthStoreState => ({
     isLogouting: false,
@@ -25,6 +27,8 @@ export const useAuthStore = defineStore('auth', {
     sessionUuid: null,
   }),
   getters: {
+    sync: () => authStoreSync,
+
     isAuthenticated: state => !!state.accessToken,
 
     isTokenExpiring(): boolean {
@@ -38,17 +42,6 @@ export const useAuthStore = defineStore('auth', {
     },
   },
   actions: {
-    setStore(data: AuthResponse) {
-      const payload = decodeJwt<{ uid: number, exp: number }>(data.access_token)
-
-      if (!payload)
-        throw new Error('Invalid jwt access token')
-
-      this.accessToken = data.access_token
-      this.accessTokenExp = payload.exp
-      this.sessionUuid = data.session_uuid
-    },
-
     async register({ email, username, password }: any) {
       try {
         this.isAuthenticating = true
@@ -66,6 +59,7 @@ export const useAuthStore = defineStore('auth', {
       }
       finally {
         this.isAuthenticating = false
+        this.sync()
       }
     },
 
@@ -85,6 +79,7 @@ export const useAuthStore = defineStore('auth', {
       }
       finally {
         this.isAuthenticating = false
+        this.sync()
       }
     },
 
@@ -102,6 +97,7 @@ export const useAuthStore = defineStore('auth', {
       }
       finally {
         this.isRefreshing = false
+        this.sync()
       }
     },
 
@@ -115,6 +111,28 @@ export const useAuthStore = defineStore('auth', {
       }
       finally {
         this.isLogouting = false
+        this.sync()
+      }
+    },
+
+    setStore(data: AuthResponse) {
+      const payload = decodeJwt<{ uid: number, exp: number }>(data.access_token)
+
+      if (!payload)
+        throw new Error('Invalid jwt access tokden')
+
+      this.accessToken = data.access_token
+      this.accessTokenExp = payload.exp
+      this.sessionUuid = data.session_uuid
+    },
+
+    useSynchronize() {
+      return {
+        onMessage: (data: string) => this.$patch(JSON.parse(data)),
+        setEmmiter: (emitter: (data: string) => void) => {
+          authStoreSync = () => emitter(JSON.stringify(this.$state))
+        },
+        unsetEmmiter: () => { authStoreSync = () => {} },
       }
     },
   },
