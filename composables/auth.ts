@@ -17,7 +17,7 @@ export function useAuthInitialize() {
  */
 export function useAuthRepeatReqestFeature() {
   const auth = useAuthStore()
-  const { addInterceptor, removeInterceptor } = useApiInterceptor()
+  const { addInterceptor, removeInterceptor } = useApiStore()
 
   async function onResponseErrorHanlder(ctx: FetchContext) {
     if (
@@ -46,7 +46,7 @@ export function useAuthRepeatReqestFeature() {
  */
 export function useAuthHeadersRequestFeature() {
   const auth = useAuthStore()
-  const { addInterceptor, removeInterceptor } = useApiInterceptor()
+  const { addInterceptor, removeInterceptor } = useApiStore()
 
   function onRequestHanlder(ctx: FetchContext) {
     if (ctx.request !== '/api/auth/refresh' && auth.isAuthenticated) {
