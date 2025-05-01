@@ -1,3 +1,5 @@
+import { fetchUser } from '../services/users-service'
+
 /**
  * Checks the request for an access token in the `Authorization` header.
  *
@@ -44,25 +46,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const db = useDatabase(event)
-
   const payload = decodeAccessToken(token)
 
-  const user = await db.User.findOne({
-    where: { id: payload.uid },
-    include: [
-      {
-        model: db.Role,
-        as: 'role',
-        include: [
-          {
-            model: db.Permission,
-            as: 'permissions',
-          },
-        ],
-      },
-    ],
-  })
+  const user = await fetchUser(payload.uid)
 
   if (!user) {
     throw createError({

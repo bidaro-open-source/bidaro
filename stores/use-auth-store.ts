@@ -49,6 +49,7 @@ export const useAuthStore = defineStore('auth', {
     async register({ email, username, password }: any) {
       try {
         const api = useApiStore()
+        const profile = useProfileStore()
 
         this.isAuthenticating = true
 
@@ -57,6 +58,7 @@ export const useAuthStore = defineStore('auth', {
         })
 
         this.setStore(data)
+        profile.setStore(data)
       }
       catch (err) {
         this.error = err
@@ -70,6 +72,7 @@ export const useAuthStore = defineStore('auth', {
     async login({ username, password }: any) {
       try {
         const api = useApiStore()
+        const profile = useProfileStore()
 
         this.isAuthenticating = true
 
@@ -78,6 +81,7 @@ export const useAuthStore = defineStore('auth', {
         })
 
         this.setStore(data)
+        profile.setStore(data)
       }
       catch (err) {
         this.error = err
@@ -91,12 +95,14 @@ export const useAuthStore = defineStore('auth', {
     async refresh() {
       try {
         const api = useApiStore()
+        const profile = useProfileStore()
 
         this.isRefreshing = true
 
         const data = await api.auth.refresh()
 
         this.setStore(data)
+        profile.setStore(data)
       }
       catch (err: any) {
         if (err.response.status !== 422)
@@ -111,12 +117,14 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       try {
         const api = useApiStore()
+        const profile = useProfileStore()
 
         this.isLogouting = true
 
         await api.auth.logout()
 
         this.$reset()
+        profile.$reset()
       }
       catch (err) {
         this.error = err

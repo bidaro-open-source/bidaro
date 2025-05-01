@@ -1,15 +1,12 @@
 import { z } from 'zod'
 import { loginRequest } from '~/server/requests/auth/login.post'
 import { createAuthenticationSession } from '~/server/services/authentication'
+import { fetchUserByUsername } from '~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
-  const db = useDatabase(event)
-
   const request = await validateRequest(event, loginRequest)
 
-  const user = await db.User.findOne({
-    where: { username: request.body.username },
-  })
+  const user = await fetchUserByUsername(request.body.username)
 
   if (!user) {
     throw createError({
@@ -49,9 +46,21 @@ export default defineEventHandler(async (event) => {
     refresh_token: session.refreshToken,
     session_uuid: session.uuid,
     user: {
-      id: user.id,
+      id: user.id as number,
       email: user.email,
       username: user.username,
     },
+    role: user.role
+      ? { name: user.role.name }
+      : null,
+    permissions: user.role
+      ? user.role.permissions
+        ? user.role.permissions.map(p => ({
+            name: p.name,
+            displayName: p.displayName,
+            description: p.description,
+          }))
+        : []
+      : [],
   }
 })

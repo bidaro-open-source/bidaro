@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const auth = useAuthStore()
+const profile = useProfileStore()
 
 const loginFormUsername = ref('test')
 const loginFormPassword = ref('password')
@@ -13,6 +14,27 @@ const loginFormPassword = ref('password')
       <div>Auth access token: {{ auth.accessToken }}</div>
       <div>Auth session token: {{ auth.sessionUuid }}</div>
 
+      <ul>
+        <li>User name: {{ profile.user?.username }}</li>
+        <li>Email: {{ profile.user?.email }}</li>
+        <li>Role: {{ profile.role }}</li>
+        <li>
+          Permission:
+
+          <ul>
+            <li
+              v-for="permission in profile.permissions" :key="permission.name"
+            >
+              {{ permission.displayName
+                ? permission.displayName : permission.name }}
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <button @click="profile.fetchProfile">
+        Refetch profile
+      </button>
       <button @click="auth.refresh">
         Refresh
       </button>
@@ -33,7 +55,11 @@ const loginFormPassword = ref('password')
     </div>
 
     <div v-if="auth.isError">
-      {{ auth.error }}
+      Auth error: {{ auth.error }}
+    </div>
+
+    <div v-if="profile.isError">
+      Profile error: {{ profile.error }}
     </div>
 
     <div v-if="auth.isAuthenticating || auth.isLogouting || auth.isRefreshing">

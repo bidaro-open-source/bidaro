@@ -46,7 +46,15 @@ export default defineEventHandler(async (event) => {
 
   const defaultRole = await db.Role.findOne({
     where: { name: roles.USER },
-    attributes: ['name'],
+    include: [
+      {
+        model: db.Permission,
+        as: 'permissions',
+        through: {
+          attributes: [],
+        },
+      },
+    ],
   })
 
   if (!defaultRole) {
@@ -74,9 +82,21 @@ export default defineEventHandler(async (event) => {
     refresh_token: session.refreshToken,
     session_uuid: session.uuid,
     user: {
-      id: user.id,
+      id: user.id as number,
       email: user.email,
       username: user.username,
     },
+    role: user.role
+      ? { name: user.role.name }
+      : null,
+    permissions: user.role
+      ? user.role.permissions
+        ? user.role.permissions.map(p => ({
+            name: p.name,
+            displayName: p.displayName,
+            description: p.description,
+          }))
+        : []
+      : [],
   }
 })

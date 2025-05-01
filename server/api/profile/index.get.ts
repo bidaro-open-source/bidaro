@@ -1,27 +1,11 @@
+import { fetchUser } from '~/server/services/users-service'
+
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const db = useDatabase(event)
-
   const user = getAuthenticatedUser(event)
 
-  const userInDB = await db.User.findOne({
-    where: { id: user.id },
-    include: [
-      {
-        model: db.Role,
-        as: 'role',
-        attributes: ['name'],
-        include: [
-          {
-            model: db.Permission,
-            as: 'permissions',
-            attributes: ['name'],
-          },
-        ],
-      },
-    ],
-  })
+  const userInDB = await fetchUser(user.id)
 
   if (!userInDB) {
     throw createError({
@@ -31,5 +15,23 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return userInDB
+  return {
+    user: {
+      id: user.id as number,
+      email: user.email,
+      username: user.username,
+    },
+    role: user.role
+      ? { name: user.role.name }
+      : null,
+    permissions: user.role
+      ? user.role.permissions
+        ? user.role.permissions.map(p => ({
+            name: p.name,
+            displayName: p.displayName,
+            description: p.description,
+          }))
+        : []
+      : [],
+  }
 })
