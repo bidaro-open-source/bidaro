@@ -32,8 +32,22 @@ const loginFormPassword = ref('password')
         </li>
       </ul>
 
+      <div>Sessions:</div>
+
+      <ul>
+        <li v-for="session in profile.sessions" :key="session.uuid">
+          {{ session.uuid }}
+          <button @click="profile.deleteSessions(session.uuid)">
+            X
+          </button>
+        </li>
+      </ul>
+
       <button @click="profile.fetchProfile">
         Refetch profile
+      </button>
+      <button @click="profile.fetchSessions">
+        Refetch sessions
       </button>
       <button @click="auth.refresh">
         Refresh
