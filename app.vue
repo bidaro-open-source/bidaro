@@ -1,7 +1,19 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
+const { addInterceptor } = useApiInterceptor()
 
-onMounted(authStore.refresh)
+onMounted(() => {
+  addInterceptor('onRequest', (event) => {
+    if (authStore.isAuthenticated) {
+      event.options.headers.set(
+        'Authorization',
+        `Bearer ${authStore.access_token}`,
+      )
+    }
+  })
+
+  authStore.refresh()
+})
 </script>
 
 <template>

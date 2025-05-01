@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.isAuthenticating = true
 
-        const data = await $fetch('/api/auth/register', {
+        const data = await useApi('/api/auth/register', {
           method: 'POST',
           body: {
             email,
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.isAuthenticating = true
 
-        const data = await $fetch('/api/auth/login', {
+        const data = await useApi('/api/auth/login', {
           method: 'POST',
           body: {
             username,
@@ -69,7 +69,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.isRefreshing = true
 
-        const data = await $fetch('/api/auth/refresh', {
+        const data = await useApi('/api/auth/refresh', {
           method: 'POST',
         })
 
@@ -90,11 +90,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.isLogouting = true
 
-        await $fetch('/api/auth/logout', {
+        await useApi('/api/auth/logout', {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${this.access_token}`,
-          },
         })
 
         this.access_token = null
