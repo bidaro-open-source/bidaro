@@ -94,6 +94,8 @@ export const useAuthStore = defineStore('auth', {
           method: 'POST',
         })
 
+        console.log('Logout successful')
+
         this.access_token = null
         this.refresh_token = null
         this.session_uuid = null

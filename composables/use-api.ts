@@ -69,6 +69,8 @@ function removeInterceptor<T extends Interceptors>(
 }
 
 export const useApi = $fetch.create({
+  retry: 2,
+  retryStatusCodes: [401],
   onResponse: interceptors.onResponse,
   onResponseError: interceptors.onResponseError,
   onRequest: interceptors.onRequest,
