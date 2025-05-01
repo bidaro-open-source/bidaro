@@ -13,6 +13,7 @@ interface AuthStoreState {
   sessionUuid: string | null
   accessToken: string | null
   accessTokenExp: number | null
+  error: unknown | null
 }
 
 let authStoreSync = () => {}
@@ -25,9 +26,12 @@ export const useAuthStore = defineStore('auth', {
     accessToken: null,
     accessTokenExp: null,
     sessionUuid: null,
+    error: null,
   }),
   getters: {
     sync: () => authStoreSync,
+
+    isError: state => !!state.error,
 
     isAuthenticated: state => !!state.accessToken,
 
@@ -54,6 +58,9 @@ export const useAuthStore = defineStore('auth', {
 
         this.setStore(data)
       }
+      catch (err) {
+        this.error = err
+      }
       finally {
         this.isAuthenticating = false
         this.sync()
@@ -72,6 +79,9 @@ export const useAuthStore = defineStore('auth', {
 
         this.setStore(data)
       }
+      catch (err) {
+        this.error = err
+      }
       finally {
         this.isAuthenticating = false
         this.sync()
@@ -89,8 +99,8 @@ export const useAuthStore = defineStore('auth', {
         this.setStore(data)
       }
       catch (err: any) {
-        if (err.status !== 422)
-          throw err.data
+        if (err.response.status !== 422)
+          this.error = err
       }
       finally {
         this.isRefreshing = false
@@ -108,8 +118,10 @@ export const useAuthStore = defineStore('auth', {
 
         this.$reset()
       }
+      catch (err) {
+        this.error = err
+      }
       finally {
-        this.isLogouting = false
         this.sync()
       }
     },

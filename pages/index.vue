@@ -32,6 +32,10 @@ const loginFormPassword = ref('password')
       </button>
     </div>
 
+    <div v-if="auth.isError">
+      {{ auth.error }}
+    </div>
+
     <div v-if="auth.isAuthenticating || auth.isLogouting || auth.isRefreshing">
       LOADING...
     </div>
