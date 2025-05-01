@@ -11,6 +11,9 @@ export default antfu({
   },
   vue: {
     overrides: {
+      'vue/block-order': ['error', {
+        order: ['script', 'template', 'style'],
+      }],
       'vue/no-restricted-syntax': ['error', {
         selector: 'VElement[name=\'a\']',
         message: 'Use NuxtLink instead.',
