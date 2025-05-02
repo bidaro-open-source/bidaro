@@ -28,7 +28,7 @@ export function useAuthRepeatReqestFeature() {
       return auth.refresh()
     }
 
-    return Promise.reject(ctx)
+    return Promise.reject(ctx.response?._data)
   }
 
   onMounted(() => {

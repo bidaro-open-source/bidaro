@@ -1,9 +1,81 @@
 <script setup lang="ts">
+const error = ref<unknown | null>(null)
+const isError = ref(false)
+
 const auth = useAuthStore()
 const profile = useProfileStore()
 
 const loginFormUsername = ref('test')
 const loginFormPassword = ref('password')
+
+async function fetchProfile() {
+  try {
+    isError.value = false
+    await profile.fetchProfile()
+  }
+  catch (err) {
+    error.value = err
+    isError.value = true
+  }
+}
+
+async function fetchSessions() {
+  try {
+    isError.value = false
+    await profile.fetchSessions()
+  }
+  catch (err) {
+    error.value = err
+    isError.value = true
+  }
+}
+
+async function refreshToken() {
+  try {
+    isError.value = false
+    await auth.refresh()
+  }
+  catch (err) {
+    error.value = err
+    isError.value = true
+  }
+}
+
+async function logout() {
+  try {
+    isError.value = false
+    await auth.logout()
+  }
+  catch (err) {
+    error.value = err
+    isError.value = true
+  }
+}
+
+async function login() {
+  try {
+    isError.value = false
+    await auth.login({
+      username: loginFormUsername.value,
+      password: loginFormPassword.value,
+    })
+  }
+  catch (err) {
+    error.value = err
+    isError.value = true
+  }
+}
+
+async function deleteSessions(uuid: string) {
+  try {
+    isError.value = false
+    await profile.deleteSessions(uuid)
+  }
+  catch (err) {
+    error.value = err
+    isError.value = true
+  }
+}
 </script>
 
 <template>
@@ -37,22 +109,22 @@ const loginFormPassword = ref('password')
       <ul>
         <li v-for="session in profile.sessions" :key="session.uuid">
           {{ session.uuid }}
-          <button @click="profile.deleteSessions(session.uuid)">
+          <button @click="deleteSessions(session.uuid)">
             X
           </button>
         </li>
       </ul>
 
-      <button @click="profile.fetchProfile">
+      <button @click="fetchProfile">
         Refetch profile
       </button>
-      <button @click="profile.fetchSessions">
-        Refetch sessions
+      <button @click="fetchSessions">
+        Fetch sessions
       </button>
-      <button @click="auth.refresh">
+      <button @click="refreshToken">
         Refresh
       </button>
-      <button @click="auth.logout">
+      <button @click="logout">
         Logout
       </button>
     </div>
@@ -60,24 +132,15 @@ const loginFormPassword = ref('password')
     <div v-else>
       <input v-model="loginFormUsername" type="text">
       <input v-model="loginFormPassword" type="text">
-      <button
-        @click="auth.login({
-          username: loginFormUsername, password: loginFormPassword })"
-      >
+      <button @click="login">
         Login
       </button>
-    </div>
-
-    <div v-if="auth.isError">
-      Auth error: {{ auth.error }}
-    </div>
-
-    <div v-if="profile.isError">
-      Profile error: {{ profile.error }}
     </div>
 
     <div v-if="auth.isAuthenticating || auth.isLogouting || auth.isRefreshing">
       LOADING...
     </div>
+
+    <ErrorHanlder v-if="isError" :error="error" />
   </div>
 </template>

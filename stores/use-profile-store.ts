@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 
 interface AuthStoreState {
-  error: unknown | null
   isLoading: boolean
   user: { id: number, username: string, email: string } | null
   role: { name: string } | null
@@ -15,29 +14,20 @@ interface AuthStoreState {
 
 export const useProfileStore = defineStore('profile', {
   state: (): AuthStoreState => ({
-    error: null,
     isLoading: false,
     user: null,
     role: null,
     permissions: [],
     sessions: [],
   }),
-  getters: {
-    isError: state => !!state.error,
-  },
   actions: {
     async fetchProfile() {
       try {
-        this.error = null
-
         const api = useApiStore()
 
         const data = await api.profile.fetchProfile()
 
         this.setStore(data)
-      }
-      catch (err) {
-        this.error = err
       }
       finally {
         this.isLoading = false
@@ -46,16 +36,11 @@ export const useProfileStore = defineStore('profile', {
 
     async fetchSessions() {
       try {
-        this.error = null
-
         const api = useApiStore()
 
         const data = await api.profile.fetchSessions()
 
         this.sessions = data
-      }
-      catch (err) {
-        this.error = err
       }
       finally {
         this.isLoading = false
@@ -64,8 +49,6 @@ export const useProfileStore = defineStore('profile', {
 
     async deleteSessions(uuid: string) {
       try {
-        this.error = null
-
         const api = useApiStore()
 
         const data = await api.profile.deleteSessions({
@@ -77,9 +60,6 @@ export const useProfileStore = defineStore('profile', {
         }
 
         this.sessions = this.sessions.filter(s => s.uuid !== uuid)
-      }
-      catch (err) {
-        this.error = err
       }
       finally {
         this.isLoading = false
