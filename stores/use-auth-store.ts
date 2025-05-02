@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
         })
 
         this.setStore(data)
-        profile.setStore(data)
+        profile.setStore(data.user)
       }
       finally {
         this.isAuthenticating = false
@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
         })
 
         this.setStore(data)
-        profile.setStore(data)
+        profile.setStore(data.user)
       }
       finally {
         this.isAuthenticating = false
@@ -92,7 +92,7 @@ export const useAuthStore = defineStore('auth', {
         const data = await api.auth.refresh()
 
         this.setStore(data)
-        profile.setStore(data)
+        profile.setStore(data.user)
       }
       catch (err: any) {
         if (err.statusCode !== 422)

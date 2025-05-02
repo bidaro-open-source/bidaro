@@ -1,3 +1,4 @@
+import { createProfileResource } from '~/server/resources/profile-resource'
 import { fetchUser } from '~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
@@ -15,23 +16,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return {
-    user: {
-      id: user.id as number,
-      email: user.email,
-      username: user.username,
-    },
-    role: user.role
-      ? { name: user.role.name }
-      : null,
-    permissions: user.role
-      ? user.role.permissions
-        ? user.role.permissions.map(p => ({
-            name: p.name,
-            displayName: p.displayName,
-            description: p.description,
-          }))
-        : []
-      : [],
-  }
+  return createProfileResource(user)
 })

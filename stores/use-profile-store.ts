@@ -1,23 +1,18 @@
+import type {
+  ProfileResource,
+} from '~/server/resources/profile-resource'
 import { defineStore } from 'pinia'
 
 interface AuthStoreState {
-  isLoading: boolean
-  user: { id: number, username: string, email: string } | null
-  role: { name: string } | null
-  permissions: {
-    name: string
-    displayName: string | null
-    description: string | null
-  }[]
+  user: ProfileResource | null
   sessions: { uid: number, uuid: string }[]
+  isLoading: boolean
 }
 
 export const useProfileStore = defineStore('profile', {
   state: (): AuthStoreState => ({
     isLoading: false,
     user: null,
-    role: null,
-    permissions: [],
     sessions: [],
   }),
   actions: {
@@ -66,10 +61,8 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    setStore(data: Omit<AuthStoreState, 'error' | 'isLoading' | 'sessions'>) {
-      this.user = data.user
-      this.role = data.role
-      this.permissions = data.permissions
+    setStore(data: ProfileResource) {
+      this.user = data
     },
   },
 })

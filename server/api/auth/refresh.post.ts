@@ -1,4 +1,5 @@
 import { refreshRequest } from '~/server/requests/auth/refresh.post'
+import { createProfileResource } from '~/server/resources/profile-resource'
 import {
   getAuthenticationSession,
   updateAuthenticationSession,
@@ -37,26 +38,10 @@ export default defineEventHandler(async (event) => {
   setRefreshTokenCookie(event, session.refreshToken)
 
   return {
+    user: createProfileResource(user),
     token_type: 'bearer',
     access_token: session.accessToken,
     refresh_token: session.refreshToken,
     session_uuid: session.uuid,
-    user: {
-      id: user.id as number,
-      email: user.email,
-      username: user.username,
-    },
-    role: user.role
-      ? { name: user.role.name }
-      : null,
-    permissions: user.role
-      ? user.role.permissions
-        ? user.role.permissions.map(p => ({
-            name: p.name,
-            displayName: p.displayName,
-            description: p.description,
-          }))
-        : []
-      : [],
   }
 })

@@ -89,13 +89,17 @@ async function deleteSessions(uuid: string) {
       <ul>
         <li>User name: {{ profile.user?.username }}</li>
         <li>Email: {{ profile.user?.email }}</li>
-        <li>Role: {{ profile.role }}</li>
+        <li>
+          Role: {{ profile.user?.role?.displayName
+            ? profile.user?.role?.displayName : profile.user?.role?.name }}
+        </li>
         <li>
           Permission:
 
           <ul>
             <li
-              v-for="permission in profile.permissions" :key="permission.name"
+              v-for="permission in profile.user?.permissions"
+              :key="permission.name"
             >
               {{ permission.displayName
                 ? permission.displayName : permission.name }}

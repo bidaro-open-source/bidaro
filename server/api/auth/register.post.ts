@@ -2,6 +2,7 @@ import { Op } from 'sequelize'
 import { z } from 'zod'
 import { roles } from '~/server/constants'
 import { registerRequest } from '~/server/requests/auth/register.post'
+import { createProfileResource } from '~/server/resources/profile-resource'
 import { createAuthenticationSession } from '~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
@@ -69,7 +70,16 @@ export default defineEventHandler(async (event) => {
     username: request.body.username,
     password: await hashPassword(event, request.body.password),
     roleName: defaultRole.name,
+  }, {
+    include: [
+      {
+        model: db.Role,
+        as: 'role',
+      },
+    ],
   })
+
+  user.role = defaultRole
 
   const metadata = createRequestMetadata(event)
 
@@ -78,25 +88,9 @@ export default defineEventHandler(async (event) => {
   setRefreshTokenCookie(event, session.refreshToken)
 
   return {
+    user: createProfileResource(user),
     access_token: session.accessToken,
     refresh_token: session.refreshToken,
     session_uuid: session.uuid,
-    user: {
-      id: user.id as number,
-      email: user.email,
-      username: user.username,
-    },
-    role: user.role
-      ? { name: user.role.name }
-      : null,
-    permissions: user.role
-      ? user.role.permissions
-        ? user.role.permissions.map(p => ({
-            name: p.name,
-            displayName: p.displayName,
-            description: p.description,
-          }))
-        : []
-      : [],
   }
 })
