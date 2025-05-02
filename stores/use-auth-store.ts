@@ -1,15 +1,16 @@
+import type { ProfileResource } from '~/server/resources/profile-resource'
 import { defineStore } from 'pinia'
 import { decodeJwt } from '~/uitls/decode-jwt'
 
 interface AuthResponse {
+  user: ProfileResource
   access_token: string
   session_uuid: string
 }
 
 interface AuthStoreState {
-  isLogouting: boolean
+  user: ProfileResource | null
   isRefreshing: boolean
-  isAuthenticating: boolean
   sessionUuid: string | null
   accessToken: string | null
   accessTokenExp: number | null
@@ -19,9 +20,8 @@ let authStoreSync = () => {}
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthStoreState => ({
-    isLogouting: false,
+    user: null,
     isRefreshing: false,
-    isAuthenticating: false,
     accessToken: null,
     accessTokenExp: null,
     sessionUuid: null,
@@ -42,22 +42,30 @@ export const useAuthStore = defineStore('auth', {
     },
   },
   actions: {
+    async fetchProfile() {
+      try {
+        const api = useApiStore()
+
+        const data = await api.profile.fetchProfile()
+
+        this.user = data
+      }
+      finally {
+        this.sync()
+      }
+    },
+
     async register({ email, username, password }: any) {
       try {
         const api = useApiStore()
-        const profile = useProfileStore()
-
-        this.isAuthenticating = true
 
         const data = await api.auth.register({
           body: { email, username, password },
         })
 
         this.setStore(data)
-        profile.setStore(data.user)
       }
       finally {
-        this.isAuthenticating = false
         this.sync()
       }
     },
@@ -65,19 +73,14 @@ export const useAuthStore = defineStore('auth', {
     async login({ username, password }: any) {
       try {
         const api = useApiStore()
-        const profile = useProfileStore()
-
-        this.isAuthenticating = true
 
         const data = await api.auth.login({
           body: { username, password },
         })
 
         this.setStore(data)
-        profile.setStore(data.user)
       }
       finally {
-        this.isAuthenticating = false
         this.sync()
       }
     },
@@ -85,16 +88,15 @@ export const useAuthStore = defineStore('auth', {
     async refresh() {
       try {
         const api = useApiStore()
-        const profile = useProfileStore()
 
         this.isRefreshing = true
 
         const data = await api.auth.refresh()
 
         this.setStore(data)
-        profile.setStore(data.user)
       }
       catch (err: any) {
+        this.$reset()
         if (err.statusCode !== 422)
           throw err
       }
@@ -107,14 +109,10 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       try {
         const api = useApiStore()
-        const profile = useProfileStore()
-
-        this.isLogouting = true
 
         await api.auth.logout()
 
         this.$reset()
-        profile.$reset()
       }
       finally {
         this.sync()
@@ -127,6 +125,7 @@ export const useAuthStore = defineStore('auth', {
       if (!payload)
         throw new Error('Invalid jwt access tokden')
 
+      this.user = data.user
       this.accessToken = data.access_token
       this.accessTokenExp = payload.exp
       this.sessionUuid = data.session_uuid

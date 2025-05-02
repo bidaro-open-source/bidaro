@@ -3,7 +3,7 @@ const error = ref<unknown | null>(null)
 const isError = ref(false)
 
 const auth = useAuthStore()
-const profile = useProfileStore()
+const sessions = useSessionsStore()
 
 const loginFormUsername = ref('test')
 const loginFormPassword = ref('password')
@@ -11,7 +11,7 @@ const loginFormPassword = ref('password')
 async function fetchProfile() {
   try {
     isError.value = false
-    await profile.fetchProfile()
+    await auth.fetchProfile()
   }
   catch (err) {
     error.value = err
@@ -22,7 +22,7 @@ async function fetchProfile() {
 async function fetchSessions() {
   try {
     isError.value = false
-    await profile.fetchSessions()
+    await sessions.fetchSessions()
   }
   catch (err) {
     error.value = err
@@ -69,7 +69,7 @@ async function login() {
 async function deleteSessions(uuid: string) {
   try {
     isError.value = false
-    await profile.deleteSessions(uuid)
+    await sessions.deleteSessions(uuid)
   }
   catch (err) {
     error.value = err
@@ -87,18 +87,18 @@ async function deleteSessions(uuid: string) {
       <div>Auth session token: {{ auth.sessionUuid }}</div>
 
       <ul>
-        <li>User name: {{ profile.user?.username }}</li>
-        <li>Email: {{ profile.user?.email }}</li>
+        <li>User name: {{ auth.user?.username }}</li>
+        <li>Email: {{ auth.user?.email }}</li>
         <li>
-          Role: {{ profile.user?.role?.displayName
-            ? profile.user?.role?.displayName : profile.user?.role?.name }}
+          Role: {{ auth.user?.role?.displayName
+            ? auth.user?.role?.displayName : auth.user?.role?.name }}
         </li>
         <li>
           Permission:
 
           <ul>
             <li
-              v-for="permission in profile.user?.permissions"
+              v-for="permission in auth.user?.permissions"
               :key="permission.name"
             >
               {{ permission.displayName
@@ -111,7 +111,7 @@ async function deleteSessions(uuid: string) {
       <div>Sessions:</div>
 
       <ul>
-        <li v-for="session in profile.sessions" :key="session.uuid">
+        <li v-for="session in sessions.sessions" :key="session.uuid">
           {{ session.uuid }}
           <button @click="deleteSessions(session.uuid)">
             X
@@ -141,7 +141,7 @@ async function deleteSessions(uuid: string) {
       </button>
     </div>
 
-    <div v-if="auth.isAuthenticating || auth.isLogouting || auth.isRefreshing">
+    <div v-if="auth.isRefreshing">
       LOADING...
     </div>
 
