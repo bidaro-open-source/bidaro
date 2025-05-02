@@ -1,7 +1,8 @@
+import type { SessionMetadata } from '~/server/services/authentication'
 import { defineStore } from 'pinia'
 
 interface AuthStoreState {
-  sessions: { uid: number, uuid: string }[]
+  sessions: SessionMetadata[]
 }
 
 export const useSessionsStore = defineStore('profile:sessions', {

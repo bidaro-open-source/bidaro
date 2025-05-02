@@ -11,6 +11,7 @@ interface AuthResponse {
 interface AuthStoreState {
   user: ProfileResource | null
   isRefreshing: boolean
+  isAuthenticating: boolean
   sessionUuid: string | null
   accessToken: string | null
   accessTokenExp: number | null
@@ -22,6 +23,7 @@ export const useAuthStore = defineStore('auth', {
   state: (): AuthStoreState => ({
     user: null,
     isRefreshing: false,
+    isAuthenticating: false,
     accessToken: null,
     accessTokenExp: null,
     sessionUuid: null,
@@ -59,6 +61,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         const api = useApiStore()
 
+        this.isAuthenticating = true
+
         const data = await api.auth.register({
           body: { email, username, password },
         })
@@ -66,6 +70,7 @@ export const useAuthStore = defineStore('auth', {
         this.setStore(data)
       }
       finally {
+        this.isAuthenticating = false
         this.sync()
       }
     },
@@ -74,6 +79,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         const api = useApiStore()
 
+        this.isAuthenticating = true
+
         const data = await api.auth.login({
           body: { username, password },
         })
@@ -81,6 +88,7 @@ export const useAuthStore = defineStore('auth', {
         this.setStore(data)
       }
       finally {
+        this.isAuthenticating = false
         this.sync()
       }
     },
@@ -90,6 +98,7 @@ export const useAuthStore = defineStore('auth', {
         const api = useApiStore()
 
         this.isRefreshing = true
+        this.isAuthenticating = true
 
         const data = await api.auth.refresh()
 
@@ -101,6 +110,7 @@ export const useAuthStore = defineStore('auth', {
           throw err
       }
       finally {
+        this.isAuthenticating = false
         this.isRefreshing = false
         this.sync()
       }

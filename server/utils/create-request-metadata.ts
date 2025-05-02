@@ -1,5 +1,5 @@
 export interface RequestMetadata {
-  date?: Date
+  date?: string
   ua?: string
   ip?: string
 }
@@ -12,7 +12,7 @@ export interface RequestMetadata {
  */
 export default function (event: H3Event): RequestMetadata {
   return {
-    date: new Date(),
+    date: new Date().toString(),
     ip: getRequestIP(event),
     ua: getRequestHeader(event, 'user-agent'),
   }

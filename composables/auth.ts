@@ -5,6 +5,7 @@ import type { FetchContext } from 'ofetch'
  */
 export function useAuthInitialize() {
   const auth = useAuthStore()
+  auth.isAuthenticating = true
   onMounted(auth.refresh)
 }
 
