@@ -41,5 +41,11 @@ async function login() {
     <button :disabled="auth.isAuthenticating" @click="login">
       Login
     </button>
+
+    <br>
+
+    <NuxtLink href="/auth/reset-password">
+      Forgot your password?
+    </NuxtLink>
   </div>
 </template>

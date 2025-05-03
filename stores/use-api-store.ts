@@ -1,6 +1,7 @@
 import type { FetchHook, FetchHooks, FetchOptions } from 'ofetch'
 import { defineStore, skipHydrate } from 'pinia'
 import { createAuthApi } from '~/api/auth-api'
+import { createPasswordResetApi } from '~/api/password-reset-api'
 import { createProfileApi } from '~/api/profile-api'
 
 type Interceptors = keyof FetchHooks
@@ -71,10 +72,12 @@ export const useApiStore = defineStore('api', () => {
 
   const auth = ref(createAuthApi(useApi))
   const profile = ref(createProfileApi(useApi))
+  const password = ref(createPasswordResetApi(useApi))
 
   return {
     auth: skipHydrate(auth),
     profile: skipHydrate(profile),
+    password: skipHydrate(password),
     interceptors: skipHydrate(interceptors),
     useApi,
     addInterceptor,
