@@ -12,6 +12,8 @@ export default defineEventHandler(async (event) => {
   const oldSession = await getAuthenticationSession(request.body.refresh_token)
 
   if (!oldSession) {
+    deleteRefreshTokenCookie(event)
+
     throw createError({
       statusCode: 404,
       message: 'Токен оновлення не знайдено',
