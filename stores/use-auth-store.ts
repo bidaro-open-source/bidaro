@@ -19,6 +19,8 @@ interface AuthStoreState {
 
 let authStoreSync = () => {}
 
+const TOKEN_EXPIRATION_BUFFER = 30 // 30 seconds
+
 export const useAuthStore = defineStore('auth', {
   state: (): AuthStoreState => ({
     user: null,
@@ -35,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
 
     isTokenExpiring(): boolean {
       if (this.accessTokenExp) {
-        const accessTokenExpDate = this.accessTokenExp - 30
+        const accessTokenExpDate = this.accessTokenExp - TOKEN_EXPIRATION_BUFFER
         const nowTime = Math.floor(Date.now() / 1000)
         return accessTokenExpDate <= nowTime
       }
