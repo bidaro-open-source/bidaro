@@ -1,10 +1,16 @@
 import nodemailer from 'nodemailer'
 
+/**
+ * Defines the structure for email content.
+ */
 export interface EmailTemplate {
   text: string
   html: string
 }
 
+/**
+ * Defines the structure for the data required by the email sending function.
+ */
 export interface EmailSenderPayload {
   to: string
   subject: string
@@ -12,13 +18,13 @@ export interface EmailSenderPayload {
 }
 
 /**
- * Sends email.
+ * Sends an email using Nodemailer.
  *
- * @param event H3Event
- * @param payload email
- * @returns message info
+ * @param event - H3Event
+ * @param payload - Containing the email details (recipient, subject, template).
+ * @returns A Promise that resolves with Nodemailer's message.
  */
-export default function (event: H3Event, payload: EmailSenderPayload) {
+export function sendEmail(event: H3Event, payload: EmailSenderPayload) {
   const runtimeConfig = useRuntimeConfig(event)
 
   const fromName = runtimeConfig.mailer.fromName

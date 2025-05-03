@@ -1,16 +1,22 @@
 import jwt from 'jsonwebtoken'
 
+/**
+ * Defines the structure of the access token.
+ */
 export type AccessToken = string
 
+/**
+ * Defines the structure of the payload for the access token.
+ */
 export interface AccessTokenPayload {
   uid: number
 }
 
 /**
- * Returns signed access token.
+ * Creates and signs a new JWT access token with the provided payload.
  *
  * @param payload token data
- * @returns assess token
+ * @returns signed access token string
  */
 export function createAccessToken(payload: AccessTokenPayload): AccessToken {
   const runtimeConfig = useRuntimeConfig()
@@ -18,15 +24,15 @@ export function createAccessToken(payload: AccessTokenPayload): AccessToken {
   return jwt.sign(
     payload,
     runtimeConfig.jwt.secret,
-    { algorithm: 'HS512', expiresIn: runtimeConfig.jwt.accessTTL },
+    { algorithm: 'HS512', expiresIn: +runtimeConfig.jwt.accessTTL },
   )
 }
 
 /**
- * Returns token verifed status.
+ * Verifies if the provided access token is valid and not expired.
  *
- * @param token assess token
- * @returns token verifed or not
+ * @param token token access token string to verify
+ * @returns true if token is valid, false otherwise
  */
 export function verifyAccessToken(token: AccessToken): boolean {
   try {
@@ -39,10 +45,13 @@ export function verifyAccessToken(token: AccessToken): boolean {
 }
 
 /**
- * Returns token payload without verification.
+ * Returns token payload without verification. Decodes the JWT access token
+ * and extracts the payload data containing user information.
  *
- * @param token assess token
- * @returns token data
+ * Please, verify the token before using this function.
+ *
+ * @param token access token string to decode
+ * @returns decoded token payload containing user data
  */
 export function decodeAccessToken(token: AccessToken): AccessTokenPayload {
   return jwt.decode(token) as AccessTokenPayload

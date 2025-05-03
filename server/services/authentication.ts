@@ -53,7 +53,7 @@ export async function getAuthenticationSessions(
 
   if (tokens.length) {
     const allSessions = await redis.mget(
-      tokens.map(token => `${REDIS_SESSION_NAMESPACE}:${token}`),
+      tokens.map((token: string) => `${REDIS_SESSION_NAMESPACE}:${token}`),
     )
 
     for (let i = 0; i < tokens.length; i++) {

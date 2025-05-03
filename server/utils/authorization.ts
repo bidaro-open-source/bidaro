@@ -2,12 +2,21 @@ import type { permissions } from '../constants'
 import type { Permission } from '../database'
 
 /**
- * Throws an nuxt error if the request is not authorized.
+ * Enforces authorization by validating against a policy function.
+ *
+ * Throws a 403 Forbidden error if the policy check fails.
  *
  * @param event H3Event
- * @param policy policy function
- * @param args policy arguments
+ * @param policy authorization policy function to evaluate
+ * @param args additional arguments passed to the policy function
  * @throws 403 Forbidden
+ *
+ * @example
+ * // Policy function that checks if user can access a resource
+ * const canAccessPolicy = (_: H3Event, val: string) => val === "value"
+ * // Usage in route handler
+ * mustBeAuthorized(event, canAccessPolicy, "value")
+ * // Continues if authorized
  */
 export function mustBeAuthorized<Policy extends (...args: any[]) => any>(
   event: H3Event,
@@ -24,11 +33,17 @@ export function mustBeAuthorized<Policy extends (...args: any[]) => any>(
 }
 
 /**
- * Checks if the user permissions include the given permission.
+ * Checks if a user has a specific permission by comparing against their
+ * assigned permissions.
  *
- * @param userPermissions user permissions
- * @param permission permission that user must have
- * @returns `true` if the user has the permission
+ * @param userPermissions array of user's assigned permissions
+ * @param permission single permission to check for
+ * @returns true if user has the specified permission, false otherwise
+ *
+ * @example
+ * const userPerms = [{ name: 'READ_POSTS' }];
+ * const canRead = hasPermission(userPerms, 'READ_POSTS'); // returns true
+ * const canDelete = hasPermission(userPerms, 'DELETE_POSTS'); // returns false
  */
 export function hasPermission(
   userPermissions: Permission[],

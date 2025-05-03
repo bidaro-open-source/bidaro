@@ -2,7 +2,7 @@ export const REFRESH_TOKEN_COOKIE_NAME = 'jwt'
 export const REFRESH_TOKEN_BODY_NAME = 'refresh_token'
 
 /**
- * Returns refresh token from cookie or request body.
+ * Returns the refresh token from the cookie.
  *
  * @param event H3Event
  * @returns refresh token or undefined
@@ -14,7 +14,7 @@ export function getRefreshTokenCookie(
 }
 
 /**
- * Sets refresh token to cookie.
+ * Sets a secure HTTP-only refresh token cookie with configured TTL.
  *
  * @param event H3Event
  * @param refreshToken refresh token
@@ -34,7 +34,7 @@ export function setRefreshTokenCookie(
 }
 
 /**
- * Deletes refresh token in cookie.
+ * Removes the refresh token cookie from the client.
  *
  * @param event H3Event
  */

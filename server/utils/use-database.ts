@@ -3,21 +3,32 @@ import process from 'node:process'
 import { Sequelize } from 'sequelize'
 import { BootstrapDatabase } from '../database'
 
-let db: Database | undefined
+/**
+ * Singleton instance of the Database.
+ */
+let database: Database | undefined
 
 /**
- * Returns Sequelize ORM instance.
+ * Returns a singleton Sequelize ORM database instance.
  *
  * @param event H3Event
- * @returns sequelize instance
- * @throws if connection is not success
+ * @returns A configured Database instance with all models initialized
+ * @throws Error if database connection cannot be established
+ *
+ * @example
+ * // Use in API route handler
+ * export default defineEventHandler(async (event) => {
+ *   const db = useDatabase(event)
+ *   const users = await db.User.findAll()
+ *   return { users }
+ * })
  */
-export default function (event?: H3Event): Database {
+export function useDatabase(event?: H3Event): Database {
   try {
-    if (!db) {
+    if (!database) {
       const runtimeConfig = useRuntimeConfig(event)
 
-      db = BootstrapDatabase(
+      database = BootstrapDatabase(
         new Sequelize({
           host: runtimeConfig.db.host,
           port: +runtimeConfig.db.port,
@@ -30,9 +41,14 @@ export default function (event?: H3Event): Database {
       )
     }
 
-    return db
+    return database
   }
   catch (e) {
-    throw new Error(`Database is not connected.`)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
+      message: 'Database connection failed',
+      data: e,
+    })
   }
 }

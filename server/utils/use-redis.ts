@@ -1,15 +1,26 @@
 import { Redis } from 'ioredis'
 
+/**
+ * Singleton instance of the Redis client.
+ */
 let instance: Redis | undefined
 
 /**
- * Returns Redis instance.
+ * Returns a singleton Redis client instance.
  *
  * @param event H3Event
- * @returns redis instance
- * @trhows if connection is not success
+ * @returns A connected Redis client instance
+ * @throws Error if Redis connection cannot be established
+ *
+ * @example
+ * // Use in API route handler
+ * export default defineEventHandler(async (event) => {
+ *   const redis = useRedis(event)
+ *   await redis.set('key', 'value')
+ *   return { success: true }
+ * })
  */
-export default function (event?: H3Event) {
+export function useRedis(event?: H3Event) {
   try {
     if (!instance) {
       const runtimeConfig = useRuntimeConfig(event)
@@ -25,6 +36,11 @@ export default function (event?: H3Event) {
     return instance
   }
   catch (e) {
-    throw new Error('Redis is not connected.')
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
+      message: 'Redis connection failed',
+      data: e,
+    })
   }
 }
