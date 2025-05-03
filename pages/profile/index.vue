@@ -28,6 +28,10 @@ watch(
     <ProfileSessions />
     <br>
     <ProfileActions />
+    <br>
+    <ProfileChangeEmailForm />
+    <br>
+    <ProfileChangePasswordForm />
 
     <div v-if="auth.isAuthenticating">
       authenticating...
