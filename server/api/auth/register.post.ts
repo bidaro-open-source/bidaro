@@ -1,12 +1,12 @@
 import { Op } from 'sequelize'
 import { z } from 'zod'
-import { roles } from '~/server/constants'
-import { registerRequest } from '~/server/requests/auth/register.post'
-import { createProfileResource } from '~/server/resources/profile-resource'
-import { createAuthenticationSession } from '~/server/services/authentication'
+import { roles } from '~~/server/constants'
+import { registerRequest } from '~~/server/requests/auth/register.post'
+import { createProfileResource } from '~~/server/resources/profile-resource'
+import { createAuthenticationSession } from '~~/server/services/authentication'
 import {
   createEmailVerificationToken,
-} from '~/server/services/email-verification'
+} from '~~/server/services/email-verification'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)

@@ -2,12 +2,15 @@ import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
-} from '~/server/services/password-reset'
-import { destroyUser, registerUser } from '~/test/utils/requests/authentication'
+} from '~~/server/services/password-reset'
+import {
+  destroyUser,
+  registerUser,
+} from '~~/test/utils/requests/authentication'
 import {
   confirmResetPasswordRequest,
   resetPasswordRequest,
-} from '~/test/utils/requests/reset-password'
+} from '~~/test/utils/requests/reset-password'
 
 describe('reset password', async () => {
   await setup()

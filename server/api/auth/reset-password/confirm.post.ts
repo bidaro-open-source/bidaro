@@ -1,10 +1,10 @@
 import {
   confirmResetPasswordRequest,
-} from '~/server/requests/auth/reset-password/confirm.post'
+} from '~~/server/requests/auth/reset-password/confirm.post'
 import {
   deletePasswordResetToken,
   getUserIdByResetToken,
-} from '~/server/services/password-reset'
+} from '~~/server/services/password-reset'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase()

@@ -3,7 +3,7 @@ import type {
   User,
   UserAttributes,
   UserAttributesOptional,
-} from '~/server/database'
+} from '~~/server/database'
 import { hashSync } from 'bcrypt'
 import { Factory } from '../class/Factory'
 

@@ -4,7 +4,7 @@ import {
   destroyUser,
   logoutRequest,
   registerUser,
-} from '~/test/utils/requests/authentication'
+} from '~~/test/utils/requests/authentication'
 
 describe('logout', async () => {
   await setup()

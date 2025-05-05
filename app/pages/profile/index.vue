@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'default',
-  middleware: 'auth-only',
 })
 
 const auth = useAuthStore()

@@ -1,6 +1,6 @@
-import { deleteSessionsPolicy } from '~/server/policies/profile/sessions'
-import { deleteSessionsRequest } from '~/server/requests/profile/sessions'
-import { deleteAuthenticationSessions } from '~/server/services/authentication'
+import { deleteSessionsPolicy } from '~~/server/policies/profile/sessions'
+import { deleteSessionsRequest } from '~~/server/requests/profile/sessions'
+import { deleteAuthenticationSessions } from '~~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

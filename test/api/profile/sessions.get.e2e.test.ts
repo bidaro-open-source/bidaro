@@ -1,8 +1,8 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { permissions } from '~/server/constants'
-import { createUser } from '~/test/utils/creations/create-user'
-import { getSessionsRequest } from '~/test/utils/requests/sessions'
+import { permissions } from '~~/server/constants'
+import { createUser } from '~~/test/utils/creations/create-user'
+import { getSessionsRequest } from '~~/test/utils/requests/sessions'
 
 describe('session fetching', async () => {
   await setup()

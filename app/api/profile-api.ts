@@ -1,8 +1,8 @@
-import type { UpdateProfileRequest } from '~/server/requests/profile/profile'
-import type { DeleteSessionsRequest } from '~/server/requests/profile/sessions'
+import type { UpdateProfileRequest } from '~~/server/requests/profile/profile'
+import type { DeleteSessionsRequest } from '~~/server/requests/profile/sessions'
 import type {
   EmailVerifyConfirmRequest,
-} from '~/server/requests/profile/verify'
+} from '~~/server/requests/profile/verify'
 
 export function createProfileApi(fetch: typeof $fetch) {
   return {

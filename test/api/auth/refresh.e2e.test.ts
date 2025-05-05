@@ -4,7 +4,7 @@ import {
   destroyUser,
   refreshRequest,
   registerUser,
-} from '~/test/utils/requests/authentication'
+} from '~~/test/utils/requests/authentication'
 
 describe('refresh', async () => {
   await setup()

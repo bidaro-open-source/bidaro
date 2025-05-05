@@ -3,7 +3,7 @@ import type {
   Permission,
   PermissionAttributes,
   PermissionAttributesOptional,
-} from '~/server/database'
+} from '~~/server/database'
 import { Factory } from '../class/Factory'
 
 type PartialAttributes = Partial<PermissionAttributes>

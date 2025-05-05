@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { loginRequest } from '~/server/requests/auth/login.post'
-import { createProfileResource } from '~/server/resources/profile-resource'
-import { createAuthenticationSession } from '~/server/services/authentication'
-import { fetchUserByUsername } from '~/server/services/users-service'
+import { loginRequest } from '~~/server/requests/auth/login.post'
+import { createProfileResource } from '~~/server/resources/profile-resource'
+import { createAuthenticationSession } from '~~/server/services/authentication'
+import { fetchUserByUsername } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
   const request = await validateRequest(event, loginRequest)

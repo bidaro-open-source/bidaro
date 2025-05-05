@@ -1,5 +1,5 @@
 import type { Seeder } from '../console/seeder-cli'
-import { permissions, roles } from '~/server/constants'
+import { permissions, roles } from '~~/server/constants'
 
 export const up: Seeder = async ({ context }) => {
   const view_own_sessions = await context.PermissionFactory.new().create({

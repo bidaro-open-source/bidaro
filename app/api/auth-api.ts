@@ -1,5 +1,5 @@
-import type { LoginRequest } from '~/server/requests/auth/login.post'
-import type { RegisterRequest } from '~/server/requests/auth/register.post'
+import type { LoginRequest } from '~~/server/requests/auth/login.post'
+import type { RegisterRequest } from '~~/server/requests/auth/register.post'
 
 export function createAuthApi(fetch: typeof $fetch) {
   return {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
-  middleware: 'guest-only',
 })
 
 const auth = useAuthStore()
@@ -21,6 +20,6 @@ watch(
 
 <template>
   <div>
-    <RegisterForm />
+    <ResetPasswordForm />
   </div>
 </template>

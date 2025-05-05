@@ -1,5 +1,5 @@
-import { getSessionsPolicy } from '~/server/policies/profile/sessions'
-import { getAuthenticationSessions } from '~/server/services/authentication'
+import { getSessionsPolicy } from '~~/server/policies/profile/sessions'
+import { getAuthenticationSessions } from '~~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

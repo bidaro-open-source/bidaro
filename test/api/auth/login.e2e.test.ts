@@ -1,11 +1,11 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { REFRESH_TOKEN_COOKIE_NAME } from '~/server/utils/refresh-token-cookie'
+import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import {
   destroyUser,
   loginRequest,
   registerUser,
-} from '~/test/utils/requests/authentication'
+} from '~~/test/utils/requests/authentication'
 
 describe('login', async () => {
   await setup()

@@ -1,9 +1,9 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { permissions } from '~/server/constants'
-import { createUser } from '~/test/utils/creations/create-user'
-import { loginRequest } from '~/test/utils/requests/authentication'
-import { deleteSessionsRequest } from '~/test/utils/requests/sessions'
+import { permissions } from '~~/server/constants'
+import { createUser } from '~~/test/utils/creations/create-user'
+import { loginRequest } from '~~/test/utils/requests/authentication'
+import { deleteSessionsRequest } from '~~/test/utils/requests/sessions'
 
 describe('session deleting', async () => {
   await setup()

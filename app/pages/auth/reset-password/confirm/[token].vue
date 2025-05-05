@@ -1,10 +1,17 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
-  middleware: 'guest-only',
 })
 
 const auth = useAuthStore()
+
+const route = useRoute()
+
+const token = computed(
+  () => Array.isArray(route.params.token)
+    ? route.params.token[0]
+    : route.params.token,
+)
 
 watch(
   () => ({
@@ -21,6 +28,6 @@ watch(
 
 <template>
   <div>
-    <LoginForm />
+    <ConfirmPasswordForm :token="token" />
   </div>
 </template>

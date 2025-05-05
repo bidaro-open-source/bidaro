@@ -1,5 +1,5 @@
-import { createProfileResource } from '~/server/resources/profile-resource'
-import { fetchUser } from '~/server/services/users-service'
+import { createProfileResource } from '~~/server/resources/profile-resource'
+import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

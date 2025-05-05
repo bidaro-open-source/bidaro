@@ -1,9 +1,9 @@
-import { emailVerifyConfirmRequest } from '~/server/requests/profile/verify'
+import { emailVerifyConfirmRequest } from '~~/server/requests/profile/verify'
 import {
   deleteEmailVerificationTokenByUid,
   getUserIdByEmailVerificationToken,
-} from '~/server/services/email-verification'
-import { fetchUser } from '~/server/services/users-service'
+} from '~~/server/services/email-verification'
+import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
   const request = await validateRequest(event, emailVerifyConfirmRequest)

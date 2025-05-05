@@ -1,4 +1,4 @@
-import type { Role, User, UserCreationAttributes } from '~/server/database'
+import type { Role, User, UserCreationAttributes } from '~~/server/database'
 import { loginRequest } from '../requests/authentication'
 
 interface CreateUserOptions {

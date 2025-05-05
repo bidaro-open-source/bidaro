@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { updateProfileRequest } from '~/server/requests/profile/profile'
-import { createProfileResource } from '~/server/resources/profile-resource'
+import { updateProfileRequest } from '~~/server/requests/profile/profile'
+import { createProfileResource } from '~~/server/resources/profile-resource'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

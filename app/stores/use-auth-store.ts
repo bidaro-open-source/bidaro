@@ -1,4 +1,4 @@
-import type { ProfileResource } from '~/server/resources/profile-resource'
+import type { ProfileResource } from '~~/server/resources/profile-resource'
 import { defineStore } from 'pinia'
 import { decodeJwt } from '~/uitls/decode-jwt'
 

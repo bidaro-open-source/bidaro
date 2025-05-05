@@ -3,7 +3,7 @@ import type {
   Role,
   RoleAttributes,
   RoleAttributesOptional,
-} from '~/server/database'
+} from '~~/server/database'
 import { Factory } from '../class/Factory'
 
 type PartialAttributes = Partial<RoleAttributes>

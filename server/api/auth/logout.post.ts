@@ -1,8 +1,8 @@
-import { logoutRequest } from '~/server/requests/auth/logout.post'
+import { logoutRequest } from '~~/server/requests/auth/logout.post'
 import {
   deleteAuthenticationSession,
   getAuthenticationSession,
-} from '~/server/services/authentication'
+} from '~~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

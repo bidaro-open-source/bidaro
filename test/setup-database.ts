@@ -1,11 +1,11 @@
-import type { Database } from '~/server/database'
+import type { Database } from '~~/server/database'
 import { env } from 'node:process'
 import { Sequelize } from 'sequelize'
 import { afterAll, beforeAll } from 'vitest'
 import {
   BootstrapDatabase,
   BootstrapFactories,
-} from '~/server/database'
+} from '~~/server/database'
 
 function useDatabase() {
   try {

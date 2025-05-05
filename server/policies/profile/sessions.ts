@@ -1,4 +1,4 @@
-import { permissions } from '~/server/constants'
+import { permissions } from '~~/server/constants'
 
 export function getSessionsPolicy(event: H3Event) {
   const userPermissions = getAuthenticatedUserPermissions(event)
