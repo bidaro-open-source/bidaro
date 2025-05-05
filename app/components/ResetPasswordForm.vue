@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const api = useApiStore()
+const { $api } = useNuxtApp()
 
 const email = ref('')
 
@@ -14,7 +14,7 @@ async function logout() {
     isError.value = false
     isLoading.value = true
 
-    const data = await api.password.sendConfirmRequest({
+    const data = await $api.password.sendConfirmRequest({
       body: { email: email.value },
     })
 

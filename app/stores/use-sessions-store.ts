@@ -11,17 +11,17 @@ export const useSessionsStore = defineStore('profile:sessions', {
   }),
   actions: {
     async fetchSessions() {
-      const api = useApiStore()
+      const { $api } = useNuxtApp()
 
-      const data = await api.profile.fetchSessions()
+      const data = await $api.profile.fetchSessions()
 
       this.sessions = data
     },
 
     async deleteSessions(uuid: string) {
-      const api = useApiStore()
+      const { $api } = useNuxtApp()
 
-      const data = await api.profile.deleteSessions({
+      const data = await $api.profile.deleteSessions({
         body: { uuids: [uuid] },
       })
 

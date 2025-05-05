@@ -48,9 +48,9 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async fetchProfile() {
       try {
-        const api = useApiStore()
+        const { $api } = useNuxtApp()
 
-        const data = await api.profile.fetchProfile()
+        const data = await $api.profile.fetchProfile()
 
         this.user = data
       }
@@ -61,11 +61,11 @@ export const useAuthStore = defineStore('auth', {
 
     async register({ email, username, password }: any) {
       try {
-        const api = useApiStore()
+        const { $api } = useNuxtApp()
 
         this.isAuthenticating = true
 
-        const data = await api.auth.register({
+        const data = await $api.auth.register({
           body: { email, username, password },
         })
 
@@ -79,11 +79,11 @@ export const useAuthStore = defineStore('auth', {
 
     async login({ username, password }: any) {
       try {
-        const api = useApiStore()
+        const { $api } = useNuxtApp()
 
         this.isAuthenticating = true
 
-        const data = await api.auth.login({
+        const data = await $api.auth.login({
           body: { username, password },
         })
 
@@ -97,12 +97,12 @@ export const useAuthStore = defineStore('auth', {
 
     async refresh() {
       try {
-        const api = useApiStore()
+        const { $api } = useNuxtApp()
 
         this.isRefreshing = true
         this.isAuthenticating = true
 
-        const data = await api.auth.refresh()
+        const data = await $api.auth.refresh()
 
         this.setStore(data)
       }
@@ -120,9 +120,9 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        const api = useApiStore()
+        const { $api } = useNuxtApp()
 
-        await api.auth.logout()
+        await $api.auth.logout()
 
         this.$reset()
       }

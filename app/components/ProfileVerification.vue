@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const api = useApiStore()
+const { $api } = useNuxtApp()
 const auth = useAuthStore()
 
 const error = ref<unknown | null>(null)
@@ -13,7 +13,7 @@ async function changeEmail() {
     isError.value = false
     isLoading.value = true
 
-    await api.profile.verifyEmailProfile()
+    await $api.profile.verifyEmailProfile()
 
     isSuccess.value = true
   }

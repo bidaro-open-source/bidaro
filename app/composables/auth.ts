@@ -18,7 +18,7 @@ export function useAuthInitialize() {
  */
 export function useAuthRepeatReqestFeature() {
   const auth = useAuthStore()
-  const { addInterceptor, removeInterceptor } = useApiStore()
+  const { $api } = useNuxtApp()
 
   async function onResponseErrorHanlder(ctx: FetchContext) {
     if (
@@ -33,11 +33,11 @@ export function useAuthRepeatReqestFeature() {
   }
 
   onMounted(() => {
-    addInterceptor('onResponseError', onResponseErrorHanlder)
+    $api.addInterceptor('onResponseError', onResponseErrorHanlder)
   })
 
   onUnmounted(() => {
-    removeInterceptor('onResponseError', onResponseErrorHanlder)
+    $api.removeInterceptor('onResponseError', onResponseErrorHanlder)
   })
 }
 
@@ -47,7 +47,7 @@ export function useAuthRepeatReqestFeature() {
  */
 export function useAuthHeadersRequestFeature() {
   const auth = useAuthStore()
-  const { addInterceptor, removeInterceptor } = useApiStore()
+  const { $api } = useNuxtApp()
 
   function onRequestHanlder(ctx: FetchContext) {
     if (ctx.request !== '/api/auth/refresh' && auth.isAuthenticated) {
@@ -59,11 +59,11 @@ export function useAuthHeadersRequestFeature() {
   }
 
   onMounted(() => {
-    addInterceptor('onRequest', onRequestHanlder)
+    $api.addInterceptor('onRequest', onRequestHanlder)
   })
 
   onUnmounted(() => {
-    removeInterceptor('onRequest', onRequestHanlder)
+    $api.removeInterceptor('onRequest', onRequestHanlder)
   })
 }
 

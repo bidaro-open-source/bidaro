@@ -11,7 +11,7 @@ await callOnce(async () => {
   try {
     isError.value = false
 
-    const api = useApiStore()
+    const { $api } = useNuxtApp()
 
     const route = useRoute()
 
@@ -19,7 +19,7 @@ await callOnce(async () => {
       ? route.params.token[0]
       : route.params.token
 
-    await api.profile.verifyConfirmEmailProfile({
+    await $api.profile.verifyConfirmEmailProfile({
       body: { token },
     })
 

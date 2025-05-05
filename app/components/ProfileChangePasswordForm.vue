@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const api = useApiStore()
+const { $api } = useNuxtApp()
 const auth = useAuthStore()
 
 const password = ref('')
@@ -15,7 +15,7 @@ async function changePassword() {
     isError.value = false
     isLoading.value = true
 
-    const data = await api.profile.updateProfile({
+    const data = await $api.profile.updateProfile({
       body: { password: password.value },
     })
 

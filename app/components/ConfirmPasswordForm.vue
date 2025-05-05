@@ -3,7 +3,7 @@ const props = defineProps<{
   token: string
 }>()
 
-const api = useApiStore()
+const { $api } = useNuxtApp()
 
 const password = ref('')
 
@@ -18,7 +18,7 @@ async function logout() {
     isError.value = false
     isLoading.value = true
 
-    const data = await api.password.sendNewPassword({
+    const data = await $api.password.sendNewPassword({
       body: { password: password.value, token: props.token },
     })
 
