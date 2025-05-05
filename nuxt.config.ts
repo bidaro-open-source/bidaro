@@ -7,7 +7,11 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
-  modules: ['@bg-dev/nuxt-s3', '@pinia/nuxt'],
+  modules: [
+    '@nuxt/eslint',
+    '@pinia/nuxt',
+    '@bg-dev/nuxt-s3',
+  ],
 
   s3: {
     driver: 's3',
@@ -58,6 +62,12 @@ export default defineNuxtConfig({
     },
     email: {
       tokenSize: '',
+    },
+  },
+
+  eslint: {
+    config: {
+      standalone: false,
     },
   },
 

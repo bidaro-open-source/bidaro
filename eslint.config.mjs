@@ -1,52 +1,74 @@
 import antfu from '@antfu/eslint-config'
+import withNuxt from './.nuxt/eslint.config.mjs'
 
-export default antfu({
-  typescript: true,
-  stylistic: {
-    indent: 2,
-    quotes: 'single',
-  },
-  formatters: {
-    css: true,
-  },
-  vue: {
-    overrides: {
-      'vue/block-order': ['error', {
-        order: ['script', 'template', 'style'],
-      }],
-      'vue/no-restricted-syntax': ['error', {
-        selector: 'VElement[name=\'a\']',
-        message: 'Use NuxtLink instead.',
-      }],
+export default withNuxt(
+  antfu({
+    stylistic: {
+      indent: 2,
+      quotes: 'single',
+      semi: false,
     },
-  },
-  ignores: [
-    '.github/**',
-    '.hooks/**',
-    '.nuxt/**',
-    '.vscode/**',
-    'public/**',
-    'package.json',
-  ],
-  rules: {
-    'no-console': 'off',
-    'vue/html-indent': 'warn',
-    'vue/html-self-closing': 'off',
-    'max-len': ['error', { code: 80 }],
-    'ts/no-unused-expressions': [
-      'off',
-      {
-        allowShortCircuit: true,
-        allowTernary: true,
-        allowTaggedTemplates: true,
-        enforceForJSX: false,
+    vue: {
+      overrides: {
+        'vue/html-indent': 'warn',
+        'vue/html-self-closing': 'off',
+        'vue/block-order': ['error', {
+          order: ['script', 'template', 'style'],
+        }],
+        'vue/no-restricted-syntax': ['error', {
+          selector: 'VElement[name=\'a\']',
+          message: 'Use NuxtLink instead.',
+        }],
       },
-    ],
-    'unused-imports/no-unused-vars': [
-      'error',
-      {
-        caughtErrors: 'none',
+    },
+    typescript: {
+      overrides: {
+        'ts/no-unused-expressions': [
+          'off',
+          {
+            allowShortCircuit: true,
+            allowTernary: true,
+            allowTaggedTemplates: true,
+            enforceForJSX: false,
+          },
+        ],
       },
+    },
+    rules: {
+      'no-console': 'off',
+      'max-len': ['error', { code: 80 }],
+      'unused-imports/no-unused-vars': [
+        'error',
+        {
+          caughtErrors: 'none',
+        },
+      ],
+    },
+    formatters: {
+      css: true,
+      svg: false,
+      html: false,
+      astro: false,
+      slidev: false,
+      markdown: false,
+      graphql: false,
+      xml: false,
+    },
+    ignores: [
+      '.git/**',
+      '.github/**',
+      '.hooks/**',
+      '.nuxt/**',
+      '.vscode/**',
+      'public/**',
+      'package.json',
     ],
-  },
-})
+    astro: false,
+    jsonc: false,
+    react: false,
+    svelte: false,
+    unocss: false,
+    unicorn: false,
+    solid: false,
+  }),
+)
