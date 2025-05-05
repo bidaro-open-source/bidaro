@@ -22,8 +22,9 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare email: string
   declare username: string
   declare password: string
+  declare emailVerifiedAt: CreationOptional<Date | null>
   declare createdAt: CreationOptional<Date>
-  declare updatedAt: CreationOptional<Date>
+  declare updatedAt: CreationOptional<Date | null>
 
   // Role association
   declare role?: NonAttribute<Role>
@@ -59,6 +60,10 @@ export function InitializeUser(database: DatabaseOptional) {
       password: {
         type: DataTypes.STRING(64),
         allowNull: false,
+      },
+      emailVerifiedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       createdAt: {
         type: DataTypes.DATE,

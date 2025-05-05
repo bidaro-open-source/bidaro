@@ -20,7 +20,11 @@ const permissions = computed(
 
     <ul>
       <li>User name: {{ auth.user.username }}</li>
-      <li>Email: {{ auth.user.email }}</li>
+      <li>
+        Email:
+        {{ auth.user.email }}
+        {{ auth.user.emailVerifiedAt ? '(verified)' : '(not verified)' }}
+      </li>
       <li>Role: {{ role }}</li>
       <li>
         Permissions:

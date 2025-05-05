@@ -32,6 +32,8 @@ watch(
     <ProfileChangeEmailForm />
     <br>
     <ProfileChangePasswordForm />
+    <br>
+    <ProfileVerification v-if="auth.user?.emailVerifiedAt === null" />
 
     <div v-if="auth.isAuthenticating">
       authenticating...

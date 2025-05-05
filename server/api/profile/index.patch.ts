@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
     }
 
     user.email = request.body.email
+    user.emailVerifiedAt = null
   }
 
   if (request.body.password) {

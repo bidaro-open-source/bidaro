@@ -4,6 +4,9 @@ import { roles } from '~/server/constants'
 import { registerRequest } from '~/server/requests/auth/register.post'
 import { createProfileResource } from '~/server/resources/profile-resource'
 import { createAuthenticationSession } from '~/server/services/authentication'
+import {
+  createEmailVerificationToken,
+} from '~/server/services/email-verification'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
@@ -80,6 +83,17 @@ export default defineEventHandler(async (event) => {
   })
 
   user.role = defaultRole
+
+  const token = await createEmailVerificationToken(user.id)
+
+  await sendEmail(event, {
+    to: user.email,
+    subject: 'Email verification',
+    template: {
+      html: `Verify token: ${token}`,
+      text: `Verify token: ${token}`,
+    },
+  })
 
   const metadata = createRequestMetadata(event)
 

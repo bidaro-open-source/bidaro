@@ -11,6 +11,8 @@ export function createProfileResource(entity: User) {
   return {
     id: ensureIncludedKey(entity, 'id') as number,
     email: ensureIncludedKey(entity, 'email'),
+    emailVerifiedAt:
+      ensureIncludedKey(entity, 'emailVerifiedAt') as string | null,
     username: ensureIncludedKey(entity, 'username'),
     role: role
       ? {

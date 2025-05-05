@@ -52,6 +52,9 @@ export default defineNuxtConfig({
       resetSize: '',
       hashRounds: '',
     },
+    email: {
+      tokenSize: '',
+    },
   },
 
   compatibilityDate: '2025-04-29',

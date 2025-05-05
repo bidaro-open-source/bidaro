@@ -24,6 +24,10 @@ export const up: Migration = async ({ context }) => {
       type: DataTypes.STRING(64),
       allowNull: false,
     },
+    emailVerifiedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
