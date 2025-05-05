@@ -1,4 +1,6 @@
 export default defineNuxtConfig({
+  srcDir: 'client',
+
   future: {
     compatibilityVersion: 4,
   },
