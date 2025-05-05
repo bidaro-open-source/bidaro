@@ -40,6 +40,14 @@ export default defineEventHandler(async (event) => {
     user.password = await hashPassword(event, request.body.password)
   }
 
+  if (request.body.name) {
+    user.name = request.body.name
+  }
+
+  if (request.body.surname) {
+    user.surname = request.body.surname
+  }
+
   await user.save()
 
   return createProfileResource(user)

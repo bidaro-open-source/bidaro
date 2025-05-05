@@ -27,6 +27,8 @@ export class UserFactory extends Factory<User> {
       username: attr.username ?? `u${user}`,
       password: hashSync(attr.password ?? UserFactory.password, 10),
       roleName: attr.roleName ?? null,
+      name: attr.name ?? null,
+      surname: attr.surname ?? null,
       emailVerifiedAt: attr.emailVerifiedAt ?? null,
     }
   }

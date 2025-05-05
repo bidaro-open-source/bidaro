@@ -20,6 +20,8 @@ export type UserAttributesOptional = MakeNullishOptional<UserCreationAttributes>
 export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare id: CreationOptional<number>
   declare email: string
+  declare name: string | null
+  declare surname: string | null
   declare username: string
   declare password: string
   declare emailVerifiedAt: CreationOptional<Date | null>
@@ -60,6 +62,14 @@ export function InitializeUser(database: DatabaseOptional) {
       password: {
         type: DataTypes.STRING(64),
         allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING(64),
+        allowNull: true,
+      },
+      surname: {
+        type: DataTypes.STRING(64),
+        allowNull: true,
       },
       emailVerifiedAt: {
         type: DataTypes.DATE,

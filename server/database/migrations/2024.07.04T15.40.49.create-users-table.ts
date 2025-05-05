@@ -24,6 +24,14 @@ export const up: Migration = async ({ context }) => {
       type: DataTypes.STRING(64),
       allowNull: false,
     },
+    name: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+    },
+    surname: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+    },
     emailVerifiedAt: {
       type: DataTypes.DATE,
       allowNull: true,

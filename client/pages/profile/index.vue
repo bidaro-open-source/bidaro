@@ -28,6 +28,8 @@ watch(
     <br>
     <ProfileActions />
     <br>
+    <ProfileChangeRowsForm />
+    <br>
     <ProfileChangeEmailForm />
     <br>
     <ProfileChangePasswordForm />

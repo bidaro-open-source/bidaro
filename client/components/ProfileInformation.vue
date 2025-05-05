@@ -12,6 +12,10 @@ const role = computed(
 const permissions = computed(
   () => auth.user && auth.user.permissions ? auth.user.permissions : [],
 )
+
+const name = computed(
+  () => auth.user && auth.user.name ? auth.user.name : auth.user?.username,
+)
 </script>
 
 <template>
@@ -19,7 +23,7 @@ const permissions = computed(
     <div>Session token: {{ auth.sessionUuid }}</div>
 
     <ul>
-      <li>User name: {{ auth.user.username }}</li>
+      <li><b>Hello, {{ name }}!</b></li>
       <li>
         Email:
         {{ auth.user.email }}
