@@ -20,7 +20,7 @@ await callOnce(async () => {
       : route.params.token
 
     await $api.profile.verifyConfirmEmailProfile({
-      body: { token },
+      body: { token: token || '' },
     })
 
     isSuccess.value = true
