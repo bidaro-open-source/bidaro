@@ -65,6 +65,9 @@ export default defineNuxtConfig({
     email: {
       tokenSize: '',
     },
+    public: {
+      appUrl: '',
+    },
   },
 
   eslint: {

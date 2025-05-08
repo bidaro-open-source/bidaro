@@ -21,12 +21,15 @@ export default defineEventHandler(async (event) => {
 
   const token = await createPasswordResetToken(user.id)
 
+  const config = useRuntimeConfig()
+
   await sendEmail(event, {
     to: request.body.email,
-    subject: 'Reset password',
+    subject: 'Скидання пароля - Bidaro',
     template: {
-      html: `Reset token: ${token}`,
-      text: `Reset token: ${token}`,
+      // eslint-disable-next-line max-len
+      html: `Для скидання пароля, натисніть сюди <a href="${config.public.appUrl}/profile/verify/${token}">сюди</a>`,
+      text: `Токен скидання пароля: ${token}`,
     },
   })
 

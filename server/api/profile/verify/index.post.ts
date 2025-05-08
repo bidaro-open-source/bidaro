@@ -12,12 +12,15 @@ export default defineEventHandler(async (event) => {
 
   const token = await createEmailVerificationToken(user.id)
 
+  const config = useRuntimeConfig()
+
   await sendEmail(event, {
     to: user.email,
-    subject: 'Email verification',
+    subject: 'Верифікуй свою пошту - Bidaro',
     template: {
-      html: `Verify token: ${token}`,
-      text: `Verify token: ${token}`,
+      // eslint-disable-next-line max-len
+      html: `Верифікуй свою пошту, клікнувши <a href="${config.public.appUrl}/profile/verify/${token}">сюди</a>`,
+      text: `Токен верифікації: ${token}`,
     },
   })
 })
