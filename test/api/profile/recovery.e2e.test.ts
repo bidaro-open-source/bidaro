@@ -24,7 +24,7 @@ describe('reset password', async () => {
       email: data.user.email,
     })
 
-    expect(resetResponse.status).toBe(200)
+    expect(resetResponse.status).toBe(204)
 
     const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
     const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
@@ -34,7 +34,7 @@ describe('reset password', async () => {
       token,
     })
 
-    expect(confirmResponse.status).toBe(200)
+    expect(confirmResponse.status).toBe(204)
 
     const updatedUser = await db.User.findByPk(data.user.id)
 
@@ -71,7 +71,7 @@ describe('reset password', async () => {
         email: data.user.email,
       })
 
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(204)
 
       await destroyUser(data.user.id)
 

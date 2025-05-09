@@ -1,4 +1,4 @@
-import { emailVerifyConfirmRequest } from '~~/server/requests/profile/verify'
+import { emailVerifyConfirmRequest } from '~~/server/requests/profile/verification/confrim.post'
 import {
   deleteEmailVerificationTokenByUid,
   getUserIdByEmailVerificationToken,
@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
   if (!uid) {
     throw createError({
       statusCode: 404,
-      message: 'Token not found',
+      statusMessage: 'Not Found',
+      message: 'Токен верифікації не знайдено, можливо ви вже активували акаунт або час дії токена закінчився.',
     })
   }
 
@@ -24,7 +25,8 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 404,
-      message: 'User not found',
+      statusMessage: 'Not Found',
+      message: 'Токен верифікації правильний, проте акаунт не знайдено. Можливо, його було видалено.',
     })
   }
 

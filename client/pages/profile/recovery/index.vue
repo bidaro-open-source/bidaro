@@ -7,6 +7,6 @@ definePageMeta({
 
 <template>
   <div>
-    <AuthResetPasswordForm />
+    <ProfileRecoveryPasswordForm />
   </div>
 </template>

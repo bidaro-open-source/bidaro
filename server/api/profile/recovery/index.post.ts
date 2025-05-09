@@ -1,6 +1,6 @@
 import {
   resetPasswordRequest,
-} from '~~/server/requests/auth/reset-password/index.post'
+} from '~~/server/requests/profile/recovery/index.post'
 import { createPasswordResetToken } from '~~/server/services/password-reset'
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 404,
-      message: 'Аккаунт не знайдено',
+      statusMessage: 'Not Found',
+      message: 'Користувача з такою поштою не знайдено',
     })
   }
 
@@ -27,12 +28,8 @@ export default defineEventHandler(async (event) => {
     to: request.body.email,
     subject: 'Скидання пароля - Bidaro',
     template: {
-      html: `Для скидання пароля, натисніть сюди <a href="${config.public.appUrl}/profile/verify/${token}">сюди</a>`,
+      html: `Для скидання пароля, натисніть сюди <a href="${config.public.appUrl}/profile/recovery/${token}">сюди</a>`,
       text: `Токен скидання пароля: ${token}`,
     },
   })
-
-  return {
-    ok: true,
-  }
 })

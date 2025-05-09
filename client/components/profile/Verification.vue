@@ -13,7 +13,7 @@ async function onSubmit() {
     isError.value = false
     isLoading.value = true
 
-    await $api.profile.verifyEmailProfile()
+    await $api.profileVerification.sendVerificationRequest()
 
     isSuccess.value = true
   }

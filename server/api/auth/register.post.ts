@@ -4,9 +4,6 @@ import { roles } from '~~/server/constants'
 import { registerRequest } from '~~/server/requests/auth/register.post'
 import { createProfileResource } from '~~/server/resources/profile-resource'
 import { createAuthenticationSession } from '~~/server/services/authentication'
-import {
-  createEmailVerificationToken,
-} from '~~/server/services/email-verification'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
@@ -83,19 +80,6 @@ export default defineEventHandler(async (event) => {
   })
 
   user.role = defaultRole
-
-  const token = await createEmailVerificationToken(user.id)
-
-  const config = useRuntimeConfig()
-
-  await sendEmail(event, {
-    to: user.email,
-    subject: 'Верифікуй свою пошту - Bidaro',
-    template: {
-      html: `Верифікуй свою пошту, клікнувши <a href="${config.public.appUrl}/profile/verify/${token}">сюди</a>`,
-      text: `Токен верифікації: ${token}`,
-    },
-  })
 
   const metadata = createRequestMetadata(event)
 

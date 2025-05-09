@@ -1,10 +1,14 @@
 <script setup lang="ts">
+const props = defineProps<{
+  token: string
+}>()
+
 const { $api } = useNuxtApp()
 
 const auth = useAuthStore()
 
 const state = reactive({
-  email: '',
+  password: '',
 })
 
 const error = ref<unknown | null>(null)
@@ -18,11 +22,11 @@ async function onSubmit() {
     isError.value = false
     isLoading.value = true
 
-    const data = await $api.password.sendConfirmRequest({
-      body: { email: state.email },
+    await $api.profileRecovery.confirmRecoveryRequest({
+      body: { password: state.password, token: props.token },
     })
 
-    isSuccess.value = data.ok
+    isSuccess.value = true
   }
   catch (err) {
     error.value = err
@@ -37,7 +41,7 @@ async function onSubmit() {
 <template>
   <div>
     <h1 class="font-bold text-2xl text-center">
-      Відновити пароль
+      Встановити пароль
     </h1>
 
     <UForm
@@ -47,8 +51,8 @@ async function onSubmit() {
       class="space-y-4 mt-4"
       @submit="onSubmit"
     >
-      <UFormField label="Пошта" name="email">
-        <UInput v-model="state.email" class="w-full" />
+      <UFormField label="Новий пароль" name="password">
+        <UInput v-model="state.password" type="password" class="w-full" />
       </UFormField>
 
       <UButton
@@ -56,12 +60,16 @@ async function onSubmit() {
         variant="soft"
         type="submit"
       >
-        Відновити
+        Скинути
       </UButton>
     </UForm>
 
     <div v-else>
-      Ми надіслали на цю пошту посилання, за яким ви можете скинути пароль.
+      Ваш пароль було успішно змінено. Перейдіть на сторінку
+      <NuxtLink class="underline" href="/auth/login">
+        входу
+      </NuxtLink>, щоб увійти до свого акаунта за допомогою нового
+      пароя
     </div>
 
     <ErrorHanlder v-if="isError" :error="error" class="mt-4" />

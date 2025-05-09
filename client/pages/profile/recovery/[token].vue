@@ -15,6 +15,6 @@ const token = computed(
 
 <template>
   <div>
-    <AuthConfirmPasswordForm :token="token" />
+    <ProfileRecoveryConfirmPasswordForm :token="token || 'undefined'" />
   </div>
 </template>

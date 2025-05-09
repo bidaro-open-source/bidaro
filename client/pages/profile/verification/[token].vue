@@ -19,7 +19,7 @@ await callOnce(async () => {
       ? route.params.token[0]
       : route.params.token
 
-    await $api.profile.verifyConfirmEmailProfile({
+    await $api.profileVerification.confrimVerificationRequest({
       body: { token: token || '' },
     })
 
@@ -36,12 +36,10 @@ await callOnce(async () => {
 <template>
   <div>
     <div v-if="isSuccess">
-      Your email has been verified.
+      Вашу пошту було верефіковано!
     </div>
 
     <div v-if="isError">
-      <div>Something went wrong.</div>
-
       <ErrorHanlder :error="error" />
     </div>
   </div>

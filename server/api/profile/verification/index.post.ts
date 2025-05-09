@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     to: user.email,
     subject: 'Верифікуй свою пошту - Bidaro',
     template: {
-      html: `Верифікуй свою пошту, клікнувши <a href="${config.public.appUrl}/profile/verify/${token}">сюди</a>`,
+      html: `Верифікуй свою пошту, клікнувши <a href="${config.public.appUrl}/profile/verification/${token}">сюди</a>`,
       text: `Токен верифікації: ${token}`,
     },
   })

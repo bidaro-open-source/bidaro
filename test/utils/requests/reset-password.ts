@@ -1,15 +1,15 @@
 import type {
   ConfirmPasswordRequest,
-} from '~~/server/requests/auth/reset-password/confirm.post'
+} from '~~/server/requests/profile/recovery/confirm.post'
 import type {
   ResetPasswordRequest,
-} from '~~/server/requests/auth/reset-password/index.post'
+} from '~~/server/requests/profile/recovery/index.post'
 import { fetch } from '@nuxt/test-utils/e2e'
 
 export async function resetPasswordRequest(
   body: ResetPasswordRequest['body'],
 ) {
-  return await fetch('/api/auth/reset-password', {
+  return await fetch('/api/profile/recovery', {
     body: JSON.stringify({
       email: body.email,
     }),
@@ -23,7 +23,7 @@ export async function resetPasswordRequest(
 export async function confirmResetPasswordRequest(
   body: ConfirmPasswordRequest['body'],
 ) {
-  return await fetch('/api/auth/reset-password/confirm', {
+  return await fetch('/api/profile/recovery/confirm', {
     body: JSON.stringify({
       token: body.token,
       password: body.password,

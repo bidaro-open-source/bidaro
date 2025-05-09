@@ -13,7 +13,7 @@ export const useSessionsStore = defineStore('profile:sessions', {
     async fetchSessions() {
       const { $api } = useNuxtApp()
 
-      const data = await $api.profile.fetchSessions()
+      const data = await $api.profileSessions.fetchSessions()
 
       this.sessions = data
     },
@@ -21,7 +21,7 @@ export const useSessionsStore = defineStore('profile:sessions', {
     async deleteSessions(uuid: string) {
       const { $api } = useNuxtApp()
 
-      const data = await $api.profile.deleteSessions({
+      const data = await $api.profileSessions.deleteSessions({
         body: { uuids: [uuid] },
       })
 

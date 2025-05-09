@@ -1,6 +1,6 @@
 import {
   confirmResetPasswordRequest,
-} from '~~/server/requests/auth/reset-password/confirm.post'
+} from '~~/server/requests/profile/recovery/confirm.post'
 import {
   deletePasswordResetToken,
   getUserIdByResetToken,
@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
   if (!uid) {
     throw createError({
       statusCode: 404,
-      message: 'Token not found',
+      statusMessage: 'Not Found',
+      message: 'Токен скидання пароля не знайдено, можливо ви вже скинули пароль або час дії токена закінчився.',
     })
   }
 
@@ -25,7 +26,8 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 404,
-      message: 'User not found',
+      statusMessage: 'Not Found',
+      message: 'Токен скидання пароля правильний, проте акаунт не знайдений, можливо, користувача було видалено.',
     })
   }
 
@@ -34,8 +36,4 @@ export default defineEventHandler(async (event) => {
   })
 
   await deletePasswordResetToken(request.body.token)
-
-  return {
-    ok: true,
-  }
 })

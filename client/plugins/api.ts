@@ -1,7 +1,5 @@
 import type { FetchHook, FetchHooks, FetchOptions } from 'ofetch'
-import { createAuthApi } from '~/api/auth-api'
-import { createPasswordResetApi } from '~/api/password-reset-api'
-import { createProfileApi } from '~/api/profile-api'
+import { createApi } from '~/api'
 
 type Interceptors = keyof FetchHooks
 
@@ -73,9 +71,7 @@ export default defineNuxtPlugin(() => {
     useApi,
     addInterceptor,
     removeInterceptor,
-    auth: createAuthApi(useApi),
-    profile: createProfileApi(useApi),
-    password: createPasswordResetApi(useApi),
+    ...createApi(useApi),
   }
 
   return {
