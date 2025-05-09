@@ -18,7 +18,7 @@ const items = ref<NavigationMenuItem[]>([
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col min-h-screen">
     <TheHeader />
 
     <div class="mx-auto container pt-8 flex gap-14">
@@ -35,5 +35,7 @@ const items = ref<NavigationMenuItem[]>([
         <slot></slot>
       </div>
     </div>
+
+    <TheFooter class="mt-auto" />
   </div>
 </template>
