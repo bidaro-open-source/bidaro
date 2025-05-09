@@ -20,6 +20,6 @@ watch(
 
 <template>
   <div>
-    <ResetPasswordForm />
+    <AuthResetPasswordForm />
   </div>
 </template>

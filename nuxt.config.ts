@@ -10,10 +10,19 @@ export default defineNuxtConfig({
   },
 
   modules: [
+    '@nuxt/ui',
     '@nuxt/eslint',
     '@pinia/nuxt',
     '@bg-dev/nuxt-s3',
   ],
+
+  css: [
+    '~/assets/stylesheets/main.css',
+  ],
+
+  colorMode: {
+    preference: 'light',
+  },
 
   s3: {
     driver: 's3',

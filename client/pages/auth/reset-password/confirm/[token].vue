@@ -28,6 +28,6 @@ watch(
 
 <template>
   <div>
-    <ConfirmPasswordForm :token="token" />
+    <AuthConfirmPasswordForm :token="token" />
   </div>
 </template>

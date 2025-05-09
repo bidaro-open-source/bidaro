@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'auth',
+  layout: 'profile',
 })
 
 const auth = useAuthStore()
@@ -11,8 +11,8 @@ watch(
     isAuthenticated: auth.isAuthenticated,
   }),
   ({ isAuthenticated, isAuthenticating }) => {
-    if (!isAuthenticating && isAuthenticated)
-      navigateTo('/profile')
+    if (!isAuthenticating && !isAuthenticated)
+      navigateTo('/auth/login')
   },
   { immediate: true },
 )
@@ -20,6 +20,6 @@ watch(
 
 <template>
   <div>
-    <AuthRegisterForm />
+    <ProfileSessions />
   </div>
 </template>

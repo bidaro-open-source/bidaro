@@ -39,44 +39,29 @@ async function deleteSessions(uuid: string) {
     isLoading.value = false
   }
 }
+
+onMounted(() => {
+  fetchSessions()
+})
 </script>
 
 <template>
   <div v-if="auth.isAuthenticated">
     <ErrorHanlder v-if="isError" :error="error" />
 
-    <div>
-      <b>Sessions:</b>
-      {{ sessions.sessions.length ? '' : 'not loaded' }}
-    </div>
+    <h1 class="font-bold text-3xl">
+      Активні сесії
+    </h1>
 
-    <ul>
-      <li v-for="session in sessions.sessions" :key="session.uuid">
-        <b>{{ session.uuid }}</b>
-
-        <ul>
-          <li v-if="session.date">
-            <b>Date:</b>
-            {{
-              session.date ? new Date(session.date).toDateString() : 'no info'
-            }}
-          </li>
-          <li v-if="session.ua">
-            <b>User Agent:</b> {{ session.ua ? session.ua : 'not info' }}
-          </li>
-          <li>
-            <button @click="deleteSessions(session.uuid)">
-              Delete
-            </button>
-          </li>
-        </ul>
-      </li>
-    </ul>
-
-    <div>
-      <button :disabled="isLoading" @click="fetchSessions">
-        Fetch Sessions
-      </button>
+    <div class="flex flex-col gap-4 mt-6">
+      <ProfileSessionCard
+        v-for="session in sessions.sessions"
+        :key="session.uuid"
+        :uuid="session.uuid"
+        :date="session.date"
+        :ua="session.ua"
+        @delete="deleteSessions"
+      />
     </div>
   </div>
 </template>

@@ -20,6 +20,6 @@ watch(
 
 <template>
   <div>
-    <LoginForm />
+    <AuthLoginForm />
   </div>
 </template>
