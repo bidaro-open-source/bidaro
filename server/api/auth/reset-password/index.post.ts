@@ -27,7 +27,6 @@ export default defineEventHandler(async (event) => {
     to: request.body.email,
     subject: 'Скидання пароля - Bidaro',
     template: {
-      // eslint-disable-next-line max-len
       html: `Для скидання пароля, натисніть сюди <a href="${config.public.appUrl}/profile/verify/${token}">сюди</a>`,
       text: `Токен скидання пароля: ${token}`,
     },
