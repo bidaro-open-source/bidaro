@@ -1,4 +1,3 @@
-<!-- eslint-disable -->
 <template>
   <div class="flex flex-col min-h-screen">
     <TheHeader />
@@ -10,4 +9,3 @@
     <TheFooter class="mt-auto" />
   </div>
 </template>
- <!-- eslint-enable -->

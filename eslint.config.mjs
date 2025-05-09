@@ -36,7 +36,6 @@ export default withNuxt(
     },
     rules: {
       'no-console': 'off',
-      'max-len': ['error', { code: 80 }],
       'unused-imports/no-unused-vars': [
         'error',
         {
