@@ -101,3 +101,41 @@ export function useAuthMultitabsFeature() {
     broadcast.removeEventListener('message', onBroadcastMessage)
   })
 }
+
+/**
+ * Defines access restrictions for pages based on authentication status.
+ *
+ * This function sets up a watcher that automatically redirects users based
+ * on their authentication state and the specified restriction type:
+ *
+ * @param type - The type of restriction to apply
+ *   - 'auth': Page requires authenticated user
+ *   - 'guest': Page requires unauthenticated user
+ *
+ * @example
+ * // Protect a page that requires authentication
+ * definePageRestrictions('auth')
+ */
+export function definePageRestrictions(type: 'auth' | 'guest') {
+  const auth = useAuthStore()
+
+  watch(
+    () => ({
+      isAuthenticating: auth.isAuthenticating,
+      isAuthenticated: auth.isAuthenticated,
+    }),
+    ({ isAuthenticated, isAuthenticating }) => {
+      switch (type) {
+        case 'auth':
+          if (!isAuthenticating && !isAuthenticated)
+            navigateTo('/auth/login')
+          break
+        case 'guest':
+          if (!isAuthenticating && isAuthenticated)
+            navigateTo('/profile')
+          break
+      }
+    },
+    { immediate: true },
+  )
+}
