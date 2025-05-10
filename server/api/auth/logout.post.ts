@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const request = await validateRequest(event, logoutRequest)
+  const request = await logoutRequest(event)
 
   const session = await getAuthenticationSession(request.body.refresh_token)
 

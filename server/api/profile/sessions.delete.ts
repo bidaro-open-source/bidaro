@@ -5,7 +5,7 @@ import { deleteAuthenticationSessions } from '~~/server/services/authentication'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await validateRequest(event, deleteSessionsRequest)
+  const request = await deleteSessionsRequest(event)
 
   mustBeAuthorized(event, deleteSessionsPolicy)
 

@@ -5,7 +5,7 @@ import { createProfileResource } from '~~/server/resources/profile-resource'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await validateRequest(event, updateProfileRequest)
+  const request = await updateProfileRequest(event)
 
   const user = getAuthenticatedUser(event)
 

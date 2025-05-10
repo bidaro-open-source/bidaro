@@ -6,7 +6,7 @@ import { createPasswordResetToken } from '~~/server/services/password-reset'
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
 
-  const request = await validateRequest(event, resetPasswordRequest)
+  const request = await resetPasswordRequest(event)
 
   const user = await db.User.findOne({
     where: { email: request.body.email },

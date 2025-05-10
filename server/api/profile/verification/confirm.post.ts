@@ -6,7 +6,7 @@ import {
 import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
-  const request = await validateRequest(event, emailVerifyConfirmRequest)
+  const request = await emailVerifyConfirmRequest(event)
 
   const uid = await getUserIdByEmailVerificationToken(
     request.body.token,

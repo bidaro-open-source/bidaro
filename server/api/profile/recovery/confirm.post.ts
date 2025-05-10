@@ -9,7 +9,7 @@ import {
 export default defineEventHandler(async (event) => {
   const db = useDatabase()
 
-  const request = await validateRequest(event, confirmResetPasswordRequest)
+  const request = await confirmResetPasswordRequest(event)
 
   const uid = await getUserIdByResetToken(request.body.token)
 

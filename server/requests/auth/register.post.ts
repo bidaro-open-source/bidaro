@@ -1,16 +1,12 @@
 import { z } from 'zod'
 import { emailSchema, passwordSchema, usernameSchema } from '~~/server/zod'
 
-export const bodySchema = z.object({
-  email: emailSchema,
-  username: usernameSchema,
-  password: passwordSchema,
+export type RegisterRequest = ValidatorReturnType<typeof registerRequest>
+
+export const registerRequest = createRequestValidator({
+  body: z.object({
+    email: emailSchema,
+    username: usernameSchema,
+    password: passwordSchema,
+  }),
 })
-
-export type RegisterRequest = Awaited<ReturnType<typeof registerRequest>>
-
-export async function registerRequest(event: H3Event) {
-  return {
-    body: await readValidatedBody(event, bodySchema.parse),
-  }
-}

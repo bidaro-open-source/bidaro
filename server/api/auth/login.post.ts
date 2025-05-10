@@ -5,7 +5,7 @@ import { createAuthenticationSession } from '~~/server/services/authentication'
 import { fetchUserByUsername } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
-  const request = await validateRequest(event, loginRequest)
+  const request = await loginRequest(event)
 
   const user = await fetchUserByUsername(request.body.username)
 

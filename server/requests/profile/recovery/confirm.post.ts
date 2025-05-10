@@ -1,17 +1,13 @@
 import { z } from 'zod'
 import { passwordSchema } from '~~/server/zod'
 
-export const bodySchema = z.object({
-  token: z.string(),
-  password: passwordSchema,
-})
-
-export type ConfirmPasswordRequest = Awaited<
-  ReturnType<typeof confirmResetPasswordRequest>
+export type ConfirmPasswordRequest = ValidatorReturnType<
+  typeof confirmResetPasswordRequest
 >
 
-export async function confirmResetPasswordRequest(event: H3Event) {
-  return {
-    body: await readValidatedBody(event, bodySchema.parse),
-  }
-}
+export const confirmResetPasswordRequest = createRequestValidator({
+  body: z.object({
+    token: z.string(),
+    password: passwordSchema,
+  }),
+})

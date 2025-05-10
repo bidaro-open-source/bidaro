@@ -7,7 +7,7 @@ import {
 import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
-  const request = await validateRequest(event, refreshRequest)
+  const request = await refreshRequest(event)
 
   const oldSession = await getAuthenticationSession(request.body.refresh_token)
 

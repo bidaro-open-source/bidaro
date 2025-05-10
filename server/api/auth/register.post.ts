@@ -8,7 +8,7 @@ import { createAuthenticationSession } from '~~/server/services/authentication'
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)
 
-  const request = await validateRequest(event, registerRequest)
+  const request = await registerRequest(event)
 
   const userInDB = await db.User.findAll({
     where: {

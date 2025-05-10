@@ -2,24 +2,24 @@ import { z } from 'zod'
 import { getRefreshTokenCookie } from '~~/server/utils/refresh-token-cookie'
 import { refreshTokenSchema } from '~~/server/zod'
 
-export const bodySchema = z.object({
+const bodySchema = z.object({
   refresh_token: refreshTokenSchema,
 })
 
-export type LogoutRequest = Awaited<ReturnType<typeof logoutRequest>>
+export type LogoutRequest = ValidatorReturnType<typeof logoutRequest>
 
-export async function logoutRequest(event: H3Event) {
-  const refreshTokenCookie = getRefreshTokenCookie(event)
-  let body
+export const logoutRequest = createRequestValidator({
+  body: async (event) => {
+    const refreshTokenCookie = getRefreshTokenCookie(event)
+    let body
 
-  if (refreshTokenCookie) {
-    body = bodySchema.parse({ refresh_token: refreshTokenCookie })
-  }
-  else {
-    body = await readValidatedBody(event, body => bodySchema.parse(body || {}))
-  }
+    if (refreshTokenCookie) {
+      body = bodySchema.parse({ refresh_token: refreshTokenCookie })
+    }
+    else {
+      body = bodySchema.parse(await readBody(event))
+    }
 
-  return {
-    body,
-  }
-}
+    return body
+  },
+})
