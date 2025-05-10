@@ -1,4 +1,4 @@
-import { logoutRequest } from '~~/server/requests/auth/logout.post'
+import { logoutRequest } from '~~/server/requests/auth/logout.request'
 import {
   deleteAuthenticationSession,
   getAuthenticationSession,

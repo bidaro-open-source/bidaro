@@ -1,4 +1,4 @@
-import type { DeleteSessionsRequest } from '~~/server/requests/profile/sessions'
+import type { DeleteSessionsRequest } from '~~/server/requests/profile/sessions.request'
 
 export function createProfileSessionsApi(fetch: typeof $fetch) {
   return {

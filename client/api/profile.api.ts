@@ -1,4 +1,4 @@
-import type { UpdateProfileRequest } from '~~/server/requests/profile/profile'
+import type { UpdateProfileRequest } from '~~/server/requests/profile/profile.request'
 
 export function createProfileApi(fetch: typeof $fetch) {
   return {

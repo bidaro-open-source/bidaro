@@ -1,8 +1,8 @@
 import { Op } from 'sequelize'
 import { z } from 'zod'
 import { roles } from '~~/server/constants'
-import { registerRequest } from '~~/server/requests/auth/register.post'
-import { createProfileResource } from '~~/server/resources/profile-resource'
+import { registerRequest } from '~~/server/requests/auth/register.request'
+import { createProfileResource } from '~~/server/resources/profile.resource'
 import { createAuthenticationSession } from '~~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {

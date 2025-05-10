@@ -1,8 +1,8 @@
 import type registerApi from '~~/server/api/auth/register.post'
-import type { LoginRequest } from '~~/server/requests/auth/login.post'
-import type { LogoutRequest } from '~~/server/requests/auth/logout.post'
-import type { RefreshRequest } from '~~/server/requests/auth/refresh.post'
-import type { RegisterRequest } from '~~/server/requests/auth/register.post'
+import type { LoginRequest } from '~~/server/requests/auth/login.request'
+import type { LogoutRequest } from '~~/server/requests/auth/logout.request'
+import type { RefreshRequest } from '~~/server/requests/auth/refresh.request'
+import type { RegisterRequest } from '~~/server/requests/auth/register.request'
 import type { AccessToken } from '~~/server/utils/crypto-access-token'
 import { fetch } from '@nuxt/test-utils/e2e'
 

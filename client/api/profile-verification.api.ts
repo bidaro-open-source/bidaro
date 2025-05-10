@@ -1,6 +1,6 @@
 import type {
   EmailVerifyConfirmRequest,
-} from '~~/server/requests/profile/verification/confrim.post'
+} from '~~/server/requests/profile/verification/confrim.request'
 
 export function createProfileVerificationApi(fetch: typeof $fetch) {
   return {

@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { loginRequest } from '~~/server/requests/auth/login.post'
-import { createProfileResource } from '~~/server/resources/profile-resource'
+import { loginRequest } from '~~/server/requests/auth/login.request'
+import { createProfileResource } from '~~/server/resources/profile.resource'
 import { createAuthenticationSession } from '~~/server/services/authentication'
 import { fetchUserByUsername } from '~~/server/services/users-service'
 

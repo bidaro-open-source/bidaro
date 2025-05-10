@@ -1,7 +1,7 @@
 import {
   resetPasswordRequest,
-} from '~~/server/requests/profile/recovery/index.post'
-import { createPasswordResetToken } from '~~/server/services/password-reset'
+} from '~~/server/requests/profile/recovery/index.request'
+import { createPasswordResetToken } from '~~/server/services/profile-recovery'
 
 export default defineEventHandler(async (event) => {
   const db = useDatabase(event)

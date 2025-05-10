@@ -1,7 +1,7 @@
 import {
   createEmailVerificationToken,
   deleteEmailVerificationTokenByUid,
-} from '~~/server/services/email-verification'
+} from '~~/server/services/profile-verification'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

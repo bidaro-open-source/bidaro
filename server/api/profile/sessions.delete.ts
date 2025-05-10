@@ -1,5 +1,5 @@
-import { deleteSessionsPolicy } from '~~/server/policies/profile/sessions'
-import { deleteSessionsRequest } from '~~/server/requests/profile/sessions'
+import { deleteSessionsPolicy } from '~~/server/policies/profile/sessions.policy'
+import { deleteSessionsRequest } from '~~/server/requests/profile/sessions.request'
 import { deleteAuthenticationSessions } from '~~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {

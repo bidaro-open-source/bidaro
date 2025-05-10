@@ -1,8 +1,8 @@
-import { emailVerifyConfirmRequest } from '~~/server/requests/profile/verification/confrim.post'
+import { emailVerifyConfirmRequest } from '~~/server/requests/profile/verification/confrim.request'
 import {
   deleteEmailVerificationTokenByUid,
   getUserIdByEmailVerificationToken,
-} from '~~/server/services/email-verification'
+} from '~~/server/services/profile-verification'
 import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {

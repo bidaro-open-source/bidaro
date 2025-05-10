@@ -2,7 +2,7 @@ import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
-} from '~~/server/services/password-reset'
+} from '~~/server/services/profile-recovery'
 import {
   destroyUser,
   registerUser,

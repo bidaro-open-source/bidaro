@@ -1,5 +1,5 @@
-import { refreshRequest } from '~~/server/requests/auth/refresh.post'
-import { createProfileResource } from '~~/server/resources/profile-resource'
+import { refreshRequest } from '~~/server/requests/auth/refresh.request'
+import { createProfileResource } from '~~/server/resources/profile.resource'
 import {
   getAuthenticationSession,
   updateAuthenticationSession,

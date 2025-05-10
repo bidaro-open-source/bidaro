@@ -1,9 +1,9 @@
 import type {
   ConfirmPasswordRequest,
-} from '~~/server/requests/profile/recovery/confirm.post'
+} from '~~/server/requests/profile/recovery/confirm.request'
 import type {
   ResetPasswordRequest,
-} from '~~/server/requests/profile/recovery/index.post'
+} from '~~/server/requests/profile/recovery/index.request'
 import { fetch } from '@nuxt/test-utils/e2e'
 
 export async function resetPasswordRequest(
