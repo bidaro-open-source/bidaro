@@ -161,6 +161,7 @@ const name = computed(
           <UButton color="neutral" href="/auth/register">
             Реєстрація
           </UButton>
+          <ThemeDropdown />
         </div>
       </div>
     </div>
