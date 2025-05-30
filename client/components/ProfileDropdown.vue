@@ -93,7 +93,7 @@ const tabs = ref<TabsItem[]>([
       sideOffset: 0,
     }"
     :ui="{
-      content: 'w-64',
+      content: 'w-68',
     }"
   >
     <UButton
