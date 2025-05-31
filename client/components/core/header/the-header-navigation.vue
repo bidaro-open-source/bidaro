@@ -86,13 +86,13 @@ const items = ref<NavigationMenuItem[]>([
       {
         label: 'Як продавати?',
         description: 'Інструкція для продавців: як створити лот і почати торгувати.',
-        href: '/faq/1',
+        href: '/guide-for-sellers',
         icon: 'i-lucide-upload',
       },
       {
         label: 'Як купувати?',
         description: 'Покроковий гайд для покупців: як знайти лот і зробити ставку.',
-        href: '/faq/2',
+        href: '/guide-for-buyers',
         icon: 'i-lucide-shopping-cart',
       },
     ],
@@ -103,11 +103,13 @@ const items = ref<NavigationMenuItem[]>([
       {
         label: 'Партнери',
         description: 'Компанії та бренди, які співпрацюють з нами.',
+        href: '/partners',
         icon: 'i-lucide-handshake',
       },
       {
         label: 'Вакансії',
         description: 'Актуальні вакансії в команді аукціону. Приєднуйся до нас!',
+        href: '/vacancies',
         icon: 'i-lucide-briefcase',
       },
       {

@@ -56,7 +56,7 @@ async function onSubmit() {
     </UForm>
 
     <div class="text-center mt-4">
-      <UButton variant="link" href="/auth/reset-password">
+      <UButton variant="link" href="/profile/recovery">
         Забули пароль?
       </UButton>
     </div>
