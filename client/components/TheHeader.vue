@@ -135,9 +135,9 @@ const name = computed(
 
 <template>
   <header class="bg-default/75 backdrop-blur border-b border-default sticky top-0 z-50">
-    <div class="mx-auto px-4 container flex items-center justify-between min-h-14">
+    <div class="mx-auto px-4 container flex items-center justify-between min-h-16">
       <NuxtLink href="/" class="text-2xl font-medium">
-        Bidaro
+        <WebsiteLogoFull :height="29" />
       </NuxtLink>
 
       <UNavigationMenu :items="items" :ui="ui" class="w-full max-w-4xl justify-center" />

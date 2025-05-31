@@ -21,7 +21,8 @@ export default defineNuxtConfig({
   ],
 
   colorMode: {
-    preference: 'light',
+    preference: 'system',
+    storage: 'cookie',
   },
 
   s3: {
