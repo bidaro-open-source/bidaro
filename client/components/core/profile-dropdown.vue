@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DropdownMenuItem, TabsItem } from '@nuxt/ui'
+import type { DropdownMenuItem } from '@nuxt/ui'
 
 const props = defineProps<{
   name: string
@@ -8,8 +8,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['logout'])
-
-const colorMode = useColorMode()
 
 const items = computed(() => {
   const baseItems: DropdownMenuItem[][] = [
@@ -64,24 +62,6 @@ const items = computed(() => {
 
   return baseItems
 })
-
-const tabs = ref<TabsItem[]>([
-  {
-    value: 'light',
-    icon: 'i-lucide-sun',
-    label: 'Light',
-  },
-  {
-    value: 'dark',
-    icon: 'i-lucide-moon',
-    label: 'Dark',
-  },
-  {
-    value: 'system',
-    icon: 'i-lucide-monitor',
-    label: 'System',
-  },
-])
 </script>
 
 <template>
@@ -119,14 +99,7 @@ const tabs = ref<TabsItem[]>([
     </template>
 
     <template #theme>
-      <UTabs
-        v-model="colorMode.preference"
-        :items="tabs"
-        :content="false"
-        color="neutral"
-        class="w-full"
-        size="xs"
-      />
+      <ThemeSwitcher />
     </template>
 
     <template #verification>

@@ -25,6 +25,13 @@ export default defineNuxtConfig({
     storage: 'cookie',
   },
 
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+
   s3: {
     driver: 's3',
     server: false,

@@ -29,7 +29,7 @@ async function onSubmit() {
 
 <template>
   <div v-if="auth.isAuthenticated">
-    <ErrorHanlder v-if="isError" :error="error" />
+    <ErrorHandler v-if="isError" :error="error" />
 
     <h2 class="font-bold text-2xl">
       Верифікувати пошту

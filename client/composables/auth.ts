@@ -20,7 +20,7 @@ export function useAuthRepeatReqestFeature() {
   const auth = useAuthStore()
   const { $api } = useNuxtApp()
 
-  async function onResponseErrorHanlder(ctx: FetchContext) {
+  async function onResponseErrorHandler(ctx: FetchContext) {
     if (
       ctx.response
       && ctx.response.status === 401
@@ -33,11 +33,11 @@ export function useAuthRepeatReqestFeature() {
   }
 
   onMounted(() => {
-    $api.addInterceptor('onResponseError', onResponseErrorHanlder)
+    $api.addInterceptor('onResponseError', onResponseErrorHandler)
   })
 
   onUnmounted(() => {
-    $api.removeInterceptor('onResponseError', onResponseErrorHanlder)
+    $api.removeInterceptor('onResponseError', onResponseErrorHandler)
   })
 }
 

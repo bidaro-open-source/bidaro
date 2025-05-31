@@ -3,8 +3,7 @@ const { $api } = useNuxtApp()
 const auth = useAuthStore()
 
 const state = reactive({
-  name: '',
-  surname: '',
+  email: '',
 })
 
 const error = ref<unknown | null>(null)
@@ -19,7 +18,7 @@ async function onSubmit() {
     isLoading.value = true
 
     const data = await $api.profile.updateProfile({
-      body: { name: state.name, surname: state.surname },
+      body: { email: state.email },
     })
 
     auth.user = data
@@ -37,10 +36,10 @@ async function onSubmit() {
 
 <template>
   <div v-if="auth.isAuthenticated">
-    <ErrorHanlder v-if="isError" :error="error" />
+    <ErrorHandler v-if="isError" :error="error" />
 
     <h2 class="font-bold text-2xl">
-      Змінити особисті дані
+      Змінити особисту потшу
     </h2>
 
     <UAlert
@@ -48,7 +47,7 @@ async function onSubmit() {
       color="success"
       variant="subtle"
       title="Успішно"
-      description="Ваші особисті дані було оновлено"
+      description="Ваша пошта була оновлена"
       class="w-full mt-4"
       close
       @update:open="isSuccess = false"
@@ -60,12 +59,8 @@ async function onSubmit() {
       class="flex gap-4 mt-4 items-end"
       @submit="onSubmit"
     >
-      <UFormField label="Ім'я" name="username">
-        <UInput v-model="state.name" />
-      </UFormField>
-
-      <UFormField label="Прізвище" name="username">
-        <UInput v-model="state.surname" />
+      <UFormField label="Нова пошта" name="email">
+        <UInput v-model="state.email" />
       </UFormField>
 
       <UButton color="neutral" variant="soft" type="submit">

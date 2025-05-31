@@ -40,7 +40,7 @@ await callOnce(async () => {
     </div>
 
     <div v-if="isError">
-      <ErrorHanlder :error="error" />
+      <ErrorHandler :error="error" />
     </div>
   </div>
 </template>

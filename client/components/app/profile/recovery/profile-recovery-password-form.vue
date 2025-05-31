@@ -64,6 +64,6 @@ async function onSubmit() {
       Ми надіслали на цю пошту посилання, за яким ви можете скинути пароль.
     </div>
 
-    <ErrorHanlder v-if="isError" :error="error" class="mt-4" />
+    <ErrorHandler v-if="isError" :error="error" class="mt-4" />
   </div>
 </template>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
-const auth = useAuthStore()
-
 const items = ref<NavigationMenuItem[]>([
   {
     label: 'Про нас',
@@ -127,43 +125,8 @@ const ui = ref({
   item: 'px-2',
   childList: 'grid-cols-3',
 })
-
-const name = computed(
-  () => auth.user && auth.user.name ? auth.user.name : auth.user?.username,
-)
 </script>
 
 <template>
-  <header class="bg-default/75 backdrop-blur border-b border-default sticky top-0 z-50">
-    <div class="mx-auto px-4 container flex items-center justify-between min-h-16">
-      <NuxtLink href="/" class="text-2xl font-medium">
-        <WebsiteLogoFull :height="29" />
-      </NuxtLink>
-
-      <UNavigationMenu :items="items" :ui="ui" class="w-full max-w-4xl justify-center" />
-
-      <div class="w-48 flex justify-end">
-        <USkeleton v-if="auth.isAuthenticating" class="h-9 w-9 mr-[6px] rounded-full" />
-
-        <div v-else-if="auth.isAuthenticated" class="flex gap-2">
-          <ProfileDropdown
-            :name="name || 'undefined'"
-            :email="auth.user?.email || 'undefined'"
-            :email-verified="!!auth.user?.emailVerifiedAt"
-            @logout="auth.logout()"
-          />
-        </div>
-
-        <div v-else class="flex gap-2">
-          <UButton color="neutral" variant="outline" href="/auth/login">
-            Увійти
-          </UButton>
-          <UButton color="neutral" href="/auth/register">
-            Реєстрація
-          </UButton>
-          <ThemeDropdown />
-        </div>
-      </div>
-    </div>
-  </header>
+  <UNavigationMenu :items="items" :ui="ui" class="w-full max-w-4xl justify-center" />
 </template>

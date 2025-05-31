@@ -47,7 +47,7 @@ onMounted(() => {
 
 <template>
   <div v-if="auth.isAuthenticated">
-    <ErrorHanlder v-if="isError" :error="error" />
+    <ErrorHandler v-if="isError" :error="error" />
 
     <h1 class="font-bold text-3xl">
       Активні сесії
