@@ -32,6 +32,12 @@ export default defineNuxtConfig({
     },
   ],
 
+  routeRules: {
+    '/creation/**': { ssr: false },
+    '/profile/**': { ssr: false },
+    '/api/**': { cors: true },
+  },
+
   s3: {
     driver: 's3',
     server: false,

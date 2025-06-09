@@ -3,12 +3,22 @@ import type {
   BelongsToSetAssociationMixin,
   CreationOptional,
   ForeignKey,
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManySetAssociationsMixin,
   InferAttributes,
   InferCreationAttributes,
   NonAttribute,
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
+import type { Lot } from './Lot'
 import type { Role } from './Role'
 import { DataTypes, Model } from 'sequelize'
 
@@ -34,7 +44,26 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare setRole: BelongsToSetAssociationMixin<Role, number>
   declare getRole: BelongsToGetAssociationMixin<Role>
 
+  // Lots associations
+  declare lots?: NonAttribute<Lot[]>
+  declare getLots: HasManyGetAssociationsMixin<Lot>
+  declare addLot: HasManyAddAssociationMixin<Lot, number>
+  declare addLots: HasManyAddAssociationsMixin<Lot, number>
+  declare setLots: HasManySetAssociationsMixin<Lot, number>
+  declare removeLot: HasManyRemoveAssociationMixin<Lot, number>
+  declare removeLots: HasManyRemoveAssociationsMixin<Lot, number>
+  declare hasLot: HasManyHasAssociationMixin<Lot, string>
+  declare hasLots: HasManyHasAssociationsMixin<Lot, number>
+  declare countLots: HasManyCountAssociationsMixin
+
   static associate(database: Database) {
+    database.User.hasMany(database.Lot, {
+      as: 'lots',
+      foreignKey: {
+        name: 'userId',
+        allowNull: false,
+      },
+    })
     database.User.belongsTo(database.Role, {
       as: 'role',
     })

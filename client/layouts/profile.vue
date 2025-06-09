@@ -7,6 +7,10 @@ const items = ref<NavigationMenuItem[]>([
     to: '/profile',
   },
   {
+    label: 'Мої лоти',
+    to: '/profile/lots',
+  },
+  {
     label: 'Налаштування',
     to: '/profile/settings',
   },

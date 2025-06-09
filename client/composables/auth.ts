@@ -6,7 +6,7 @@ import type { FetchContext } from 'ofetch'
 export function useAuthInitialize() {
   const auth = useAuthStore()
   auth.isAuthenticating = true
-  onMounted(auth.refresh)
+  onBeforeMount(auth.refresh)
 }
 
 /**
@@ -32,7 +32,7 @@ export function useAuthRepeatReqestFeature() {
     return Promise.reject(ctx.response?._data)
   }
 
-  onMounted(() => {
+  onBeforeMount(() => {
     $api.addInterceptor('onResponseError', onResponseErrorHandler)
   })
 
@@ -58,7 +58,7 @@ export function useAuthHeadersRequestFeature() {
     }
   }
 
-  onMounted(() => {
+  onBeforeMount(() => {
     $api.addInterceptor('onRequest', onRequestHanlder)
   })
 
@@ -91,7 +91,7 @@ export function useAuthMultitabsFeature() {
 
   const onBroadcastMessage = (event: MessageEvent) => onMessage(event.data)
 
-  onMounted(() => {
+  onBeforeMount(() => {
     setEmmiter((data: string) => broadcast.postMessage(data))
     broadcast.addEventListener('message', onBroadcastMessage)
   })

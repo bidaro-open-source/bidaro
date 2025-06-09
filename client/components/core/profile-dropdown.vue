@@ -30,6 +30,11 @@ const items = computed(() => {
         to: '/profile',
       },
       {
+        label: 'Мої лоти',
+        icon: 'i-lucide-user',
+        to: '/profile/lots',
+      },
+      {
         label: 'Налаштування',
         icon: 'i-lucide-cog',
         to: '/profile/settings',
