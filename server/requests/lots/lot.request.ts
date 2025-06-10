@@ -46,3 +46,17 @@ export const deleteLotRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
 })
+
+export type PublishLotRequest = ValidatorReturnType<typeof publishLotRequest>
+export const publishLotRequest = createRequestValidator({
+  params: z.object({
+    id: primaryKeySchema,
+  }),
+})
+
+export type ShipLotRequest = ValidatorReturnType<typeof shipLotRequest>
+export const shipLotRequest = createRequestValidator({
+  params: z.object({
+    id: primaryKeySchema,
+  }),
+})

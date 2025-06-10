@@ -1,5 +1,5 @@
 import type { Lot } from '../database'
-import { normalizeInterval } from '../services/lot-service'
+import { normalizeLotDuration } from '../services/lot-service'
 
 export type LotResource = ReturnType<typeof createLotResource>
 
@@ -9,7 +9,7 @@ export function createLotResource(entity: Lot) {
     title: ensureIncludedKey(entity, 'title'),
     description: ensureIncludedKey(entity, 'description'),
     status: ensureIncludedKey(entity, 'statusName') as string,
-    duration: normalizeInterval(ensureIncludedKey(entity, 'duration')),
+    duration: normalizeLotDuration(ensureIncludedKey(entity, 'duration')),
     startDate: ensureIncludedKey(entity, 'startDate'),
     endDate: ensureIncludedKey(entity, 'endDate'),
   }

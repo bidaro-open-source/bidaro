@@ -30,7 +30,7 @@ async function onSubmit() {
     const { $api } = useNuxtApp()
 
     await $api.lots.updateLot({
-      params: { id: props.id },
+      params: { id: +props.id },
       body: {
         title: state.title,
         description: state.description,
@@ -52,7 +52,7 @@ onMounted(async () => {
     const { $api } = useNuxtApp()
 
     const data = await $api.lots.fetchLot({
-      params: { id: props.id },
+      params: { id: +props.id },
     })
 
     state.title = data.title

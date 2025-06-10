@@ -1,4 +1,5 @@
 import { deleteLotRequest } from '~~/server/requests/lots/lot.request'
+import { getUserLot } from '~~/server/services/lot-service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -7,23 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await deleteLotRequest(event)
 
-  const db = useDatabase()
-
-  const lot = await db.Lot.findByPk(request.params.id)
-
-  if (!lot) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Лот не знайдено',
-    })
-  }
-
-  if (lot.userId !== user.id) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Вам не дозволено видаляти цей лот',
-    })
-  }
+  const lot = await getUserLot(request.params.id, user.id)
 
   if (lot.statusName !== 'draft') {
     throw createError({

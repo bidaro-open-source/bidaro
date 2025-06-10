@@ -1,5 +1,6 @@
 import { getLotRequest } from '~~/server/requests/lots/lot.request'
 import { createLotResource } from '~~/server/resources/lot.resource'
+import { getLot } from '~~/server/services/lot-service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -8,21 +9,13 @@ export default defineEventHandler(async (event) => {
 
   const request = await getLotRequest(event)
 
-  const db = useDatabase()
+  const lot = await getLot(request.params.id, { withUser: true })
 
-  const lot = await db.Lot.findByPk(request.params.id)
-
-  if (!lot) {
+  if (lot.statusName === 'draft' && lot.userId !== user.id) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Лот не знайдено',
-    })
-  }
-
-  if (lot.userId !== user.id && lot.statusName === 'draft') {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Лот не знайдено',
+      statusMessage: 'Not Found',
+      message: 'Лот не знайдено',
     })
   }
 

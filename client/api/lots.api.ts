@@ -2,10 +2,12 @@ import type {
   CreateLotRequest,
   DeleteLotRequest,
   GetLotRequest,
+  PublishLotRequest,
+  ShipLotRequest,
   UpdateLotRequest,
 } from '~~/server/requests/lots/lot.request'
 
-export function createLotApi(fetch: typeof $fetch) {
+export function createLotsApi(fetch: typeof $fetch) {
   return {
     async fetchLot(payload: GetLotRequest) {
       return fetch(`/api/lots/${payload.params.id}`, {
@@ -27,6 +29,16 @@ export function createLotApi(fetch: typeof $fetch) {
     async deleteLot(payload: DeleteLotRequest) {
       return fetch(`/api/lots/${payload.params.id}`, {
         method: 'DELETE',
+      })
+    },
+    async publishLot(payload: PublishLotRequest) {
+      return fetch(`/api/lots/${payload.params.id}/publish`, {
+        method: 'POST',
+      })
+    },
+    async shipLot(payload: ShipLotRequest) {
+      return fetch(`/api/lots/${payload.params.id}/ship`, {
+        method: 'POST',
       })
     },
   }

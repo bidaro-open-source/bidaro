@@ -6,6 +6,8 @@ definePageMeta({
   layout: 'profile',
 })
 
+const auth = useAuthStore()
+
 const data = ref<LotResource[]>([])
 const error = ref<unknown | null>(null)
 const isError = ref(false)
@@ -19,7 +21,9 @@ onMounted(async () => {
 
     const { $api } = useNuxtApp()
 
-    data.value = await $api.profileLots.fetchLots() as LotResource[]
+    data.value = await $api.users.fetchUserLots({
+      params: { id: auth.user?.id || 0 },
+    }) as LotResource[]
   }
   catch (err) {
     error.value = err
