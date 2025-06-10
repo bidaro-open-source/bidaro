@@ -11,6 +11,7 @@ const items = ref([
 const state = reactive({
   title: '',
   description: '',
+  initialAmount: 1,
   duration: '1_day' as const,
   immediatelyPublish: false,
 })
@@ -29,6 +30,7 @@ async function onSubmit() {
         title: state.title,
         description: state.description,
         duration: state.duration,
+        initialAmount: state.initialAmount,
         immediatelyPublish: state.immediatelyPublish,
       },
     })
@@ -62,6 +64,10 @@ async function onSubmit() {
 
       <UFormField label="Час" name="duration">
         <USelect v-model="state.duration" :items="items" class="w-48" />
+      </UFormField>
+
+      <UFormField label="Початкова ціна" name="title">
+        <UInput v-model="state.initialAmount" class="w-full" type="number" />
       </UFormField>
 
       <UFormField name="immediatelyPublish">

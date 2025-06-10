@@ -17,6 +17,7 @@ const isError = ref(false)
 const state = reactive({
   title: '',
   description: '',
+  initialAmount: 1,
   duration: '1_day' as const,
   immediatelyPublish: false,
   hideImmediatelyPublish: false,
@@ -35,6 +36,7 @@ async function onSubmit() {
         title: state.title,
         description: state.description,
         duration: state.duration,
+        initialAmount: state.initialAmount,
         immediatelyPublish: state.immediatelyPublish,
       },
     })
@@ -57,6 +59,7 @@ onMounted(async () => {
 
     state.title = data.title
     state.description = data.description || ''
+    state.initialAmount = data.initialAmount
     state.duration = data.duration as any
     state.immediatelyPublish = data.status === 'draft'
     state.hideImmediatelyPublish = data.status !== 'draft'
@@ -91,6 +94,10 @@ onMounted(async () => {
 
       <UFormField label="Час" name="duration">
         <USelect v-model="state.duration" :items="items" class="w-48" />
+      </UFormField>
+
+      <UFormField label="Початкова ціна" name="title">
+        <UInput v-model="state.initialAmount" class="w-full" type="number" />
       </UFormField>
 
       <UFormField v-if="!state.hideImmediatelyPublish" name="immediatelyPublish">

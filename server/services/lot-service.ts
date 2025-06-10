@@ -5,6 +5,7 @@ import { Op } from 'sequelize'
  * Options for fetching lot
  */
 interface GetLotOptions {
+  withBets?: boolean
   withUser?: boolean
 }
 
@@ -21,6 +22,10 @@ export async function getLot(
 ): Promise<Lot> {
   const db = useDatabase()
   const include = []
+
+  if (options.withBets) {
+    include.push({ model: db.LotBet, as: 'bets' })
+  }
 
   if (options.withUser) {
     include.push({ model: db.User, as: 'user' })

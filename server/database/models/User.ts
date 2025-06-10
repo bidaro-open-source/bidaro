@@ -56,6 +56,18 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare hasLots: HasManyHasAssociationsMixin<Lot, number>
   declare countLots: HasManyCountAssociationsMixin
 
+  // Lots associations
+  declare bets?: NonAttribute<Lot[]>
+  declare getBets: HasManyGetAssociationsMixin<Lot>
+  declare addBet: HasManyAddAssociationMixin<Lot, number>
+  declare addBets: HasManyAddAssociationsMixin<Lot, number>
+  declare setBets: HasManySetAssociationsMixin<Lot, number>
+  declare removeBet: HasManyRemoveAssociationMixin<Lot, number>
+  declare removeBets: HasManyRemoveAssociationsMixin<Lot, number>
+  declare hasBet: HasManyHasAssociationMixin<Lot, string>
+  declare hasBets: HasManyHasAssociationsMixin<Lot, number>
+  declare countBets: HasManyCountAssociationsMixin
+
   static associate(database: Database) {
     database.User.hasMany(database.Lot, {
       as: 'lots',
@@ -64,6 +76,15 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
         allowNull: false,
       },
     })
+
+    database.User.hasMany(database.LotBet, {
+      as: 'bets',
+      foreignKey: {
+        name: 'userId',
+        allowNull: false,
+      },
+    })
+
     database.User.belongsTo(database.Role, {
       as: 'role',
     })

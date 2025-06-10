@@ -1,5 +1,6 @@
 import { updateLotRequest } from '~~/server/requests/lots/lot.request'
 import { createLotResource } from '~~/server/resources/lot.resource'
+import { createLotBet } from '~~/server/services/lot-bet-service'
 import { getUserLot, updateLotData, updateLotDuration, updateLotStatusToPublished } from '~~/server/services/lot-service'
 
 export default defineEventHandler(async (event) => {
@@ -28,6 +29,8 @@ export default defineEventHandler(async (event) => {
 
   if (request.body.immediatelyPublish) {
     updateLotStatusToPublished(lot)
+
+    await createLotBet(lot.id, user.id, lot.initialAmount)
   }
 
   await lot.save()

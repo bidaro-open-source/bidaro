@@ -51,6 +51,10 @@ export const up: Migration = async ({ context }) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    initialAmount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     startDate: {
       type: DataTypes.DATE,
       allowNull: true,

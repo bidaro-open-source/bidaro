@@ -3,6 +3,15 @@ import type {
   BelongsToSetAssociationMixin,
   CreationOptional,
   ForeignKey,
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManySetAssociationsMixin,
   InferAttributes,
   InferCreationAttributes,
   NonAttribute,
@@ -23,8 +32,11 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare duration: number
   declare startDate: Date | null
   declare endDate: Date | null
+  declare initialAmount: number
   declare userId: ForeignKey<User['id']>
   declare statusName: ForeignKey<LotStatus['name']>
+  declare createdAt: CreationOptional<Date>
+  declare updatedAt: CreationOptional<Date | null>
 
   // LotStatus association
   declare user?: NonAttribute<User>
@@ -36,7 +48,24 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare getStatus: BelongsToGetAssociationMixin<LotStatus>
   declare setStatus: BelongsToSetAssociationMixin<LotStatus, string>
 
+  // Lots associations
+  declare bets?: NonAttribute<Lot[]>
+  declare getBets: HasManyGetAssociationsMixin<Lot>
+  declare addBet: HasManyAddAssociationMixin<Lot, number>
+  declare addBets: HasManyAddAssociationsMixin<Lot, number>
+  declare setBets: HasManySetAssociationsMixin<Lot, number>
+  declare removeBet: HasManyRemoveAssociationMixin<Lot, number>
+  declare removeBets: HasManyRemoveAssociationsMixin<Lot, number>
+  declare hasBet: HasManyHasAssociationMixin<Lot, string>
+  declare hasBets: HasManyHasAssociationsMixin<Lot, number>
+  declare countBets: HasManyCountAssociationsMixin
+
   static associate(database: Database) {
+    database.Lot.hasMany(database.LotBet, {
+      as: 'bets',
+      foreignKey: 'lotId',
+    })
+
     database.Lot.belongsTo(database.User, {
       as: 'user',
       foreignKey: 'userId',
@@ -79,6 +108,10 @@ export function InitializeLot(database: DatabaseOptional) {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      initialAmount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       startDate: {
         type: DataTypes.DATE,
         allowNull: true,
@@ -94,6 +127,15 @@ export function InitializeLot(database: DatabaseOptional) {
           model: 'lot_statuses',
           key: 'name',
         },
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     },
     {

@@ -21,6 +21,12 @@ export const createLotRequest = createRequestValidator({
       required_error: 'Тривалість є обов’язковою',
       invalid_type_error: 'Невалідне значення тривалості',
     }),
+    initialAmount: z.number({
+      required_error: 'Початкова сума є обов’язковою',
+      invalid_type_error: 'Невалідне значення початкової суми',
+    }).min(1, {
+      message: 'Початкова сума має бути більшою за 0',
+    }),
     immediatelyPublish: z.boolean(),
   }),
 })
@@ -33,6 +39,12 @@ export const updateLotRequest = createRequestValidator({
   body: z.object({
     title: z.optional(titleSchema),
     description: z.optional(descriptionSchema),
+    initialAmount: z.optional(z.number({
+      required_error: 'Початкова сума є обов’язковою',
+      invalid_type_error: 'Невалідне значення початкової суми',
+    }).min(1, {
+      message: 'Початкова сума має бути більшою за 0',
+    })),
     duration: z.enum(['1_hour', '1_day', '3_days', '7_days'], {
       invalid_type_error: 'Невалідне значення тривалості',
     }).optional(),
@@ -58,5 +70,20 @@ export type ShipLotRequest = ValidatorReturnType<typeof shipLotRequest>
 export const shipLotRequest = createRequestValidator({
   params: z.object({
     id: primaryKeySchema,
+  }),
+})
+
+export type BetLotRequest = ValidatorReturnType<typeof betLotRequest>
+export const betLotRequest = createRequestValidator({
+  params: z.object({
+    id: primaryKeySchema,
+  }),
+  body: z.object({
+    amount: z
+      .number({
+        required_error: 'Сума є обов’язковою',
+        invalid_type_error: 'Невалідна сума',
+      })
+      .min(1, 'Сума має бути більшою за 0'),
   }),
 })
