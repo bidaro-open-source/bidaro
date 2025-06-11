@@ -1,0 +1,29 @@
+import { lotStatuses } from '~~/server/constants'
+import { lotRepository } from '~~/server/repositories/lot.repository'
+import { createLotRequest } from '~~/server/requests/lots/lots.post.request'
+import { createLotResource } from '~~/server/resources/lot.resource'
+
+export default defineEventHandler(async (event) => {
+  mustBeAuthenticated(event)
+
+  const user = getAuthenticatedUser(event)
+
+  const request = await createLotRequest(event)
+
+  const lot = await lotRepository.create({
+    userId: user.id,
+    title: request.body.title,
+    description: request.body.description,
+    initialAmount: request.body.initialAmount,
+    initialDuration: request.body.initialDuration,
+    statusName: lotStatuses.DRAFT,
+  })
+
+  setResponseStatus(event, 201)
+
+  return {
+    ...createLotResource(lot),
+    betsCount: 0,
+    bets: [],
+  }
+})

@@ -7,40 +7,41 @@ import type {
   InferCreationAttributes,
   NonAttribute,
 } from 'sequelize'
+import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
 import type { Lot } from './Lot'
 import type { User } from './User'
-import {
-  DataTypes,
-  Model,
-} from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 
-export class LotBet extends Model<InferAttributes<LotBet>, InferCreationAttributes<LotBet>> {
+export type LotBetModel = typeof LotBet
+export type LotBetAttributes = InferAttributes<LotBet>
+export type LotBetCreationAttributes = InferCreationAttributes<LotBet>
+export type LotBetAttributesOptional = MakeNullishOptional<LotBetCreationAttributes>
+
+export class LotBet extends Model<LotBetAttributes, LotBetCreationAttributes> {
   declare id: CreationOptional<number>
   declare lotId: ForeignKey<Lot['id']>
   declare userId: ForeignKey<User['id']>
   declare amount: number
   declare createdAt: CreationOptional<Date>
 
-  // User association
-  declare user?: NonAttribute<User>
-  declare getUser: BelongsToGetAssociationMixin<User>
-  declare setUser: BelongsToSetAssociationMixin<User, number>
-
-  // Lot association
   declare lot?: NonAttribute<Lot>
   declare getLot: BelongsToGetAssociationMixin<Lot>
   declare setLot: BelongsToSetAssociationMixin<Lot, number>
 
-  static associate(database: Database) {
-    database.LotBet.belongsTo(database.User, {
-      as: 'user',
-      foreignKey: 'userId',
-    })
+  declare user?: NonAttribute<User>
+  declare getUser: BelongsToGetAssociationMixin<User>
+  declare setUser: BelongsToSetAssociationMixin<User, number>
 
+  static associate(database: Database) {
     database.LotBet.belongsTo(database.Lot, {
       as: 'lot',
       foreignKey: 'lotId',
+    })
+
+    database.LotBet.belongsTo(database.User, {
+      as: 'user',
+      foreignKey: 'userId',
     })
   }
 }
@@ -64,6 +65,11 @@ export function InitializeLotBet(database: DatabaseOptional) {
       amount: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+        get() {
+          // @ts-expect-error sequelize issue #8019
+          const value: string = this.getDataValue('amount')
+          return value === null ? null : parseFloat(value)
+        },
       },
       createdAt: {
         type: DataTypes.DATE,

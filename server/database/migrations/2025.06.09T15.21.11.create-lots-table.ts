@@ -5,22 +5,12 @@ export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
 
   try {
-    await queryInterface.createTable('lot_bets', {
+    await queryInterface.createTable('lots', {
       id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         autoIncrement: true,
+        primaryKey: true,
         allowNull: false,
-      },
-      lotId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'lots',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       userId: {
         type: DataTypes.INTEGER,
@@ -32,7 +22,27 @@ export const up: Migration = async ({ context }) => {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      amount: {
+      title: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.STRING(1028),
+        allowNull: true,
+      },
+      effectiveDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      expirationDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      initialDuration: {
+        type: DataTypes.ENUM('1_hour', '1_day', '3_days', '7_days'),
+        allowNull: false,
+      },
+      initialAmount: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
@@ -40,6 +50,10 @@ export const up: Migration = async ({ context }) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
         allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     })
   }
@@ -50,6 +64,5 @@ export const up: Migration = async ({ context }) => {
 
 export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
-
-  await queryInterface.dropTable('lot_bets')
+  await queryInterface.dropTable('lots', {})
 }

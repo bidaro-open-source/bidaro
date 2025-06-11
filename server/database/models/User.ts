@@ -38,13 +38,11 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date | null>
 
-  // Role association
   declare role?: NonAttribute<Role>
   declare roleName: ForeignKey<Role['name']> | null
   declare setRole: BelongsToSetAssociationMixin<Role, number>
   declare getRole: BelongsToGetAssociationMixin<Role>
 
-  // Lots associations
   declare lots?: NonAttribute<Lot[]>
   declare getLots: HasManyGetAssociationsMixin<Lot>
   declare addLot: HasManyAddAssociationMixin<Lot, number>
@@ -56,7 +54,6 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   declare hasLots: HasManyHasAssociationsMixin<Lot, number>
   declare countLots: HasManyCountAssociationsMixin
 
-  // Lots associations
   declare bets?: NonAttribute<Lot[]>
   declare getBets: HasManyGetAssociationsMixin<Lot>
   declare addBet: HasManyAddAssociationMixin<Lot, number>

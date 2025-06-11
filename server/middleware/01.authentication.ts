@@ -1,4 +1,4 @@
-import { fetchUser } from '../services/users-service'
+import { userRepository } from '../repositories/user.repository'
 
 /**
  * Checks the request for an access token in the `Authorization` header.
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
   const payload = decodeAccessToken(token)
 
-  const user = await fetchUser(payload.uid)
+  const user = await userRepository.findById(payload.uid)
 
   if (!user) {
     throw createError({

@@ -1,16 +1,13 @@
+import { userRepository } from '~~/server/repositories/user.repository'
 import {
   resetPasswordRequest,
 } from '~~/server/requests/profile/recovery/index.request'
 import { createPasswordResetToken } from '~~/server/services/profile-recovery'
 
 export default defineEventHandler(async (event) => {
-  const db = useDatabase(event)
-
   const request = await resetPasswordRequest(event)
 
-  const user = await db.User.findOne({
-    where: { email: request.body.email },
-  })
+  const user = await userRepository.findByEmail(request.body.email)
 
   if (!user) {
     throw createError({

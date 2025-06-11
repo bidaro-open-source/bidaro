@@ -1,28 +1,22 @@
-import { Op } from 'sequelize'
 import { z } from 'zod'
 import { roles } from '~~/server/constants'
+import { roleRepository } from '~~/server/repositories/role.repository'
+import { userRepository } from '~~/server/repositories/user.repository'
 import { registerRequest } from '~~/server/requests/auth/register.request'
 import { createProfileResource } from '~~/server/resources/profile.resource'
 import { createAuthenticationSession } from '~~/server/services/authentication'
 
 export default defineEventHandler(async (event) => {
-  const db = useDatabase(event)
-
   const request = await registerRequest(event)
 
-  const userInDB = await db.User.findAll({
-    where: {
-      [Op.or]: [
-        { email: request.body.email },
-        { username: request.body.username },
-      ],
-    },
-  })
+  const userByEmail = await userRepository.findByEmail(request.body.email)
 
-  if (userInDB.length) {
+  const userByUsername = await userRepository.findByUsername(request.body.username)
+
+  if (userByEmail || userByUsername) {
     const issues: z.ZodIssue[] = []
 
-    if (userInDB.findIndex(u => u.email === request.body.email) !== -1) {
+    if (userByEmail) {
       issues.push({
         code: 'custom',
         path: ['email'],
@@ -30,7 +24,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    if (userInDB.findIndex(u => u.username === request.body.username) !== -1) {
+    if (userByUsername) {
       issues.push({
         code: 'custom',
         path: ['username'],
@@ -45,18 +39,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const defaultRole = await db.Role.findOne({
-    where: { name: roles.USER },
-    include: [
-      {
-        model: db.Permission,
-        as: 'permissions',
-        through: {
-          attributes: [],
-        },
-      },
-    ],
-  })
+  const defaultRole = await roleRepository.findByName(roles.USER)
 
   if (!defaultRole) {
     throw createError({
@@ -65,18 +48,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await db.User.create({
+  const user = await userRepository.create({
     email: request.body.email,
     username: request.body.username,
     password: await hashPassword(event, request.body.password),
     roleName: defaultRole.name,
-  }, {
-    include: [
-      {
-        model: db.Role,
-        as: 'role',
-      },
-    ],
   })
 
   user.role = defaultRole

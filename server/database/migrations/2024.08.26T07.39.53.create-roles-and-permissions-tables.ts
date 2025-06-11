@@ -1,5 +1,6 @@
 import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
+import { permissions, roles } from '~~/server/constants'
 
 export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
@@ -83,6 +84,23 @@ export const up: Migration = async ({ context }) => {
         },
       },
     }, { transaction })
+
+    await queryInterface.bulkInsert('roles', [{
+      name: roles.USER,
+      displayName: 'Користувач',
+      description: 'Роль за замовчуванням',
+      createdAt: new Date(),
+    }], { transaction })
+
+    await queryInterface.bulkInsert('permissions', [
+      { name: permissions.VIEW_OWN_SESSIONS, createdAt: new Date() },
+      { name: permissions.DELETE_OWN_SESSIONS, createdAt: new Date() },
+    ], { transaction })
+
+    await queryInterface.bulkInsert('roles_has_permissions', [
+      { role: roles.USER, permission: permissions.VIEW_OWN_SESSIONS },
+      { role: roles.USER, permission: permissions.DELETE_OWN_SESSIONS },
+    ], { transaction })
 
     await transaction.commit()
   }

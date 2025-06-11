@@ -12,6 +12,7 @@ import type {
   InferCreationAttributes,
   NonAttribute,
 } from 'sequelize'
+import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
 import type { Lot } from './Lot'
 import { DataTypes, Model } from 'sequelize'
@@ -19,11 +20,13 @@ import { DataTypes, Model } from 'sequelize'
 export type LotStatusModel = typeof LotStatus
 export type LotStatusAttributes = InferAttributes<LotStatus>
 export type LotStatusCreationAttributes = InferCreationAttributes<LotStatus>
+export type LotStatusAttributesOptional = MakeNullishOptional<LotStatusCreationAttributes>
 
 export class LotStatus extends Model<LotStatusAttributes, LotStatusCreationAttributes> {
   declare name: string
+  declare displayName: string | null
+  declare description: string | null
 
-  // Lots associations
   declare lots?: NonAttribute<Lot[]>
   declare getLots: HasManyGetAssociationsMixin<Lot>
   declare addLot: HasManyAddAssociationMixin<Lot, number>
@@ -51,6 +54,14 @@ export function InitializeLotStatus(database: DatabaseOptional) {
         unique: true,
         primaryKey: true,
         allowNull: false,
+      },
+      displayName: {
+        type: DataTypes.STRING(64),
+        allowNull: true,
+      },
+      description: {
+        type: DataTypes.STRING(1024),
+        allowNull: true,
       },
     },
     {

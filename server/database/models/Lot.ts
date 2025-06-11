@@ -16,7 +16,9 @@ import type {
   InferCreationAttributes,
   NonAttribute,
 } from 'sequelize'
+import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
+import type { LotBet } from './LotBet'
 import type { LotStatus } from './LotStatus'
 import type { User } from './User'
 import { DataTypes, Model } from 'sequelize'
@@ -24,48 +26,41 @@ import { DataTypes, Model } from 'sequelize'
 export type LotModel = typeof Lot
 export type LotAttributes = InferAttributes<Lot>
 export type LotCreationAttributes = InferCreationAttributes<Lot>
+export type LotAttributesOptional = MakeNullishOptional<LotCreationAttributes>
 
 export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare id: CreationOptional<number>
-  declare title: string
-  declare description: string | null
-  declare duration: number
-  declare startDate: Date | null
-  declare endDate: Date | null
-  declare initialAmount: number
   declare userId: ForeignKey<User['id']>
   declare statusName: ForeignKey<LotStatus['name']>
+  declare title: string
+  declare description: string | null
+  declare effectiveDate: Date | null
+  declare expirationDate: Date | null
+  declare initialDuration: string
+  declare initialAmount: number
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date | null>
 
-  // LotStatus association
   declare user?: NonAttribute<User>
   declare getUser: BelongsToGetAssociationMixin<User>
   declare setUser: BelongsToSetAssociationMixin<User, number>
 
-  // LotStatus association
   declare status?: NonAttribute<LotStatus>
   declare getStatus: BelongsToGetAssociationMixin<LotStatus>
   declare setStatus: BelongsToSetAssociationMixin<LotStatus, string>
 
-  // Lots associations
-  declare bets?: NonAttribute<Lot[]>
-  declare getBets: HasManyGetAssociationsMixin<Lot>
-  declare addBet: HasManyAddAssociationMixin<Lot, number>
-  declare addBets: HasManyAddAssociationsMixin<Lot, number>
-  declare setBets: HasManySetAssociationsMixin<Lot, number>
-  declare removeBet: HasManyRemoveAssociationMixin<Lot, number>
-  declare removeBets: HasManyRemoveAssociationsMixin<Lot, number>
-  declare hasBet: HasManyHasAssociationMixin<Lot, string>
-  declare hasBets: HasManyHasAssociationsMixin<Lot, number>
+  declare bets?: NonAttribute<LotBet[]>
+  declare getBets: HasManyGetAssociationsMixin<LotBet>
+  declare addBet: HasManyAddAssociationMixin<LotBet, number>
+  declare addBets: HasManyAddAssociationsMixin<LotBet, number>
+  declare setBets: HasManySetAssociationsMixin<LotBet, number>
+  declare removeBet: HasManyRemoveAssociationMixin<LotBet, number>
+  declare removeBets: HasManyRemoveAssociationsMixin<LotBet, number>
+  declare hasBet: HasManyHasAssociationMixin<LotBet, string>
+  declare hasBets: HasManyHasAssociationsMixin<LotBet, number>
   declare countBets: HasManyCountAssociationsMixin
 
   static associate(database: Database) {
-    database.Lot.hasMany(database.LotBet, {
-      as: 'bets',
-      foreignKey: 'lotId',
-    })
-
     database.Lot.belongsTo(database.User, {
       as: 'user',
       foreignKey: 'userId',
@@ -74,6 +69,11 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
     database.Lot.belongsTo(database.LotStatus, {
       as: 'status',
       foreignKey: 'statusName',
+    })
+
+    database.Lot.hasMany(database.LotBet, {
+      as: 'bets',
+      foreignKey: 'lotId',
     })
   }
 }
@@ -94,6 +94,16 @@ export function InitializeLot(database: DatabaseOptional) {
           key: 'id',
         },
         onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      statusName: {
+        type: DataTypes.STRING(32),
+        allowNull: false,
+        references: {
+          model: 'lot_statuses',
+          key: 'name',
+        },
+        onUpdate: 'CASCADE',
         onDelete: 'RESTRICT',
       },
       title: {
@@ -104,29 +114,26 @@ export function InitializeLot(database: DatabaseOptional) {
         type: DataTypes.STRING(1028),
         allowNull: true,
       },
-      duration: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      effectiveDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      expirationDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       initialAmount: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
-      },
-      startDate: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
-      endDate: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
-      statusName: {
-        type: DataTypes.STRING(32),
-        allowNull: false,
-        references: {
-          model: 'lot_statuses',
-          key: 'name',
+        get() {
+          // @ts-expect-error sequelize issue #8019
+          const value: string = this.getDataValue('initialAmount')
+          return value === null ? null : parseFloat(value)
         },
+      },
+      initialDuration: {
+        type: DataTypes.ENUM('1_hour', '1_day', '3_days', '7_days'),
+        allowNull: false,
       },
       createdAt: {
         type: DataTypes.DATE,

@@ -1,3 +1,4 @@
+import { userRepository } from '~~/server/repositories/user.repository'
 import {
   confirmResetPasswordRequest,
 } from '~~/server/requests/profile/recovery/confirm.request'
@@ -7,8 +8,6 @@ import {
 } from '~~/server/services/profile-recovery'
 
 export default defineEventHandler(async (event) => {
-  const db = useDatabase()
-
   const request = await confirmResetPasswordRequest(event)
 
   const uid = await getUserIdByResetToken(request.body.token)
@@ -21,7 +20,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await db.User.findOne({ where: { id: uid } })
+  const user = await userRepository.findById(uid)
 
   if (!user) {
     throw createError({
@@ -31,9 +30,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await user.update({
-    password: await hashPassword(event, request.body.password),
-  })
+  user.password = await hashPassword(event, request.body.password)
+
+  await userRepository.save(user)
 
   await deletePasswordResetToken(request.body.token)
 })

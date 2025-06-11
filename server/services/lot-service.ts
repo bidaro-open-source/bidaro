@@ -1,295 +1,81 @@
-import type { Lot, LotAttributes } from '../database'
-import { Op } from 'sequelize'
+const stepTable: [number, number, number][] = [
+  [1.0, 5.0, 1.0],
+  [5.0, 10.0, 2.0],
+  [10.0, 20.0, 3.0],
+  [20.0, 40.0, 5.0],
+  [40.0, 60.0, 6.0],
+  [60.0, 80.0, 8.0],
+  [80.0, 100.0, 10.0],
+  [100.0, 125.0, 12.0],
+  [125.0, 150.0, 15.0],
+  [150.0, 175.0, 18.0],
+  [175.0, 200.0, 20.0],
+  [200.0, 225.0, 22.0],
+  [225.0, 250.0, 24.0],
+  [250.0, 275.0, 26.0],
+  [275.0, 300.0, 28.0],
+  [300.0, 350.0, 30.0],
+  [350.0, 400.0, 32.0],
+  [400.0, 450.0, 34.0],
+  [450.0, 500.0, 36.0],
+  [500.0, 550.0, 38.0],
+  [550.0, 600.0, 40.0],
+  [600.0, 650.0, 42.0],
+  [650.0, 700.0, 44.0],
+  [700.0, 750.0, 46.0],
+  [750.0, 900.0, 48.0],
+  [900.0, 1000.0, 50.0],
+  [1000.0, 1100.0, 55.0],
+  [1100.0, 1200.0, 60.0],
+  [1200.0, 1300.0, 65.0],
+  [1300.0, 1500.0, 70.0],
+  [1500.0, 1600.0, 75.0],
+  [1600.0, 1700.0, 80.0],
+  [1700.0, 1900.0, 85.0],
+  [1900.0, 2000.0, 90.0],
+  [2000.0, 2250.0, 95.0],
+  [2250.0, 2500.0, 100.0],
+  [2500.0, 2750.0, 105.0],
+  [2750.0, 3000.0, 110.0],
+  [3000.0, 3250.0, 120.0],
+  [3250.0, 3500.0, 150.0],
+  [3500.0, 4000.0, 175.0],
+  [4000.0, 5000.0, 200.0],
+  [5000.0, 6000.0, 220.0],
+  [6000.0, 7000.0, 240.0],
+  [7000.0, 8000.0, 280.0],
+  [8000.0, 9000.0, 300.0],
+  [9000.0, 10000.0, 350.0],
+  [10000.0, Infinity, 400.0],
+]
 
 /**
- * Options for fetching lot
+ * Calculate the minimal step for the lot based on the amount of the
+ * latest bet.
+ *
+ * @param amount amount of the latest bet
  */
-interface GetLotOptions {
-  withBets?: boolean
-  withUser?: boolean
+export function calcualteLotMinimalStep(amount: number) {
+  for (const [min, max, step] of stepTable) {
+    if (amount >= min && amount < max) {
+      return step
+    }
+  }
+
+  throw new Error(`Amount is out of range ${amount}.`)
 }
-
 /**
- * Fetch lot by the primary key
+ * Calculate the interval for the lot based on the text duration.
  *
- * @param id lot primary key
- * @param options fetch options
- * @returns lot instance
- */
-export async function getLot(
-  id: number,
-  options: GetLotOptions = {},
-): Promise<Lot> {
-  const db = useDatabase()
-  const include = []
-
-  if (options.withBets) {
-    include.push({ model: db.LotBet, as: 'bets' })
-  }
-
-  if (options.withUser) {
-    include.push({ model: db.User, as: 'user' })
-  }
-
-  const lot = await db.Lot.findByPk(id, { include })
-
-  if (!lot) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Лот не знайдено',
-    })
-  }
-
-  return lot
-}
-
-/**
- * Fetch lot by the primary key for the user
- *
- * @param id lot primary key
- * @param userId user primary key
- * @param options fetch options
- * @returns lot instance
- */
-export async function getUserLot(
-  id: number,
-  userId: number,
-  options: GetLotOptions = {},
-): Promise<Lot> {
-  const db = useDatabase()
-  const include = []
-
-  if (options.withUser) {
-    include.push({ model: db.User, as: 'user' })
-  }
-
-  const lot = await db.Lot.findByPk(id, { include })
-
-  if (!lot || lot.userId !== userId) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Лот не знайдено',
-    })
-  }
-
-  return lot
-}
-
-/**
- * Fetch all lots of the user
- *
- * @param userId user primary key
- * @param options fetch options
- * @returns lot instance
- */
-export async function getUserLots(
-  userId: number,
-  options: GetLotOptions = {},
-): Promise<Lot[]> {
-  const db = useDatabase()
-  const include = []
-
-  if (options.withUser) {
-    include.push({ model: db.User, as: 'user' })
-  }
-
-  return await db.Lot.findAll({ include, where: { userId } })
-}
-
-/**
- * Fetch all lots of the user
- *
- * @param userId user primary key
- * @param options fetch options
- * @returns lot instance
- */
-export async function getPublishedUserLots(
-  userId: number,
-  options: GetLotOptions = {},
-): Promise<Lot[]> {
-  const db = useDatabase()
-  const include = []
-
-  if (options.withUser) {
-    include.push({ model: db.User, as: 'user' })
-  }
-
-  const lots = await db.Lot.findAll({
-    include,
-    where: {
-      userId,
-      statusName: {
-        [Op.ne]: 'draft',
-      },
-    },
-  })
-
-  return lots
-}
-
-/**
- * Update lot data
- *
- * @param lot lot instance
- * @param fields fields to update
- * @returns updated lot instance
- */
-export function updateLotData(
-  lot: Lot,
-  fields: Partial<Pick<LotAttributes, 'title' | 'description'>>,
-): Lot {
-  if (fields.title) {
-    lot.title = fields.title
-  }
-
-  if (fields.description) {
-    lot.description = fields.description
-  }
-
-  return lot
-}
-
-/**
- * Update lot duration
- *
- * If the lot is in the draft status, then the duration is updated.
- * Otherwise, an error is thrown.
- *
- * @param lot lot instance
  * @param duration duration of the lot by text value
- * @returns updated lot instance
- * @throws if the lot is not in the draft status
  */
-export function updateLotDuration(
-  lot: Lot,
-  duration?: string,
-): Lot {
-  console.log(duration)
-  if (!duration)
-    return lot
-
-  if (lot.statusName !== 'draft') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'Час лоту не може бути оновлений, оскільки він вже опублікований',
-    })
-  }
-
+export function calculateLotIntervals(duration: string) {
   const durationInMs = calculateLotDuration(duration)
 
-  lot.duration = durationInMs
-
-  return lot
-}
-
-/**
- * Update lot status to 'in_trading_process'
- *
- * @param lot lot instance
- * @returns updated lot instance
- * @throws if the lot is not in the `draft` status
- */
-export function updateLotStatusToPublished(
-  lot: Lot,
-): Lot {
-  if (lot.statusName !== 'draft') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'Лот вже опублікований',
-    })
+  return {
+    effectiveDate: new Date(),
+    expirationDate: new Date(Date.now() + durationInMs),
   }
-
-  lot.startDate = new Date()
-  lot.endDate = new Date(new Date().getTime() + lot.duration)
-  lot.statusName = 'in_trading_process'
-
-  return lot
-}
-
-/**
- * Update lot status to 'in_discussion_process'
- *
- * @param lot lot instance
- * @returns updated lot instance
- * @throws if the lot is not in the `in_trading_process` status
- */
-export function updateLotStatusToDiscussion(
-  lot: Lot,
-): Lot {
-  if (lot.statusName !== 'in_trading_process') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'Лот не в процесі торгів',
-    })
-  }
-
-  lot.statusName = 'in_discussion_process'
-
-  return lot
-}
-
-/**
- * Update lot status to 'in_delivery_process'
- *
- * @param lot lot instance
- * @returns updated lot instance
- * @throws if the lot is not in the `in_discussion_process` status
- */
-export function updateLotStatusToShipment(
-  lot: Lot,
-): Lot {
-  if (lot.statusName !== 'in_discussion_process') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'Лот не в процесі обговорення',
-    })
-  }
-
-  lot.statusName = 'in_delivery_process'
-
-  return lot
-}
-
-/**
- * Update lot status to 'received'
- *
- * @param lot lot instance
- * @returns updated lot instance
- * @throws if the lot is not in the `in_delivery_process` status
- */
-export function updateLotStatusToReceived(
-  lot: Lot,
-): Lot {
-  if (lot.statusName !== 'in_delivery_process') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'Лот не в процесі доставки',
-    })
-  }
-
-  lot.statusName = 'received'
-
-  return lot
-}
-
-/**
- * Update lot status to 'rejected'
- *
- * @param lot lot instance
- * @returns updated lot instance
- */
-export function updateLotStatusToRejected(
-  lot: Lot,
-): Lot {
-  lot.statusName = 'rejected'
-  return lot
 }
 
 /**
@@ -308,31 +94,6 @@ export function calculateLotDuration(duration: string): number {
       return 259200000
     case '7_days':
       return 604800000
-    default:
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        message: `Unknown duration: ${duration}`,
-      })
-  }
-}
-
-/**
- * Calculate the interval in ms for the lot based on the text duration.
- *
- * @param duration duration of the lot by text value
- * @returns duration in milliseconds
- */
-export function normalizeLotDuration(duration: number): string {
-  switch (`${duration}`) {
-    case '3600000':
-      return '1_hour'
-    case '86400000':
-      return '1_day'
-    case '259200000':
-      return '3_days'
-    case '604800000':
-      return '7_days'
     default:
       throw createError({
         statusCode: 500,

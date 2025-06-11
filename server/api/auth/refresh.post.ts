@@ -1,10 +1,10 @@
+import { userRepository } from '~~/server/repositories/user.repository'
 import { refreshRequest } from '~~/server/requests/auth/refresh.request'
 import { createProfileResource } from '~~/server/resources/profile.resource'
 import {
   getAuthenticationSession,
   updateAuthenticationSession,
 } from '~~/server/services/authentication'
-import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
   const request = await refreshRequest(event)
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await fetchUser(oldSession.uid)
+  const user = await userRepository.findById(oldSession.uid)
 
   if (!user) {
     throw createError({

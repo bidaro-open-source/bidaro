@@ -1,13 +1,13 @@
 import { z } from 'zod'
+import { userRepository } from '~~/server/repositories/user.repository'
 import { loginRequest } from '~~/server/requests/auth/login.request'
 import { createProfileResource } from '~~/server/resources/profile.resource'
 import { createAuthenticationSession } from '~~/server/services/authentication'
-import { fetchUserByUsername } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
   const request = await loginRequest(event)
 
-  const user = await fetchUserByUsername(request.body.username)
+  const user = await userRepository.findByUsername(request.body.username)
 
   if (!user) {
     throw createError({

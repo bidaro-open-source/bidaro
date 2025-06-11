@@ -1,17 +1,18 @@
-import { getLotRequest } from '~~/server/requests/lots/lot.request'
+import type { LotBet, User } from '~~/server/database'
+import { lotRepository } from '~~/server/repositories/lot.repository'
+import { lotRequest } from '~~/server/requests/lots/lots.request'
+import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
-import { getLot } from '~~/server/services/lot-service'
+import { createUserResource } from '~~/server/resources/user.resource'
 
 export default defineEventHandler(async (event) => {
-  mustBeAuthenticated(event)
-
   const user = getAuthenticatedUser(event)
 
-  const request = await getLotRequest(event)
+  const request = await lotRequest(event)
 
-  const lot = await getLot(request.params.id, { withUser: true })
+  const lot = await lotRepository.findById(request.params.id)
 
-  if (lot.statusName === 'draft' && lot.userId !== user.id) {
+  if (!lot) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Not Found',
@@ -19,5 +20,21 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return createLotResource(lot)
+  if (lot.statusName === 'draft' && lot.userId !== user?.id) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Not Found',
+      message: 'Лот не знайдено',
+    })
+  }
+
+  return {
+    ...createLotResource(lot),
+    user: createUserResource(lot.user as User),
+    betsCount: await lotRepository.countAllBetsById(lot.id),
+    bets: (lot.bets as LotBet[]).map(bet => ({
+      ...createLotBetResource(bet),
+      user: createUserResource(bet.user as User),
+    })),
+  }
 })

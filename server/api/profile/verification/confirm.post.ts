@@ -1,9 +1,9 @@
+import { userRepository } from '~~/server/repositories/user.repository'
 import { emailVerifyConfirmRequest } from '~~/server/requests/profile/verification/confrim.request'
 import {
   deleteEmailVerificationTokenByUid,
   getUserIdByEmailVerificationToken,
 } from '~~/server/services/profile-verification'
-import { fetchUser } from '~~/server/services/users-service'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await fetchUser(uid)
+  const user = await userRepository.findById(uid)
 
   if (!user) {
     throw createError({
@@ -30,9 +30,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await user.update({
-    emailVerifiedAt: new Date(),
-  })
+  user.emailVerifiedAt = new Date()
+
+  await userRepository.save(user)
 
   await deleteEmailVerificationTokenByUid(user.id)
 })

@@ -1,7 +1,7 @@
-import { updateLotRequest } from '~~/server/requests/lots/lot.request'
+import { lotRepository } from '~~/server/repositories/lot.repository'
+import { userRepository } from '~~/server/repositories/user.repository'
+import { updateLotRequest } from '~~/server/requests/lots/lots.patch.request'
 import { createLotResource } from '~~/server/resources/lot.resource'
-import { createLotBet } from '~~/server/services/lot-bet-service'
-import { getUserLot, updateLotData, updateLotDuration, updateLotStatusToPublished } from '~~/server/services/lot-service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -10,7 +10,15 @@ export default defineEventHandler(async (event) => {
 
   const request = await updateLotRequest(event)
 
-  const lot = await getUserLot(request.params.id, user.id)
+  const lot = await userRepository.findLotById(user.id, request.params.id)
+
+  if (!lot) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Not Found',
+      message: 'Лот не знайдено',
+    })
+  }
 
   if (lot.statusName !== 'draft' && lot.statusName !== 'in_trading_process') {
     throw createError({
@@ -20,20 +28,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  updateLotData(lot, {
-    title: request.body.title,
-    description: request.body.description,
-  })
+  lot.title = request.body.title ?? lot.title
+  lot.description = request.body.description ?? lot.description
 
-  updateLotDuration(lot, request.body.duration)
-
-  if (request.body.immediatelyPublish) {
-    updateLotStatusToPublished(lot)
-
-    await createLotBet(lot.id, user.id, lot.initialAmount)
+  if (lot.statusName === 'draft') {
+    lot.initialAmount = request.body.initialAmount ?? lot.initialAmount
+    lot.initialDuration = request.body.initialDuration ?? lot.initialDuration
   }
 
-  await lot.save()
+  await lotRepository.save(lot)
 
   return createLotResource(lot)
 })

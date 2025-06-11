@@ -1,20 +1,17 @@
 import { z } from 'zod'
+import { userRepository } from '~~/server/repositories/user.repository'
 import { updateProfileRequest } from '~~/server/requests/profile/profile.request'
 import { createProfileResource } from '~~/server/resources/profile.resource'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await updateProfileRequest(event)
-
   const user = getAuthenticatedUser(event)
 
-  if (request.body.email) {
-    const db = useDatabase()
+  const request = await updateProfileRequest(event)
 
-    const userInDB = await db.User.findOne({
-      where: { email: request.body.email },
-    })
+  if (request.body.email) {
+    const userInDB = await userRepository.findByUsername(request.body.email)
 
     if (userInDB) {
       const issues: z.ZodIssue[] = []
@@ -48,7 +45,7 @@ export default defineEventHandler(async (event) => {
     user.surname = request.body.surname
   }
 
-  await user.save()
+  await userRepository.save(user)
 
   return createProfileResource(user)
 })
