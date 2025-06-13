@@ -2,6 +2,7 @@ import { lotStatuses } from '~~/server/constants'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { createLotRequest } from '~~/server/requests/lots/lots.post.request'
 import { createLotResource } from '~~/server/resources/lot.resource'
+import { createUserResource } from '~~/server/resources/user.resource'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -23,6 +24,8 @@ export default defineEventHandler(async (event) => {
 
   return {
     ...createLotResource(lot),
+    user: createUserResource(user),
+    winner: null,
     betsCount: 0,
     bets: [],
   }

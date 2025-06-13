@@ -43,6 +43,7 @@ export default defineEventHandler(async (event) => {
     const response = {
       ...createLotResource(lot),
       user: userResource,
+      winner: null,
       betsCount: 1,
       bets: [
         {

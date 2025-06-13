@@ -191,13 +191,10 @@ describe('post /api/lots/:id/bets', async () => {
       const uData1 = await createUser()
       const uData2 = await createUser()
       const uData3 = await createUser({ withSession: true })
-      const lotData = await createLotRejected({
-        ownerId: uData1.user.id,
-        winnderId: uData2.user.id,
-      })
+      const lotData = await createLotRejected({ ownerId: uData1.user.id })
 
       const response = await createLotBetRequest(
-        { params: { id: lotData.lot.id }, body: { amount: lotData.winnerBet.amount * 2 } },
+        { params: { id: lotData.lot.id }, body: { amount: lotData.initialBet.amount * 2 } },
         { accessToken: uData3.access_token },
       )
 

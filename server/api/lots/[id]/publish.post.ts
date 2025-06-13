@@ -57,6 +57,7 @@ export default defineEventHandler(async (event) => {
     const response = {
       ...createLotResource(lot),
       user: userResource,
+      winner: null,
       betsCount: 1,
       bets: [
         {
@@ -75,7 +76,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Bad Request',
+      statusMessage: 'Internal Server Error',
       message: 'Не вдалося опублікувати лот',
       cause: e,
     })

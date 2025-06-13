@@ -74,6 +74,14 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
       },
     })
 
+    database.User.hasMany(database.Lot, {
+      as: 'winLots',
+      foreignKey: {
+        name: 'winnerId',
+        allowNull: false,
+      },
+    })
+
     database.User.hasMany(database.LotBet, {
       as: 'bets',
       foreignKey: {

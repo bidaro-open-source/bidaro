@@ -3,14 +3,12 @@ import { lotStatuses } from '~~/server/constants'
 
 interface Options {
   ownerId: number
-  winnderId: number
 }
 
-export async function createLotWithWinner(options: Options) {
+export async function createLotWithoutWinner(options: Options) {
   const lot = await db.LotFactory.new().create({
     userId: options.ownerId,
-    winnerId: options.winnderId,
-    statusName: lotStatuses.IN_DISCUSSION_PROCESS,
+    statusName: lotStatuses.IN_TRADING_PROCESS,
     initialAmount: db.LotFactory.initialAmount,
     initialDuration: db.LotFactory.initialDuration,
     effectiveDate: new Date(Date.now() - db.LotFactory.initialDurationInMs * 2),
@@ -23,17 +21,10 @@ export async function createLotWithWinner(options: Options) {
     amount: lot.initialAmount,
   })
 
-  const winnerBet: LotBet = await db.LotBetFactory.new().create({
-    lotId: lot.id,
-    userId: options.winnderId,
-    amount: lot.initialAmount + 100,
-  })
-
   const clear = async () => {
-    await winnerBet.destroy()
     await initialBet.destroy()
     await lot.destroy()
   }
 
-  return { lot, initialBet, winnerBet, clear }
+  return { lot, initialBet, clear }
 }

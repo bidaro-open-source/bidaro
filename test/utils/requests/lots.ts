@@ -120,11 +120,50 @@ export async function publishLotRequest(
   })
 }
 
-export async function shipLotRequest(
+export async function confirmRejectLotRequest(
   payload: LotRequest,
   options: { accessToken: string },
 ) {
-  return await fetch(`/api/lots/${payload.params.id}/ship`, {
+  return await fetch(`/api/lots/${payload.params.id}/confirm-reject`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${options.accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+export async function confirmWinnerLotRequest(
+  payload: LotRequest,
+  options: { accessToken: string },
+) {
+  return await fetch(`/api/lots/${payload.params.id}/confirm-winner`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${options.accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+export async function confirmShipLotRequest(
+  payload: LotRequest,
+  options: { accessToken: string },
+) {
+  return await fetch(`/api/lots/${payload.params.id}/confirm-ship`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${options.accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+export async function confirmReceiveLotRequest(
+  payload: LotRequest,
+  options: { accessToken: string },
+) {
+  return await fetch(`/api/lots/${payload.params.id}/confirm-receive`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${options.accessToken}`,

@@ -30,6 +30,10 @@ export const lotRepository = {
           as: 'user',
         },
         {
+          model: db.User,
+          as: 'winner',
+        },
+        {
           model: db.LotBet,
           as: 'bets',
           limit: 1,
@@ -135,6 +139,10 @@ export const lotRepository = {
           {
             model: db.User,
             as: 'user',
+          },
+          {
+            model: db.User,
+            as: 'winner',
           },
           {
             model: db.LotBet,

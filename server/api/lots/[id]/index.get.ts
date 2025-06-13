@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
   return {
     ...createLotResource(lot),
     user: createUserResource(lot.user as User),
+    winner: lot.winnerId ? createUserResource(lot.winner as User) : null,
     betsCount: await lotRepository.countAllBetsById(lot.id),
     bets: (lot.bets as LotBet[]).map(bet => ({
       ...createLotBetResource(bet),

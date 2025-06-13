@@ -9,6 +9,7 @@ interface Options {
 export async function createLotShipped(options: Options) {
   const lot = await db.LotFactory.new().create({
     userId: options.ownerId,
+    winnerId: options.winnderId,
     statusName: lotStatuses.IN_DELIVERY_PROCESS,
     initialAmount: db.LotFactory.initialAmount,
     initialDuration: db.LotFactory.initialDuration,

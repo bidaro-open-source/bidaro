@@ -38,12 +38,17 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare expirationDate: Date | null
   declare initialDuration: string
   declare initialAmount: number
+  declare winnerId: ForeignKey<User['id']> | null
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date | null>
 
   declare user?: NonAttribute<User>
   declare getUser: BelongsToGetAssociationMixin<User>
   declare setUser: BelongsToSetAssociationMixin<User, number>
+
+  declare winner?: NonAttribute<User>
+  declare getWinner: BelongsToGetAssociationMixin<User>
+  declare setWinner: BelongsToSetAssociationMixin<User, number>
 
   declare status?: NonAttribute<LotStatus>
   declare getStatus: BelongsToGetAssociationMixin<LotStatus>
@@ -64,6 +69,11 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
     database.Lot.belongsTo(database.User, {
       as: 'user',
       foreignKey: 'userId',
+    })
+
+    database.Lot.belongsTo(database.User, {
+      as: 'winner',
+      foreignKey: 'winnerId',
     })
 
     database.Lot.belongsTo(database.LotStatus, {
@@ -95,6 +105,16 @@ export function InitializeLot(database: DatabaseOptional) {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+      },
+      winnerId: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+        onUpdate: 'CASCADE',
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       statusName: {
         type: DataTypes.STRING(32),

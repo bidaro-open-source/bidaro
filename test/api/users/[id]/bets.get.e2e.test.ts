@@ -36,7 +36,10 @@ describe('get /api/users/:id/bets', async () => {
     expect(bets[0].lot.initialAmount).toBeDefined()
     expect(bets[0].lot.effectiveDate).toBeDefined()
     expect(bets[0].lot.expirationDate).toBeDefined()
-
+    expect(bets[0].lot.user).toBeDefined()
+    expect(bets[0].lot.user.id).toBeDefined()
+    expect(bets[0].lot.user.username).toBeDefined()
+    expect(bets[0].lot.winner).toBeNull()
     expect(bets[0].lot.betsCount).toBe(2)
     expect(bets[0].lot.bets).toBeDefined()
     expect(bets[0].lot.bets.length).toBe(1)

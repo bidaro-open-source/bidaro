@@ -126,6 +126,10 @@ export const userRepository = {
       where: { id: lotId, userId: id },
       include: [
         {
+          model: db.User,
+          as: 'winner',
+        },
+        {
           model: db.LotBet,
           as: 'bets',
           limit: 1,
@@ -160,6 +164,10 @@ export const userRepository = {
       where: { userId: id },
       include: [
         {
+          model: db.User,
+          as: 'winner',
+        },
+        {
           model: db.LotBet,
           as: 'bets',
           limit: 1,
@@ -193,6 +201,10 @@ export const userRepository = {
       transaction: options.transaction,
       where: { userId: id, statusName: { [Op.ne]: 'draft' } },
       include: [
+        {
+          model: db.User,
+          as: 'winner',
+        },
         {
           model: db.LotBet,
           as: 'bets',
@@ -235,6 +247,10 @@ export const userRepository = {
             {
               model: db.User,
               as: 'user',
+            },
+            {
+              model: db.User,
+              as: 'winner',
             },
             {
               model: db.LotBet,

@@ -3,7 +3,6 @@ import { lotStatuses } from '~~/server/constants'
 
 interface Options {
   ownerId: number
-  winnderId: number
 }
 
 export async function createLotRejected(options: Options) {
@@ -22,17 +21,10 @@ export async function createLotRejected(options: Options) {
     amount: lot.initialAmount,
   })
 
-  const winnerBet: LotBet = await db.LotBetFactory.new().create({
-    lotId: lot.id,
-    userId: options.winnderId,
-    amount: lot.initialAmount + 100,
-  })
-
   const clear = async () => {
-    await winnerBet.destroy()
     await initialBet.destroy()
     await lot.destroy()
   }
 
-  return { lot, initialBet, winnerBet, clear }
+  return { lot, initialBet, clear }
 }
