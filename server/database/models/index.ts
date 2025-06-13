@@ -1,3 +1,4 @@
+import { InitializeCategory } from './Category'
 import { InitializeLot } from './Lot'
 import { InitializeLotBet } from './LotBet'
 import { InitializeLotStatus } from './LotStatus'
@@ -12,6 +13,7 @@ import { InitializeUser } from './User'
  * - `value` is a function that initializes the model
  */
 export const models = {
+  Category: InitializeCategory,
   Lot: InitializeLot,
   LotBet: InitializeLotBet,
   LotStatus: InitializeLotStatus,

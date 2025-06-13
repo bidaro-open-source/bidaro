@@ -1,7 +1,9 @@
-import type { Lot, LotBet, User } from '~~/server/database'
+import type { Lot, User } from '~~/server/database'
+import type { Category } from '~~/server/database/models/Category'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { getUserRequest } from '~~/server/requests/user.request'
+import { categoryResource } from '~~/server/resources/category.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserBetResource } from '~~/server/resources/user-bet.resource'
@@ -26,17 +28,26 @@ export default defineEventHandler(async (event) => {
 
   const lotsBets = await lotRepository.countAllBetsByIds(lotIds)
 
-  return bets.map(bet => ({
-    ...createUserBetResource(bet),
-    lot: {
-      ...createLotResource(bet.lot as Lot),
-      user: createUserResource(user),
-      winner: (bet.lot as Lot).winner ? createUserResource((bet.lot as Lot).winner as User) : null,
-      betsCount: lotsBets[bet.lotId],
-      bets: ((bet.lot as Lot).bets as LotBet[]).map(b => ({
-        ...createLotBetResource(b),
-        user: createUserResource(b.user as User),
-      })),
-    },
-  }))
+  return bets.map((bet) => {
+    const lot = bet.lot as Lot
+    const user = lot.user as User
+    const winner = lot.winner as User | undefined
+    const category = lot.category as Category | undefined
+    const bets = lot.bets || []
+
+    return {
+      ...createUserBetResource(bet),
+      lot: {
+        ...createLotResource(lot),
+        user: createUserResource(user),
+        winner: winner ? createUserResource(winner) : null,
+        category: category ? categoryResource.create(category) : null,
+        betsCount: lotsBets[bet.lotId],
+        bets: bets.map(bet => ({
+          ...createLotBetResource(bet),
+          user: createUserResource(bet.user as User),
+        })),
+      },
+    }
+  })
 })

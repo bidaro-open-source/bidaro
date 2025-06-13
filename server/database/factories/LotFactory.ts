@@ -33,6 +33,7 @@ export class LotFactory extends Factory<Lot> {
     return {
       userId: attr.userId,
       winnerId: attr.winnerId ?? null,
+      categoryId: attr.categoryId ?? null,
       title: attr.title ?? `l${lot}`,
       statusName: attr.statusName ?? lotStatuses.DRAFT,
       description: attr.description ?? null,

@@ -18,6 +18,7 @@ import type {
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
+import type { Category } from './Category'
 import type { LotBet } from './LotBet'
 import type { LotStatus } from './LotStatus'
 import type { User } from './User'
@@ -31,6 +32,8 @@ export type LotAttributesOptional = MakeNullishOptional<LotCreationAttributes>
 export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare id: CreationOptional<number>
   declare userId: ForeignKey<User['id']>
+  declare winnerId: ForeignKey<User['id']> | null
+  declare categoryId: ForeignKey<Category['id']> | null
   declare statusName: ForeignKey<LotStatus['name']>
   declare title: string
   declare description: string | null
@@ -38,7 +41,6 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare expirationDate: Date | null
   declare initialDuration: string
   declare initialAmount: number
-  declare winnerId: ForeignKey<User['id']> | null
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date | null>
 
@@ -53,6 +55,10 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare status?: NonAttribute<LotStatus>
   declare getStatus: BelongsToGetAssociationMixin<LotStatus>
   declare setStatus: BelongsToSetAssociationMixin<LotStatus, string>
+
+  declare category?: NonAttribute<Category>
+  declare getCategory: BelongsToGetAssociationMixin<Category>
+  declare setCategory: BelongsToSetAssociationMixin<Category, string>
 
   declare bets?: NonAttribute<LotBet[]>
   declare getBets: HasManyGetAssociationsMixin<LotBet>
@@ -74,6 +80,11 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
     database.Lot.belongsTo(database.User, {
       as: 'winner',
       foreignKey: 'winnerId',
+    })
+
+    database.Lot.belongsTo(database.Category, {
+      as: 'category',
+      foreignKey: 'categoryId',
     })
 
     database.Lot.belongsTo(database.LotStatus, {
@@ -113,6 +124,17 @@ export function InitializeLot(database: DatabaseOptional) {
         onUpdate: 'CASCADE',
         references: {
           model: 'users',
+          key: 'id',
+        },
+      },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+        references: {
+          model: 'category',
           key: 'id',
         },
       },

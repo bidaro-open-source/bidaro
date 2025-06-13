@@ -3,6 +3,7 @@ import { lotBetRepository } from '~~/server/repositories/lot-bet.repository'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { lotRequest } from '~~/server/requests/lots/lots.request'
+import { categoryResource } from '~~/server/resources/category.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserResource } from '~~/server/resources/user.resource'
@@ -58,6 +59,7 @@ export default defineEventHandler(async (event) => {
       ...createLotResource(lot),
       user: userResource,
       winner: null,
+      category: lot.category ? categoryResource.create(lot.category) : null,
       betsCount: 1,
       bets: [
         {

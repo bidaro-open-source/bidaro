@@ -1,7 +1,9 @@
-import type { LotBet, User } from '~~/server/database'
+import type { User } from '~~/server/database'
+import type { Category } from '~~/server/database/models/Category'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { getUserRequest } from '~~/server/requests/user.request'
+import { categoryResource } from '~~/server/resources/category.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserResource } from '~~/server/resources/user.resource'
@@ -29,13 +31,21 @@ export default defineEventHandler(async (event) => {
 
   const lotsBets = await lotRepository.countAllBetsByIds(lotIds)
 
-  return lots.map(lot => ({
-    ...createLotResource(lot),
-    winner: lot.winner ? createUserResource(lot.winner as User) : null,
-    betsCount: lotsBets[lot.id],
-    bets: (lot.bets as LotBet[]).map(b => ({
-      ...createLotBetResource(b),
-      user: createUserResource(b.user as User),
-    })),
-  }))
+  return lots.map((lot) => {
+    const winner = lot.winner as User | undefined
+    const category = lot.category as Category | undefined
+    const bets = lot.bets || []
+
+    return {
+      ...createLotResource(lot),
+      user: createUserResource(userInDB),
+      winner: winner ? createUserResource(winner) : null,
+      category: category ? categoryResource.create(category) : null,
+      betsCount: lotsBets[lot.id],
+      bets: bets.map(bet => ({
+        ...createLotBetResource(bet),
+        user: createUserResource(bet.user as User),
+      })),
+    }
+  })
 })

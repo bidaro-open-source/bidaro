@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
   if (lot.statusName === 'draft') {
     lot.initialAmount = request.body.initialAmount ?? lot.initialAmount
     lot.initialDuration = request.body.initialDuration ?? lot.initialDuration
+    lot.categoryId = request.body.categoryId ?? lot.categoryId
   }
 
   await lotRepository.save(lot)

@@ -130,6 +130,10 @@ export const userRepository = {
           as: 'winner',
         },
         {
+          model: db.Category,
+          as: 'category',
+        },
+        {
           model: db.LotBet,
           as: 'bets',
           limit: 1,
@@ -168,6 +172,10 @@ export const userRepository = {
           as: 'winner',
         },
         {
+          model: db.Category,
+          as: 'category',
+        },
+        {
           model: db.LotBet,
           as: 'bets',
           limit: 1,
@@ -204,6 +212,10 @@ export const userRepository = {
         {
           model: db.User,
           as: 'winner',
+        },
+        {
+          model: db.Category,
+          as: 'category',
         },
         {
           model: db.LotBet,
@@ -251,6 +263,10 @@ export const userRepository = {
             {
               model: db.User,
               as: 'winner',
+            },
+            {
+              model: db.Category,
+              as: 'category',
             },
             {
               model: db.LotBet,

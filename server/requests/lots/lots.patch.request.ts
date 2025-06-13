@@ -13,6 +13,9 @@ export const updateLotRequest = createRequestValidator({
   body: z.object({
     title: z.optional(titleSchema),
     description: z.optional(descriptionSchema),
+    categoryId: z.number({
+      invalid_type_error: 'Невалідне значення категорії',
+    }).optional(),
     initialPublish: z.boolean().optional(),
     initialAmount: z
       .number({

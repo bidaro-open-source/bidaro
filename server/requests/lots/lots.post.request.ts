@@ -9,6 +9,9 @@ export const createLotRequest = createRequestValidator({
   body: z.object({
     title: titleSchema,
     description: z.optional(descriptionSchema),
+    categoryId: z.number({
+      invalid_type_error: 'Невалідне значення категорії',
+    }).optional(),
     initialAmount: z
       .number({
         required_error: 'Початкова сума є обов’язковою',
