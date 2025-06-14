@@ -4,6 +4,7 @@ import { lotRepository } from '~~/server/repositories/lot.repository'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { getUserRequest } from '~~/server/requests/user.request'
 import { categoryResource } from '~~/server/resources/category.resource'
+import { imageResource } from '~~/server/resources/image.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserBetResource } from '~~/server/resources/user-bet.resource'
@@ -40,6 +41,7 @@ export default defineEventHandler(async (event) => {
       lot: {
         ...createLotResource(lot),
         user: createUserResource(user),
+        image: lot.image ? imageResource.create(lot.image) : null,
         winner: winner ? createUserResource(winner) : null,
         category: category ? categoryResource.create(category) : null,
         betsCount: lotsBets[bet.lotId],

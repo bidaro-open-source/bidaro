@@ -6,6 +6,7 @@ import { categoryRepository } from '~~/server/repositories/category.repository'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { getCatalogByCategoryRequest } from '~~/server/requests/catalog.request'
 import { categoryResource } from '~~/server/resources/category.resource'
+import { imageResource } from '~~/server/resources/image.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserResource } from '~~/server/resources/user.resource'
@@ -57,6 +58,10 @@ export default defineEventHandler(async (event) => {
         as: 'user',
       },
       {
+        model: db.Image,
+        as: 'image',
+      },
+      {
         model: db.User,
         as: 'winner',
       },
@@ -93,6 +98,7 @@ export default defineEventHandler(async (event) => {
       return {
         ...createLotResource(lot),
         user: createUserResource(user),
+        image: lot.image ? imageResource.create(lot.image) : null,
         winner: winner ? createUserResource(winner) : null,
         category: category ? categoryResource.create(category) : null,
         betsCount: lotsBetsCounts[lot.id],

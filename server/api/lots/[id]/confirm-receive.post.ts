@@ -3,6 +3,7 @@ import { lotStatuses } from '~~/server/constants'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { lotRequest } from '~~/server/requests/lots/lots.request'
 import { categoryResource } from '~~/server/resources/category.resource'
+import { imageResource } from '~~/server/resources/image.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserResource } from '~~/server/resources/user.resource'
@@ -57,6 +58,7 @@ export default defineEventHandler(async (event) => {
   return {
     ...createLotResource(lot),
     user: createUserResource(lot.user as User),
+    image: lot.image ? imageResource.create(lot.image) : null,
     winner: createUserResource(latestBet.user as User),
     betsCount: await lotRepository.countAllBetsById(lot.id),
     category: lot.category ? categoryResource.create(lot.category) : null,

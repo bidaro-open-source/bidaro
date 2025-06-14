@@ -46,8 +46,13 @@ export const up: Seeder = async ({ context }) => {
 
     const randomAmount = faker.number.float({ min: 1, max: 10000, fractionDigits: 2 })
 
+    const image = await context.Image.create({
+      path: 'test.png',
+    })
+
     const lot = await context.LotFactory.new().create({
       userId: randomUserId,
+      imageId: image.id,
       categoryId: i % 10 === 0 ? null : randomCategoryId,
       title: faker.lorem.sentence(),
       description: faker.lorem.paragraph(),

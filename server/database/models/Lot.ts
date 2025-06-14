@@ -19,6 +19,7 @@ import type {
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
 import type { Category } from './Category'
+import type { Image } from './Image'
 import type { LotBet } from './LotBet'
 import type { LotStatus } from './LotStatus'
 import type { User } from './User'
@@ -32,6 +33,7 @@ export type LotAttributesOptional = MakeNullishOptional<LotCreationAttributes>
 export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare id: CreationOptional<number>
   declare userId: ForeignKey<User['id']>
+  declare imageId: ForeignKey<Image['id']> | null
   declare winnerId: ForeignKey<User['id']> | null
   declare categoryId: ForeignKey<Category['id']> | null
   declare statusName: ForeignKey<LotStatus['name']>
@@ -47,6 +49,10 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare user?: NonAttribute<User>
   declare getUser: BelongsToGetAssociationMixin<User>
   declare setUser: BelongsToSetAssociationMixin<User, number>
+
+  declare image?: NonAttribute<Image>
+  declare getImage: BelongsToGetAssociationMixin<Image>
+  declare setImage: BelongsToSetAssociationMixin<Image, number>
 
   declare winner?: NonAttribute<User>
   declare getWinner: BelongsToGetAssociationMixin<User>
@@ -75,6 +81,11 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
     database.Lot.belongsTo(database.User, {
       as: 'user',
       foreignKey: 'userId',
+    })
+
+    database.Lot.belongsTo(database.Image, {
+      as: 'image',
+      foreignKey: 'imageId',
     })
 
     database.Lot.belongsTo(database.User, {
@@ -116,6 +127,16 @@ export function InitializeLot(database: DatabaseOptional) {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+      },
+      imageId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'images',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT',
       },
       winnerId: {
         type: DataTypes.INTEGER,

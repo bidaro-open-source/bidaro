@@ -5,6 +5,7 @@ import { lotStatuses } from '~~/server/constants'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { getCatalogRequest } from '~~/server/requests/catalog.request'
 import { categoryResource } from '~~/server/resources/category.resource'
+import { imageResource } from '~~/server/resources/image.resource'
 import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { createUserResource } from '~~/server/resources/user.resource'
@@ -32,6 +33,10 @@ export default defineEventHandler(async (event) => {
       {
         model: db.User,
         as: 'user',
+      },
+      {
+        model: db.Image,
+        as: 'image',
       },
       {
         model: db.User,
@@ -70,6 +75,7 @@ export default defineEventHandler(async (event) => {
       return {
         ...createLotResource(lot),
         user: createUserResource(user),
+        image: lot.image ? imageResource.create(lot.image) : null,
         winner: winner ? createUserResource(winner) : null,
         category: category ? categoryResource.create(category) : null,
         betsCount: lotsBetsCounts[lot.id],

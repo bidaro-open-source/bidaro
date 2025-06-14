@@ -1,6 +1,7 @@
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { lotRequest } from '~~/server/requests/lots/lots.request'
+import { unregisterImage } from '~~/server/services/image-service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -25,6 +26,10 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Bad Request',
       message: 'Цей лот не може бути видалений, оскільки він вже опублікований',
     })
+  }
+
+  if (lot.imageId) {
+    await unregisterImage(lot.imageId)
   }
 
   await lotRepository.destroy(lot)

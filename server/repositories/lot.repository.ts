@@ -30,6 +30,10 @@ export const lotRepository = {
           as: 'user',
         },
         {
+          model: db.Image,
+          as: 'image',
+        },
+        {
           model: db.User,
           as: 'winner',
         },
@@ -143,6 +147,10 @@ export const lotRepository = {
           {
             model: db.User,
             as: 'user',
+          },
+          {
+            model: db.Image,
+            as: 'image',
           },
           {
             model: db.User,
