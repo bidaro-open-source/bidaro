@@ -65,13 +65,13 @@ function formatDate(date: Date | string): string {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside class="lg:col-span-1">
-          <div class="bg-white rounded-lg shadow-sm border">
-            <div class="p-6 border-b">
-              <h2 class="text-lg font-semibold text-gray-900">
+          <div class=" rounded-lg shadow-sm border dark:border-gray-800">
+            <div class="p-6 border-b dark:border-gray-800">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Категорії
               </h2>
             </div>
@@ -83,7 +83,7 @@ function formatDate(date: Date | string): string {
 
         <main class="lg:col-span-3">
           <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Каталог
             </h1>
             <p v-if="catalog?.meta" class="text-gray-600">
@@ -129,11 +129,11 @@ function formatDate(date: Date | string): string {
                 </template>
 
                 <div class="space-y-3">
-                  <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-neutral-50 line-clamp-2">
                     {{ lot.title }}
                   </h3>
 
-                  <p v-if="lot.description" class="text-gray-600 text-sm line-clamp-3">
+                  <p v-if="lot.description" class="text-gray-600 dark:text-neutral-400 text-sm line-clamp-3">
                     {{ lot.description }}
                   </p>
 

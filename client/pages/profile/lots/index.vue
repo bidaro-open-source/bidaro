@@ -412,7 +412,7 @@ async function deleteLot(lot: Lot) {
         </h3>
         <UButton
           color="primary"
-          to="/lots/create"
+          to="/profile/lots/create"
         >
           <UIcon name="i-heroicons-plus" class="mr-2" />
           Створити новий лот

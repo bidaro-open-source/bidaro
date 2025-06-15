@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (lot.statusName !== lotStatuses.DRAFT || lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
+  if (lot.statusName !== lotStatuses.DRAFT && lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Bad Request',
