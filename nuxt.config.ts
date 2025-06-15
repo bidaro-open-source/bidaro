@@ -22,7 +22,7 @@ export default defineNuxtConfig({
 
   colorMode: {
     preference: 'system',
-    storage: 'cookie',
+    storage: 'localStorage',
   },
 
   components: [

@@ -3,7 +3,7 @@ const { $api } = useNuxtApp()
 const auth = useAuthStore()
 
 const state = reactive({
-  email: '',
+  email: auth.user?.email || '',
 })
 
 const error = ref<unknown | null>(null)

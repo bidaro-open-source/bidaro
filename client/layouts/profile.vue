@@ -11,6 +11,10 @@ const items = ref<NavigationMenuItem[]>([
     to: '/profile/lots',
   },
   {
+    label: 'Мої ставки',
+    to: '/profile/bets',
+  },
+  {
     label: 'Налаштування',
     to: '/profile/settings',
   },

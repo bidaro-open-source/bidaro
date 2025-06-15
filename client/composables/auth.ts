@@ -3,10 +3,9 @@ import type { FetchContext } from 'ofetch'
 /**
  * Initialize fetch user access token at mount.
  */
-export function useAuthInitialize() {
+export async function useAuthInitialize() {
   const auth = useAuthStore()
-  auth.isAuthenticating = true
-  onBeforeMount(auth.refresh)
+  await auth.refresh()
 }
 
 /**

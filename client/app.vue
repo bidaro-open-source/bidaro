@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useAuthInitialize()
+await useAuthInitialize()
 useAuthRepeatReqestFeature()
 useAuthHeadersRequestFeature()
 useAuthAutorefreshFeature()

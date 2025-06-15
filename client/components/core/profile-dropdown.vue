@@ -35,6 +35,11 @@ const items = computed(() => {
         to: '/profile/lots',
       },
       {
+        label: 'Мої ставки',
+        icon: 'i-lucide-user',
+        to: '/profile/bets',
+      },
+      {
         label: 'Налаштування',
         icon: 'i-lucide-cog',
         to: '/profile/settings',

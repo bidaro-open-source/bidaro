@@ -38,16 +38,19 @@ export const up: Seeder = async ({ context }) => {
 
   const lots: Lot[] = []
 
+  const paths = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg', '10.jpg']
+
   for (let i = 0; i < LOT_COUNT; i++) {
     const randomUserId = faker.helpers.arrayElement(userIds)
     const randomCategoryId = faker.helpers.arrayElement(categoriesIds)
     const randomDuration = faker.helpers.arrayElement(durations)
     const randomDurationInMs = calculateLotDuration(randomDuration)
+    const randomImage = faker.helpers.arrayElement(paths)
 
     const randomAmount = faker.number.float({ min: 1, max: 10000, fractionDigits: 2 })
 
     const image = await context.Image.create({
-      path: 'test.png',
+      path: randomImage,
     })
 
     const lot = await context.LotFactory.new().create({

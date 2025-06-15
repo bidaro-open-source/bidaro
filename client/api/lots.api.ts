@@ -1,15 +1,10 @@
-import type {
-  CreateLotRequest,
-  DeleteLotRequest,
-  GetLotRequest,
-  PublishLotRequest,
-  ShipLotRequest,
-  UpdateLotRequest,
-} from '~~/server/requests/lots/lot.request'
+import type { UpdateLotRequest } from '~~/server/requests/lots/lots.patch.request'
+import type { CreateLotRequest } from '~~/server/requests/lots/lots.post.request'
+import type { LotRequest } from '~~/server/requests/lots/lots.request'
 
 export function createLotsApi(fetch: typeof $fetch) {
   return {
-    async fetchLot(payload: GetLotRequest) {
+    async fetchLot(payload: LotRequest) {
       return fetch(`/api/lots/${payload.params.id}`, {
         method: 'GET',
       })
@@ -26,17 +21,17 @@ export function createLotsApi(fetch: typeof $fetch) {
         body: payload.body,
       })
     },
-    async deleteLot(payload: DeleteLotRequest) {
+    async deleteLot(payload: LotRequest) {
       return fetch(`/api/lots/${payload.params.id}`, {
         method: 'DELETE',
       })
     },
-    async publishLot(payload: PublishLotRequest) {
+    async publishLot(payload: LotRequest) {
       return fetch(`/api/lots/${payload.params.id}/publish`, {
         method: 'POST',
       })
     },
-    async shipLot(payload: ShipLotRequest) {
+    async shipLot(payload: LotRequest) {
       return fetch(`/api/lots/${payload.params.id}/ship`, {
         method: 'POST',
       })

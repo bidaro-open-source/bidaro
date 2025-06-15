@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { transformToFormError } from '~/uitls/transform-to-form-error'
+
 const auth = useAuthStore()
 
 const state = reactive({
@@ -6,7 +8,8 @@ const state = reactive({
   password: '',
 })
 
-const error = ref<unknown | null>(null)
+const form = ref()
+const error = ref<any>(null)
 const isError = ref(false)
 
 async function onSubmit() {
@@ -19,9 +22,13 @@ async function onSubmit() {
       password: state.password,
     })
   }
-  catch (err) {
+  catch (err: any) {
     error.value = err
     isError.value = true
+
+    if (err.data && err.data.fieldErrors) {
+      form.value.setErrors(transformToFormError(err.data.fieldErrors))
+    }
   }
 }
 </script>
@@ -33,6 +40,7 @@ async function onSubmit() {
     </h1>
 
     <UForm
+      ref="form"
       :state="state"
       :disabled="auth.isAuthenticating"
       class="space-y-4 mt-4"
@@ -61,6 +69,6 @@ async function onSubmit() {
       </UButton>
     </div>
 
-    <ErrorHandler v-if="isError" :error="error" class="mt-4" />
+    <ErrorHandler v-if="isError && error && error.statusCode !== 422" :error="error" class="mt-4" />
   </div>
 </template>
