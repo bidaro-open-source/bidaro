@@ -107,7 +107,7 @@ async function placeBet() {
   catch (error: any) {
     toast.add({
       title: 'Помилка',
-      description: error.message || 'Не вдалося розмістити ставку',
+      description: error?.data.message || 'Не вдалося розмістити ставку',
       color: 'error',
     })
   }
@@ -125,7 +125,7 @@ if (error.value?.statusCode === 404) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <div class="container mx-auto px-4 py-8">
       <!-- Навігаційні крихти -->
       <nav class="mb-6">
@@ -146,7 +146,7 @@ if (error.value?.statusCode === 404) {
           <li class="text-gray-500">
             /
           </li>
-          <li class="text-gray-900 font-medium">
+          <li class="text-gray-900 dark:text-white font-medium">
             {{ lot?.title || 'Завантаження...' }}
           </li>
         </ol>
@@ -181,7 +181,7 @@ if (error.value?.statusCode === 404) {
                 v-else
                 class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center"
               >
-                <UIcon name="i-heroicons-photo" class="text-6xl text-gray-400" />
+                <UIcon name="i-heroicons-photo" class="text-6xl text-gray-400 dark:text-gray-600" />
                 <span class="ml-2 text-gray-500">Немає зображення</span>
               </div>
             </div>
@@ -205,10 +205,10 @@ if (error.value?.statusCode === 404) {
           <!-- Інформація про лот -->
           <div class="space-y-6">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 mb-2">
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {{ lot.title }}
               </h1>
-              <p v-if="lot.description" class="text-gray-600 text-lg">
+              <p v-if="lot.description" class="text-gray-600 dark:text-gray-400 text-lg">
                 {{ lot.description }}
               </p>
             </div>
@@ -217,17 +217,17 @@ if (error.value?.statusCode === 404) {
             <UCard>
               <div class="space-y-4">
                 <div class="flex justify-between items-center">
-                  <span class="text-lg text-gray-600">Початкова сума:</span>
+                  <span class="text-lg text-gray-600 dark:text-gray-400">Початкова сума:</span>
                   <span class="text-2xl font-bold text-green-600">
                     ₴{{ lot.initialAmount?.toLocaleString() }}
                   </span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="text-lg text-gray-600">Кількість ставок:</span>
+                  <span class="text-lg text-gray-600 dark:text-gray-400">Кількість ставок:</span>
                   <span class="text-xl font-semibold">{{ lot.betsCount }}</span>
                 </div>
-                <div v-if="highestBet" class="flex justify-between items-center border-t pt-4">
-                  <span class="text-lg text-gray-600">Найвища ставка:</span>
+                <div v-if="highestBet" class="flex justify-between items-center border-t dark:border-gray-700 pt-4">
+                  <span class="text-lg text-gray-600 dark:text-gray-400">Найвища ставка:</span>
                   <span class="text-2xl font-bold text-blue-600">
                     ₴{{ highestBet?.toLocaleString() }}
                   </span>
@@ -235,20 +235,14 @@ if (error.value?.statusCode === 404) {
               </div>
             </UCard>
 
-            <!-- Переможець -->
-            <UCard v-if="lot.winner" class="bg-yellow-50 border-yellow-200">
-              <div class="flex items-center space-x-3">
-                <UIcon name="i-heroicons-trophy" class="text-2xl text-yellow-600" />
-                <div>
-                  <h3 class="font-semibold text-yellow-800">
-                    Переможець аукціону
-                  </h3>
-                  <p class="text-yellow-700">
-                    {{ getUserDisplayName(lot.winner) }}
-                  </p>
-                </div>
-              </div>
-            </UCard>
+            <UAlert
+              v-if="lot.winner"
+              icon="i-heroicons-trophy"
+              color="warning"
+              variant="subtle"
+              title="Переможець аукціону"
+              :description="getUserDisplayName(lot.winner)"
+            />
 
             <!-- Форма ставки -->
             <UCard v-if="canPlaceBet">
@@ -258,13 +252,14 @@ if (error.value?.statusCode === 404) {
                 </h3>
               </template>
 
-              <form class="space-y-4" @submit.prevent="placeBet">
+              <form class="flex space-x-4" @submit.prevent="placeBet">
                 <UFormGroup label="Сума ставки (₴)" required>
                   <UInput
                     v-model="betAmount"
                     type="number"
                     :placeholder="`Мінімум ₴${minBetAmount?.toLocaleString()}`"
                     size="lg"
+                    class="min-w-3xs"
                   />
                 </UFormGroup>
 
@@ -273,7 +268,6 @@ if (error.value?.statusCode === 404) {
                   color="primary"
                   variant="solid"
                   size="lg"
-                  class="mt-4"
                   block
                   :loading="placingBet"
                 >
@@ -328,7 +322,7 @@ if (error.value?.statusCode === 404) {
               <UBadge color="blue" variant="soft" size="lg">
                 {{ lot.category.displayName }}
               </UBadge>
-              <p v-if="lot.category.description" class="text-sm text-gray-600 mt-2">
+              <p v-if="lot.category.description" class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 {{ lot.category.description }}
               </p>
             </div>
@@ -343,19 +337,19 @@ if (error.value?.statusCode === 404) {
             </template>
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-gray-600">Створено:</span>
+                <span class="text-gray-600 dark:text-gray-400">Створено:</span>
                 <span>{{ formatDate(lot.createdAt) }}</span>
               </div>
               <div v-if="lot.effectiveDate" class="flex justify-between">
-                <span class="text-gray-600">Початок:</span>
+                <span class="text-gray-600 dark:text-gray-400">Початок:</span>
                 <span>{{ formatDate(lot.effectiveDate) }}</span>
               </div>
               <div v-if="lot.expirationDate" class="flex justify-between">
-                <span class="text-gray-600">Завершення:</span>
+                <span class="text-gray-600 dark:text-gray-400">Завершення:</span>
                 <span>{{ formatDate(lot.expirationDate) }}</span>
               </div>
               <div v-if="lot.updatedAt" class="flex justify-between">
-                <span class="text-gray-600">Оновлено:</span>
+                <span class="text-gray-600 dark:text-gray-400">Оновлено:</span>
                 <span>{{ formatDate(lot.updatedAt) }}</span>
               </div>
             </div>
@@ -382,14 +376,14 @@ if (error.value?.statusCode === 404) {
           </template>
 
           <div v-if="betsLoading" class="space-y-3">
-            <USkeleton v-for="i in 5" :key="i" class="h-16 w-full" />
+            <USkeleton v-for="i in 1" :key="i" class="h-16 w-full" />
           </div>
 
           <div v-else-if="bets?.length" class="space-y-3">
             <div
               v-for="bet in bets"
               :key="bet.id"
-              class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+              class="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg"
             >
               <div class="flex items-center space-x-3">
                 <UAvatar

@@ -105,4 +105,79 @@ export const up: Seeder = async ({ context }) => {
     // NEVER DO THIS IN PRODUCTION
     randomLot.initialAmount = randomAmount
   }
+
+  // Create dev accounts
+
+  const devUser = await context.UserFactory.new().create({
+    roleName: roles.USER,
+    email: faker.internet.email({ provider: 'gmail.com' }),
+    name: 'Dev',
+    surname: 'Dev',
+    username: 'dev',
+  })
+  const devUser2 = await context.UserFactory.new().create({
+    roleName: roles.USER,
+    email: faker.internet.email({ provider: 'gmail.com' }),
+    name: 'Dev2',
+    surname: 'Dev2',
+    username: 'dev2',
+  })
+
+  const image1 = await context.Image.create({
+    path: faker.helpers.arrayElement(paths),
+  })
+  await context.LotFactory.new().create({
+    userId: devUser.id,
+    imageId: image1.id,
+    title: faker.lorem.sentence(),
+    description: faker.lorem.paragraph(),
+    statusName: lotStatuses.DRAFT,
+    initialAmount: 100,
+    initialDuration: '1_hour',
+  })
+
+  const image2 = await context.Image.create({
+    path: faker.helpers.arrayElement(paths),
+  })
+  const devLotWithoutWinner = await context.LotFactory.new().create({
+    userId: devUser.id,
+    imageId: image2.id,
+    title: faker.lorem.sentence(),
+    description: faker.lorem.paragraph(),
+    statusName: lotStatuses.IN_TRADING_PROCESS,
+    initialAmount: 100,
+    initialDuration: '3_days',
+    effectiveDate: new Date(Date.now() - calculateLotDuration('3_days') * 2),
+    expirationDate: new Date(Date.now() - calculateLotDuration('3_days')),
+  })
+  await context.LotBetFactory.new().create({
+    lotId: devLotWithoutWinner.id,
+    userId: devUser.id,
+    amount: 100,
+  })
+
+  const image3 = await context.Image.create({
+    path: faker.helpers.arrayElement(paths),
+  })
+  const devLotWithWinner = await context.LotFactory.new().create({
+    userId: devUser.id,
+    imageId: image3.id,
+    title: faker.lorem.sentence(),
+    description: faker.lorem.paragraph(),
+    statusName: lotStatuses.IN_TRADING_PROCESS,
+    initialAmount: 100,
+    initialDuration: '3_days',
+    effectiveDate: new Date(),
+    expirationDate: new Date(Date.now() + calculateLotDuration('3_days')),
+  })
+  await context.LotBetFactory.new().create({
+    lotId: devLotWithWinner.id,
+    userId: devUser.id,
+    amount: 100,
+  })
+  await context.LotBetFactory.new().create({
+    lotId: devLotWithoutWinner.id,
+    userId: devUser2.id,
+    amount: 200,
+  })
 }

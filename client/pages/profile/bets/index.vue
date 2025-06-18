@@ -8,38 +8,15 @@ definePageRestrictions('auth')
 definePageMeta({
   layout: 'profile',
 })
-useHead({ title: 'Мої лоти - Профіль' })
+useHead({ title: 'Мої ставки - Профіль' })
 
-const { data: lots, pending, error, refresh } = await useFetch(`/api/users/${auth.user?.id}/lots`, {
+const { data: lots, pending, error, refresh } = await useFetch(`/api/users/${auth.user?.id}/bets`, {
   server: true,
-  headers: {
-    Authorization: `Bearer ${auth.accessToken}`,
-  },
   default: () => [],
 })
 
-function canEdit(lot: any): boolean {
-  return (lot.status === lotStatuses.IN_TRADING_PROCESS && new Date(lot.expirationDate) >= new Date()) || lot.status === 'draft'
-}
-
-function canShowWinner(lot: any): boolean {
-  return lot.status === lotStatuses.IN_TRADING_PROCESS && new Date(lot.expirationDate) < new Date()
-}
-
-function canSend(lot: any): boolean {
-  return lot.status === lotStatuses.IN_DISCUSSION_PROCESS && lot.user?.id === auth.user?.id
-}
-
 function canReceive(lot: any): boolean {
   return lot.status === lotStatuses.IN_DELIVERY_PROCESS && lot.winner?.id === auth.user?.id
-}
-
-function canDelete(lot: any): boolean {
-  return lot.status === lotStatuses.DRAFT
-}
-
-function canPublish(lot: any): boolean {
-  return lot.status === lotStatuses.DRAFT
 }
 
 function getUserDisplayName(user: any): string {
@@ -73,84 +50,6 @@ function formatDate(date: Date | string): string {
   })
 }
 
-async function showWinner(lot: any) {
-  try {
-    await $fetch(`/api/lots/${lot.id}/confirm-winner`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${auth.accessToken}`,
-      },
-    })
-
-    toast.add({
-      title: 'Успіх!',
-      description: 'Переможець визначений',
-      color: 'success',
-    })
-
-    await refresh()
-  }
-  catch (error: any) {
-    toast.add({
-      title: 'Помилка',
-      description: error?.data.message || 'Не вдалося визначити переможця',
-      color: 'error',
-    })
-  }
-}
-
-async function publishLot(lot: any) {
-  try {
-    await $fetch(`/api/lots/${lot.id}/publish`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${auth.accessToken}`,
-      },
-    })
-
-    toast.add({
-      title: 'Успіх!',
-      description: 'Лот опубліковано',
-      color: 'success',
-    })
-
-    await refresh()
-  }
-  catch (error: any) {
-    toast.add({
-      title: 'Помилка',
-      description: error?.data.message || 'Не вдалося опублікувати лот',
-      color: 'error',
-    })
-  }
-}
-
-async function sendLot(lot: any) {
-  try {
-    await $fetch(`/api/lots/${lot.id}/confirm-ship`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${auth.accessToken}`,
-      },
-    })
-
-    toast.add({
-      title: 'Успіх!',
-      description: 'Лот відправлено',
-      color: 'success',
-    })
-
-    await refresh()
-  }
-  catch (error: any) {
-    toast.add({
-      title: 'Помилка',
-      description: error?.data.message || 'Не вдалося відправити лот',
-      color: 'error',
-    })
-  }
-}
-
 async function receiveLot(lot: Lot) {
   try {
     await $fetch(`/api/lots/${lot.id}/confirm-receive`, {
@@ -176,32 +75,6 @@ async function receiveLot(lot: Lot) {
     })
   }
 }
-
-async function deleteLot(lot: Lot) {
-  try {
-    await $fetch(`/api/lots/${lot.id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${auth.accessToken}`,
-      },
-    })
-
-    toast.add({
-      title: 'Успіх!',
-      description: 'Лот видалено',
-      color: 'success',
-    })
-
-    await refresh()
-  }
-  catch (error: any) {
-    toast.add({
-      title: 'Помилка',
-      description: error?.data.message || 'Не вдалося видалити лот',
-      color: 'error',
-    })
-  }
-}
 </script>
 
 <template>
@@ -210,10 +83,10 @@ async function deleteLot(lot: Lot) {
       <!-- Заголовок сторінки -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-90 dark:text-white mb-2">
-          Мої лоти
+          Мої ставки
         </h1>
         <p class="text-gray-600">
-          Керуйте своїми лотами та відстежуйте їхній статус
+          Керуйте своїми ставками та відстежуйте їхній статус
         </p>
       </div>
 
@@ -325,56 +198,7 @@ async function deleteLot(lot: Lot) {
                 </div>
               </div>
 
-              <!-- Кнопки дій -->
               <div class="mt-4 flex items-center space-x-3">
-                <!-- Опублікувати -->
-                <UButton
-                  v-if="canPublish(lot)"
-                  color="info"
-                  variant="outline"
-                  size="sm"
-                  @click="publishLot(lot)"
-                >
-                  Опублікувати
-                </UButton>
-
-                <!-- Редагувати -->
-                <UButton
-                  v-if="canEdit(lot)"
-                  color="info"
-                  variant="outline"
-                  size="sm"
-                  :to="`/profile/lots/edit?id=${lot.id}`"
-                >
-                  <UIcon name="i-heroicons-pencil-square" class="mr-1" />
-                  Редагувати
-                </UButton>
-
-                <!-- Показати переможця -->
-                <UButton
-                  v-if="canShowWinner(lot)"
-                  color="success"
-                  variant="outline"
-                  size="sm"
-                  @click="showWinner(lot)"
-                >
-                  <UIcon name="i-heroicons-trophy" class="mr-1" />
-                  Показати переможця
-                </UButton>
-
-                <!-- Відправити -->
-                <UButton
-                  v-if="canSend(lot)"
-                  color="info"
-                  variant="outline"
-                  size="sm"
-                  @click="sendLot(lot)"
-                >
-                  <UIcon name="i-heroicons-paper-airplane" class="mr-1" />
-                  Відправити
-                </UButton>
-
-                <!-- Отримати -->
                 <UButton
                   v-if="canReceive(lot)"
                   color="info"
@@ -385,46 +209,6 @@ async function deleteLot(lot: Lot) {
                   <UIcon name="i-heroicons-inbox-arrow-down" class="mr-1" />
                   Отримати
                 </UButton>
-
-                <!-- Модальне вікно підтвердження видалення -->
-                <UModal v-if="canDelete(lot)">
-                  <UButton
-                    color="error"
-                    variant="outline"
-                    size="sm"
-                  >
-                    <UIcon name="i-heroicons-trash" class="mr-1" />
-                    Видалити
-                  </UButton>
-
-                  <template #content>
-                    <UCard>
-                      <template #header>
-                        <h3 class="text-lg font-semibold">
-                          Підтвердити видалення
-                        </h3>
-                      </template>
-
-                      <p class="text-gray-600 mb-4">
-                        Ви впевнені, що хочете видалити лот "<strong>{{ lot.title }}</strong>"?
-                      </p>
-                      <p class="text-sm text-red-600">
-                        Цю дію неможливо скасувати.
-                      </p>
-
-                      <template #footer>
-                        <div class="flex justify-end space-x-3">
-                          <UButton
-                            color="error"
-                            @click="deleteLot(lot)"
-                          >
-                            Видалити
-                          </UButton>
-                        </div>
-                      </template>
-                    </UCard>
-                  </template>
-                </UModal>
 
                 <UButton
                   v-if="lot.status !== lotStatuses.DRAFT"
@@ -439,35 +223,15 @@ async function deleteLot(lot: Lot) {
             </div>
           </div>
         </UCard>
-
-        <div class="text-center py-12">
-          <UButton
-            color="primary"
-            to="/profile/lots/create"
-          >
-            <UIcon name="i-heroicons-plus" class="mr-2" />
-            Створити новий лот
-          </UButton>
-        </div>
       </div>
 
       <div v-else class="text-center py-12">
         <UIcon name="i-heroicons-archive-box" class="text-6xl text-gray-300 mb-4" />
         <h3 class="text-lg font-medium text-gray-900 mb-2">
-          Лотів нема
+          Ставок нема
         </h3>
-        <UButton
-          color="primary"
-          to="/profile/lots/create"
-        >
-          <UIcon name="i-heroicons-plus" class="mr-2" />
-          Створити новий лот
-        </UButton>
       </div>
     </div>
-
-    <!-- Toast повідомлення -->
-    <UNotifications />
   </div>
 </template>
 
