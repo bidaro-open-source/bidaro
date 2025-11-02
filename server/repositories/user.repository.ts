@@ -126,10 +126,6 @@ export const userRepository = {
       where: { id: lotId, userId: id },
       include: [
         {
-          model: db.Image,
-          as: 'image',
-        },
-        {
           model: db.User,
           as: 'winner',
         },
@@ -172,10 +168,6 @@ export const userRepository = {
       where: { userId: id },
       include: [
         {
-          model: db.Image,
-          as: 'image',
-        },
-        {
           model: db.User,
           as: 'winner',
         },
@@ -217,10 +209,6 @@ export const userRepository = {
       transaction: options.transaction,
       where: { userId: id, statusName: { [Op.ne]: 'draft' } },
       include: [
-        {
-          model: db.Image,
-          as: 'image',
-        },
         {
           model: db.User,
           as: 'winner',
@@ -271,10 +259,6 @@ export const userRepository = {
             {
               model: db.User,
               as: 'user',
-            },
-            {
-              model: db.Image,
-              as: 'image',
             },
             {
               model: db.User,

@@ -5,28 +5,28 @@ export type ProfileResource = ReturnType<
 >
 
 export function createProfileResource(entity: User) {
-  const role = ensureIncludedModel(entity, 'role')
-  const permissions = role ? ensureIncludedModel(role, 'permissions') : []
+  const role = entity.role
+  const permissions = role?.permissions || []
 
   return {
-    id: ensureIncludedKey(entity, 'id') as number,
-    name: ensureIncludedKey(entity, 'name'),
-    surname: ensureIncludedKey(entity, 'surname'),
-    email: ensureIncludedKey(entity, 'email'),
+    id: entity.id as number,
+    name: entity.name,
+    surname: entity.surname,
+    email: entity.email,
     emailVerifiedAt:
-      ensureIncludedKey(entity, 'emailVerifiedAt') as string | null,
-    username: ensureIncludedKey(entity, 'username'),
+      entity.emailVerifiedAt as string | null,
+    username: entity.username,
     role: role
       ? {
-          name: ensureIncludedKey(role, 'name'),
-          displayName: ensureIncludedKey(role, 'displayName'),
-          description: ensureIncludedKey(role, 'description'),
+          name: entity.name,
+          displayName: role.displayName,
+          description: role.description,
         }
       : null,
-    permissions: (permissions || []).map(perm => ({
-      name: ensureIncludedKey(perm, 'name'),
-      displayName: ensureIncludedKey(perm, 'displayName'),
-      description: ensureIncludedKey(perm, 'description'),
+    permissions: permissions.map(perm => ({
+      name: perm.name,
+      displayName: perm.displayName,
+      description: perm.description,
     })),
   }
 }
