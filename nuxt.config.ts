@@ -1,9 +1,7 @@
 export default defineNuxtConfig({
-  srcDir: 'client',
+  compatibilityDate: '2025-04-29',
 
-  future: {
-    compatibilityVersion: 4,
-  },
+  srcDir: 'client',
 
   devtools: {
     enabled: true,
@@ -20,9 +18,8 @@ export default defineNuxtConfig({
     '~/assets/stylesheets/main.css',
   ],
 
-  colorMode: {
-    preference: 'system',
-    storage: 'localStorage',
+  ui: {
+    colorMode: true,
   },
 
   components: [
@@ -33,8 +30,6 @@ export default defineNuxtConfig({
   ],
 
   routeRules: {
-    '/creation/**': { ssr: false },
-    '/profile/**': { ssr: false },
     '/api/**': { cors: true },
   },
 
@@ -98,6 +93,4 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
-
-  compatibilityDate: '2025-04-29',
 })

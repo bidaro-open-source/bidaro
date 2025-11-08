@@ -1,14 +1,22 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { defineVitestProject } from '@nuxt/test-utils/config'
+import { defineConfig } from 'vitest/config'
 
-export default defineVitestConfig({
-  root: './',
+export default defineConfig({
   test: {
-    include: ['test/**/*.test.ts'],
-    passWithNoTests: true,
-    globalSetup: 'test/setup.ts',
-    setupFiles: [
-      'test/setup-database.ts',
-      'test/setup-redis.ts',
+    projects: [
+      await defineVitestProject({
+        root: './',
+        test: {
+          name: 'api-e2e',
+          include: ['test/api/**/*.e2e.{test,spec}.ts'],
+          environment: 'node',
+          globalSetup: 'test/setup.ts',
+          setupFiles: [
+            'test/setup-database.ts',
+            'test/setup-redis.ts',
+          ],
+        },
+      }),
     ],
   },
 })
