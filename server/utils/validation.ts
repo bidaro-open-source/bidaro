@@ -19,10 +19,10 @@ type ValidatorResult<Options extends ValidatorOptions> = {
 /**
  * Returns the validated data from the validator.
  */
-export type ValidatorReturnType<V> =
-  V extends z.ZodType<infer T> ? T :
-    V extends (event: H3Event, context?: any) => Promise<infer R> | infer R ? R :
-      never
+export type ValidatorReturnType<V>
+  = V extends z.ZodType<infer T> ? T
+    : V extends (event: H3Event, context?: any) => Promise<infer R> | infer R ? R
+      : never
 
 /**
  * Creates a request validator function.
