@@ -64,7 +64,7 @@ jobs:
           - 5432:5432
 
       minio:
-        image: bitnami/minio:latest
+        image: bitnamilegacy/minio:latest
         env:
           MINIO_ROOT_USER: ${{ env.NUXT_S3_ACCESS_KEY_ID }}
           MINIO_ROOT_PASSWORD: ${{ env.NUXT_S3_SECRET_ACCESS_KEY }}
