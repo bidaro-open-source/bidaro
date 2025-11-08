@@ -1,9 +1,0 @@
-{
-  "extends": "../.nuxt/tsconfig.server.json",
-  "files": [
-    "./types/shims.d.ts"
-  ],
-  "exclude": [
-    "../eslint.config.mjs"
-  ]
-}

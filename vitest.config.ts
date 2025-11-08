@@ -8,13 +8,12 @@ export default defineConfig({
         root: './',
         test: {
           name: 'api-e2e',
-          include: ['test/api/**/*.e2e.{test,spec}.ts'],
-          environment: 'node',
-          globalSetup: 'test/setup.ts',
-          setupFiles: [
-            'test/setup-database.ts',
-            'test/setup-redis.ts',
+          include: [
+            'server/api/**/*.{test,spec}.ts',
+            'test/api-e2e/**/*.{test,spec}.ts',
           ],
+          environment: 'node',
+          globalSetup: 'test/api-e2e/setup.ts',
         },
       }),
     ],

@@ -1,6 +1,6 @@
 import { userRepository } from '~~/server/repositories/user.repository'
-import { getUserRequest } from '~~/server/requests/user.request'
 import { createUserResource } from '~~/server/resources/user.resource'
+import { getUserRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
   const request = await getUserRequest(event)

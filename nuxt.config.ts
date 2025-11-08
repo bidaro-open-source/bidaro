@@ -3,6 +3,14 @@ export default defineNuxtConfig({
 
   srcDir: 'client',
 
+  nitro: {
+    ignore: [
+      'api/**/*.{test,spec}.ts',
+      'api/**/*.policy.ts',
+      'api/**/*.request.ts',
+    ],
+  },
+
   devtools: {
     enabled: true,
   },

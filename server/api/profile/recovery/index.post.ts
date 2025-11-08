@@ -1,7 +1,7 @@
-import { userRepository } from '~~/server/repositories/user.repository'
 import {
   resetPasswordRequest,
-} from '~~/server/requests/profile/recovery/index.request'
+} from '~~/server/api/profile/recovery/index.request'
+import { userRepository } from '~~/server/repositories/user.repository'
 import { createPasswordResetToken } from '~~/server/services/profile-recovery'
 
 export default defineEventHandler(async (event) => {

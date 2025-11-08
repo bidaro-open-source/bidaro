@@ -4,7 +4,7 @@ import type {
   LotAttributes,
   LotAttributesOptional,
 } from '~~/server/database'
-import { lotStatuses } from '~~/server/constants'
+import { lotStatuses } from '../../constants'
 import { Factory } from '../class/Factory'
 
 type PartialAttributes = Partial<LotAttributes>

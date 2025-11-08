@@ -1,6 +1,6 @@
 import { z } from 'zod'
+import { updateProfileRequest } from '~~/server/api/profile/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import { updateProfileRequest } from '~~/server/requests/profile/profile.request'
 import { createProfileResource } from '~~/server/resources/profile.resource'
 
 export default defineEventHandler(async (event) => {
