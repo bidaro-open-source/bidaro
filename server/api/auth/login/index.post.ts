@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const metadata = createRequestMetadata(event)
+  const metadata = createRequestMeta(event)
 
   const session = await createAuthenticationSession(user.id, metadata)
 
