@@ -4,7 +4,7 @@ import { getAuthenticationSessions } from '~~/server/services/authentication'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  mustBeAuthorized(event, getSessionsPolicy)
+  getSessionsPolicy(event)
 
   const user = getAuthenticatedUser(event)
 

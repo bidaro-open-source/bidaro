@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await deleteSessionsRequest(event)
 
-  mustBeAuthorized(event, deleteSessionsPolicy)
+  deleteSessionsPolicy(event)
 
   const user = getAuthenticatedUser(event)
 
