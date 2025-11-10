@@ -19,7 +19,6 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/eslint',
     '@pinia/nuxt',
-    '@bg-dev/nuxt-s3',
   ],
 
   css: [
@@ -39,11 +38,6 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/api/**': { cors: true },
-  },
-
-  s3: {
-    driver: 's3',
-    server: false,
   },
 
   runtimeConfig: {
