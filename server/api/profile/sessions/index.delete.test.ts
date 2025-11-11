@@ -5,8 +5,6 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { loginRequest } from '~~/test/api-e2e/requests/authentication'
-import '~~/test/api-e2e/setup-redis'
-import '~~/test/api-e2e/setup-database'
 
 async function deleteSessionsRequest(
   body: DeleteSessionsRequest['body'],

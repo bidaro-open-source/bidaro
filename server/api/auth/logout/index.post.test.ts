@@ -3,8 +3,6 @@ import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { logoutRequest } from '~~/test/api-e2e/requests/authentication'
-import '~~/test/api-e2e/setup-redis'
-import '~~/test/api-e2e/setup-database'
 
 describe('logout', async () => {
   await setup({ host: env.SETUP_HOST })

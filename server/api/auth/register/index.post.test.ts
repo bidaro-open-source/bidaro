@@ -3,8 +3,6 @@ import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { destroyUser, registerRequest } from '~~/test/api-e2e/requests/authentication'
-import '~~/test/api-e2e/setup-redis'
-import '~~/test/api-e2e/setup-database'
 
 describe('register', async () => {
   await setup({ host: env.SETUP_HOST })

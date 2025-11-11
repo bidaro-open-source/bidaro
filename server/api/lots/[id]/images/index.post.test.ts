@@ -8,11 +8,7 @@ import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-fetch-payload'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
-
 import { withAuth } from '~~/test/api-e2e/with-auth'
-import '~~/test/api-e2e/setup-redis'
-import '~~/test/api-e2e/setup-database'
-import '~~/test/api-e2e/setup-object-storage'
 
 async function uploadLotImageRequest(
   payload: { params: UploadLotImageRequest['params'], multipart: MultipartConfig },

@@ -7,11 +7,7 @@ import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-
 import { withAuth } from '~~/test/api-e2e/with-auth'
-import '~~/test/api-e2e/setup-redis'
-import '~~/test/api-e2e/setup-database'
-import '~~/test/api-e2e/setup-object-storage'
 
 async function getLotImageRequest(
   payload: GetLotRequest,

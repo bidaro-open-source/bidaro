@@ -4,6 +4,13 @@ export default defineNuxtConfig({
   srcDir: 'client',
 
   nitro: {
+    typescript: {
+      tsConfig: {
+        include: [
+          '../test/api-e2e/**/*',
+        ],
+      },
+    },
     ignore: [
       'api/**/*.{test,spec}.ts',
       'api/**/*.policy.ts',

@@ -3,8 +3,6 @@ import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { withAuth } from '~~/test/api-e2e/with-auth'
-import '~~/test/api-e2e/setup-redis'
-import '~~/test/api-e2e/setup-database'
 
 async function createLotRequest(
   options: { accessToken?: string } = {},
