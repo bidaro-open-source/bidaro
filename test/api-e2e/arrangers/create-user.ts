@@ -27,6 +27,16 @@ type CreateUserResult<T extends CreateUserOptions> = BaseResult & {
   access_token: T['withSession'] extends true ? string : undefined
 }
 
+/**
+ * Creates user in database.
+ *
+ * Can creates the role with permissions and attach it to the user.
+ *
+ * Can make login request for getting a session.
+ *
+ * @param options user options
+ * @returns user, role, session and clear function
+ */
 export async function createUser<T extends CreateUserOptions>(
   options: T = {} as T,
 ): Promise<CreateUserResult<T>> {

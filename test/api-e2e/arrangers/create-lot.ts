@@ -4,6 +4,12 @@ interface Options {
   ownerId: number
 }
 
+/**
+ * Creates new lot in database.
+ *
+ * @param options lot options
+ * @returns lot instance with clear function
+ */
 export async function createLot(options: Options) {
   const lot = await db.LotFactory.new().create({
     userId: options.ownerId,

@@ -8,9 +8,20 @@ interface FileOption {
   filename: string
 }
 
-export type MultipartFetch = ReturnType<typeof createMultipartFetch>
+export type MultipartConfig = ReturnType<typeof createMultipartConfig>
 
-export function createMultipartFetch(files: FileOption[]) {
+/**
+ * Creates a configuration for fetch to upload files by multipart/form-data.
+ *
+ * There is a bug in bun where automatic fetch filling does not work when
+ * transferring FormData to the body.
+ *
+ * @see Issue https://github.com/oven-sh/bun/issues/7917
+ *
+ * @param files file options
+ * @returns multipart config for fetch
+ */
+export function createMultipartConfig(files: FileOption[]) {
   const boundary = `----bun-boundary-${randomUUID()}`
 
   const parts: Buffer[] = []

@@ -1,7 +1,7 @@
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { logoutRequest } from '~~/test/api-e2e/requests/authentication'
-import { createUser } from '~~/test/api-e2e/utils/create-user'
 import '~~/test/api-e2e/setup-redis'
 import '~~/test/api-e2e/setup-database'
 

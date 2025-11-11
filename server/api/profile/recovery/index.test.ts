@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
 } from '~~/server/services/profile-recovery'
-import { createUser } from '~~/test/api-e2e/utils/create-user'
+import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import '~~/test/api-e2e/setup-redis'
 import '~~/test/api-e2e/setup-database'
 

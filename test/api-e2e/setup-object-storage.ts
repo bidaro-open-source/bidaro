@@ -3,7 +3,6 @@ import { S3Client } from '@aws-sdk/client-s3'
 import { afterAll, beforeAll } from 'vitest'
 
 let s3Client: S3Client | undefined
-let bucket: string | undefined
 
 function useObjectStorage() {
   try {
@@ -19,10 +18,6 @@ function useObjectStorage() {
       })
     }
 
-    if (!bucket) {
-      bucket = env.NUXT_S3_BUCKET
-    }
-
     return s3Client
   }
   catch (e) {
@@ -33,13 +28,18 @@ function useObjectStorage() {
 beforeAll(() => {
   // @ts-expect-error type
   globalThis.s3 = useObjectStorage()
+  // @ts-expect-error type
+  globalThis.s3Bucket = env.NUXT_S3_BUCKET as string
 })
 
 afterAll(async () => {
   // @ts-expect-error type
   delete globalThis.s3
+  // @ts-expect-error type
+  delete globalThis.s3Bucket
 })
 
 declare global {
   let s3: ReturnType<typeof useObjectStorage>
+  let s3Bucket: string
 }
