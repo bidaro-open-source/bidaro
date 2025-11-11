@@ -2,6 +2,9 @@
   "type": "module",
   "private": true,
   "license": "GPL-3.0-only",
+  "engines": {
+    "node": "^22"
+  },
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
