@@ -1,6 +1,8 @@
 import { InitializeCategory } from './Category'
+import { InitializeImage } from './Image'
 import { InitializeLot } from './Lot'
 import { InitializeLotBet } from './LotBet'
+import { InitializeLotImage } from './LotImage'
 import { InitializeLotStatus } from './LotStatus'
 import { InitializePermission } from './Permission'
 import { InitializeRole } from './Role'
@@ -14,8 +16,10 @@ import { InitializeUser } from './User'
  */
 export const models = {
   Category: InitializeCategory,
+  Image: InitializeImage,
   Lot: InitializeLot,
   LotBet: InitializeLotBet,
+  LotImage: InitializeLotImage,
   LotStatus: InitializeLotStatus,
   Permission: InitializePermission,
   Role: InitializeRole,

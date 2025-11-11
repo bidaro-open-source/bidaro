@@ -1,8 +1,9 @@
-import type { Transaction } from 'sequelize'
+import type { LOCK, Transaction } from 'sequelize'
 import type { Lot, LotAttributesOptional } from '../database'
 import type { LotBet } from '../database/models/LotBet'
 
 interface Options {
+  lock?: LOCK
   transaction?: Transaction
 }
 
@@ -50,6 +51,42 @@ export const lotRepository = {
           ],
         },
       ],
+    })
+  },
+
+  /**
+   * Finds a lot by their primary key with lock.
+   *
+   * @param id - lot primary key
+   * @param options - sequelize options
+   * @returns lot or null if not found
+   */
+  async findByIdOrFail(id: number, options: Options = {}): Promise<Lot> {
+    const lot = await lotRepository.findById(id, options)
+
+    if (!lot) {
+      throw createError({
+        message: 'Лот не знайдено',
+        status: 404,
+      })
+    }
+
+    return lot
+  },
+
+  /**
+   * Finds a lot by their primary key with lock.
+   *
+   * @param id - lot primary key
+   * @param options - sequelize options
+   * @returns lot or null if not found
+   */
+  findByIdWithLock: (id: number, options: Required<Options>): Promise<Lot | null> => {
+    const db = useDatabase()
+
+    return db.Lot.findByPk(id, {
+      transaction: options.transaction,
+      lock: options.lock,
     })
   },
 

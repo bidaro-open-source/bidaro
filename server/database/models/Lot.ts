@@ -20,6 +20,7 @@ import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
 import type { Category } from './Category'
 import type { LotBet } from './LotBet'
+import type { LotImage } from './LotImage'
 import type { LotStatus } from './LotStatus'
 import type { User } from './User'
 import { DataTypes, Model } from 'sequelize'
@@ -71,6 +72,8 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare hasBets: HasManyHasAssociationsMixin<LotBet, number>
   declare countBets: HasManyCountAssociationsMixin
 
+  declare images?: NonAttribute<LotImage[]>
+
   static associate(database: Database) {
     database.Lot.belongsTo(database.User, {
       as: 'user',
@@ -95,6 +98,13 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
     database.Lot.hasMany(database.LotBet, {
       as: 'bets',
       foreignKey: 'lotId',
+    })
+
+    database.Lot.belongsToMany(database.Image, {
+      through: database.LotImage,
+      foreignKey: 'lotId',
+      otherKey: 'imageId',
+      as: 'images',
     })
   }
 }
