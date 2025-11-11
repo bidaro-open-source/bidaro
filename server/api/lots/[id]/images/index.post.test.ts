@@ -1,14 +1,15 @@
 import type { MultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-fetch-payload'
 import type { UploadLotImageRequest } from './index.post.request'
 import * as path from 'node:path'
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-fetch-payload'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
-import { withAuth } from '~~/test/api-e2e/with-auth'
 
+import { withAuth } from '~~/test/api-e2e/with-auth'
 import '~~/test/api-e2e/setup-redis'
 import '~~/test/api-e2e/setup-database'
 import '~~/test/api-e2e/setup-object-storage'
@@ -37,7 +38,7 @@ function getMultipart(filename: string, mime: string) {
 }
 
 describe('create draft lot', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   describe('uploading correct files', () => {
     it.each([

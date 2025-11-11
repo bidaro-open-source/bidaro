@@ -1,5 +1,6 @@
 import type { ConfirmPasswordRequest } from './confirm/index.request'
 import type { ResetPasswordRequest } from './index.request'
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
@@ -39,7 +40,7 @@ async function confirmResetPasswordRequest(
 }
 
 describe('reset password', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should reset password', async () => {
     const data = await createUser()

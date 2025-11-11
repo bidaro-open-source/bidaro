@@ -1,4 +1,5 @@
 import type { DeleteSessionsRequest } from './index.request'
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
@@ -22,7 +23,7 @@ async function deleteSessionsRequest(
 }
 
 describe('session deleting', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should delete session', async () => {
     const data = await createUser({

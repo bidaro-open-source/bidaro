@@ -1,4 +1,5 @@
 import type { GetUserRequest } from './index.request'
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -19,7 +20,7 @@ async function getUserRequest(
 }
 
 describe('get /api/users/:id', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should return the correct structure', async () => {
     const data = await createUser({ withSession: true })

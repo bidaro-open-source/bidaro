@@ -1,3 +1,4 @@
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
@@ -18,7 +19,7 @@ async function getSessionsRequest(
 }
 
 describe('session fetching', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should return user sessions', async () => {
     const data = await createUser({

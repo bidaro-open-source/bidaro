@@ -1,13 +1,14 @@
 import type { DeleteLotImageRequest } from './index.delete.request'
 import * as path from 'node:path'
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { withAuth } from '~~/test/api-e2e/with-auth'
 
+import { withAuth } from '~~/test/api-e2e/with-auth'
 import '~~/test/api-e2e/setup-redis'
 import '~~/test/api-e2e/setup-database'
 import '~~/test/api-e2e/setup-object-storage'
@@ -26,7 +27,7 @@ async function deleteLotImageRequest(
 }
 
 describe('create draft lot', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   const filePath = path.resolve(__dirname, '__fixtures__', 'image-normal.png')
 

@@ -1,3 +1,4 @@
+import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -6,7 +7,7 @@ import '~~/test/api-e2e/setup-redis'
 import '~~/test/api-e2e/setup-database'
 
 describe('logout', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should logout user', async () => {
     const data = await createUser({ withSession: true })

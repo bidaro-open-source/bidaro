@@ -1,3 +1,4 @@
+import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -21,7 +22,7 @@ export async function destroyLot(id: number) {
 }
 
 describe('create draft lot', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should create a lot', async () => {
     const data = await createUser({ withSession: true })

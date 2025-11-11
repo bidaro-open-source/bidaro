@@ -1,3 +1,4 @@
+import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
@@ -6,7 +7,7 @@ import '~~/test/api-e2e/setup-redis'
 import '~~/test/api-e2e/setup-database'
 
 describe('register', async () => {
-  await setup()
+  await setup({ host: env.SETUP_HOST })
 
   it('should register user', async () => {
     const userData = db.UserFactory.new().make()
