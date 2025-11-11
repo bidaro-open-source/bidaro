@@ -62,8 +62,7 @@ describe('create draft lot', async () => {
       expect(image.id).toBeDefined()
       expect(image.key).toBeDefined()
       expect(image.bucket).toBeDefined()
-      expect(image.mime_type).toBeDefined()
-      expect(image.size_bytes).toBeDefined()
+      expect(image.mime).toBeDefined()
 
       await deleteS3Object(image.bucket, image.key)
       await (db.Image.destroy({ where: { id: image.id } }))

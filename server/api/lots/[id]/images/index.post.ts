@@ -1,4 +1,5 @@
 import { lotRepository } from '~~/server/repositories/lot.repository'
+import { createImageResource } from '~~/server/resources/lot-image.resource'
 import { imageService } from '~~/server/services/image'
 import { lotService } from '~~/server/services/lot'
 import { uploadLotImagePolicy } from './index.post.policy'
@@ -17,5 +18,5 @@ export default defineEventHandler(async (event) => {
 
   await lotService.attachImages(request.params.id, [image])
 
-  return image.toJSON()
+  return createImageResource(image)
 })
