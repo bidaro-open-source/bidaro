@@ -13,16 +13,17 @@ interface Options {
  * @returns image instance with clear function
  */
 export async function createImage(path: string, options: Options = {}) {
-  const image = await db.ImageFactory.new().create({
-    bucket: s3Bucket,
-    mime_type: options.mime,
-  })
-
   const file = fs.readFileSync(path)
 
   if (!file) {
     throw new Error('Image file not found')
   }
+
+  const image = await db.ImageFactory.new().create({
+    bucket: s3Bucket,
+    size_bytes: file.length,
+    mime_type: options.mime,
+  })
 
   const s3Image = await createS3Object(s3Bucket, image.key, file)
 
