@@ -38,6 +38,8 @@ export const lotService = {
     })
 
     if (!lot) {
+      await transaction.rollback()
+
       throw createError({
         message: 'Лот не знайдено',
         status: 404,
