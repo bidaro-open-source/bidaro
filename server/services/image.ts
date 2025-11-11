@@ -94,8 +94,6 @@ export const imageService = {
         })
       }
 
-      console.log(error)
-
       throw createError({
         message: 'Помилка сервера під час завантаження зображення',
         status: 500,

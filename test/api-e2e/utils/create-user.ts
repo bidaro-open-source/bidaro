@@ -47,8 +47,6 @@ export async function createUser<T extends CreateUserOptions>(
 
   const user = await db.UserFactory.new().create(attributes)
 
-  console.log(user)
-
   if (options.withSession) {
     const response = await loginRequest({
       username: user.username,
