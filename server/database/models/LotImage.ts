@@ -4,7 +4,7 @@ import type {
   InferAttributes,
   InferCreationAttributes,
 } from 'sequelize'
-import type { DatabaseOptional } from '../types'
+import type { Database, DatabaseOptional } from '../types'
 import type { Image } from './Image'
 import type { Lot } from './Lot'
 import {
@@ -21,6 +21,16 @@ export class LotImage extends Model<LotImageAttributes, LotImageCreationAttribut
   declare lotId: ForeignKey<Lot['id']>
   declare imageId: ForeignKey<Image['id']>
   declare order: number
+
+  static associate(database: Database) {
+    database.LotImage.belongsTo(database.Lot, {
+      foreignKey: 'lotId',
+    })
+
+    database.LotImage.belongsTo(database.Image, {
+      foreignKey: 'imageId',
+    })
+  }
 }
 
 export function InitializeLotImage(database: DatabaseOptional) {
@@ -57,7 +67,7 @@ export function InitializeLotImage(database: DatabaseOptional) {
       indexes: [
         {
           unique: true,
-          fields: ['lotId', 'displayOrder'],
+          fields: ['lotId', 'order'],
         },
       ],
     },

@@ -12,7 +12,7 @@ interface UploadPayload {
 interface ErrorHandling {
   ok: boolean
   id: number
-  cause?: H3Error
+  cause?: string
 }
 
 export const imageService = {
@@ -114,7 +114,11 @@ export const imageService = {
     const result = await safeDeleteImage(imageId)
 
     if (!result.ok) {
-      throw result.cause
+      throw createError({
+        message: 'Зображення не видалено',
+        status: 500,
+        cause: result.cause,
+      })
     }
   },
 
@@ -148,10 +152,7 @@ async function safeDeleteImage(imageId: number): Promise<ErrorHandling> {
   const image = await db.Image.findByPk(imageId)
 
   if (!image) {
-    result.cause = createError({
-      message: 'Зображення не знайдено',
-      status: 500,
-    })
+    result.cause = 'Зображення не знайдено'
 
     return result
   }
@@ -165,11 +166,7 @@ async function safeDeleteImage(imageId: number): Promise<ErrorHandling> {
     await s3.send(s3Command)
   }
   catch (error) {
-    result.cause = createError({
-      message: 'Зображення не вдалося видалити зі сховища об\'єктів',
-      status: 500,
-      cause: error,
-    })
+    result.cause = 'Зображення не вдалося видалити зі сховища об\'єктів'
 
     return result
   }
@@ -178,14 +175,12 @@ async function safeDeleteImage(imageId: number): Promise<ErrorHandling> {
     await image.destroy()
   }
   catch (error) {
-    result.cause = createError({
-      message: 'Зображення не вдалося видалити з бази даних',
-      status: 500,
-      cause: error,
-    })
+    result.cause = 'Зображення не вдалося видалити з бази даних'
 
     return result
   }
+
+  result.ok = true
 
   return result
 }

@@ -18,10 +18,10 @@ export const lotImageRepository = {
           model: db.Image,
           as: 'images',
           through: { attributes: [] },
+          order: [
+            [db.LotImage, 'order', 'ASC'],
+          ],
         },
-      ],
-      order: [
-        [db.Image, db.LotImage, 'order', 'ASC'],
       ],
     })
 
