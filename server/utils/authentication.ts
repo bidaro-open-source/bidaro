@@ -21,7 +21,7 @@ export function mustBeAuthenticated(event: H3Event): void {
   if (!event.context.auth || !event.context.auth.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Необхідна авторизація',
+      statusMessage: 'Unauthorized',
       message: 'Для цієї дії необхідно бути в системі',
     })
   }
