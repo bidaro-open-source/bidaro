@@ -18,10 +18,12 @@ export type MultipartConfig = ReturnType<typeof createMultipartConfig>
  *
  * @see Issue https://github.com/oven-sh/bun/issues/7917
  *
- * @param files file options
+ * @param payload file options or array of file options
  * @returns multipart config for fetch
  */
-export function createMultipartConfig(files: FileOption[]) {
+export function createMultipartConfig(payload: FileOption | FileOption[]) {
+  const files = Array.isArray(payload) ? payload : [payload]
+
   const boundary = `----bun-boundary-${randomUUID()}`
 
   const parts: Buffer[] = []

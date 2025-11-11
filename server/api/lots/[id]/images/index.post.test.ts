@@ -1,13 +1,13 @@
-import type { MultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-fetch-payload'
+import type { MultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import type { UploadLotImageRequest } from './index.post.request'
-import * as path from 'node:path'
 import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
-import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-fetch-payload'
+import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
+import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function uploadLotImageRequest(
@@ -23,29 +23,27 @@ async function uploadLotImageRequest(
   })
 }
 
-function getMultipart(filename: string, mime: string) {
-  const filePath = path.resolve(__dirname, `./__fixtures__/${filename}`)
-
-  return createMultipartConfig([{
-    path: filePath,
-    filename,
-    mime,
-  }])
-}
-
 describe('create draft lot', async () => {
   await setup({ host: env.SETUP_HOST })
 
+  const IMAGE = 'image-normal.png'
+  const IMAGE_TO_BIG = 'image-heavy.png'
+  const IMAGE_PNG = 'image-normal.png'
+  const IMAGE_JPG = 'image-normal.jpg'
+  const IMAGE_JPEG = 'image-normal.jpeg'
+  const IMAGE_WEBP = 'image-normal.webp'
+  const IMAGE_AVIF = 'image-unsupport.avif'
+
   describe('uploading correct files', () => {
     it.each([
-      ['image-normal.png', 'image/png'],
-      ['image-normal.jpg', 'image/jpg'],
-      ['image-normal.jpeg', 'image/jpeg'],
-      ['image-normal.webp', 'image/webp'],
-    ])('should upload file "%s"', async (path: string, mime: string) => {
+      IMAGE_PNG,
+      IMAGE_JPG,
+      IMAGE_JPEG,
+      IMAGE_WEBP,
+    ])('should upload file "%s"', async (filename: string) => {
       const userData = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: userData.user.id })
-      const multipart = getMultipart(path, mime)
+      const multipart = createMultipartConfig(resolveImage(filename))
 
       const response = await uploadLotImageRequest(
         { multipart, params: { id: lotData.lot.id } },
@@ -69,12 +67,12 @@ describe('create draft lot', async () => {
 
   describe('uploading uncorrect files', () => {
     it.each([
-      ['image-heavy.png', 'image/png'],
-      ['image-unsupport.avif', 'image/avif'],
-    ])('should upload file "%s"', async (path: string, mime: string) => {
+      IMAGE_TO_BIG,
+      IMAGE_AVIF,
+    ])('should upload file "%s"', async (filename: string) => {
       const userData = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: userData.user.id })
-      const multipart = getMultipart(path, mime)
+      const multipart = createMultipartConfig(resolveImage(filename))
 
       const response = await uploadLotImageRequest(
         { multipart, params: { id: lotData.lot.id } },
@@ -90,7 +88,7 @@ describe('create draft lot', async () => {
 
   describe('error handling', () => {
     it('should return 401 for anonymus', async () => {
-      const multipart = getMultipart('image-normal.png', 'image/png')
+      const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(
         { multipart, params: { id: 1 } },
@@ -101,7 +99,7 @@ describe('create draft lot', async () => {
 
     it('should return 404', async () => {
       const userData = await createUser({ withSession: true })
-      const multipart = getMultipart('image-normal.png', 'image/png')
+      const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(
         { multipart, params: { id: 945395394 } },
@@ -117,7 +115,7 @@ describe('create draft lot', async () => {
       const user1Data = await createUser()
       const user2Data = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: user1Data.user.id })
-      const multipart = getMultipart('image-normal.png', 'image/png')
+      const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(
         { multipart, params: { id: lotData.lot.id } },

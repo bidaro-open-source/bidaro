@@ -1,13 +1,12 @@
 import type { UpdateImageOrderRequest } from './index.post.request'
-import * as path from 'node:path'
 import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
-
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function updateImageOrderRequest(
@@ -26,19 +25,19 @@ async function updateImageOrderRequest(
 describe('update order of lot images', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  const filePath = path.resolve(__dirname, '..', '__fixtures__', 'image-normal.png')
+  const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should update order of uploaded image', async () => {
     const userData = await createUser({ withSession: true })
     const lotData = await createLot({ ownerId: userData.user.id })
 
-    const imageData1 = await createImage(filePath)
+    const imageData1 = await createImage(IMAGE_PATH)
     await createLotImage(lotData.lot.id, imageData1.image.id)
 
-    const imageData2 = await createImage(filePath)
+    const imageData2 = await createImage(IMAGE_PATH)
     await createLotImage(lotData.lot.id, imageData2.image.id)
 
-    const imageData3 = await createImage(filePath)
+    const imageData3 = await createImage(IMAGE_PATH)
     await createLotImage(lotData.lot.id, imageData3.image.id)
 
     const ids = [imageData2.image.id, imageData3.image.id, imageData1.image.id]
@@ -97,7 +96,7 @@ describe('update order of lot images', async () => {
       const user2Data = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: user1Data.user.id })
 
-      const imageData = await createImage(filePath)
+      const imageData = await createImage(IMAGE_PATH)
       await createLotImage(lotData.lot.id, imageData.image.id)
 
       const response = await updateImageOrderRequest(
@@ -117,10 +116,10 @@ describe('update order of lot images', async () => {
       const userData = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: userData.user.id })
 
-      const imageData1 = await createImage(filePath)
+      const imageData1 = await createImage(IMAGE_PATH)
       await createLotImage(lotData.lot.id, imageData1.image.id)
 
-      const imageData2 = await createImage(filePath)
+      const imageData2 = await createImage(IMAGE_PATH)
       await createLotImage(lotData.lot.id, imageData2.image.id)
 
       const ids = [imageData1.image.id]
@@ -142,10 +141,10 @@ describe('update order of lot images', async () => {
       const lotData1 = await createLot({ ownerId: userData.user.id })
       const lotData2 = await createLot({ ownerId: userData.user.id })
 
-      const imageData1 = await createImage(filePath)
+      const imageData1 = await createImage(IMAGE_PATH)
       await createLotImage(lotData1.lot.id, imageData1.image.id)
 
-      const imageData2 = await createImage(filePath)
+      const imageData2 = await createImage(IMAGE_PATH)
       await createLotImage(lotData2.lot.id, imageData2.image.id)
 
       const ids = [imageData2.image.id]

@@ -1,5 +1,4 @@
 import type { DeleteLotImageRequest } from './index.delete.request'
-import * as path from 'node:path'
 import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -7,6 +6,7 @@ import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function deleteLotImageRequest(
@@ -25,12 +25,12 @@ async function deleteLotImageRequest(
 describe('create draft lot', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  const filePath = path.resolve(__dirname, '__fixtures__', 'image-normal.png')
+  const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should delete uploaded file and return correct structure', async () => {
     const userData = await createUser({ withSession: true })
     const lotData = await createLot({ ownerId: userData.user.id })
-    const imageData = await createImage(filePath)
+    const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
 
     const deleteResponse = await deleteLotImageRequest(
@@ -86,7 +86,7 @@ describe('create draft lot', async () => {
       const user2Data = await createUser({ withSession: true })
       const lot1Data = await createLot({ ownerId: user1Data.user.id })
       const lot2Data = await createLot({ ownerId: user2Data.user.id })
-      const imageData = await createImage(filePath)
+      const imageData = await createImage(IMAGE_PATH)
       const lotImageData = await createLotImage(lot2Data.lot.id, imageData.image.id)
 
       const deleteResponse = await deleteLotImageRequest(
