@@ -17,7 +17,7 @@ export async function createLotImage(lotId: number, imageId: number) {
   })
 
   // @ts-expect-error used raw reqeust
-  const maxOrder = result.max_order ?? 1
+  const maxOrder = result.max_order ?? -1
 
   const lotImage = await db.LotImage.create({
     order: maxOrder + 1,

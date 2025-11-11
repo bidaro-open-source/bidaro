@@ -1,5 +1,6 @@
 import type {
   BelongsToGetAssociationMixin,
+  BelongsToManySetAssociationsMixin,
   BelongsToSetAssociationMixin,
   CreationOptional,
   ForeignKey,
@@ -73,6 +74,7 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare countBets: HasManyCountAssociationsMixin
 
   declare images?: NonAttribute<Image[]>
+  declare setImages: BelongsToManySetAssociationsMixin<Image, number>
 
   static associate(database: Database) {
     database.Lot.belongsTo(database.User, {

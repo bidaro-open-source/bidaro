@@ -4,6 +4,7 @@ import type {
   InferAttributes,
   InferCreationAttributes,
 } from 'sequelize'
+import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
 import type { Image } from './Image'
 import type { Lot } from './Lot'
@@ -15,6 +16,7 @@ import {
 export type LotImageModel = typeof LotImage
 export type LotImageAttributes = InferAttributes<LotImage>
 export type LotImageCreationAttributes = InferCreationAttributes<LotImage>
+export type LotImageAttributesOptional = MakeNullishOptional<LotImageCreationAttributes>
 
 export class LotImage extends Model<LotImageAttributes, LotImageCreationAttributes> {
   declare id: CreationOptional<number>

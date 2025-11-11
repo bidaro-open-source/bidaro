@@ -1,4 +1,5 @@
 import type { LOCK, Transaction } from 'sequelize'
+import type { LotImageAttributesOptional } from '../database'
 import { Op } from 'sequelize'
 
 interface Options {
@@ -32,7 +33,17 @@ export const lotImageRepository = {
     return lot.images
   },
 
-  async findAllLinksByLot(lotId: number, imageIds: number[], options: Options = {}) {
+  async findAllLinksByLot(lotId: number, options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.LotImage.findAll({
+      where: { lotId },
+      attributes: ['imageId'],
+      transaction: options.transaction,
+    })
+  },
+
+  async findAllLinksByLotAndPks(lotId: number, imageIds: number[], options: Options = {}) {
     const db = useDatabase()
 
     return await db.LotImage.findAll({
@@ -63,6 +74,15 @@ export const lotImageRepository = {
     return result.max_order ?? 1
   },
 
+  async destroyByLotId(lotId: number, options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.LotImage.destroy({
+      where: { lotId },
+      transaction: options.transaction,
+    })
+  },
+
   async destoryByIds(linkIds: number[]) {
     const db = useDatabase()
 
@@ -74,4 +94,13 @@ export const lotImageRepository = {
       },
     })
   },
+
+  async bulkCreate(records: LotImageAttributesOptional[], options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.LotImage.bulkCreate(records, {
+      transaction: options.transaction,
+    })
+  },
+
 }
