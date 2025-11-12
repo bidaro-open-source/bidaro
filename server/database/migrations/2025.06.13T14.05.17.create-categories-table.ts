@@ -1,5 +1,7 @@
 import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
+import { v4 as uuidv4 } from 'uuid'
+import { permissions, roles } from '../../constants'
 
 interface InsertCategoryOptions {
   parentId?: number
@@ -157,6 +159,11 @@ export const up: Migration = async ({ context }) => {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      slug: {
+        type: DataTypes.STRING(128),
+        unique: true,
+        allowNull: false,
+      },
       displayName: {
         type: DataTypes.STRING(128),
         allowNull: false,
@@ -175,6 +182,7 @@ export const up: Migration = async ({ context }) => {
             displayName: category.displayName,
             description: category.description,
             parentId: category.parentId,
+            slug: uuidv4(),
           },
         ],
         // @ts-expect-error sequelize bug
@@ -206,6 +214,18 @@ export const up: Migration = async ({ context }) => {
         key: 'id',
       },
     }, { transaction })
+
+    await queryInterface.bulkInsert('permissions', [
+      { name: permissions.CREATE_CATEGORY, createdAt: new Date() },
+      { name: permissions.UPDATE_CATEGORY, createdAt: new Date() },
+      { name: permissions.DELETE_CATEGORY, createdAt: new Date() },
+    ], { transaction })
+
+    await queryInterface.bulkInsert('roles_has_permissions', [
+      { role: roles.USER, permission: permissions.CREATE_CATEGORY },
+      { role: roles.USER, permission: permissions.UPDATE_CATEGORY },
+      { role: roles.USER, permission: permissions.DELETE_CATEGORY },
+    ], { transaction })
 
     await transaction.commit()
   }

@@ -1,3 +1,4 @@
+import { InitializeCategoryFactroy } from './CategoryFactory'
 import { InitializeImageFactroy } from './ImageFactory'
 import { InitializeLotBetFactroy } from './LotBetFactory'
 import { InitializeLotFactroy } from './LotFactory'
@@ -6,6 +7,7 @@ import { InitializeRoleFactroy } from './RoleFactory'
 import { InitializeUserFactroy } from './UserFactory'
 
 export const factories = {
+  CategoryFactory: InitializeCategoryFactroy,
   ImageFactory: InitializeImageFactroy,
   LotBetFactory: InitializeLotBetFactroy,
   LotFactory: InitializeLotFactroy,

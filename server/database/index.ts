@@ -6,6 +6,7 @@ export {
 export type * from './factories/PermissionFactory'
 export type * from './factories/RoleFactory'
 export type * from './factories/UserFactory'
+export type * from './models/Category'
 export type * from './models/Image'
 export type * from './models/Lot'
 export type * from './models/LotBet'

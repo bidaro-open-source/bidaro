@@ -5,6 +5,9 @@ export const roles = {
 export const permissions = {
   VIEW_OWN_SESSIONS: 'view_own_sessions',
   DELETE_OWN_SESSIONS: 'delete_own_sessions',
+  CREATE_CATEGORY: 'create_category',
+  UPDATE_CATEGORY: 'update_category',
+  DELETE_CATEGORY: 'delete_category',
 } as const
 
 export const lotStatuses = {
