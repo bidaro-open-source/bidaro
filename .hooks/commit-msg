@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 msg=${1}
 regex="^(release|build|ci|feat|fix|ref|perf|style|test)(\(.+\))?: .{1,72}$"
