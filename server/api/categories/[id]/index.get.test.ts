@@ -19,9 +19,20 @@ describe('get category', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should return correct structure', async () => {
+    const userData = await createUser()
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory({
       parentId: categoryData1.category.id,
+    })
+
+    const lotData1 = await createLot({
+      ownerId: userData.user.id,
+      categoryId: categoryData1.category.id,
+    })
+
+    const lotData2 = await createLot({
+      ownerId: userData.user.id,
+      categoryId: categoryData2.category.id,
     })
 
     const response = await getCategoryRequest(
@@ -37,6 +48,7 @@ describe('get category', async () => {
     expect(category.description).toBe(categoryData1.category.description)
     expect(category.parentId).toBe(categoryData1.category.parentId)
     expect(typeof category.countLots).toBe('number')
+    expect(category.countLots).toBe(2)
 
     expect(Array.isArray(category.children)).toBeTruthy()
     expect(category.children.length).toBe(1)
@@ -47,37 +59,6 @@ describe('get category', async () => {
     expect(category.children[0]?.description).toBe(categoryData2.category.description)
     expect(category.children[0]?.parentId).toBe(categoryData2.category.parentId)
     expect(typeof category.children[0]?.countLots).toBe('number')
-
-    await categoryData2.clear()
-    await categoryData1.clear()
-  })
-
-  it('should return correct lot counts', async () => {
-    const userData = await createUser()
-    const categoryData1 = await createCategory()
-    const categoryData2 = await createCategory({
-      parentId: categoryData1.category.id,
-    })
-
-    const lotData1 = await createLot({
-      ownerId: userData.user.id,
-    })
-    await lotData1.lot.update({ categoryId: categoryData1.category.id })
-
-    const lotData2 = await createLot({
-      ownerId: userData.user.id,
-    })
-    await lotData2.lot.update({ categoryId: categoryData2.category.id })
-
-    const response = await getCategoryRequest(
-      { params: { id: categoryData1.category.id } },
-    )
-
-    const category = await response.json()
-
-    expect(response.status).toBe(200)
-    expect(category.countLots).toBe(2)
-    expect(category.children.length).toBe(1)
     expect(category.children[0].countLots).toBe(1)
 
     await lotData2.clear()
