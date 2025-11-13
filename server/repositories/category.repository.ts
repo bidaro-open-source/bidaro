@@ -33,10 +33,7 @@ export const categoryRepository = {
 
     return db.Category.findByPk(id, {
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
+      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
@@ -74,10 +71,7 @@ export const categoryRepository = {
     return db.Category.findOne({
       where: { slug },
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
+      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
@@ -94,6 +88,7 @@ export const categoryRepository = {
     return db.Category.findAll({
       where: { parentId },
       transaction: options.transaction,
+      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
