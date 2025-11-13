@@ -34,6 +34,7 @@ describe('get category', async () => {
     expect(category.displayName).toBe(categoryData1.category.displayName)
     expect(category.description).toBe(categoryData1.category.description)
     expect(category.parentId).toBe(categoryData1.category.parentId)
+    expect(typeof category.countLots).toBe('number')
 
     expect(Array.isArray(category.children)).toBeTruthy()
     expect(category.children.length).toBe(1)
@@ -43,6 +44,7 @@ describe('get category', async () => {
     expect(category.children[0]?.displayName).toBe(categoryData2.category.displayName)
     expect(category.children[0]?.description).toBe(categoryData2.category.description)
     expect(category.children[0]?.parentId).toBe(categoryData2.category.parentId)
+    expect(typeof category.children[0]?.countLots).toBe('number')
 
     await categoryData2.clear()
     await categoryData1.clear()

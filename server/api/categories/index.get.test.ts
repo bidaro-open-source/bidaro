@@ -35,6 +35,7 @@ describe('get root categories', async () => {
     expect(categories[0].description).toBeDefined()
     expect(categories[0].parentId).toBeDefined()
     expect(categories[0].children).toBeDefined()
+    expect(typeof categories[0].countLots).toBe('number')
 
     await categoryData2.clear()
     await categoryData1.clear()

@@ -5,6 +5,36 @@ interface Options {
   transaction?: Transaction
 }
 
+/**
+ * Helper to create nested include for children with lots
+ * @param depth - how many levels deep to include children
+ */
+function createNestedInclude(depth: number): any {
+  const db = useDatabase()
+
+  if (depth === 0) {
+    return [
+      {
+        model: db.Lot,
+        as: 'lots',
+        attributes: ['id'],
+      },
+    ]
+  }
+  return [
+    {
+      model: db.Category,
+      as: 'children',
+      include: createNestedInclude(depth - 1),
+    },
+    {
+      model: db.Lot,
+      as: 'lots',
+      attributes: ['id'],
+    },
+  ]
+}
+
 export const categoryRepository = {
   /**
    * Finds a category by their primary key.
@@ -18,10 +48,7 @@ export const categoryRepository = {
 
     return db.Category.findByPk(id, {
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
+      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
@@ -59,10 +86,7 @@ export const categoryRepository = {
     return db.Category.findOne({
       where: { slug },
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
+      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
@@ -79,6 +103,7 @@ export const categoryRepository = {
     return db.Category.findAll({
       where: { parentId },
       transaction: options.transaction,
+      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
