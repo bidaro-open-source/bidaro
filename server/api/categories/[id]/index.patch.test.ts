@@ -25,7 +25,7 @@ describe('update category', async () => {
 
   describe('should update a category', () => {
     it.each([
-      ['slug', 'updated_slug'],
+      ['slug', 'updated-slug'],
       ['displayName', 'updated display name'],
       ['description', 'updated description'],
     ])(
