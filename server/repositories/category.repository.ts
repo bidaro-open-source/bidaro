@@ -5,6 +5,21 @@ interface Options {
   transaction?: Transaction
 }
 
+const REDIS_CATEGORY_DESCENDANTS_NAMESPACE = 'category:descendants'
+const REDIS_CATEGORY_LOT_COUNT_NAMESPACE = 'category:lot-count'
+const LOT_COUNT_TTL = 600 // 10 minutes in seconds
+
+/**
+ * Invalidates all cached category descendant IDs
+ */
+async function invalidateCategoryDescendantsCache() {
+  const redis = useRedis()
+  const keys = await redis.keys(`${REDIS_CATEGORY_DESCENDANTS_NAMESPACE}:*`)
+  if (keys.length > 0) {
+    await redis.del(...keys)
+  }
+}
+
 export const categoryRepository = {
   /**
    * Finds a category by their primary key.
@@ -89,13 +104,17 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns category instance
    */
-  create(fields: CategoryAttributesOptional, options: Options = {}): Promise<Category> {
+  async create(fields: CategoryAttributesOptional, options: Options = {}): Promise<Category> {
     const db = useDatabase()
 
-    return db.Category.create(
+    const category = await db.Category.create(
       fields,
       { transaction: options.transaction },
     )
+
+    await invalidateCategoryDescendantsCache()
+
+    return category
   },
 
   /**
@@ -104,8 +123,10 @@ export const categoryRepository = {
    * @param category - category instance
    * @param options - sequelize options
    */
-  save(category: Category, options: Options = {}) {
-    return category.save({ transaction: options.transaction })
+  async save(category: Category, options: Options = {}) {
+    const result = await category.save({ transaction: options.transaction })
+    await invalidateCategoryDescendantsCache()
+    return result
   },
 
   /**
@@ -115,12 +136,92 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns category instance
    */
-  destory(id: number, options: Options = {}) {
+  async destory(id: number, options: Options = {}) {
     const db = useDatabase()
 
-    return db.Category.destroy({
+    const result = await db.Category.destroy({
       where: { id },
       transaction: options.transaction,
     })
+
+    await invalidateCategoryDescendantsCache()
+
+    return result
+  },
+
+  /**
+   * Get all descendant category IDs for a given category ID (including the category itself)
+   *
+   * @param categoryId - category primary key
+   * @param options - sequelize options
+   * @returns array of category IDs
+   */
+  async getAllDescendantIds(categoryId: number, options: Options = {}): Promise<number[]> {
+    const redis = useRedis()
+    const cacheKey = `${REDIS_CATEGORY_DESCENDANTS_NAMESPACE}:${categoryId}`
+
+    // Try to get from cache
+    const cached = await redis.get(cacheKey)
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
+    // Calculate descendant IDs
+    const db = useDatabase()
+    const categoryIds: number[] = [categoryId]
+    const queue: number[] = [categoryId]
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!
+      const children = await db.Category.findAll({
+        where: { parentId: currentId },
+        attributes: ['id'],
+        transaction: options.transaction,
+      })
+
+      for (const child of children) {
+        categoryIds.push(child.id)
+        queue.push(child.id)
+      }
+    }
+
+    // Cache with no expiration (eternal TTL)
+    await redis.set(cacheKey, JSON.stringify(categoryIds))
+
+    return categoryIds
+  },
+
+  /**
+   * Count lots for a category and all its descendants
+   *
+   * @param categoryId - category primary key
+   * @param options - sequelize options
+   * @returns count of lots
+   */
+  async countLotsForCategoryTree(categoryId: number, options: Options = {}): Promise<number> {
+    const redis = useRedis()
+    const cacheKey = `${REDIS_CATEGORY_LOT_COUNT_NAMESPACE}:${categoryId}`
+
+    // Try to get from cache
+    const cached = await redis.get(cacheKey)
+    if (cached !== null) {
+      return parseInt(cached, 10)
+    }
+
+    // Calculate lot count
+    const db = useDatabase()
+    const categoryIds = await categoryRepository.getAllDescendantIds(categoryId, options)
+
+    const count = await db.Lot.count({
+      where: {
+        categoryId: categoryIds,
+      },
+      transaction: options.transaction,
+    })
+
+    // Cache with 10 minutes TTL
+    await redis.setex(cacheKey, LOT_COUNT_TTL, count.toString())
+
+    return count
   },
 }
