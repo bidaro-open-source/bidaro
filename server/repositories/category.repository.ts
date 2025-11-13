@@ -5,36 +5,6 @@ interface Options {
   transaction?: Transaction
 }
 
-/**
- * Helper to create nested include for children with lots
- * @param depth - how many levels deep to include children
- */
-function createNestedInclude(depth: number): any {
-  const db = useDatabase()
-
-  if (depth === 0) {
-    return [
-      {
-        model: db.Lot,
-        as: 'lots',
-        attributes: ['id'],
-      },
-    ]
-  }
-  return [
-    {
-      model: db.Category,
-      as: 'children',
-      include: createNestedInclude(depth - 1),
-    },
-    {
-      model: db.Lot,
-      as: 'lots',
-      attributes: ['id'],
-    },
-  ]
-}
-
 export const categoryRepository = {
   /**
    * Finds a category by their primary key.
@@ -48,7 +18,10 @@ export const categoryRepository = {
 
     return db.Category.findByPk(id, {
       transaction: options.transaction,
-      include: createNestedInclude(3), // Support up to 3 levels of nesting
+      include: {
+        model: db.Category,
+        as: 'children',
+      },
     })
   },
 
@@ -86,7 +59,10 @@ export const categoryRepository = {
     return db.Category.findOne({
       where: { slug },
       transaction: options.transaction,
-      include: createNestedInclude(3), // Support up to 3 levels of nesting
+      include: {
+        model: db.Category,
+        as: 'children',
+      },
     })
   },
 
@@ -103,7 +79,6 @@ export const categoryRepository = {
     return db.Category.findAll({
       where: { parentId },
       transaction: options.transaction,
-      include: createNestedInclude(3), // Support up to 3 levels of nesting
     })
   },
 
@@ -145,6 +120,54 @@ export const categoryRepository = {
 
     return db.Category.destroy({
       where: { id },
+      transaction: options.transaction,
+    })
+  },
+
+  /**
+   * Get all descendant category IDs for a given category ID (including the category itself)
+   *
+   * @param categoryId - category primary key
+   * @param options - sequelize options
+   * @returns array of category IDs
+   */
+  async getAllDescendantIds(categoryId: number, options: Options = {}): Promise<number[]> {
+    const db = useDatabase()
+    const categoryIds: number[] = [categoryId]
+    const queue: number[] = [categoryId]
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!
+      const children = await db.Category.findAll({
+        where: { parentId: currentId },
+        attributes: ['id'],
+        transaction: options.transaction,
+      })
+
+      for (const child of children) {
+        categoryIds.push(child.id)
+        queue.push(child.id)
+      }
+    }
+
+    return categoryIds
+  },
+
+  /**
+   * Count lots for a category and all its descendants
+   *
+   * @param categoryId - category primary key
+   * @param options - sequelize options
+   * @returns count of lots
+   */
+  async countLotsForCategoryTree(categoryId: number, options: Options = {}): Promise<number> {
+    const db = useDatabase()
+    const categoryIds = await categoryRepository.getAllDescendantIds(categoryId, options)
+
+    return db.Lot.count({
+      where: {
+        categoryId: categoryIds,
+      },
       transaction: options.transaction,
     })
   },

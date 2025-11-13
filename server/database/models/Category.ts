@@ -26,7 +26,6 @@ export class Category extends Model<InferAttributes<Category>, InferCreationAttr
 
   declare parent?: NonAttribute<Category>
   declare children?: NonAttribute<Category[]>
-  declare lots?: NonAttribute<any[]>
 
   static associate(db: Database) {
     db.Category.belongsTo(db.Category, {
