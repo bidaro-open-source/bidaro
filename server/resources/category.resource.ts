@@ -2,7 +2,7 @@ import type { Category } from '../database'
 
 export interface CategoryResource {
   id: number
-  parentId: Category['parentId']
+  parentId: number | null
   path: Category['path']
   slug: Category['slug']
   displayName: Category['displayName']

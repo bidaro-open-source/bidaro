@@ -70,8 +70,10 @@ export default defineEventHandler(async (event) => {
 
     await transaction.commit()
 
-    // uncorrect child categories
-    return createCategoryResource(updatedCategory)
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { children, countLots, ...other } = createCategoryResource(updatedCategory)
+
+    return other
   }
   catch (error) {
     await transaction.rollback()

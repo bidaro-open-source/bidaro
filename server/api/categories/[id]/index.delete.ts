@@ -1,5 +1,3 @@
-// Удаляет категорию (только если у категории нет дочек) (нужны права)
-
 import { categoryRepository } from '~~/server/repositories/category.repository'
 import { deleteCateogryPolicy } from '../index.policy'
 import { deleteCategoryRequest } from './index.delete.request'
