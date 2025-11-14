@@ -20,5 +20,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const lotsCount = await categoryRepository.countLotsByPath(category.path)
+
+  if (lotsCount > 0) {
+    throw createError({
+      statusCode: 400,
+      message: 'Не можна видалити категорію, яка має лоти',
+    })
+  }
+
   await categoryRepository.destory(category.id)
 })
