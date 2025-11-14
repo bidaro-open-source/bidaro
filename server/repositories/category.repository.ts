@@ -1,24 +1,9 @@
 import type { Transaction } from 'sequelize'
 import type { Category, CategoryAttributesOptional } from '../database/models/Category'
-import { QueryTypes } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 
 interface Options {
   transaction?: Transaction
-}
-
-const REDIS_CATEGORY_DESCENDANTS_NAMESPACE = 'category:descendants'
-const REDIS_CATEGORY_LOT_COUNT_NAMESPACE = 'category:lot-count'
-const LOT_COUNT_TTL = 600 // 10 minutes in seconds
-
-/**
- * Invalidates all cached category descendant IDs
- */
-async function invalidateCategoryDescendantsCache() {
-  const redis = useRedis()
-  const keys = await redis.keys(`${REDIS_CATEGORY_DESCENDANTS_NAMESPACE}:*`)
-  if (keys.length > 0) {
-    await redis.del(...keys)
-  }
 }
 
 export const categoryRepository = {
@@ -29,7 +14,7 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns Category instance or null if not found
    */
-  findById: (id: number, options: Options = {}): Promise<Category | null> => {
+  async findById(id: number, options: Options = {}): Promise<Category | null> {
     const db = useDatabase()
 
     return db.Category.findByPk(id, {
@@ -49,7 +34,7 @@ export const categoryRepository = {
    * @returns Category instance or null if not found
    * @throws - if category is not exists
    */
-  findByIdOrFail: async (id: number, options: Options = {}): Promise<Category> => {
+  async findByIdOrFail(id: number, options: Options = {}): Promise<Category> {
     const category = await categoryRepository.findById(id, options)
 
     if (!category) {
@@ -69,10 +54,10 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns Category instance or null if not found
    */
-  findBySlug: (slug: string, options: Options = {}): Promise<Category | null> => {
+  async findBySlug(slug: string, options: Options = {}): Promise<Category | null> {
     const db = useDatabase()
 
-    return db.Category.findOne({
+    return await db.Category.findOne({
       where: { slug },
       transaction: options.transaction,
       include: {
@@ -83,43 +68,66 @@ export const categoryRepository = {
   },
 
   /**
-   * Finds categories by their parent id.
+   * Finds a category by their slug or fail.
    *
-   * @param parentId - category parent id
+   * @param slug - category slug
    * @param options - sequelize options
    * @returns Category instance or null if not found
+   * @throws - if category is not exists
    */
-  findAllByParentId: (parentId: number | null, options: Options = {}): Promise<Category[]> => {
+  async findBySlugOrFail(slug: string, options: Options = {}): Promise<Category> {
+    const category = await categoryRepository.findBySlug(slug, options)
+
+    if (!category) {
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    return category
+  },
+
+  /**
+   * Finds categories by their parent id.
+   *
+   * @param parentId - category slug
+   * @param options - sequelize options
+   * @returns array of categories with given parent id
+   */
+  async findAllByParentId(parentId: number | null, options: Options = {}): Promise<Category[]> {
     const db = useDatabase()
 
-    return db.Category.findAll({
+    return await db.Category.findAll({
       where: { parentId },
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
     })
   },
 
   /**
-   * Creates a new category record in the database.
+   * Finds categories by their parent id.
    *
-   * @param fields - category attributes
+   * @param path - category path
    * @param options - sequelize options
-   * @returns category instance
+   * @returns array of categories with given parent id
    */
-  async create(fields: CategoryAttributesOptional, options: Options = {}): Promise<Category> {
+  async countLotsByPath(path: string, options: Options = {}): Promise<number> {
     const db = useDatabase()
 
-    const category = await db.Category.create(
-      fields,
-      { transaction: options.transaction },
-    )
-
-    await invalidateCategoryDescendantsCache()
-
-    return category
+    return await db.Lot.count({
+      transaction: options.transaction,
+      include: [{
+        model: db.Category,
+        as: 'category',
+        where: {
+          path: {
+            [Op.like]: `${path}%`,
+          },
+        },
+        required: true,
+        attributes: [],
+      }],
+    })
   },
 
   /**
@@ -149,15 +157,31 @@ export const categoryRepository = {
   },
 
   /**
+   * Creates a new category record in the database.
+   *
+   * @param fields - category attributes
+   * @param options - sequelize options
+   * @returns category instance
+   */
+  async create(fields: CategoryAttributesOptional, options: Options = {}): Promise<Category> {
+    const db = useDatabase()
+
+    const category = await db.Category.create(
+      fields,
+      { transaction: options.transaction },
+    )
+
+    return category
+  },
+
+  /**
    * Save a changed category in the database.
    *
    * @param category - category instance
    * @param options - sequelize options
    */
   async save(category: Category, options: Options = {}) {
-    const result = await category.save({ transaction: options.transaction })
-    await invalidateCategoryDescendantsCache()
-    return result
+    return await category.save({ transaction: options.transaction })
   },
 
   /**
@@ -170,89 +194,9 @@ export const categoryRepository = {
   async destory(id: number, options: Options = {}) {
     const db = useDatabase()
 
-    const result = await db.Category.destroy({
+    return await db.Category.destroy({
       where: { id },
       transaction: options.transaction,
     })
-
-    await invalidateCategoryDescendantsCache()
-
-    return result
-  },
-
-  /**
-   * Get all descendant category IDs for a given category ID (including the category itself)
-   *
-   * @param categoryId - category primary key
-   * @param options - sequelize options
-   * @returns array of category IDs
-   */
-  async getAllDescendantIds(categoryId: number, options: Options = {}): Promise<number[]> {
-    const redis = useRedis()
-    const cacheKey = `${REDIS_CATEGORY_DESCENDANTS_NAMESPACE}:${categoryId}`
-
-    // Try to get from cache
-    const cached = await redis.get(cacheKey)
-    if (cached) {
-      return JSON.parse(cached)
-    }
-
-    // Calculate descendant IDs
-    const db = useDatabase()
-    const categoryIds: number[] = [categoryId]
-    const queue: number[] = [categoryId]
-
-    while (queue.length > 0) {
-      const currentId = queue.shift()!
-      const children = await db.Category.findAll({
-        where: { parentId: currentId },
-        attributes: ['id'],
-        transaction: options.transaction,
-      })
-
-      for (const child of children) {
-        categoryIds.push(child.id)
-        queue.push(child.id)
-      }
-    }
-
-    // Cache with no expiration (eternal TTL)
-    await redis.set(cacheKey, JSON.stringify(categoryIds))
-
-    return categoryIds
-  },
-
-  /**
-   * Count lots for a category and all its descendants
-   *
-   * @param categoryId - category primary key
-   * @param options - sequelize options
-   * @returns count of lots
-   */
-  async countLotsForCategoryTree(categoryId: number, options: Options = {}): Promise<number> {
-    const redis = useRedis()
-    const cacheKey = `${REDIS_CATEGORY_LOT_COUNT_NAMESPACE}:${categoryId}`
-
-    // Try to get from cache
-    const cached = await redis.get(cacheKey)
-    if (cached !== null) {
-      return parseInt(cached, 10)
-    }
-
-    // Calculate lot count
-    const db = useDatabase()
-    const categoryIds = await categoryRepository.getAllDescendantIds(categoryId, options)
-
-    const count = await db.Lot.count({
-      where: {
-        categoryId: categoryIds,
-      },
-      transaction: options.transaction,
-    })
-
-    // Cache with 10 minutes TTL
-    await redis.setex(cacheKey, LOT_COUNT_TTL, count.toString())
-
-    return count
   },
 }

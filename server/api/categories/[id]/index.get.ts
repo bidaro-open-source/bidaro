@@ -1,3 +1,4 @@
+import type { CategoryResource } from '~~/server/resources/category.resource'
 import { categoryRepository } from '~~/server/repositories/category.repository'
 import { createCategoryResource } from '~~/server/resources/category.resource'
 import { getCategoryRequest } from './index.get.request'
@@ -6,13 +7,13 @@ export default defineEventHandler(async (event) => {
   const request = await getCategoryRequest(event)
 
   const category = await categoryRepository.findByIdOrFail(request.params.id)
-  const countLots = await categoryRepository.countLotsForCategoryTree(category.id)
+  const countLots = await categoryRepository.countLotsByPath(category.path)
+  let childrenWithCounts: CategoryResource[] = []
 
-  // Calculate counts for children if they exist
   if (category.children && category.children.length > 0) {
-    const childrenWithCounts = await Promise.all(
+    childrenWithCounts = await Promise.all(
       category.children.map(async (child) => {
-        const childCountLots = await categoryRepository.countLotsForCategoryTree(child.id)
+        const childCountLots = await categoryRepository.countLotsByPath(child.path)
         return createCategoryResource(child, childCountLots)
       }),
     )
@@ -28,5 +29,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return createCategoryResource(category, countLots)
+  return {
+    ...createCategoryResource(category, countLots),
+    children: childrenWithCounts,
+  }
 })
