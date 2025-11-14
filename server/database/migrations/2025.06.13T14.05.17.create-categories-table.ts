@@ -24,7 +24,12 @@ export const up: Migration = async ({ context }) => {
           key: 'id',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
+      },
+      path: {
+        type: DataTypes.STRING(1024),
+        unique: true,
+        allowNull: false,
       },
       slug: {
         type: DataTypes.STRING(128),

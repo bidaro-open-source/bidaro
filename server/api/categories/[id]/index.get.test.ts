@@ -48,10 +48,7 @@ describe('get category', async () => {
     expect(category.description).toBe(categoryData1.category.description)
     expect(category.parentId).toBe(categoryData1.category.parentId)
     expect(typeof category.countLots).toBe('number')
-<<<<<<< HEAD
     expect(category.countLots).toBe(2)
-=======
->>>>>>> 0d3f1a8 (feat: add countLots property to category resources)
 
     expect(Array.isArray(category.children)).toBeTruthy()
     expect(category.children.length).toBe(1)
@@ -62,10 +59,7 @@ describe('get category', async () => {
     expect(category.children[0]?.description).toBe(categoryData2.category.description)
     expect(category.children[0]?.parentId).toBe(categoryData2.category.parentId)
     expect(typeof category.children[0]?.countLots).toBe('number')
-<<<<<<< HEAD
     expect(category.children[0].countLots).toBe(1)
-=======
->>>>>>> 0d3f1a8 (feat: add countLots property to category resources)
 
     await lotData2.clear()
     await lotData1.clear()

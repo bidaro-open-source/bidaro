@@ -21,6 +21,7 @@ export class Category extends Model<InferAttributes<Category>, InferCreationAttr
   declare id: CreationOptional<number>
   declare parentId: ForeignKey<Category['id']> | null
   declare slug: string
+  declare path: string
   declare displayName: string
   declare description: string | null
 
@@ -60,6 +61,11 @@ export function InitializeCategory(database: DatabaseOptional) {
       },
       slug: {
         type: DataTypes.STRING(128),
+        unique: true,
+        allowNull: false,
+      },
+      path: {
+        type: DataTypes.STRING(1028),
         unique: true,
         allowNull: false,
       },

@@ -12,11 +12,16 @@ type CreationAttributes = CategoryAttributesOptional
 
 export class CategoryFactory extends Factory<Category> {
   protected definition(attr: PartialAttributes = {}): CreationAttributes {
+    if (attr.parentId || attr.path) {
+      throw new Error('Cannot set parentId or path in CategoryFactory')
+    }
+
     return {
+      path: uuidv4(),
+      parentId: null,
       slug: attr.slug ?? uuidv4(),
       displayName: attr.displayName ?? uuidv4(),
       description: attr.description ?? null,
-      parentId: attr.parentId ?? null,
     }
   }
 }

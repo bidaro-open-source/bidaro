@@ -3,6 +3,7 @@ import { env } from 'node:process'
 import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
+import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { withAuth } from '~~/test/api-e2e/with-auth'
 
@@ -45,11 +46,39 @@ describe('create category', async () => {
     expect(response.status).toBe(201)
     expect(category.id).toBeDefined()
     expect(category.slug).toBe(slug)
+    expect(category.path).toBe(`${category.id}`)
     expect(category.displayName).toBe(displayName)
     expect(category.description).toBe(null)
     expect(category.parentId).toBe(null)
 
     await destoryCategory(category.id)
+    await userData.clear()
+  })
+
+  it('should create a category with parent category', async () => {
+    const categoryData = await createCategory()
+
+    const userData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.CREATE_CATEGORY],
+    })
+
+    const { slug, displayName } = db.CategoryFactory.new().make()
+
+    const response = await createCategoryRequest(
+      { body: { slug, displayName, parentId: categoryData.category.id } },
+      { accessToken: userData.access_token },
+    )
+
+    const category = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(category.path).toBe(`${categoryData.category.path}/${category.id}`)
+    expect(category.parentId).toBe(categoryData.category.id)
+
+    await destoryCategory(category.id)
+    await categoryData.clear()
     await userData.clear()
   })
 
@@ -68,7 +97,7 @@ describe('create category', async () => {
       'WILL-BE-LOWERCASED',
       '  Combined-Test-123  ',
     ])(
-      'should create a category with slug "%s"',
+      '"%s"',
       async (slug: string) => {
         const userData = await createUser({
           withRole: true,
@@ -119,6 +148,47 @@ describe('create category', async () => {
       )
 
       expect(response.status).toBe(403)
+
+      await userData.clear()
+    })
+
+    it('should return 422 when slug already taken', async () => {
+      const categoryData = await createCategory()
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_CATEGORY],
+      })
+
+      const slug = categoryData.category.slug
+      const displayName = categoryData.category.displayName
+
+      const response = await createCategoryRequest(
+        { body: { slug, displayName } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(422)
+
+      await categoryData.clear()
+      await userData.clear()
+    })
+
+    it('should return 422 when parent not found', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_CATEGORY],
+      })
+
+      const { slug, displayName } = db.CategoryFactory.new().make()
+
+      const response = await createCategoryRequest(
+        { body: { slug, displayName, parentId: 93475937459 } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(422)
 
       await userData.clear()
     })

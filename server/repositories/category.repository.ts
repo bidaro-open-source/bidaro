@@ -1,5 +1,6 @@
 import type { Transaction } from 'sequelize'
 import type { Category, CategoryAttributesOptional } from '../database/models/Category'
+import { QueryTypes } from 'sequelize'
 
 interface Options {
   transaction?: Transaction
@@ -33,7 +34,10 @@ export const categoryRepository = {
 
     return db.Category.findByPk(id, {
       transaction: options.transaction,
-      include: createNestedInclude(3), // Support up to 3 levels of nesting
+      include: {
+        model: db.Category,
+        as: 'children',
+      },
     })
   },
 
@@ -71,7 +75,10 @@ export const categoryRepository = {
     return db.Category.findOne({
       where: { slug },
       transaction: options.transaction,
-      include: createNestedInclude(3), // Support up to 3 levels of nesting
+      include: {
+        model: db.Category,
+        as: 'children',
+      },
     })
   },
 
@@ -88,7 +95,10 @@ export const categoryRepository = {
     return db.Category.findAll({
       where: { parentId },
       transaction: options.transaction,
-      include: createNestedInclude(3), // Support up to 3 levels of nesting
+      include: {
+        model: db.Category,
+        as: 'children',
+      },
     })
   },
 
@@ -110,6 +120,32 @@ export const categoryRepository = {
     await invalidateCategoryDescendantsCache()
 
     return category
+  },
+
+  /**
+   * Update category paths for category and its descendants.
+   *
+   * @param oldPath - old category path
+   * @param newPath - new category path
+   * @param options - sequelize options
+   */
+  async updatePaths(oldPath: string, newPath: string, options: Options = {}) {
+    const db = useDatabase()
+    const updateQuery = `
+      UPDATE "${db.sequelize.models.Category.tableName}"
+      SET path = REPLACE(path, :oldPathPrefix, :newPathPrefix)
+      WHERE path LIKE :oldPathLike;
+    `
+
+    await db.sequelize.query(updateQuery, {
+      replacements: {
+        oldPathPrefix: oldPath,
+        newPathPrefix: newPath,
+        oldPathLike: `${oldPath}%`,
+      },
+      type: QueryTypes.UPDATE,
+      transaction: options.transaction,
+    })
   },
 
   /**
