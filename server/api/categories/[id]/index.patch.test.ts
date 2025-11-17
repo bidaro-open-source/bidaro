@@ -275,5 +275,31 @@ describe('update category', async () => {
       await categoryData.clear()
       await userData.clear()
     })
+
+    it('should return 422 when parent id is children', async () => {
+      const categoryData1 = await createCategory()
+      const categoryData2 = await createCategory({ parentId: categoryData1.category.id })
+      const categoryData3 = await createCategory({ parentId: categoryData2.category.id })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_CATEGORY],
+      })
+
+      const response = await updateCategoryRequest(
+        {
+          body: { parentId: categoryData3.category.id },
+          params: { id: categoryData1.category.id },
+        },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(422)
+
+      await categoryData3.clear()
+      await categoryData2.clear()
+      await categoryData1.clear()
+      await userData.clear()
+    })
   })
 })

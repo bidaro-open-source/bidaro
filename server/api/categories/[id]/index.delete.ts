@@ -11,7 +11,9 @@ export default defineEventHandler(async (event) => {
 
   const category = await categoryRepository.findByIdOrFail(request.params.id)
 
-  if (!category.children || category.children?.length > 0) {
+  const children = await categoryRepository.findAllByParentId(category.id)
+
+  if (children.length > 0) {
     throw createError({
       statusCode: 400,
       message: 'Не можна видалити категорію, яка має дочірні категорії',
