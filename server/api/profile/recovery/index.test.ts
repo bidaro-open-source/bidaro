@@ -3,9 +3,6 @@ import type { ResetPasswordRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import {
-  REDIS_PASSWORD_RESET_NAMESPACE,
-} from '~~/server/services/profile-recovery.service'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -35,8 +32,13 @@ describe('POST /api/profile/recovery', async () => {
 
     expect(resetResponse.status).toBe(204)
 
-    const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
-    const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
+    const messages = await mailhog.getMessagesByEmail(data.user.email)
+    const content = messages[0].Content.Body.replace(/=[\r\n]+/g, '')
+    const regex = /\/profile\/recovery\/([a-fA-F0-9]+)/
+    const match = content.match(regex)
+    const token = match ? match[1] : null
+
+    expect(token).toBeDefined()
 
     const confirmResponse = await confirmResetPasswordRequest(
       { body: { password: db.UserFactory.newPassword, token } },
@@ -48,7 +50,6 @@ describe('POST /api/profile/recovery', async () => {
 
     expect(user!.password).not.toBe(updatedUser!.password)
 
-    await redis.del(`${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`)
     await data.clear()
   })
 
@@ -82,16 +83,19 @@ describe('POST /api/profile/recovery', async () => {
 
       await data.clear()
 
-      const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
-      const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
+      const messages = await mailhog.getMessagesByEmail(data.user.email)
+      const content = messages[0].Content.Body.replace(/=[\r\n]+/g, '')
+      const regex = /\/profile\/recovery\/([a-fA-F0-9]+)/
+      const match = content.match(regex)
+      const token = match ? match[1] : null
+
+      expect(token).toBeDefined()
 
       const confirmResponse = await confirmResetPasswordRequest(
         { body: { password: db.UserFactory.newPassword, token } },
       )
 
       expect(confirmResponse.status).toBe(404)
-
-      await redis.del(`${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`)
     })
   })
 })
