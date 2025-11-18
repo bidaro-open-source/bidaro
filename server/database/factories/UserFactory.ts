@@ -19,6 +19,11 @@ export class UserFactory extends Factory<User> {
 
   public static readonly invalidUsername: string = 'username_invalid'
 
+  public static generateEmail(): string {
+    const user = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+    return `u${user}@example.com`
+  }
+
   protected definition(attr: PartialAttributes = {}): CreationAttributes {
     const user = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
 

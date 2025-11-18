@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const request = await updateProfileRequest(event)
 
   if (request.body.email) {
-    const userInDB = await userRepository.findByUsername(request.body.email)
+    const userInDB = await userRepository.findByEmail(request.body.email)
 
     if (userInDB) {
       const issues: z.ZodIssue[] = []
