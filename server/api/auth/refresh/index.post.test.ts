@@ -7,7 +7,7 @@ import { refreshRequest } from '~~/test/api-e2e/requests/authentication'
 describe('POST /api/auth/refresh - Token Refresh and Rotation', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should refresh session with refresh token in body', async () => {
+  it('should refresh session successfully with token in request body', async () => {
     const data = await createUser({ withSession: true })
 
     const response = await refreshRequest(
@@ -20,7 +20,7 @@ describe('POST /api/auth/refresh - Token Refresh and Rotation', async () => {
     await data.clear()
   })
 
-  it('should refresh session with refresh token in cookie', async () => {
+  it('should refresh session successfully with token in cookie', async () => {
     const data = await createUser({ withSession: true })
 
     const response = await refreshRequest(
@@ -35,7 +35,7 @@ describe('POST /api/auth/refresh - Token Refresh and Rotation', async () => {
 
   describe('error handling', () => {
     it(
-      'should return error if refresh token is not provided in body',
+      'should return 422 when refresh token is missing from request body',
       async () => {
         const response = await refreshRequest(
           { refresh_token: '' },
@@ -47,7 +47,7 @@ describe('POST /api/auth/refresh - Token Refresh and Rotation', async () => {
     )
 
     it(
-      'should return error if refresh token is not provided in cookie',
+      'should return 422 when refresh token is missing from cookie',
       async () => {
         const response = await refreshRequest(
           { refresh_token: '' },
@@ -58,7 +58,7 @@ describe('POST /api/auth/refresh - Token Refresh and Rotation', async () => {
       },
     )
 
-    it('should return error when sending previous refresh token', async () => {
+    it('should return 404 when attempting to reuse previous refresh token', async () => {
       const data = await createUser({ withSession: true })
 
       await refreshRequest(

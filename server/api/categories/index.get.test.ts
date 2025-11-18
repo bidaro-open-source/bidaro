@@ -17,7 +17,7 @@ async function getCategoriesRequest() {
 describe('GET /api/categories - List Root Categories with Lot Counts', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should return correct structure', async () => {
+  it('should return categories with correct structure and lot counts including children', async () => {
     const userData = await createUser()
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory({

@@ -27,7 +27,7 @@ describe('DELETE /api/lots/:id/images - Remove Lot Images', async () => {
 
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
-  it('should delete uploaded file and return correct structure', async () => {
+  it('should delete lot image successfully and return deletion status', async () => {
     const userData = await createUser({ withSession: true })
     const lotData = await createLot({ ownerId: userData.user.id })
     const imageData = await createImage(IMAGE_PATH)
@@ -54,7 +54,7 @@ describe('DELETE /api/lots/:id/images - Remove Lot Images', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 401 for anonymus', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const userData = await createUser()
       const lotData = await createLot({ ownerId: userData.user.id })
 
@@ -68,7 +68,7 @@ describe('DELETE /api/lots/:id/images - Remove Lot Images', async () => {
       await userData.clear()
     })
 
-    it('should return 404', async () => {
+    it('should return 404 when lot does not exist', async () => {
       const userData = await createUser({ withSession: true })
 
       const response = await deleteLotImageRequest(
@@ -81,7 +81,7 @@ describe('DELETE /api/lots/:id/images - Remove Lot Images', async () => {
       await userData.clear()
     })
 
-    it('should return empty array when user is not owner', async () => {
+    it('should return empty array when user is not the lot owner', async () => {
       const user1Data = await createUser({ withSession: true })
       const user2Data = await createUser({ withSession: true })
       const lot1Data = await createLot({ ownerId: user1Data.user.id })

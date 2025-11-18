@@ -26,7 +26,7 @@ describe('GET /api/lots/:id/images - Retrieve Lot Images with Ordering', async (
 
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
-  it('should get uploaded image and return correct structure', async () => {
+  it('should retrieve lot image with correct structure and metadata', async () => {
     const userData = await createUser({ withSession: true })
     const lotData = await createLot({ ownerId: userData.user.id })
     const imageData = await createImage(IMAGE_PATH)
@@ -52,7 +52,7 @@ describe('GET /api/lots/:id/images - Retrieve Lot Images with Ordering', async (
     await userData.clear()
   })
 
-  it('should get uploaded images with correct order', async () => {
+  it('should retrieve lot images in correct order', async () => {
     const userData = await createUser({ withSession: true })
     const lotData = await createLot({ ownerId: userData.user.id })
 
@@ -83,7 +83,7 @@ describe('GET /api/lots/:id/images - Retrieve Lot Images with Ordering', async (
   })
 
   describe('error handling', () => {
-    it('should return 404', async () => {
+    it('should return 404 when lot does not exist', async () => {
       const userData = await createUser({ withSession: true })
 
       const response = await getLotImageRequest(

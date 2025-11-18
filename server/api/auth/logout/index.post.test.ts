@@ -7,7 +7,7 @@ import { logoutRequest } from '~~/test/api-e2e/requests/authentication'
 describe('POST /api/auth/logout - Session Termination', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should logout user', async () => {
+  it('should terminate user session successfully', async () => {
     const data = await createUser({ withSession: true })
 
     const response = await logoutRequest(
@@ -21,7 +21,7 @@ describe('POST /api/auth/logout - Session Termination', async () => {
   })
 
   describe('error handling', () => {
-    it('should return error if no access token is provided', async () => {
+    it('should return 401 when access token is not provided', async () => {
       const data = await createUser({ withSession: true })
 
       const response = await logoutRequest(
@@ -34,7 +34,7 @@ describe('POST /api/auth/logout - Session Termination', async () => {
       await data.clear()
     })
 
-    it('should return error if no refresh token is provided', async () => {
+    it('should return 422 when refresh token is not provided', async () => {
       const data = await createUser({ withSession: true })
 
       const response = await logoutRequest(
@@ -48,7 +48,7 @@ describe('POST /api/auth/logout - Session Termination', async () => {
       await data.clear()
     })
 
-    it('should return error if refresh token not found', async () => {
+    it('should return 404 when refresh token does not exist', async () => {
       const data = await createUser({ withSession: true })
 
       const response = await logoutRequest(
@@ -61,7 +61,7 @@ describe('POST /api/auth/logout - Session Termination', async () => {
       await data.clear()
     })
 
-    it('should return error if refresh token belongs to another user', async () => {
+    it('should return 403 when refresh token belongs to a different user', async () => {
       const user1 = await createUser({ withSession: true })
       const user2 = await createUser({ withSession: true })
 

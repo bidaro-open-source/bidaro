@@ -20,7 +20,7 @@ async function getUserRequest(
 describe('GET /api/users/:id - Retrieve User Profile (Public and Authenticated)', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should return the correct structure', async () => {
+  it('should retrieve user profile with correct structure for authenticated user', async () => {
     const data = await createUser({ withSession: true })
 
     const response = await getUserRequest(
@@ -38,7 +38,7 @@ describe('GET /api/users/:id - Retrieve User Profile (Public and Authenticated)'
     await data.clear()
   })
 
-  it('should return the correct structure for anonymous user', async () => {
+  it('should retrieve user profile with correct structure for anonymous user', async () => {
     const data = await createUser()
 
     const response = await getUserRequest({ params: { id: data.user.id } })
@@ -54,7 +54,7 @@ describe('GET /api/users/:id - Retrieve User Profile (Public and Authenticated)'
   })
 
   describe('error handling', () => {
-    it('should return 404 when user is not exists', async () => {
+    it('should return 404 when user does not exist', async () => {
       const response = await getUserRequest({ params: { id: 123 } })
 
       expect(response.status).toBe(404)

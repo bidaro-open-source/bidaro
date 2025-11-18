@@ -7,7 +7,7 @@ import { destroyUser, registerRequest } from '~~/test/api-e2e/requests/authentic
 describe('POST /api/auth/register - User Registration and Validation', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should register user', async () => {
+  it('should register new user successfully with valid credentials', async () => {
     const userData = db.UserFactory.new().make()
 
     const response = await registerRequest({
@@ -26,7 +26,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     await destroyUser(body.user.id)
   })
 
-  it('should return pair of tokens', async () => {
+  it('should return both access and refresh tokens upon registration', async () => {
     const userData = db.UserFactory.new().make()
 
     const response = await registerRequest({
@@ -44,7 +44,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     await destroyUser(body.user.id)
   })
 
-  it('should return refresh token in cookie', async () => {
+  it('should set refresh token in HTTP-only cookie upon registration', async () => {
     const userData = db.UserFactory.new().make()
 
     const response = await registerRequest({
@@ -63,13 +63,13 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     await destroyUser(body.user.id)
   })
 
-  describe('registration with valid email', () => {
+  describe('valid email formats', () => {
     it.each([
       'email@example.com',
       'firstname.lastname@example.com',
       'email@subdomain.example.com',
       'firstname+lastname@example.com',
-    ])('should register user when email is "%s"', async (email) => {
+    ])('should accept valid email format: "%s"', async (email) => {
       const userData = db.UserFactory.new().make()
 
       const response = await registerRequest({
@@ -86,7 +86,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     })
   })
 
-  describe('registration with valid username', () => {
+  describe('valid username formats', () => {
     it.each([
       'user',
       'user123',
@@ -97,7 +97,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
       '_u_s_e_r_',
       '_____u',
       'u_____',
-    ])('should register user when username is "%s"', async (username) => {
+    ])('should accept valid username format: "%s"', async (username) => {
       const userData = db.UserFactory.new().make()
 
       const response = await registerRequest({
@@ -114,8 +114,8 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     })
   })
 
-  describe('error handling of already taken fields', () => {
-    it('should return error when email already taken', async () => {
+  describe('duplicate field validation', () => {
+    it('should return 422 when email is already taken', async () => {
       const userData = db.UserFactory.new().make()
       const userCreated = await db.UserFactory.new().create()
 
@@ -130,7 +130,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
       await destroyUser(userCreated.id)
     })
 
-    it('should return error when username already taken', async () => {
+    it('should return 422 when username is already taken', async () => {
       const userData = db.UserFactory.new().make()
       const userCreated = await db.UserFactory.new().create()
 
@@ -146,7 +146,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     })
   })
 
-  describe('error handling of invalid email', () => {
+  describe('invalid email format validation', () => {
     it.each([
       undefined,
       '',
@@ -184,7 +184,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
       '"email@example.museum',
       '"email@example.co.jp',
       '"firstname-lastname@example.com',
-    ])('should return error when email is "%s"', async (email) => {
+    ])('should return 422 for invalid email format: "%s"', async (email) => {
       const userData = db.UserFactory.new().make()
 
       const response = await registerRequest({
@@ -197,7 +197,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     })
   })
 
-  describe('error handling of invalid username', () => {
+  describe('invalid username format validation', () => {
     it.each([
       undefined,
       '',
@@ -215,7 +215,7 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
       'abc-def',
       'абвгдеёжзий',
       '中文字符',
-    ])('should return error when username is "%s"', async (username) => {
+    ])('should return 422 for invalid username format: "%s"', async (username) => {
       const userData = db.UserFactory.new().make()
 
       const response = await registerRequest({
@@ -228,14 +228,14 @@ describe('POST /api/auth/register - User Registration and Validation', async () 
     })
   })
 
-  describe('error handling of invalid password', () => {
+  describe('invalid password format validation', () => {
     it.each([
       undefined,
       '',
       ' ',
       '  ',
       'a'.repeat(65),
-    ])('should return error when password is "%s"', async (password) => {
+    ])('should return 422 for invalid password: "%s"', async (password) => {
       const userData = db.UserFactory.new().make()
 
       const response = await registerRequest({

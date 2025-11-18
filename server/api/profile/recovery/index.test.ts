@@ -40,7 +40,7 @@ async function confirmResetPasswordRequest(
 describe('POST /api/profile/recovery - Password Reset Flow with Token Validation', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should reset password', async () => {
+  it('should complete password reset flow successfully', async () => {
     const data = await createUser()
 
     const user = await db.User.findByPk(data.user.id)
@@ -70,7 +70,7 @@ describe('POST /api/profile/recovery - Password Reset Flow with Token Validation
   })
 
   describe('error handling', () => {
-    it('should return error if email not found', async () => {
+    it('should return 404 when email does not exist', async () => {
       const userData = db.UserFactory.new().make()
 
       const response = await resetPasswordRequest({
@@ -80,7 +80,7 @@ describe('POST /api/profile/recovery - Password Reset Flow with Token Validation
       expect(response.status).toBe(404)
     })
 
-    it('should return error if token not found', async () => {
+    it('should return 404 when reset token does not exist', async () => {
       const response = await confirmResetPasswordRequest({
         password: db.UserFactory.newPassword,
         token: 'fff',
@@ -89,7 +89,7 @@ describe('POST /api/profile/recovery - Password Reset Flow with Token Validation
       expect(response.status).toBe(404)
     })
 
-    it('should return error if account not found', async () => {
+    it('should return 404 when account is deleted after token generation', async () => {
       const data = await createUser()
 
       const response = await resetPasswordRequest({

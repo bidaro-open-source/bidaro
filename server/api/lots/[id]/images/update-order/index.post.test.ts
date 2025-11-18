@@ -27,7 +27,7 @@ describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async ()
 
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
-  it('should update order of uploaded image', async () => {
+  it('should reorder lot images successfully', async () => {
     const userData = await createUser({ withSession: true })
     const lotData = await createLot({ ownerId: userData.user.id })
 
@@ -70,7 +70,7 @@ describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async ()
   })
 
   describe('error handling', () => {
-    it('should return 401', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const response = await updateImageOrderRequest(
         { body: { ids: [1] }, params: { id: 945395394 } },
       )
@@ -78,7 +78,7 @@ describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async ()
       expect(response.status).toBe(401)
     })
 
-    it('should return 404', async () => {
+    it('should return 404 when lot does not exist', async () => {
       const userData = await createUser({ withSession: true })
 
       const response = await updateImageOrderRequest(
@@ -91,7 +91,7 @@ describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async ()
       await userData.clear()
     })
 
-    it('should return 403 when user is not owner', async () => {
+    it('should return 403 when user is not the lot owner', async () => {
       const user1Data = await createUser()
       const user2Data = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: user1Data.user.id })
@@ -112,7 +112,7 @@ describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async ()
       await user2Data.clear()
     })
 
-    it('should return error when ids do not match quantitatively', async () => {
+    it('should return 422 when image IDs count does not match existing images', async () => {
       const userData = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: userData.user.id })
 
@@ -136,7 +136,7 @@ describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async ()
       await userData.clear()
     })
 
-    it('should return error when ids contains a foreign id', async () => {
+    it('should return 422 when image IDs contain foreign image from different lot', async () => {
       const userData = await createUser({ withSession: true })
       const lotData1 = await createLot({ ownerId: userData.user.id })
       const lotData2 = await createLot({ ownerId: userData.user.id })

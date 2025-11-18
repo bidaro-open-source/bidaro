@@ -19,7 +19,7 @@ async function getSessionsRequest(
 describe('GET /api/profile/sessions - List User Sessions with Permission Check', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should return user sessions', async () => {
+  it('should retrieve user sessions successfully', async () => {
     const data = await createUser({
       withRole: true,
       withSession: true,
@@ -39,7 +39,7 @@ describe('GET /api/profile/sessions - List User Sessions with Permission Check',
   })
 
   describe('error handling', () => {
-    it('should return error if user have not permissions', async () => {
+    it('should return 403 when user lacks required permission', async () => {
       const data = await createUser({
         withRole: true,
         withSession: true,
