@@ -152,5 +152,20 @@ describe('PATCH /api/profile', async () => {
       await data2.clear()
       await data1.clear()
     })
+
+    it('should return 422 when attempting to update username', async () => {
+      const data = await createUser({
+        withSession: true,
+      })
+
+      const response = await updateProfileRequest(
+        { body: { username: 'newusername' } as any },
+        { accessToken: data.access_token },
+      )
+
+      expect(response.status).toBe(422)
+
+      await data.clear()
+    })
   })
 })
