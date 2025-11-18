@@ -8,7 +8,14 @@ interface Options {
 }
 
 export const lotImageRepository = {
-  async findAllByLot(lotId: number, options: Options = {}) {
+  /**
+   * Find all images attached to a lot.
+   *
+   * @param lotId - Primary key of the lot.
+   * @param options - sequelize options
+   * @returns Promise resolving to an array of Image instances (may be empty).
+   */
+  async findAllByLotId(lotId: number, options: Options = {}) {
     const db = useDatabase()
 
     const lot = await db.Lot.findByPk(lotId, {
@@ -26,14 +33,17 @@ export const lotImageRepository = {
       ],
     })
 
-    if (!lot || !lot.images) {
-      return []
-    }
-
-    return lot.images
+    return lot && lot.images ? lot.images : []
   },
 
-  async findAllLinksByLot(lotId: number, options: Options = {}) {
+  /**
+   * Fetch links (join rows) for a lot returning only imageId attribute.
+   *
+   * @param lotId - Primary key of the lot.
+   * @param options - sequelize options
+   * @returns Promise resolving to an array of LotImage rows containing imageId.
+   */
+  async findAllLinksByLotId(lotId: number, options: Options = {}) {
     const db = useDatabase()
 
     return await db.LotImage.findAll({
@@ -43,6 +53,14 @@ export const lotImageRepository = {
     })
   },
 
+  /**
+   * Find lot-image link rows for given image primary keys.
+   *
+   * @param lotId - Primary key of the lot.
+   * @param imageIds - Array of image primary keys to filter by.
+   * @param options - sequelize options
+   * @returns Promise resolving to matching LotImage rows.
+   */
   async findAllLinksByLotAndPks(lotId: number, imageIds: number[], options: Options = {}) {
     const db = useDatabase()
 
@@ -58,6 +76,13 @@ export const lotImageRepository = {
     })
   },
 
+  /**
+   * Get maximum 'order' value among lot-image links for a lot.
+   *
+   * @param lotId - Primary key of the lot.
+   * @param options - sequelize options
+   * @returns Promise resolving to the max order (returns 1 if none found).
+   */
   async getMaxOrder(lotId: number, options: Options = {}) {
     const db = useDatabase()
 
@@ -74,6 +99,13 @@ export const lotImageRepository = {
     return result.max_order ?? 1
   },
 
+  /**
+   * Destroy all lot-image links for a given lot id.
+   *
+   * @param lotId - Primary key of the lot.
+   * @param options - sequelize options
+   * @returns Number of rows deleted.
+   */
   async destroyByLotId(lotId: number, options: Options = {}) {
     const db = useDatabase()
 
@@ -83,6 +115,12 @@ export const lotImageRepository = {
     })
   },
 
+  /**
+   * Destroy lot-image links by their link ids.
+   *
+   * @param linkIds - Array of LotImage primary keys to remove.
+   * @returns Number of rows deleted.
+   */
   async destoryByIds(linkIds: number[]) {
     const db = useDatabase()
 
@@ -95,6 +133,13 @@ export const lotImageRepository = {
     })
   },
 
+  /**
+   * Bulk create lot-image link records.
+   *
+   * @param records - Array of LotImage records to create.
+   * @param options - sequelize options
+   * @returns Promise resolving to created LotImage instances.
+   */
   async bulkCreate(records: LotImageAttributesOptional[], options: Options = {}) {
     const db = useDatabase()
 

@@ -22,12 +22,12 @@ describe('GET /api/categories/:id', async () => {
     })
 
     const lotData1 = await createLot({
-      ownerId: userData.user.id,
+      sellerId: userData.user.id,
       categoryId: categoryData1.category.id,
     })
 
     const lotData2 = await createLot({
-      ownerId: userData.user.id,
+      sellerId: userData.user.id,
       categoryId: categoryData2.category.id,
     })
 

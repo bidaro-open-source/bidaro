@@ -69,7 +69,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
     database.User.hasMany(database.Lot, {
       as: 'lots',
       foreignKey: {
-        name: 'userId',
+        name: 'sellerId',
         allowNull: false,
       },
     })

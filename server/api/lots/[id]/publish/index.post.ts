@@ -1,20 +1,17 @@
-import { lotStatuses } from '~~/server/constants'
+import { lotInitialDurationsInMs, lotStatuses } from '~~/server/constants'
 import { lotRepository } from '~~/server/repositories/lot.repository'
 import { createLotResource } from '~~/server/resources/lot.resource'
 import { getLotRequest } from '../index.request'
+import { publishLotPolicy } from './index.post.policy'
 
 export default defineEventHandler(async (event) => {
+  mustBeAuthenticated(event)
+
   const request = await getLotRequest(event)
 
-  const lot = await lotRepository.findById(request.params.id)
+  const lot = await lotRepository.findByIdOrFail(request.params.id)
 
-  if (!lot) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Лот не знайдено',
-    })
-  }
+  publishLotPolicy(event, lot)
 
   if (lot.statusName !== lotStatuses.DRAFT) {
     throw createError({
@@ -26,8 +23,11 @@ export default defineEventHandler(async (event) => {
 
   try {
     lot.statusName = lotStatuses.IN_TRADING_PROCESS
+    lot.effectiveDate = new Date()
+    lot.expirationDate = new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration])
+    lot.currentPrice = lot.initialPrice
 
-    await lot.save()
+    await lotRepository.save(lot)
 
     return createLotResource(lot)
   }

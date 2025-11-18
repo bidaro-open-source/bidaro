@@ -26,7 +26,7 @@ describe('GET /api/lots/:id/images', async () => {
 
   it('should retrieve lot image with correct structure and metadata', async () => {
     const userData = await createUser({ withSession: true })
-    const lotData = await createLot({ ownerId: userData.user.id })
+    const lotData = await createLot({ sellerId: userData.user.id })
     const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
 
@@ -52,7 +52,7 @@ describe('GET /api/lots/:id/images', async () => {
 
   it('should retrieve lot images in correct order', async () => {
     const userData = await createUser({ withSession: true })
-    const lotData = await createLot({ ownerId: userData.user.id })
+    const lotData = await createLot({ sellerId: userData.user.id })
 
     const imageData1 = await createImage(IMAGE_PATH)
     const lotImageData1 = await createLotImage(lotData.lot.id, imageData1.image.id)

@@ -129,7 +129,7 @@ export const lotService = {
       })
     }
 
-    const currentLinks = await lotImageRepository.findAllLinksByLot(id, { transaction })
+    const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
 
     const currentImageIds = new Set(currentLinks.map(link => link.imageId))
     const newImageIds = new Set(imageIds)
