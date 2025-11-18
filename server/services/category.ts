@@ -191,4 +191,35 @@ export const categoryService = {
       throw error
     }
   },
+
+  /**
+   * Deletes a category.
+   *
+   * @param id - The ID of the category to delete
+   * @throws 400 if the category has children or lots
+   * @throws 404 if the category does not exist
+   */
+  async delete(id: number) {
+    const category = await categoryRepository.findByIdOrFail(id)
+
+    const children = await categoryRepository.findAllByParentId(category.id)
+
+    if (children.length > 0) {
+      throw createError({
+        statusCode: 400,
+        message: 'Не можна видалити категорію, яка має дочірні категорії',
+      })
+    }
+
+    const lotsCount = await categoryRepository.countLotsByPath(category.path)
+
+    if (lotsCount > 0) {
+      throw createError({
+        statusCode: 400,
+        message: 'Не можна видалити категорію, яка має лоти',
+      })
+    }
+
+    await categoryRepository.destory(category.id)
+  },
 }

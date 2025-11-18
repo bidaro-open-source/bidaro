@@ -1,4 +1,4 @@
-import { categoryRepository } from '~~/server/repositories/category.repository'
+import { categoryService } from '~~/server/services/category'
 import { deleteCateogryPolicy } from '../index.policy'
 import { deleteCategoryRequest } from './index.delete.request'
 
@@ -9,25 +9,5 @@ export default defineEventHandler(async (event) => {
 
   deleteCateogryPolicy(event)
 
-  const category = await categoryRepository.findByIdOrFail(request.params.id)
-
-  const children = await categoryRepository.findAllByParentId(category.id)
-
-  if (children.length > 0) {
-    throw createError({
-      statusCode: 400,
-      message: 'Не можна видалити категорію, яка має дочірні категорії',
-    })
-  }
-
-  const lotsCount = await categoryRepository.countLotsByPath(category.path)
-
-  if (lotsCount > 0) {
-    throw createError({
-      statusCode: 400,
-      message: 'Не можна видалити категорію, яка має лоти',
-    })
-  }
-
-  await categoryRepository.destory(category.id)
+  await categoryService.delete(request.params.id)
 })
