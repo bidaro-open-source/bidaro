@@ -20,10 +20,10 @@ async function deleteCategoryRequest(
   })
 }
 
-describe('delete category', async () => {
+describe('DELETE /api/categories/:id', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should delete a category', async () => {
+  it('should delete category successfully', async () => {
     const categoryData = await createCategory()
     const userData = await createUser({
       withRole: true,
@@ -43,7 +43,7 @@ describe('delete category', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 401 for anonymus', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const categoryData = await createCategory()
 
       const response = await deleteCategoryRequest(
@@ -55,7 +55,7 @@ describe('delete category', async () => {
       await categoryData.clear()
     })
 
-    it('should return 404 when category not exists', async () => {
+    it('should return 404 when category does not exist', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -72,7 +72,7 @@ describe('delete category', async () => {
       await userData.clear()
     })
 
-    it('should return 403 when user have not permission', async () => {
+    it('should return 403 when user lacks required permission', async () => {
       const categoryData = await createCategory()
       const userData = await createUser({
         withRole: true,
@@ -91,7 +91,7 @@ describe('delete category', async () => {
       await userData.clear()
     })
 
-    it('should return 400 when category has children', async () => {
+    it('should return 400 when category has child categories', async () => {
       const categoryData1 = await createCategory()
       const categoryData2 = await createCategory({
         parentId: categoryData1.category.id,
@@ -115,7 +115,7 @@ describe('delete category', async () => {
       await userData.clear()
     })
 
-    it('should return 400 when category has lots', async () => {
+    it('should return 400 when category has associated lots', async () => {
       const categoryData = await createCategory()
       const userData = await createUser({
         withRole: true,

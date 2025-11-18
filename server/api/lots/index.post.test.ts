@@ -19,10 +19,10 @@ export async function destroyLot(id: number) {
   return (await db.Lot.findByPk(id))!.destroy()
 }
 
-describe('create draft lot', async () => {
+describe('POST /api/lots', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should create a lot', async () => {
+  it('should create draft lot successfully for authenticated user', async () => {
     const data = await createUser({ withSession: true })
 
     const response = await createLotRequest(
@@ -43,7 +43,7 @@ describe('create draft lot', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 401 for anonymus', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const response = await createLotRequest()
 
       expect(response.status).toBe(401)

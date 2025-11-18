@@ -14,10 +14,10 @@ async function getCategoriesRequest() {
   })
 }
 
-describe('get root categories', async () => {
+describe('GET /api/categories', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should return correct structure', async () => {
+  it('should return categories with correct structure', async () => {
     const userData = await createUser()
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory({

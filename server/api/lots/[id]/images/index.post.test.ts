@@ -23,7 +23,7 @@ async function uploadLotImageRequest(
   })
 }
 
-describe('create draft lot', async () => {
+describe('POST /api/lots/:id/images', async () => {
   await setup({ host: env.SETUP_HOST })
 
   const IMAGE = 'image-normal.png'
@@ -34,7 +34,7 @@ describe('create draft lot', async () => {
   const IMAGE_WEBP = 'image-normal.webp'
   const IMAGE_AVIF = 'image-unsupport.avif'
 
-  describe('uploading correct files', () => {
+  describe('valid file uploads', () => {
     it.each([
       IMAGE_PNG,
       IMAGE_JPG,
@@ -65,7 +65,7 @@ describe('create draft lot', async () => {
     })
   })
 
-  describe('uploading uncorrect files', () => {
+  describe('invalid file uploads', () => {
     it.each([
       IMAGE_TO_BIG,
       IMAGE_AVIF,
@@ -87,7 +87,7 @@ describe('create draft lot', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 401 for anonymus', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(
@@ -97,7 +97,7 @@ describe('create draft lot', async () => {
       expect(response.status).toBe(401)
     })
 
-    it('should return 404', async () => {
+    it('should return 404 when lot does not exist', async () => {
       const userData = await createUser({ withSession: true })
       const multipart = createMultipartConfig(resolveImage(IMAGE))
 
@@ -111,7 +111,7 @@ describe('create draft lot', async () => {
       await userData.clear()
     })
 
-    it('should return 403 when user is not owner', async () => {
+    it('should return 403 when user is not the lot owner', async () => {
       const user1Data = await createUser()
       const user2Data = await createUser({ withSession: true })
       const lotData = await createLot({ ownerId: user1Data.user.id })

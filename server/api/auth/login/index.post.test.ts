@@ -5,10 +5,10 @@ import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { loginRequest } from '~~/test/api-e2e/requests/authentication'
 
-describe('login', async () => {
+describe('POST /api/auth/login', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should login user', async () => {
+  it('should authenticate user successfully with valid credentials', async () => {
     const data = await createUser()
 
     const response = await loginRequest({
@@ -25,7 +25,7 @@ describe('login', async () => {
     await data.clear()
   })
 
-  it('should return pair of access and refresh tokens', async () => {
+  it('should return both access and refresh tokens in response body', async () => {
     const data = await createUser()
 
     const response = await loginRequest({
@@ -42,7 +42,7 @@ describe('login', async () => {
     await data.clear()
   })
 
-  it('should return refresh token in cookie', async () => {
+  it('should set refresh token in HTTP-only cookie', async () => {
     const data = await createUser()
 
     const response = await loginRequest({
@@ -59,7 +59,7 @@ describe('login', async () => {
   })
 
   describe('error handling', () => {
-    it('should return error if username not exists', async () => {
+    it('should return 404 when username does not exist', async () => {
       const response = await loginRequest({
         username: db.UserFactory.invalidUsername,
         password: db.UserFactory.invalidPassword,
@@ -68,7 +68,7 @@ describe('login', async () => {
       expect(response.status).toBe(404)
     })
 
-    it('should return error if password is incorrect', async () => {
+    it('should return 422 when password is incorrect', async () => {
       const data = await createUser()
 
       const response = await loginRequest({

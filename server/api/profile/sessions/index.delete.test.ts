@@ -20,10 +20,10 @@ async function deleteSessionsRequest(
   })
 }
 
-describe('session deleting', async () => {
+describe('DELETE /api/profile/sessions', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should delete session', async () => {
+  it('should delete single session successfully', async () => {
     const data = await createUser({
       withRole: true,
       withSession: true,
@@ -43,7 +43,7 @@ describe('session deleting', async () => {
     await data.clear()
   })
 
-  it('should delete multiply sessions', async () => {
+  it('should delete multiple sessions in batch successfully', async () => {
     const data = await createUser({
       withRole: true,
       withSession: true,
@@ -77,7 +77,7 @@ describe('session deleting', async () => {
     await data.clear()
   })
 
-  it('should return false statuses when session not exists', async () => {
+  it('should return false status for non-existent sessions', async () => {
     const data = await createUser({
       withRole: true,
       withSession: true,
@@ -98,7 +98,7 @@ describe('session deleting', async () => {
   })
 
   describe('error handling', () => {
-    it('should return error if sessions is empty', async () => {
+    it('should return 422 when session list is empty', async () => {
       const data = await createUser({
         withRole: true,
         withSession: true,
@@ -115,7 +115,7 @@ describe('session deleting', async () => {
       await data.clear()
     })
 
-    it('should return error if user have not permissions', async () => {
+    it('should return 403 when user lacks required permission', async () => {
       const data = await createUser({
         withRole: true,
         withSession: true,

@@ -15,10 +15,10 @@ async function getCategoryRequest(payload: GetCategoryRequest) {
   })
 }
 
-describe('get category', async () => {
+describe('GET /api/categories/:id', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should return correct structure', async () => {
+  it('should return category with children and aggregated lot counts', async () => {
     const userData = await createUser()
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory({
@@ -69,7 +69,7 @@ describe('get category', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 404 when category not exists', async () => {
+    it('should return 404 when category does not exist', async () => {
       const response = await getCategoryRequest(
         { params: { id: 5345345 } },
       )

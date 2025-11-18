@@ -20,7 +20,7 @@ async function updateCategoryRequest(
   })
 }
 
-describe('update category', async () => {
+describe('PATCH /api/categories/:id', async () => {
   await setup({ host: env.SETUP_HOST })
 
   describe('should update a category', () => {
@@ -53,7 +53,7 @@ describe('update category', async () => {
       },
     )
 
-    it('by key "paretnId"', async () => {
+    it('by key "parentId"', async () => {
       const categoryData1 = await createCategory()
       const categoryData2 = await createCategory()
       const userData = await createUser({
@@ -106,7 +106,7 @@ describe('update category', async () => {
     })
   })
 
-  it('should update a category path', async () => {
+  it('should update category path when parent changes', async () => {
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory({ parentId: categoryData1.category.id })
 
@@ -134,7 +134,7 @@ describe('update category', async () => {
     await userData.clear()
   })
 
-  it('should update a category path with child categories', async () => {
+  it('should cascade path updates to all child categories', async () => {
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory({ parentId: categoryData1.category.id })
     const categoryData3 = await createCategory({ parentId: categoryData2.category.id })
@@ -173,7 +173,7 @@ describe('update category', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 401 for anonymus', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const categoryData = await createCategory()
 
       const response = await updateCategoryRequest(
@@ -188,7 +188,7 @@ describe('update category', async () => {
       await categoryData.clear()
     })
 
-    it('should return 404 when category not exists', async () => {
+    it('should return 404 when category does not exist', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -208,7 +208,7 @@ describe('update category', async () => {
       await userData.clear()
     })
 
-    it('should return 403 when user have not permission', async () => {
+    it('should return 403 when user lacks required permission', async () => {
       const categoryData = await createCategory()
       const userData = await createUser({
         withRole: true,
@@ -230,7 +230,7 @@ describe('update category', async () => {
       await userData.clear()
     })
 
-    it('should return 422 when slug already exists', async () => {
+    it('should return 422 when slug is already in use by another category', async () => {
       const categoryData1 = await createCategory()
       const categoryData2 = await createCategory()
       const userData = await createUser({
@@ -254,7 +254,7 @@ describe('update category', async () => {
       await userData.clear()
     })
 
-    it('should return 422 when parent id not exists', async () => {
+    it('should return 422 when parent category does not exist', async () => {
       const categoryData = await createCategory()
       const userData = await createUser({
         withRole: true,
@@ -276,7 +276,7 @@ describe('update category', async () => {
       await userData.clear()
     })
 
-    it('should return 422 when parent id is children', async () => {
+    it('should return 422 when attempting to set child as parent (circular reference)', async () => {
       const categoryData1 = await createCategory()
       const categoryData2 = await createCategory({ parentId: categoryData1.category.id })
       const categoryData3 = await createCategory({ parentId: categoryData2.category.id })

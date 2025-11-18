@@ -24,10 +24,10 @@ async function destoryCategory(id: number) {
   return await db.Category.destroy({ where: { id } })
 }
 
-describe('create category', async () => {
+describe('POST /api/categories', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should create a category and return correct structure', async () => {
+  it('should create root category successfully', async () => {
     const userData = await createUser({
       withRole: true,
       withSession: true,
@@ -55,7 +55,7 @@ describe('create category', async () => {
     await userData.clear()
   })
 
-  it('should create a category with parent category', async () => {
+  it('should create child category successfully with parent relationship', async () => {
     const categoryData = await createCategory()
 
     const userData = await createUser({
@@ -82,7 +82,7 @@ describe('create category', async () => {
     await userData.clear()
   })
 
-  describe('should create with correct slug', () => {
+  describe('valid slug format handling', () => {
     it.each([
       'my-new-product',
       'product-123',
@@ -97,7 +97,7 @@ describe('create category', async () => {
       'WILL-BE-LOWERCASED',
       '  Combined-Test-123  ',
     ])(
-      '"%s"',
+      'should accept and normalize slug: "%s"',
       async (slug: string) => {
         const userData = await createUser({
           withRole: true,
@@ -123,7 +123,7 @@ describe('create category', async () => {
   })
 
   describe('error handling', () => {
-    it('should return 401 for anonymus', async () => {
+    it('should return 401 when user is not authenticated', async () => {
       const { slug, displayName } = db.CategoryFactory.new().make()
 
       const response = await createCategoryRequest(
@@ -133,7 +133,7 @@ describe('create category', async () => {
       expect(response.status).toBe(401)
     })
 
-    it('should return 403 when user have not permission', async () => {
+    it('should return 403 when user lacks required permission', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -152,7 +152,7 @@ describe('create category', async () => {
       await userData.clear()
     })
 
-    it('should return 422 when slug already taken', async () => {
+    it('should return 422 when slug is already in use', async () => {
       const categoryData = await createCategory()
       const userData = await createUser({
         withRole: true,
@@ -174,7 +174,7 @@ describe('create category', async () => {
       await userData.clear()
     })
 
-    it('should return 422 when parent not found', async () => {
+    it('should return 422 when parent category does not exist', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -211,7 +211,7 @@ describe('create category', async () => {
       null,
       undefined,
       true,
-    ])('should return 422 when slug is "%s"', async (slug: any) => {
+    ])('should return 422 for invalid slug format: "%s"', async (slug: any) => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
