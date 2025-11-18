@@ -1,39 +1,25 @@
 import type { ConfirmPasswordRequest } from './confirm/index.request'
 import type { ResetPasswordRequest } from './index.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
 } from '~~/server/services/profile-recovery.service'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { fetch } from '~~/test/api-e2e/fetch'
 
-async function resetPasswordRequest(
-  body: ResetPasswordRequest['body'],
-) {
+async function resetPasswordRequest(payload: ResetPasswordRequest) {
   return await fetch('/api/profile/recovery', {
-    body: JSON.stringify({
-      email: body.email,
-    }),
+    body: payload.body,
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
-async function confirmResetPasswordRequest(
-  body: ConfirmPasswordRequest['body'],
-) {
+async function confirmResetPasswordRequest(payload: ConfirmPasswordRequest) {
   return await fetch('/api/profile/recovery/confirm', {
-    body: JSON.stringify({
-      token: body.token,
-      password: body.password,
-    }),
+    body: payload.body,
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
@@ -45,19 +31,16 @@ describe('POST /api/profile/recovery', async () => {
 
     const user = await db.User.findByPk(data.user.id)
 
-    const resetResponse = await resetPasswordRequest({
-      email: data.user.email,
-    })
+    const resetResponse = await resetPasswordRequest({ body: { email: data.user.email } })
 
     expect(resetResponse.status).toBe(204)
 
     const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
     const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
 
-    const confirmResponse = await confirmResetPasswordRequest({
-      password: db.UserFactory.newPassword,
-      token,
-    })
+    const confirmResponse = await confirmResetPasswordRequest(
+      { body: { password: db.UserFactory.newPassword, token } },
+    )
 
     expect(confirmResponse.status).toBe(204)
 
@@ -73,18 +56,17 @@ describe('POST /api/profile/recovery', async () => {
     it('should return 404 when email does not exist', async () => {
       const userData = db.UserFactory.new().make()
 
-      const response = await resetPasswordRequest({
-        email: userData.email,
-      })
+      const response = await resetPasswordRequest(
+        { body: { email: userData.email } },
+      )
 
       expect(response.status).toBe(404)
     })
 
     it('should return 404 when reset token does not exist', async () => {
-      const response = await confirmResetPasswordRequest({
-        password: db.UserFactory.newPassword,
-        token: 'fff',
-      })
+      const response = await confirmResetPasswordRequest(
+        { body: { password: db.UserFactory.newPassword, token: 'fff' } },
+      )
 
       expect(response.status).toBe(404)
     })
@@ -92,9 +74,9 @@ describe('POST /api/profile/recovery', async () => {
     it('should return 404 when account is deleted after token generation', async () => {
       const data = await createUser()
 
-      const response = await resetPasswordRequest({
-        email: data.user.email,
-      })
+      const response = await resetPasswordRequest(
+        { body: { email: data.user.email } },
+      )
 
       expect(response.status).toBe(204)
 
@@ -103,10 +85,9 @@ describe('POST /api/profile/recovery', async () => {
       const keys = await redis.keys(`${REDIS_PASSWORD_RESET_NAMESPACE}:*`)
       const token = keys[0].replace(`${REDIS_PASSWORD_RESET_NAMESPACE}:`, '')
 
-      const confirmResponse = await confirmResetPasswordRequest({
-        password: db.UserFactory.newPassword,
-        token,
-      })
+      const confirmResponse = await confirmResetPasswordRequest(
+        { body: { password: db.UserFactory.newPassword, token } },
+      )
 
       expect(confirmResponse.status).toBe(404)
 

@@ -1,14 +1,14 @@
 import type { MultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import type { UploadLotImageRequest } from './index.post.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
+import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
-import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function uploadLotImageRequest(
   payload: { params: UploadLotImageRequest['params'], multipart: MultipartConfig },
@@ -17,9 +17,10 @@ async function uploadLotImageRequest(
   return await fetch(`/api/lots/${payload.params.id}/images`, {
     method: 'POST',
     body: payload.multipart.body,
-    headers: withAuth(options.accessToken, {
+    accessToken: options.accessToken,
+    headers: {
       'Content-Type': payload.multipart.contentType,
-    }),
+    },
   })
 }
 
@@ -50,7 +51,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      const image = await response.json()
+      const image = response._data
 
       expect(response.status).toBe(200)
       expect(image.id).toBeDefined()

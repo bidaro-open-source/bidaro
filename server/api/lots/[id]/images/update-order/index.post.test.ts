@@ -1,13 +1,13 @@
 import type { UpdateImageOrderRequest } from './index.post.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
-import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function updateImageOrderRequest(
   payload: UpdateImageOrderRequest,
@@ -15,10 +15,8 @@ async function updateImageOrderRequest(
 ) {
   return await fetch(`/api/lots/${payload.params.id}/images/update-order`, {
     method: 'POST',
-    body: JSON.stringify(payload.body),
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    body: payload.body,
+    accessToken: options.accessToken,
   })
 }
 

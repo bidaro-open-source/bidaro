@@ -1,13 +1,13 @@
 import type { DeleteLotImageRequest } from './index.delete.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
-import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function deleteLotImageRequest(
   payload: DeleteLotImageRequest,
@@ -15,10 +15,8 @@ async function deleteLotImageRequest(
 ) {
   return await fetch(`/api/lots/${payload.params.id}/images`, {
     method: 'DELETE',
-    body: JSON.stringify(payload.body),
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    body: payload.body,
+    accessToken: options.accessToken,
   })
 }
 
@@ -38,7 +36,7 @@ describe('DELETE /api/lots/:id/images', async () => {
       { accessToken: userData.access_token },
     )
 
-    const result = await deleteResponse.json()
+    const result = deleteResponse._data
 
     expect(deleteResponse.status).toBe(200)
     expect(Array.isArray(result)).toBeTruthy()
@@ -94,7 +92,7 @@ describe('DELETE /api/lots/:id/images', async () => {
         { accessToken: user1Data.access_token },
       )
 
-      const result = await deleteResponse.json()
+      const result = deleteResponse._data
 
       expect(deleteResponse.status).toBe(200)
       expect(Array.isArray(result)).toBeTruthy()

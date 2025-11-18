@@ -1,17 +1,13 @@
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getCategoriesRequest() {
-  return await fetch(`/api/categories`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return await fetch(`/api/categories`, { method: 'GET' })
 }
 
 describe('GET /api/categories', async () => {
@@ -36,7 +32,7 @@ describe('GET /api/categories', async () => {
 
     const response = await getCategoriesRequest()
 
-    const categories = await response.json()
+    const categories = response._data
 
     expect(response.status).toBe(200)
 

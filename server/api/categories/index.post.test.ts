@@ -1,11 +1,11 @@
 import type { CreateCategoryRequest } from './index.post.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { withAuth } from '~~/test/api-e2e/with-auth'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function createCategoryRequest(
   payload: CreateCategoryRequest,
@@ -13,10 +13,8 @@ async function createCategoryRequest(
 ) {
   return await fetch(`/api/categories`, {
     method: 'POST',
-    body: JSON.stringify(payload.body),
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    body: payload.body,
+    accessToken: options.accessToken,
   })
 }
 
@@ -41,7 +39,7 @@ describe('POST /api/categories', async () => {
       { accessToken: userData.access_token },
     )
 
-    const category = await response.json()
+    const category = response._data
 
     expect(response.status).toBe(201)
     expect(category.id).toBeDefined()
@@ -71,7 +69,7 @@ describe('POST /api/categories', async () => {
       { accessToken: userData.access_token },
     )
 
-    const category = await response.json()
+    const category = response._data
 
     expect(response.status).toBe(201)
     expect(category.path).toBe(`${categoryData.category.path}/${category.id}`)
@@ -112,7 +110,7 @@ describe('POST /api/categories', async () => {
           { accessToken: userData.access_token },
         )
 
-        const category = await response.json()
+        const category = response._data
 
         expect(response.status).toBe(201)
 

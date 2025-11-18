@@ -1,11 +1,11 @@
 import type { UpdateCategoryRequest } from './index.patch.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { withAuth } from '~~/test/api-e2e/with-auth'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function updateCategoryRequest(
   payload: UpdateCategoryRequest,
@@ -13,10 +13,8 @@ async function updateCategoryRequest(
 ) {
   return await fetch(`/api/categories/${payload.params.id}`, {
     method: 'PATCH',
-    body: JSON.stringify(payload.body),
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    body: payload.body,
+    accessToken: options.accessToken,
   })
 }
 
@@ -43,7 +41,7 @@ describe('PATCH /api/categories/:id', async () => {
           { accessToken: userData.access_token },
         )
 
-        const updatedCategory = await response.json()
+        const updatedCategory = response._data
 
         expect(response.status).toBe(200)
         expect(updatedCategory[key]).toBe(value)
@@ -70,7 +68,7 @@ describe('PATCH /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      const updatedCategory = await response.json()
+      const updatedCategory = response._data
 
       expect(response.status).toBe(200)
       expect(updatedCategory.parentId).toBe(categoryData2.category.id)
@@ -96,7 +94,7 @@ describe('PATCH /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      const updatedCategory = await response.json()
+      const updatedCategory = response._data
 
       expect(response.status).toBe(200)
       expect(updatedCategory.slug).toBe(categoryData.category.slug)
@@ -124,7 +122,7 @@ describe('PATCH /api/categories/:id', async () => {
       { accessToken: userData.access_token },
     )
 
-    const updatedCategory = await response.json()
+    const updatedCategory = response._data
 
     expect(response.status).toBe(200)
     expect(updatedCategory.path).toBe(`${categoryData2.category.id}`)

@@ -1,17 +1,15 @@
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { withAuth } from '~~/test/api-e2e/with-auth'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function createLotRequest(
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/lots`, {
     method: 'POST',
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    accessToken: options.accessToken,
   })
 }
 
@@ -29,7 +27,7 @@ describe('POST /api/lots', async () => {
       { accessToken: data.access_token },
     )
 
-    const lot = await response.json()
+    const lot = response._data
 
     expect(response.status).toBe(201)
     expect(lot.id).toBeDefined()

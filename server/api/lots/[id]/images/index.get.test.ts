@@ -1,13 +1,13 @@
 import type { GetLotRequest } from '../index.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
-import { withAuth } from '~~/test/api-e2e/with-auth'
 
 async function getLotImageRequest(
   payload: GetLotRequest,
@@ -15,9 +15,7 @@ async function getLotImageRequest(
 ) {
   return await fetch(`/api/lots/${payload.params.id}/images`, {
     method: 'GET',
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    accessToken: options.accessToken,
   })
 }
 
@@ -32,13 +30,13 @@ describe('GET /api/lots/:id/images', async () => {
     const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
 
-    const getResponse = await getLotImageRequest(
+    const response = await getLotImageRequest(
       { params: { id: lotData.lot.id } },
     )
 
-    const result = await getResponse.json()
+    const result = response._data
 
-    expect(getResponse.status).toBe(200)
+    expect(response.status).toBe(200)
     expect(Array.isArray(result)).toBeTruthy()
     expect(result.length).toBe(1)
     expect(result[0]?.id).toBe(imageData.image.id)
@@ -62,13 +60,13 @@ describe('GET /api/lots/:id/images', async () => {
     const imageData2 = await createImage(IMAGE_PATH)
     const lotImageData2 = await createLotImage(lotData.lot.id, imageData2.image.id)
 
-    const getResponse = await getLotImageRequest(
+    const response = await getLotImageRequest(
       { params: { id: lotData.lot.id } },
     )
 
-    const result = await getResponse.json()
+    const result = response._data
 
-    expect(getResponse.status).toBe(200)
+    expect(response.status).toBe(200)
     expect(Array.isArray(result)).toBeTruthy()
     expect(result.length).toBe(2)
     expect(result[0]?.id).toBe(imageData1.image.id)

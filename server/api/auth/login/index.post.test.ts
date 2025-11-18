@@ -16,7 +16,7 @@ describe('POST /api/auth/login', async () => {
       password: db.UserFactory.password,
     })
 
-    const body = await response.json()
+    const body = response._data
 
     expect(response.status).toBe(200)
     expect(body.user.email).toBe(data.user.email)
@@ -33,7 +33,7 @@ describe('POST /api/auth/login', async () => {
       password: db.UserFactory.password,
     })
 
-    const body = await response.json()
+    const body = response._data
 
     expect(response.status).toBe(200)
     expect(typeof body.access_token).toBe('string')

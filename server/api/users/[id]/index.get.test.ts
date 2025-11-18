@@ -1,9 +1,9 @@
 import type { GetUserRequest } from './index.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { withAuth } from '~~/test/api-e2e/with-auth'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getUserRequest(
   payload: GetUserRequest,
@@ -11,9 +11,7 @@ async function getUserRequest(
 ) {
   return await fetch(`/api/users/${payload.params.id}`, {
     method: 'GET',
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    accessToken: options.accessToken,
   })
 }
 
@@ -28,7 +26,7 @@ describe('GET /api/users/:id', async () => {
       { accessToken: data.access_token },
     )
 
-    const user = await response.json()
+    const user = response._data
 
     expect(user.id).toBe(data.user.id)
     expect(user.name).toBe(data.user.name)
@@ -43,7 +41,7 @@ describe('GET /api/users/:id', async () => {
 
     const response = await getUserRequest({ params: { id: data.user.id } })
 
-    const user = await response.json()
+    const user = response._data
 
     expect(user.id).toBe(data.user.id)
     expect(user.name).toBe(data.user.name)

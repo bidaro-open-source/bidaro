@@ -1,18 +1,16 @@
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getSessionsRequest(
-  options: { accessToken: string },
+  options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/profile/sessions`, {
     method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${options.accessToken}`,
-      'Content-Type': 'application/json',
-    },
+    accessToken: options.accessToken,
   })
 }
 
@@ -30,7 +28,7 @@ describe('GET /api/profile/sessions', async () => {
       accessToken: data.access_token,
     })
 
-    const sessions = await response.json()
+    const sessions = response._data
 
     expect(response.status).toBe(200)
     expect(sessions[0].uuid).toBe(data.session_uuid)
@@ -39,6 +37,12 @@ describe('GET /api/profile/sessions', async () => {
   })
 
   describe('error handling', () => {
+    it('should return 401 when user is not authenticated', async () => {
+      const response = await getSessionsRequest()
+
+      expect(response.status).toBe(401)
+    })
+
     it('should return 403 when user lacks required permission', async () => {
       const data = await createUser({
         withRole: true,

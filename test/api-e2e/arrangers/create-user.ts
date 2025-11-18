@@ -63,7 +63,7 @@ export async function createUser<T extends CreateUserOptions>(
       password: db.UserFactory.password,
     })
 
-    const data = await response.json()
+    const data = response._data
 
     refresh_token = data.refresh_token
     session_uuid = data.session_uuid

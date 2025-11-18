@@ -1,12 +1,12 @@
 import type { DeleteCategoryRequest } from './index.delete.request'
 import { env } from 'node:process'
-import { fetch, setup } from '@nuxt/test-utils/e2e'
+import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { withAuth } from '~~/test/api-e2e/with-auth'
+import { fetch } from '~~/test/api-e2e/fetch'
 
 async function deleteCategoryRequest(
   payload: DeleteCategoryRequest,
@@ -14,9 +14,7 @@ async function deleteCategoryRequest(
 ) {
   return await fetch(`/api/categories/${payload.params.id}`, {
     method: 'DELETE',
-    headers: withAuth(options.accessToken, {
-      'Content-Type': 'application/json',
-    }),
+    accessToken: options.accessToken,
   })
 }
 

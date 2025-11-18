@@ -16,7 +16,7 @@ describe('POST /api/auth/register', async () => {
       password: db.UserFactory.password,
     })
 
-    const body = await response.json()
+    const body = response._data
 
     expect(response.status).toBe(200)
     expect(typeof body.user.id).toBe('number')
@@ -35,7 +35,7 @@ describe('POST /api/auth/register', async () => {
       password: db.UserFactory.password,
     })
 
-    const body = await response.json()
+    const body = response._data
 
     expect(response.status).toBe(200)
     expect(typeof body.access_token).toBe('string')
@@ -58,7 +58,7 @@ describe('POST /api/auth/register', async () => {
       new RegExp(`${REFRESH_TOKEN_COOKIE_NAME}=`),
     )
 
-    const body = await response.json()
+    const body = response._data
 
     await destroyUser(body.user.id)
   })
@@ -78,7 +78,7 @@ describe('POST /api/auth/register', async () => {
         email,
       })
 
-      const body = await response.json()
+      const body = response._data
 
       expect(response.status).toBe(200)
 
@@ -106,7 +106,7 @@ describe('POST /api/auth/register', async () => {
         username,
       })
 
-      const body = await response.json()
+      const body = response._data
 
       expect(response.status).toBe(200)
 
