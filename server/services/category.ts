@@ -27,8 +27,6 @@ export const categoryService = {
         data: new z.ZodError(issues).flatten(),
       })
     }
-
-    return categoryBySlug
   },
 
   /**
@@ -54,8 +52,6 @@ export const categoryService = {
         data: new z.ZodError(issues).flatten(),
       })
     }
-
-    return parentCategory
   },
 
   /**
@@ -73,7 +69,7 @@ export const categoryService = {
       const issues: z.ZodIssue[] = [{
         code: 'custom',
         path: ['parentId'],
-        message: 'Батьківська категорія не може бути нащадком самої себе',
+        message: 'Батьківська категорія не може бути нащадком цієї категорії',
       }]
 
       throw createError({
@@ -82,8 +78,6 @@ export const categoryService = {
         data: new z.ZodError(issues).flatten(),
       })
     }
-
-    return parentCategory
   },
 
   /**
@@ -165,8 +159,9 @@ export const categoryService = {
         let parentCategory: Category | null = null
 
         if (parentIsId) {
-          parentCategory = await categoryService.checkParentExists(data.parentId as number)
+          await categoryService.checkParentExists(data.parentId as number)
           await categoryService.checkParentIsNotChildren(category.id, data.parentId as number)
+          parentCategory = await categoryRepository.findById(data.parentId as number, { transaction })
         }
 
         const oldPath = category.path
@@ -220,6 +215,6 @@ export const categoryService = {
       })
     }
 
-    await categoryRepository.destory(category.id)
+    await categoryRepository.destroy(category.id)
   },
 }

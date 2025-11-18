@@ -91,7 +91,7 @@ export const categoryRepository = {
   /**
    * Finds categories by their parent id.
    *
-   * @param parentId - category slug
+   * @param parentId - category parent id
    * @param options - sequelize options
    * @returns array of categories with given parent id
    */
@@ -105,13 +105,13 @@ export const categoryRepository = {
   },
 
   /**
-   * Finds categories by their parent id.
+   * Counts lots for a category and all its descendants by path.
    *
-   * @param path - category path
+   * @param path - category path (prefix to match categories and their descendants)
    * @param options - sequelize options
-   * @returns array of categories with given parent id
+   * @returns number of lots for the category and its descendants
    */
-  async countLotsByPath(path: string, options: Options = {}): Promise<number> {
+  async countLotsByPath(path: string, options: Options = {}) {
     const db = useDatabase()
 
     return await db.Lot.count({
@@ -191,7 +191,7 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns category instance
    */
-  async destory(id: number, options: Options = {}) {
+  async destroy(id: number, options: Options = {}) {
     const db = useDatabase()
 
     return await db.Category.destroy({

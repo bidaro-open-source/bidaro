@@ -65,7 +65,7 @@ export function InitializeCategory(database: DatabaseOptional) {
         allowNull: false,
       },
       path: {
-        type: DataTypes.STRING(1028),
+        type: DataTypes.STRING(1024),
         unique: true,
         allowNull: false,
       },
