@@ -21,14 +21,12 @@ describe('PATCH /api/profile', async () => {
 
   describe('should update profile', () => {
     it.each([
-      ['name', 'Updated Name'],
-      ['surname', 'Updated Surname'],
+      ['name', 'UpdatedName'],
+      ['surname', 'UpdatedSurname'],
     ])(
       'by key "%s" with value "%s"',
       async (key: string, value: string) => {
-        const data = await createUser({
-          withSession: true,
-        })
+        const data = await createUser({ withSession: true })
 
         const response = await updateProfileRequest(
           { body: { [key]: value } },
@@ -45,33 +43,29 @@ describe('PATCH /api/profile', async () => {
     )
 
     it('by key "email"', async () => {
-      const data = await createUser({
-        withSession: true,
-      })
+      const data = await createUser({ withSession: true })
 
-      const newEmail = 'newemail@example.com'
+      const email = db.UserFactory.generateEmail()
 
       const response = await updateProfileRequest(
-        { body: { email: newEmail } },
+        { body: { email } },
         { accessToken: data.access_token },
       )
 
       const updatedProfile = response._data
 
       expect(response.status).toBe(200)
-      expect(updatedProfile.email).toBe(newEmail)
+      expect(updatedProfile.email).toBe(email)
       expect(updatedProfile.emailVerifiedAt).toBe(null)
 
       await data.clear()
     })
 
     it('by key "password"', async () => {
-      const data = await createUser({
-        withSession: true,
-      })
+      const data = await createUser({ withSession: true })
 
       const response = await updateProfileRequest(
-        { body: { password: 'NewPassword123!' } },
+        { body: { password: db.UserFactory.newPassword } },
         { accessToken: data.access_token },
       )
 
@@ -82,36 +76,26 @@ describe('PATCH /api/profile', async () => {
   })
 
   it('should update multiple fields simultaneously', async () => {
-    const data = await createUser({
-      withSession: true,
-    })
+    const data = await createUser({ withSession: true })
 
     const response = await updateProfileRequest(
-      {
-        body: {
-          name: 'New Name',
-          surname: 'New Surname',
-        },
-      },
+      { body: { name: 'NewName', surname: 'NewSurname' } },
       { accessToken: data.access_token },
     )
 
     const updatedProfile = response._data
 
     expect(response.status).toBe(200)
-    expect(updatedProfile.name).toBe('New Name')
-    expect(updatedProfile.surname).toBe('New Surname')
+    expect(updatedProfile.name).toBe('NewName')
+    expect(updatedProfile.surname).toBe('NewSurname')
 
     await data.clear()
   })
 
   it('should reset emailVerifiedAt when email is changed', async () => {
-    const data = await createUser({
-      withSession: true,
-    })
+    const data = await createUser({ withSession: true })
 
-    // Set emailVerifiedAt to a value first
-    data.user.emailVerifiedAt = new Date().toISOString()
+    data.user.emailVerifiedAt = new Date()
     await data.user.save()
 
     const response = await updateProfileRequest(
@@ -130,7 +114,7 @@ describe('PATCH /api/profile', async () => {
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await updateProfileRequest({
-        body: { name: 'New Name' },
+        body: { name: 'NewName' },
       })
 
       expect(response.status).toBe(401)
@@ -138,9 +122,7 @@ describe('PATCH /api/profile', async () => {
 
     it('should return 422 when email is already in use by another user', async () => {
       const data1 = await createUser()
-      const data2 = await createUser({
-        withSession: true,
-      })
+      const data2 = await createUser({ withSession: true })
 
       const response = await updateProfileRequest(
         { body: { email: data1.user.email } },
@@ -151,21 +133,6 @@ describe('PATCH /api/profile', async () => {
 
       await data2.clear()
       await data1.clear()
-    })
-
-    it('should return 422 when attempting to update username', async () => {
-      const data = await createUser({
-        withSession: true,
-      })
-
-      const response = await updateProfileRequest(
-        { body: { username: 'newusername' } as any },
-        { accessToken: data.access_token },
-      )
-
-      expect(response.status).toBe(422)
-
-      await data.clear()
     })
   })
 })

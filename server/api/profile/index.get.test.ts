@@ -1,6 +1,7 @@
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -63,7 +64,7 @@ describe('GET /api/profile', async () => {
     const data = await createUser({
       withRole: true,
       withSession: true,
-      withPermissions: ['VIEW_OWN_SESSIONS'],
+      withPermissions: [permissions.VIEW_OWN_SESSIONS],
     })
 
     const response = await getProfileRequest({
