@@ -22,7 +22,7 @@ async function updateImageOrderRequest(
   })
 }
 
-describe('POST /api/lots/:id/images/update-order - Reorder Lot Images', async () => {
+describe('POST /api/lots/:id/images/update-order', async () => {
   await setup({ host: env.SETUP_HOST })
 
   const IMAGE_PATH = resolveImage('image-normal.png').path

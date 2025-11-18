@@ -22,7 +22,7 @@ async function deleteLotImageRequest(
   })
 }
 
-describe('DELETE /api/lots/:id/images - Remove Lot Images', async () => {
+describe('DELETE /api/lots/:id/images', async () => {
   await setup({ host: env.SETUP_HOST })
 
   const IMAGE_PATH = resolveImage('image-normal.png').path

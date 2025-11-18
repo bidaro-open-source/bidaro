@@ -20,7 +20,7 @@ async function updateCategoryRequest(
   })
 }
 
-describe('PATCH /api/categories/:id - Update Category and Cascade Path Changes', async () => {
+describe('PATCH /api/categories/:id', async () => {
   await setup({ host: env.SETUP_HOST })
 
   describe('should update a category', () => {
@@ -53,7 +53,7 @@ describe('PATCH /api/categories/:id - Update Category and Cascade Path Changes',
       },
     )
 
-    it('by key "paretnId"', async () => {
+    it('by key "parentId"', async () => {
       const categoryData1 = await createCategory()
       const categoryData2 = await createCategory()
       const userData = await createUser({

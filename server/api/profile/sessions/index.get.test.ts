@@ -16,7 +16,7 @@ async function getSessionsRequest(
   })
 }
 
-describe('GET /api/profile/sessions - List User Sessions with Permission Check', async () => {
+describe('GET /api/profile/sessions', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should retrieve user sessions successfully', async () => {

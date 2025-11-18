@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { destroyUser, registerRequest } from '~~/test/api-e2e/requests/authentication'
 
-describe('POST /api/auth/register - User Registration and Validation', async () => {
+describe('POST /api/auth/register', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should register new user successfully with valid credentials', async () => {

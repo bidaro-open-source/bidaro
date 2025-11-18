@@ -20,10 +20,10 @@ async function deleteCategoryRequest(
   })
 }
 
-describe('DELETE /api/categories/:id - Remove Category with Constraint Validation', async () => {
+describe('DELETE /api/categories/:id', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should delete category successfully when constraints are met', async () => {
+  it('should delete category successfully', async () => {
     const categoryData = await createCategory()
     const userData = await createUser({
       withRole: true,

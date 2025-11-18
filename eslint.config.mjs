@@ -35,6 +35,7 @@ export default withNuxt(
       },
     },
     rules: {
+      'test/prefer-lowercase-title': 'off',
       'no-console': 'off',
       'unused-imports/no-unused-vars': [
         'error',

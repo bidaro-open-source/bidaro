@@ -24,10 +24,10 @@ async function destoryCategory(id: number) {
   return await db.Category.destroy({ where: { id } })
 }
 
-describe('POST /api/categories - Create Category with Validation and Authorization', async () => {
+describe('POST /api/categories', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should create root category successfully with valid data', async () => {
+  it('should create root category successfully', async () => {
     const userData = await createUser({
       withRole: true,
       withSession: true,
