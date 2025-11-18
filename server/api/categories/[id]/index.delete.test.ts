@@ -4,6 +4,7 @@ import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
+import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { withAuth } from '~~/test/api-e2e/with-auth'
 
@@ -111,6 +112,30 @@ describe('delete category', async () => {
 
       await categoryData2.clear()
       await categoryData1.clear()
+      await userData.clear()
+    })
+
+    it('should return 400 when category has lots', async () => {
+      const categoryData = await createCategory()
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_CATEGORY],
+      })
+      const lotData = await createLot({
+        ownerId: userData.user.id,
+        categoryId: categoryData.category.id,
+      })
+
+      const response = await deleteCategoryRequest(
+        { params: { id: categoryData.category.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(400)
+
+      await lotData.clear()
+      await categoryData.clear()
       await userData.clear()
     })
   })

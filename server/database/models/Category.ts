@@ -21,11 +21,13 @@ export class Category extends Model<InferAttributes<Category>, InferCreationAttr
   declare id: CreationOptional<number>
   declare parentId: ForeignKey<Category['id']> | null
   declare slug: string
+  declare path: string
   declare displayName: string
   declare description: string | null
 
   declare parent?: NonAttribute<Category>
   declare children?: NonAttribute<Category[]>
+  declare lots?: NonAttribute<any[]>
 
   static associate(db: Database) {
     db.Category.belongsTo(db.Category, {
@@ -59,6 +61,11 @@ export function InitializeCategory(database: DatabaseOptional) {
       },
       slug: {
         type: DataTypes.STRING(128),
+        unique: true,
+        allowNull: false,
+      },
+      path: {
+        type: DataTypes.STRING(1024),
         unique: true,
         allowNull: false,
       },

@@ -6,27 +6,25 @@ export default defineEventHandler(async (event) => {
   const request = await getCategoryRequest(event)
 
   const category = await categoryRepository.findByIdOrFail(request.params.id)
-  const countLots = await categoryRepository.countLotsForCategoryTree(category.id)
+  const countLots = await categoryRepository.countLotsByPath(category.path)
+  let childrenWithCounts: ReturnType<typeof createCategoryResource>[] = []
 
-  // Calculate counts for children if they exist
   if (category.children && category.children.length > 0) {
-    const childrenWithCounts = await Promise.all(
+    childrenWithCounts = await Promise.all(
       category.children.map(async (child) => {
-        const childCountLots = await categoryRepository.countLotsForCategoryTree(child.id)
-        return createCategoryResource(child, childCountLots)
+        const childCountLots = await categoryRepository.countLotsByPath(child.path)
+
+        return {
+          ...createCategoryResource(child),
+          countLots: childCountLots,
+        }
       }),
     )
-
-    return {
-      id: category.id,
-      parentId: category.parentId,
-      slug: category.slug,
-      displayName: category.displayName,
-      description: category.description,
-      children: childrenWithCounts,
-      countLots,
-    }
   }
 
-  return createCategoryResource(category, countLots)
+  return {
+    ...createCategoryResource(category),
+    children: childrenWithCounts,
+    countLots,
+  }
 })

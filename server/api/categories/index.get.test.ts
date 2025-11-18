@@ -47,7 +47,6 @@ describe('get root categories', async () => {
     expect(categories[0].displayName).toBeDefined()
     expect(categories[0].description).toBeDefined()
     expect(categories[0].parentId).toBeDefined()
-    expect(categories[0].children).toBeDefined()
     expect(typeof categories[0].countLots).toBe('number')
 
     const parentCategory = categories.find((c: any) => c.id === categoryData1.category.id)

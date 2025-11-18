@@ -1,7 +1,6 @@
-import z from 'zod'
-import { categoryRepository } from '~~/server/repositories/category.repository'
 import { createCategoryResource } from '~~/server/resources/category.resource'
-import { createCateogryPolicy } from './index.policy'
+import { categoryService } from '~~/server/services/category'
+import { createCategoryPolicy } from './index.policy'
 import { createCategoryRequest } from './index.post.request'
 
 export default defineEventHandler(async (event) => {
@@ -9,37 +8,11 @@ export default defineEventHandler(async (event) => {
 
   const request = await createCategoryRequest(event)
 
-  createCateogryPolicy(event)
+  createCategoryPolicy(event)
 
-  const categoryBySlug = await categoryRepository.findBySlug(request.body.slug)
+  const category = await categoryService.create(request.body)
 
-  if (categoryBySlug) {
-    const issues: z.ZodIssue[] = [{
-      code: 'custom',
-      path: ['slug'],
-      message: 'Слаг вже зайнят',
-    }]
+  setResponseStatus(event, 201)
 
-    throw createError({
-      statusCode: 422,
-      message: 'Неправильні дані запиту',
-      data: new z.ZodError(issues).flatten(),
-    })
-  }
-
-  try {
-    const category = await categoryRepository.create(request.body)
-
-    setResponseStatus(event, 201)
-
-    return createCategoryResource(category)
-  }
-  catch (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Unprocessable Content',
-      message: 'Невідома помилка під час створення категорії',
-      data: error,
-    })
-  }
+  return createCategoryResource(category)
 })
