@@ -32,7 +32,7 @@ describe('POST /api/lots', async () => {
     expect(response.status).toBe(201)
     expect(lot.id).toBeDefined()
     expect(lot.title).toBeDefined()
-    expect(lot.initialAmount).toBeDefined()
+    expect(lot.initialPrice).toBeDefined()
     expect(lot.initialDuration).toBeDefined()
     expect(lot.statusName).toBeDefined()
 

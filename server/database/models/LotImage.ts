@@ -3,6 +3,7 @@ import type {
   ForeignKey,
   InferAttributes,
   InferCreationAttributes,
+  NonAttribute,
 } from 'sequelize'
 import type { MakeNullishOptional } from 'sequelize/lib/utils'
 import type { Database, DatabaseOptional } from '../types'
@@ -24,12 +25,17 @@ export class LotImage extends Model<LotImageAttributes, LotImageCreationAttribut
   declare imageId: ForeignKey<Image['id']>
   declare order: number
 
+  declare lot?: NonAttribute<Lot>
+  declare image?: NonAttribute<Image>
+
   static associate(database: Database) {
     database.LotImage.belongsTo(database.Lot, {
+      as: 'lot',
       foreignKey: 'lotId',
     })
 
     database.LotImage.belongsTo(database.Image, {
+      as: 'image',
       foreignKey: 'imageId',
     })
   }

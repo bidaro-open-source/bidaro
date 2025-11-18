@@ -1,5 +1,6 @@
 import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
+import { lotInitialDurations } from '../../constants'
 
 export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
@@ -12,7 +13,7 @@ export const up: Migration = async ({ context }) => {
         primaryKey: true,
         allowNull: false,
       },
-      userId: {
+      sellerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -21,6 +22,17 @@ export const up: Migration = async ({ context }) => {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+      },
+      winnerId: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       title: {
         type: DataTypes.STRING(128),
@@ -39,12 +51,21 @@ export const up: Migration = async ({ context }) => {
         allowNull: true,
       },
       initialDuration: {
-        type: DataTypes.ENUM('1_hour', '1_day', '3_days', '7_days'),
+        type: DataTypes.ENUM(
+          lotInitialDurations.ONE_HOUR,
+          lotInitialDurations.ONE_DAY,
+          lotInitialDurations.THREE_DAYS,
+          lotInitialDurations.SEVEN_DAYS,
+        ),
         allowNull: false,
       },
-      initialAmount: {
+      initialPrice: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+      },
+      currentPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -64,5 +85,6 @@ export const up: Migration = async ({ context }) => {
 
 export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
+  // DONT'T REMOVE {} - THROWNS ERROR
   await queryInterface.dropTable('lots', {})
 }

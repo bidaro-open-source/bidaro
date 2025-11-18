@@ -27,7 +27,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
 
   it('should reorder lot images successfully', async () => {
     const userData = await createUser({ withSession: true })
-    const lotData = await createLot({ ownerId: userData.user.id })
+    const lotData = await createLot({ sellerId: userData.user.id })
 
     const imageData1 = await createImage(IMAGE_PATH)
     await createLotImage(lotData.lot.id, imageData1.image.id)
@@ -92,7 +92,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
     it('should return 403 when user is not the lot owner', async () => {
       const user1Data = await createUser()
       const user2Data = await createUser({ withSession: true })
-      const lotData = await createLot({ ownerId: user1Data.user.id })
+      const lotData = await createLot({ sellerId: user1Data.user.id })
 
       const imageData = await createImage(IMAGE_PATH)
       await createLotImage(lotData.lot.id, imageData.image.id)
@@ -112,7 +112,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
 
     it('should return 422 when image IDs count does not match existing images', async () => {
       const userData = await createUser({ withSession: true })
-      const lotData = await createLot({ ownerId: userData.user.id })
+      const lotData = await createLot({ sellerId: userData.user.id })
 
       const imageData1 = await createImage(IMAGE_PATH)
       await createLotImage(lotData.lot.id, imageData1.image.id)
@@ -136,8 +136,8 @@ describe('POST /api/lots/:id/images/update-order', async () => {
 
     it('should return 422 when image IDs contain foreign image from different lot', async () => {
       const userData = await createUser({ withSession: true })
-      const lotData1 = await createLot({ ownerId: userData.user.id })
-      const lotData2 = await createLot({ ownerId: userData.user.id })
+      const lotData1 = await createLot({ sellerId: userData.user.id })
+      const lotData2 = await createLot({ sellerId: userData.user.id })
 
       const imageData1 = await createImage(IMAGE_PATH)
       await createLotImage(lotData1.lot.id, imageData1.image.id)

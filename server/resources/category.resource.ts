@@ -1,5 +1,7 @@
 import type { Category } from '../database'
 
+export type CategoryResource = ReturnType<typeof createCategoryResource>
+
 export function createCategoryResource(entity: Category) {
   return {
     id: entity.id as number,

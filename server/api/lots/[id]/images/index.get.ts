@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   await lotRepository.findByIdOrFail(request.params.id)
 
-  const images = await lotImageRepository.findAllByLot(request.params.id)
+  const images = await lotImageRepository.findAllByLotId(request.params.id)
 
   return images.map(createImageResource)
 })

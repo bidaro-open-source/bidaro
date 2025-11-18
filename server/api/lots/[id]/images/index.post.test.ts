@@ -43,7 +43,7 @@ describe('POST /api/lots/:id/images', async () => {
       IMAGE_WEBP,
     ])('should upload file "%s"', async (filename: string) => {
       const userData = await createUser({ withSession: true })
-      const lotData = await createLot({ ownerId: userData.user.id })
+      const lotData = await createLot({ sellerId: userData.user.id })
       const multipart = createMultipartConfig(resolveImage(filename))
 
       const response = await uploadLotImageRequest(
@@ -72,7 +72,7 @@ describe('POST /api/lots/:id/images', async () => {
       IMAGE_AVIF,
     ])('should upload file "%s"', async (filename: string) => {
       const userData = await createUser({ withSession: true })
-      const lotData = await createLot({ ownerId: userData.user.id })
+      const lotData = await createLot({ sellerId: userData.user.id })
       const multipart = createMultipartConfig(resolveImage(filename))
 
       const response = await uploadLotImageRequest(
@@ -115,7 +115,7 @@ describe('POST /api/lots/:id/images', async () => {
     it('should return 403 when user is not the lot owner', async () => {
       const user1Data = await createUser()
       const user2Data = await createUser({ withSession: true })
-      const lotData = await createLot({ ownerId: user1Data.user.id })
+      const lotData = await createLot({ sellerId: user1Data.user.id })
       const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(

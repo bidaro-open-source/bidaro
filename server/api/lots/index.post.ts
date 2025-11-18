@@ -1,6 +1,6 @@
-import { lotStatuses } from '~~/server/constants'
+import { lotInitialDurations, lotStatuses } from '~~/server/constants'
 import { lotRepository } from '~~/server/repositories/lot.repository'
-import { createLotResource } from '~~/server/resources/lot.resource'
+import { createOnlyLotResource } from '~~/server/resources/lot.resource'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -9,16 +9,16 @@ export default defineEventHandler(async (event) => {
     const user = getAuthenticatedUser(event)
 
     const lot = await lotRepository.create({
-      title: 'Draft title',
-      initialAmount: 100,
-      initialDuration: '1_day',
+      title: 'Чернетка',
+      initialPrice: 1,
+      initialDuration: lotInitialDurations.THREE_DAYS,
       statusName: lotStatuses.DRAFT,
-      userId: user.id,
+      sellerId: user.id,
     })
 
     setResponseStatus(event, 201)
 
-    return createLotResource(lot)
+    return createOnlyLotResource(lot)
   }
   catch (error) {
     throw createError({

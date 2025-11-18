@@ -30,7 +30,7 @@ export const up: Migration = async ({ context }) => {
           key: 'id',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       amount: {
         type: DataTypes.DECIMAL(10, 2),

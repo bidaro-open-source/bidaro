@@ -27,7 +27,7 @@ describe('DELETE /api/lots/:id/images', async () => {
 
   it('should delete lot image successfully and return deletion status', async () => {
     const userData = await createUser({ withSession: true })
-    const lotData = await createLot({ ownerId: userData.user.id })
+    const lotData = await createLot({ sellerId: userData.user.id })
     const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
 
@@ -54,7 +54,7 @@ describe('DELETE /api/lots/:id/images', async () => {
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
       const userData = await createUser()
-      const lotData = await createLot({ ownerId: userData.user.id })
+      const lotData = await createLot({ sellerId: userData.user.id })
 
       const response = await deleteLotImageRequest(
         { body: { ids: [1] }, params: { id: lotData.lot.id } },
@@ -82,8 +82,8 @@ describe('DELETE /api/lots/:id/images', async () => {
     it('should return empty array when user is not the lot owner', async () => {
       const user1Data = await createUser({ withSession: true })
       const user2Data = await createUser({ withSession: true })
-      const lot1Data = await createLot({ ownerId: user1Data.user.id })
-      const lot2Data = await createLot({ ownerId: user2Data.user.id })
+      const lot1Data = await createLot({ sellerId: user1Data.user.id })
+      const lot2Data = await createLot({ sellerId: user2Data.user.id })
       const imageData = await createImage(IMAGE_PATH)
       const lotImageData = await createLotImage(lot2Data.lot.id, imageData.image.id)
 

@@ -18,3 +18,17 @@ export const lotStatuses = {
   RECEIVED: 'received',
   REJECTED: 'rejected',
 } as const
+
+export const lotInitialDurations = {
+  ONE_HOUR: '1_hour',
+  ONE_DAY: '1_day',
+  THREE_DAYS: '3_days',
+  SEVEN_DAYS: '7_days',
+} as const
+
+export const lotInitialDurationsInMs: Record<string, number> = {
+  [lotInitialDurations.ONE_HOUR]: 60 * 60 * 1000,
+  [lotInitialDurations.ONE_DAY]: 24 * 60 * 60 * 1000,
+  [lotInitialDurations.THREE_DAYS]: 3 * 24 * 60 * 60 * 1000,
+  [lotInitialDurations.SEVEN_DAYS]: 7 * 24 * 60 * 60 * 1000,
+} as const

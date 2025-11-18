@@ -121,7 +121,7 @@ describe('DELETE /api/categories/:id', async () => {
         withPermissions: [permissions.DELETE_CATEGORY],
       })
       const lotData = await createLot({
-        ownerId: userData.user.id,
+        sellerId: userData.user.id,
         categoryId: categoryData.category.id,
       })
 
