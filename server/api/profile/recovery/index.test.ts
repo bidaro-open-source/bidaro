@@ -5,7 +5,7 @@ import { fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
   REDIS_PASSWORD_RESET_NAMESPACE,
-} from '~~/server/services/profile-recovery'
+} from '~~/server/services/profile-recovery.service'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 
 async function resetPasswordRequest(

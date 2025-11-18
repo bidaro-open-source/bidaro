@@ -1,5 +1,5 @@
 import { getSessionsPolicy } from '~~/server/api/profile/sessions/index.policy'
-import { getAuthenticationSessions } from '~~/server/services/authentication'
+import { authService } from '~~/server/services/authentication.service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const sessions = await getAuthenticationSessions(user.id)
+  const sessions = await authService.getAuthenticationSessions(user.id)
 
   return Object.values(sessions)
 })

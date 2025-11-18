@@ -2,7 +2,7 @@ import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import { createPasswordResetToken } from '~~/server/services/profile-recovery'
+import { profileRecoveryService } from '~~/server/services/profile-recovery.service'
 
 export default defineEventHandler(async (event) => {
   const request = await resetPasswordRequest(event)
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const token = await createPasswordResetToken(user.id)
+  const token = await profileRecoveryService.createPasswordResetToken(user.id)
 
   const config = useRuntimeConfig()
 

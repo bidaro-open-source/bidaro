@@ -1,14 +1,11 @@
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import {
-  deleteEmailVerificationTokenByUid,
-  getUserIdByEmailVerificationToken,
-} from '~~/server/services/profile-verification'
+import { profileVerificationService } from '~~/server/services/profile-verification.service'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)
 
-  const uid = await getUserIdByEmailVerificationToken(
+  const uid = await profileVerificationService.getUserIdByEmailVerificationToken(
     request.body.token,
   )
 
@@ -34,5 +31,5 @@ export default defineEventHandler(async (event) => {
 
   await userRepository.save(user)
 
-  await deleteEmailVerificationTokenByUid(user.id)
+  await profileVerificationService.deleteEmailVerificationTokenByUid(user.id)
 })

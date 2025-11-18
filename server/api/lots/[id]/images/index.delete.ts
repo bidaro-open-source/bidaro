@@ -1,6 +1,6 @@
 import { lotRepository } from '~~/server/repositories/lot.repository'
-import { imageService } from '~~/server/services/image'
-import { lotService } from '~~/server/services/lot'
+import { imageService } from '~~/server/services/image.service'
+import { lotService } from '~~/server/services/lot.service'
 import { deleteLotImagePolicy } from './index.delete.policy'
 import { deleteLotImageRequest } from './index.delete.request'
 

@@ -1,5 +1,5 @@
 import { lotRepository } from '~~/server/repositories/lot.repository'
-import { lotService } from '~~/server/services/lot'
+import { lotService } from '~~/server/services/lot.service'
 import { updateImageOrderPolicy } from './index.post.policy'
 import { updateImageOrderRequest } from './index.post.request'
 

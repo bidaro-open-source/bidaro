@@ -1,6 +1,6 @@
 import { deleteSessionsPolicy } from '~~/server/api/profile/sessions/index.policy'
 import { deleteSessionsRequest } from '~~/server/api/profile/sessions/index.request'
-import { deleteAuthenticationSessions } from '~~/server/services/authentication'
+import { authService } from '~~/server/services/authentication.service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const sessions = await deleteAuthenticationSessions(
+  const sessions = await authService.deleteAuthenticationSessions(
     user.id,
     request.body.uuids,
   )

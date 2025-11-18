@@ -1,15 +1,12 @@
 import { userRepository } from '~~/server/repositories/user.repository'
 import { createProfileResource } from '~~/server/resources/profile.resource'
-import {
-  getAuthenticationSession,
-  updateAuthenticationSession,
-} from '~~/server/services/authentication'
+import { authService } from '~~/server/services/authentication.service'
 import { refreshRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
   const request = await refreshRequest(event)
 
-  const oldSession = await getAuthenticationSession(request.body.refresh_token)
+  const oldSession = await authService.getAuthenticationSession(request.body.refresh_token)
 
   if (!oldSession) {
     deleteRefreshTokenCookie(event)
@@ -32,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const metadata = createRequestMeta(event)
 
-  const session = await updateAuthenticationSession(
+  const session = await authService.updateAuthenticationSession(
     request.body.refresh_token,
     metadata,
   )

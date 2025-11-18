@@ -3,7 +3,7 @@ import { roles } from '~~/server/constants'
 import { roleRepository } from '~~/server/repositories/role.repository'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { createProfileResource } from '~~/server/resources/profile.resource'
-import { createAuthenticationSession } from '~~/server/services/authentication'
+import { authService } from '~~/server/services/authentication.service'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
 
   const metadata = createRequestMeta(event)
 
-  const session = await createAuthenticationSession(user.id, metadata)
+  const session = await authService.createAuthenticationSession(user.id, metadata)
 
   setRefreshTokenCookie(event, session.refreshToken)
 

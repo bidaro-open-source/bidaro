@@ -2,15 +2,12 @@ import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import {
-  deletePasswordResetToken,
-  getUserIdByResetToken,
-} from '~~/server/services/profile-recovery'
+import { profileRecoveryService } from '~~/server/services/profile-recovery.service'
 
 export default defineEventHandler(async (event) => {
   const request = await confirmResetPasswordRequest(event)
 
-  const uid = await getUserIdByResetToken(request.body.token)
+  const uid = await profileRecoveryService.getUserIdByResetToken(request.body.token)
 
   if (!uid) {
     throw createError({
@@ -34,5 +31,5 @@ export default defineEventHandler(async (event) => {
 
   await userRepository.save(user)
 
-  await deletePasswordResetToken(request.body.token)
+  await profileRecoveryService.deletePasswordResetToken(request.body.token)
 })

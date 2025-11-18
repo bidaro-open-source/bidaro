@@ -1,7 +1,4 @@
-import {
-  deleteAuthenticationSession,
-  getAuthenticationSession,
-} from '~~/server/services/authentication'
+import { authService } from '~~/server/services/authentication.service'
 import { logoutRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -11,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await logoutRequest(event)
 
-  const session = await getAuthenticationSession(request.body.refresh_token)
+  const session = await authService.getAuthenticationSession(request.body.refresh_token)
 
   if (!session) {
     throw createError({
@@ -27,7 +24,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await deleteAuthenticationSession(session.uid, request.body.refresh_token)
+  await authService.deleteAuthenticationSession(session.uid, request.body.refresh_token)
 
   deleteRefreshTokenCookie(event)
 

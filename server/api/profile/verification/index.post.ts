@@ -1,16 +1,13 @@
-import {
-  createEmailVerificationToken,
-  deleteEmailVerificationTokenByUid,
-} from '~~/server/services/profile-verification'
+import { profileVerificationService } from '~~/server/services/profile-verification.service'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
   const user = getAuthenticatedUser(event)
 
-  await deleteEmailVerificationTokenByUid(user.id)
+  await profileVerificationService.deleteEmailVerificationTokenByUid(user.id)
 
-  const token = await createEmailVerificationToken(user.id)
+  const token = await profileVerificationService.createEmailVerificationToken(user.id)
 
   const config = useRuntimeConfig()
 
