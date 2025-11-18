@@ -17,7 +17,7 @@ async function getUserRequest(
   })
 }
 
-describe('get /api/users/:id', async () => {
+describe('GET /api/users/:id - Retrieve User Profile (Public and Authenticated)', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should return the correct structure', async () => {

@@ -20,7 +20,7 @@ async function updateCategoryRequest(
   })
 }
 
-describe('update category', async () => {
+describe('PATCH /api/categories/:id - Update Category and Cascade Path Changes', async () => {
   await setup({ host: env.SETUP_HOST })
 
   describe('should update a category', () => {

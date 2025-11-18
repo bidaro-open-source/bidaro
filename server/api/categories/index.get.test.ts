@@ -14,7 +14,7 @@ async function getCategoriesRequest() {
   })
 }
 
-describe('get root categories', async () => {
+describe('GET /api/categories - List Root Categories with Lot Counts', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should return correct structure', async () => {

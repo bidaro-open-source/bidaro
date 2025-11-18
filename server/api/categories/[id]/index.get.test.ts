@@ -15,7 +15,7 @@ async function getCategoryRequest(payload: GetCategoryRequest) {
   })
 }
 
-describe('get category', async () => {
+describe('GET /api/categories/:id - Retrieve Category with Children and Lot Counts', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should return correct structure', async () => {

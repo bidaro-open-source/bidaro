@@ -21,7 +21,7 @@ async function getLotImageRequest(
   })
 }
 
-describe('get images', async () => {
+describe('GET /api/lots/:id/images - Retrieve Lot Images with Ordering', async () => {
   await setup({ host: env.SETUP_HOST })
 
   const IMAGE_PATH = resolveImage('image-normal.png').path

@@ -23,7 +23,7 @@ async function uploadLotImageRequest(
   })
 }
 
-describe('create draft lot', async () => {
+describe('POST /api/lots/:id/images - Upload Lot Images with Validation', async () => {
   await setup({ host: env.SETUP_HOST })
 
   const IMAGE = 'image-normal.png'

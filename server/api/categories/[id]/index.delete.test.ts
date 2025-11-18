@@ -20,7 +20,7 @@ async function deleteCategoryRequest(
   })
 }
 
-describe('delete category', async () => {
+describe('DELETE /api/categories/:id - Remove Category with Constraint Validation', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should delete a category', async () => {

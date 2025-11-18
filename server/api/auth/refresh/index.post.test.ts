@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { refreshRequest } from '~~/test/api-e2e/requests/authentication'
 
-describe('refresh', async () => {
+describe('POST /api/auth/refresh - Token Refresh and Rotation', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should refresh session with refresh token in body', async () => {

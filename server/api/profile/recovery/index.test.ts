@@ -37,7 +37,7 @@ async function confirmResetPasswordRequest(
   })
 }
 
-describe('reset password', async () => {
+describe('POST /api/profile/recovery - Password Reset Flow with Token Validation', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should reset password', async () => {

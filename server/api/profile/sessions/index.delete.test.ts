@@ -20,7 +20,7 @@ async function deleteSessionsRequest(
   })
 }
 
-describe('session deleting', async () => {
+describe('DELETE /api/profile/sessions - Terminate User Sessions', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should delete session', async () => {

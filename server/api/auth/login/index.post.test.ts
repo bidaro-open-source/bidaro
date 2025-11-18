@@ -5,7 +5,7 @@ import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { loginRequest } from '~~/test/api-e2e/requests/authentication'
 
-describe('login', async () => {
+describe('POST /api/auth/login - User Authentication', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should login user', async () => {

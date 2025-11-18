@@ -24,7 +24,7 @@ async function destoryCategory(id: number) {
   return await db.Category.destroy({ where: { id } })
 }
 
-describe('create category', async () => {
+describe('POST /api/categories - Create Category with Validation and Authorization', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should create a category and return correct structure', async () => {

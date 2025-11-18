@@ -19,7 +19,7 @@ export async function destroyLot(id: number) {
   return (await db.Lot.findByPk(id))!.destroy()
 }
 
-describe('create draft lot', async () => {
+describe('POST /api/lots - Create Draft Lot', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should create a lot', async () => {
