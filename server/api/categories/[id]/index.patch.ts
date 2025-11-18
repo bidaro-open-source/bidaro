@@ -12,8 +12,5 @@ export default defineEventHandler(async (event) => {
 
   const updatedCategory = await categoryService.update(request.params.id, request.body)
 
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  const { children, countLots, ...other } = createCategoryResource(updatedCategory)
-
-  return other
+  return createCategoryResource(updatedCategory)
 })

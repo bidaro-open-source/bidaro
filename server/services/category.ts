@@ -93,6 +93,12 @@ export const categoryService = {
    * @returns category instance
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
+    await categoryService.checkSlugUnique(data.slug)
+
+    if (typeof data.parentId === 'number') {
+      await categoryService.checkParentExists(data.parentId)
+    }
+
     const transaction = await useDatabaseTransaction()
 
     try {

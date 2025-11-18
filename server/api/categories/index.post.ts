@@ -10,12 +10,6 @@ export default defineEventHandler(async (event) => {
 
   createCategoryPolicy(event)
 
-  await categoryService.checkSlugUnique(request.body.slug)
-
-  if (typeof request.body.parentId === 'number') {
-    await categoryService.checkParentExists(request.body.parentId)
-  }
-
   const category = await categoryService.create(request.body)
 
   setResponseStatus(event, 201)

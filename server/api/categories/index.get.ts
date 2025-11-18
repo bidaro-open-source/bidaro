@@ -7,7 +7,11 @@ export default defineEventHandler(async () => {
   return Promise.all(
     categories.map(async (category) => {
       const countLots = await categoryRepository.countLotsByPath(category.path)
-      return createCategoryResource(category, countLots)
+
+      return {
+        ...createCategoryResource(category),
+        countLots,
+      }
     }),
   )
 })
