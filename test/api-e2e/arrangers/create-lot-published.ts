@@ -2,7 +2,7 @@ import { lotStatuses } from '~~/server/constants'
 
 interface Options {
   sellerId: number
-  categoryId?: number | null
+  categoryId: number
 }
 
 /**
@@ -14,7 +14,7 @@ interface Options {
 export async function createPublishedLot(options: Options) {
   const lot = await db.LotFactory.new().create({
     sellerId: options.sellerId,
-    categoryId: options.categoryId ?? null,
+    categoryId: options.categoryId,
     statusName: lotStatuses.IN_TRADING_PROCESS,
     initialPrice: db.LotFactory.initialPrice,
     initialDuration: db.LotFactory.initialDuration,

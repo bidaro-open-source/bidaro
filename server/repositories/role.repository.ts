@@ -1,5 +1,4 @@
 import type { Transaction } from 'sequelize'
-import type { Role } from '../database'
 
 interface Options {
   transaction?: Transaction
@@ -9,14 +8,11 @@ export const roleRepository = {
   /**
    * Finds a role by their name.
    *
-   * Included models:
-   * - Permissions (all fields)
-   *
    * @param name - role primary key
    * @param options - sequelize options
    * @returns role or null if not found
    */
-  findByName(name: string, options: Options = {}): Promise<Role | null> {
+  async findByName(name: string, options: Options = {}) {
     const db = useDatabase()
 
     return db.Role.findByPk(name, {

@@ -29,9 +29,22 @@ export class LotFactory extends Factory<Lot> {
 
   protected definition(attr: PartialAttributes): CreationAttributes {
     const lot = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+    const lotStatus = attr.statusName ?? lotStatuses.DRAFT
 
     if (!attr.sellerId) {
       throw new Error('sellerId attribute in LotFactory is required')
+    }
+
+    if (lotStatus !== lotStatuses.DRAFT) {
+      if (!attr.effectiveDate) {
+        throw new Error('effectiveDate attribute in LotFactory is required for non-draft lots')
+      }
+      if (!attr.expirationDate) {
+        throw new Error('expirationDate attribute in LotFactory is required for non-draft lots')
+      }
+      if (!attr.categoryId) {
+        throw new Error('categoryId attribute in LotFactory is required for non-draft lots')
+      }
     }
 
     return {

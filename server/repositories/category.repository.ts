@@ -14,7 +14,7 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns Category instance or null if not found
    */
-  async findById(id: number, options: Options = {}): Promise<Category | null> {
+  async findById(id: number, options: Options = {}) {
     const db = useDatabase()
 
     return db.Category.findByPk(id, {
@@ -27,34 +27,13 @@ export const categoryRepository = {
   },
 
   /**
-   * Finds a category by their primary key or fail.
-   *
-   * @param id - category primary key
-   * @param options - sequelize options
-   * @returns Category instance or null if not found
-   * @throws - if category is not exists
-   */
-  async findByIdOrFail(id: number, options: Options = {}): Promise<Category> {
-    const category = await categoryRepository.findById(id, options)
-
-    if (!category) {
-      throw createError({
-        message: 'Категорію не знайдено',
-        status: 404,
-      })
-    }
-
-    return category
-  },
-
-  /**
    * Finds a category by their slug.
    *
    * @param slug - category slug
    * @param options - sequelize options
    * @returns Category instance or null if not found
    */
-  async findBySlug(slug: string, options: Options = {}): Promise<Category | null> {
+  async findBySlug(slug: string, options: Options = {}) {
     const db = useDatabase()
 
     return await db.Category.findOne({
@@ -68,34 +47,13 @@ export const categoryRepository = {
   },
 
   /**
-   * Finds a category by their slug or fail.
-   *
-   * @param slug - category slug
-   * @param options - sequelize options
-   * @returns Category instance or null if not found
-   * @throws - if category is not exists
-   */
-  async findBySlugOrFail(slug: string, options: Options = {}): Promise<Category> {
-    const category = await categoryRepository.findBySlug(slug, options)
-
-    if (!category) {
-      throw createError({
-        message: 'Категорію не знайдено',
-        status: 404,
-      })
-    }
-
-    return category
-  },
-
-  /**
    * Finds categories by their parent id.
    *
    * @param parentId - category parent id
    * @param options - sequelize options
    * @returns array of categories with given parent id
    */
-  async findAllByParentId(parentId: number | null, options: Options = {}): Promise<Category[]> {
+  async findAllByParentId(parentId: number | null, options: Options = {}) {
     const db = useDatabase()
 
     return await db.Category.findAll({
@@ -163,15 +121,13 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns category instance
    */
-  async create(fields: CategoryAttributesOptional, options: Options = {}): Promise<Category> {
+  async create(fields: CategoryAttributesOptional, options: Options = {}) {
     const db = useDatabase()
 
-    const category = await db.Category.create(
+    return await db.Category.create(
       fields,
       { transaction: options.transaction },
     )
-
-    return category
   },
 
   /**

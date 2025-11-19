@@ -63,26 +63,6 @@ export const lotRepository = {
    * @param options - sequelize options
    * @returns lot or null if not found
    */
-  async findByIdOrFail(id: number, options: Options = {}) {
-    const lot = await lotRepository.findById(id, options)
-
-    if (!lot) {
-      throw createError({
-        message: 'Лот не знайдено',
-        status: 404,
-      })
-    }
-
-    return lot
-  },
-
-  /**
-   * Finds a lot by their primary key with lock.
-   *
-   * @param id - lot primary key
-   * @param options - sequelize options
-   * @returns lot or null if not found
-   */
   async findByIdWithLock(id: number, options: Required<Options>) {
     const db = useDatabase()
 

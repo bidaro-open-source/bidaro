@@ -1,15 +1,17 @@
-import type { Image } from '../database'
-import { lotImageRepository } from '../repositories/lot-image.repository'
+import type { Lot } from '../database'
+import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../constants'
 import { lotRepository } from '../repositories/lot.repository'
+import { categoryService } from './category.service'
 
 export const lotService = {
   /**
    * Returns a lot instance or throw.
    *
    * @param id lot primary key
+   * @throws 404 when lot not found
    * @returns lot instance
    */
-  async getLotOrFail(id: number) {
+  async findByIdOrFail(id: number) {
     const lot = await lotRepository.findById(id)
 
     if (!lot) {
@@ -23,160 +25,107 @@ export const lotService = {
   },
 
   /**
-   * Attach images to lot by primary key.
+   * Creates a draft lot for the given seller.
    *
-   * @param id lot primary key
-   * @param images images instance
+   * @param sellerId seller primary key
+   * @returns created lot instance
    */
-  async attachImages(id: number, images: Image[]) {
-    const db = useDatabase()
-    const transaction = await useDatabaseTransaction()
-
-    const lot = await lotRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
+  async createDraftLot(sellerId: number) {
+    const lot = await lotRepository.create({
+      title: 'Чернетка',
+      initialPrice: 1,
+      initialDuration: lotInitialDurations.THREE_DAYS,
+      statusName: lotStatuses.DRAFT,
+      sellerId,
     })
 
-    if (!lot) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Лот не знайдено',
-        status: 404,
-      })
-    }
-
-    try {
-      const currentMaxOrder = await lotImageRepository.getMaxOrder(id, { transaction })
-
-      const linksToCreate = images.map((image, index) => ({
-        lotId: id,
-        imageId: image.id,
-        order: currentMaxOrder + 1 + index,
-      }))
-
-      await db.LotImage.bulkCreate(linksToCreate, { transaction })
-
-      await transaction.commit()
-    }
-    catch (error) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Не вдалося приєднати зображення до лотів',
-        status: 500,
-        cause: error,
-      })
-    }
+    return lot
   },
 
   /**
-   * Unattach images from lot by primary key.
+   * Updates a lot.
    *
-   * @param id lot primary key
-   * @param imageIds unsafe image primary keys
-   * @returns safe image primary keys which already unattached
+   * @param lot lot instance
+   * @param updates lot properies
+   * @throws 400 when lot is not editable
+   * @returns updated lot instance
    */
-  async unattachImages(id: number, imageIds: number[]) {
-    try {
-      const existingLinks = await lotImageRepository.findAllLinksByLotAndPks(id, imageIds)
+  async updateLot(lot: Lot, updates: Partial<Lot>) {
+    const editableStatuses: string[] = [lotStatuses.DRAFT, lotStatuses.IN_TRADING_PROCESS]
 
-      const safeLinkIds = existingLinks.map(link => link.id)
-      const safeImageIds = existingLinks.map(link => link.imageId)
-
-      await lotImageRepository.destoryByIds(safeLinkIds)
-
-      return safeImageIds
-    }
-    catch (error) {
+    if (!editableStatuses.includes(lot.statusName)) {
       throw createError({
-        message: 'Не вдалося відкріпити зображення',
-        status: 500,
-        cause: error,
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        message: 'Лот не може бути змінений у поточному статусі',
       })
     }
+
+    lot.title = updates.title ?? lot.title
+    lot.description = updates.description ?? lot.description
+
+    if (lot.statusName === lotStatuses.DRAFT) {
+      lot.initialPrice = updates.initialPrice ?? lot.initialPrice
+      lot.initialDuration = updates.initialDuration ?? lot.initialDuration
+    }
+
+    if (updates.categoryId) {
+      const category = await categoryService.findByIdOrFail(updates.categoryId)
+
+      lot.category = category
+      lot.categoryId = category.id
+    }
+
+    return await lotRepository.save(lot)
   },
 
   /**
-   * Atomically updates (fully "re-creates") the order of images for a lot.
+   * Publishes a lot.
    *
-   * This function performs deleting all old associations and creating new ones
-   * within a locked transaction to ensure atomicity and prevent race conditions.
-   *
-   * To work, it requires all image ids that this lot has.
-   *
-   * @throws 404 - if a lot not found
-   * @throws 422 - if was passed an incomplete array of image ids
-   * @throws 422 - if the imageIds contains foreign ids
-   *
-   * @param id lot primary key
-   * @param imageIds image ids in new order
+   * @param lot lot instance
+   * @throws 400 when lot category is not set
+   * @throws 400 when lot is already published
+   * @returns updated lot instance
    */
-  async updateImageOrder(id: number, imageIds: number[]) {
-    const transaction = await useDatabaseTransaction()
-
-    const lot = await lotRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!lot) {
-      await transaction.rollback()
-
+  async publishLot(lot: Lot) {
+    if (lot.statusName !== lotStatuses.DRAFT) {
       throw createError({
-        message: 'Лот не знайдено',
-        status: 404,
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        message: 'Лот вже опубліковано',
       })
     }
 
-    const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
-
-    const currentImageIds = new Set(currentLinks.map(link => link.imageId))
-    const newImageIds = new Set(imageIds)
-
-    const extraIds = newImageIds.difference(currentImageIds)
-    if (extraIds.size > 0) {
-      await transaction.rollback()
-
+    if (!lot.categoryId) {
       throw createError({
-        statusCode: 422,
-        message: 'Знайдено унікальні ідентифікатори, що не належать лоту ',
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        message: 'Категорія лоту не встановлена',
       })
     }
 
-    const missingIds = currentImageIds.difference(newImageIds)
-    if (missingIds.size > 0) {
-      await transaction.rollback()
+    lot.statusName = lotStatuses.IN_TRADING_PROCESS
+    lot.effectiveDate = new Date()
+    lot.expirationDate = new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration])
+    lot.currentPrice = lot.initialPrice
 
+    return await lotRepository.save(lot)
+  },
+
+  /**
+   * Deletes a lot.
+   *
+   * @throws 400 when lot is not in draft status
+   * @param lot lot instance
+   */
+  async deleteLot(lot: Lot) {
+    if (lot.statusName !== lotStatuses.DRAFT) {
       throw createError({
-        statusCode: 422,
-        message: 'Кількість унікальних ідентифікаторів не відповідає кількості зображень у лоті.',
+        message: 'Цей лот не може бути видалений, оскільки він вже опублікований',
+        status: 400,
       })
     }
 
-    try {
-      await lotImageRepository.destroyByLotId(id, { transaction })
-
-      const linksToCreate = imageIds.map((imageId, index) => {
-        return {
-          lotId: id,
-          order: index,
-          imageId,
-        }
-      })
-
-      await lotImageRepository.bulkCreate(linksToCreate, { transaction })
-
-      await transaction.commit()
-    }
-    catch (error) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Не вдалося оновити порядок зображень',
-        status: 500,
-        cause: error,
-      })
-    }
+    await lotRepository.destroy(lot.id)
   },
 }

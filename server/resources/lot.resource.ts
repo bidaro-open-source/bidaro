@@ -18,6 +18,15 @@ export function createLotResource(entity: Lot) {
           username: entity.winner.username,
         }
       : null,
+    category: entity.category
+      ? {
+          id: entity.category.id as number,
+          name: entity.category.displayName,
+          slug: entity.category.slug,
+          path: entity.category.path,
+        }
+      : null,
+    description: entity.description,
     images: entity.images,
     title: entity.title,
     initialPrice: entity.initialPrice,

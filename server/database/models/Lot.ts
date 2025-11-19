@@ -168,7 +168,7 @@ export function InitializeLot(database: DatabaseOptional) {
         allowNull: false,
         get() {
           // @ts-expect-error sequelize issue #8019
-          const value: string = this.getDataValue('initialAmount')
+          const value: string = this.getDataValue('initialPrice')
           return value === null ? null : parseFloat(value)
         },
       },

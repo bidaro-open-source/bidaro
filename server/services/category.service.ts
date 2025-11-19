@@ -1,9 +1,56 @@
+import type { Transaction } from 'sequelize'
 import type { Category, CategoryAttributesOptional } from '../database'
 import { v4 as uuidv4 } from 'uuid'
 import z from 'zod'
 import { categoryRepository } from '../repositories/category.repository'
 
+interface Options {
+  transaction?: Transaction
+}
+
 export const categoryService = {
+  /**
+   * Finds a category by their primary key or fail.
+   *
+   * @param id - category primary key
+   * @param options - sequelize options
+   * @returns Category instance or null if not found
+   * @throws - if category is not exists
+   */
+  async findByIdOrFail(id: number, options: Options = {}) {
+    const category = await categoryRepository.findById(id, options)
+
+    if (!category) {
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    return category
+  },
+
+  /**
+   * Finds a category by their slug or fail.
+   *
+   * @param slug - category slug
+   * @param options - sequelize options
+   * @returns Category instance or null if not found
+   * @throws - if category is not exists
+   */
+  async findBySlugOrFail(slug: string, options: Options = {}) {
+    const category = await categoryRepository.findBySlug(slug, options)
+
+    if (!category) {
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    return category
+  },
+
   /**
    * Checks if a category slug is unique.
    *
@@ -63,7 +110,7 @@ export const categoryService = {
    * @returns The parent category instance
    */
   async checkParentIsNotChildren(id: number, parentId: number) {
-    const parentCategory = await categoryRepository.findByIdOrFail(parentId)
+    const parentCategory = await categoryService.findByIdOrFail(parentId)
 
     if (parentCategory.path.split('/').map(Number).includes(id)) {
       const issues: z.ZodIssue[] = [{
@@ -141,7 +188,7 @@ export const categoryService = {
     const transaction = await useDatabaseTransaction()
 
     try {
-      const category = await categoryRepository.findByIdOrFail(id, { transaction })
+      const category = await categoryService.findByIdOrFail(id, { transaction })
 
       category.displayName = data.displayName ?? category.displayName
       category.description = data.description ?? category.description
@@ -195,7 +242,7 @@ export const categoryService = {
    * @throws 404 if the category does not exist
    */
   async delete(id: number) {
-    const category = await categoryRepository.findByIdOrFail(id)
+    const category = await categoryService.findByIdOrFail(id)
 
     const children = await categoryRepository.findAllByParentId(category.id)
 

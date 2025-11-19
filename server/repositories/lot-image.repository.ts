@@ -77,13 +77,13 @@ export const lotImageRepository = {
   },
 
   /**
-   * Get maximum 'order' value among lot-image links for a lot.
+   * Finds maximum 'order' value among lot-image links for a lot.
    *
    * @param lotId - Primary key of the lot.
    * @param options - sequelize options
    * @returns Promise resolving to the max order (returns 1 if none found).
    */
-  async getMaxOrder(lotId: number, options: Options = {}) {
+  async findMaxOrder(lotId: number, options: Options = {}) {
     const db = useDatabase()
 
     const result = await db.LotImage.findOne({
