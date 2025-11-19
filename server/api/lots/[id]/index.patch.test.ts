@@ -3,9 +3,9 @@ import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { lotInitialDurations } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
-import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
-import { createPublishedLot } from '~~/test/api-e2e/arrangers/create-lot-published'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
+import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function updateLotRequest(

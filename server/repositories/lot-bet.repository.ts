@@ -29,6 +29,29 @@ export const lotBetRepository = {
   },
 
   /**
+   * Finds the latest lot bet by lot id.
+   *
+   * @param lotId - lot primary key
+   * @param options - sequelize options
+   * @returns lot bet or null if not found
+   */
+  async findLatestByLotId(lotId: number, options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.LotBet.findOne({
+      transaction: options.transaction,
+      where: { lotId },
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: db.User,
+          as: 'user',
+        },
+      ],
+    })
+  },
+
+  /**
    * Creates a new lot bet record in the database.
    *
    * @param fields - bet attributes
