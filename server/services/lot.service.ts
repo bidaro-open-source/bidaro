@@ -1,5 +1,6 @@
 import type { Lot } from '../database'
 import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../constants'
+import { lotBetRepository } from '../repositories/lot-bet.repository'
 import { lotRepository } from '../repositories/lot.repository'
 import { categoryService } from './category.service'
 
@@ -108,6 +109,44 @@ export const lotService = {
     lot.effectiveDate = new Date()
     lot.expirationDate = new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration])
     lot.currentPrice = lot.initialPrice
+
+    return await lotRepository.save(lot)
+  },
+
+  /**
+   * Closes a lot.
+   *
+   * @param lot lot instance
+   * @throws 400 when lot is not in trading process status
+   * @throws 400 when lot expiration date is not reached
+   * @returns updated lot instance
+   */
+  async closeLot(lot: Lot) {
+    if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        message: 'Лот не може бути закритий у поточному статусі',
+      })
+    }
+
+    if (!lot.expirationDate || lot.expirationDate > new Date()) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        message: 'Лот не може бути закритий до завершення терміну дії',
+      })
+    }
+
+    const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
+
+    if (latestBet) {
+      lot.winnerId = latestBet.userId
+      lot.statusName = lotStatuses.IN_DISCUSSION_PROCESS
+    }
+    else {
+      lot.statusName = lotStatuses.REJECTED
+    }
 
     return await lotRepository.save(lot)
   },

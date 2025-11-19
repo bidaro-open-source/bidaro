@@ -2,8 +2,8 @@ import type { GetLotRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getLotRequest(payload: GetLotRequest) {
