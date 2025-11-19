@@ -17,6 +17,7 @@ export async function createPublishedLot(options: Options) {
     categoryId: options.categoryId,
     statusName: lotStatuses.IN_TRADING_PROCESS,
     initialPrice: db.LotFactory.initialPrice,
+    currentPrice: db.LotFactory.initialPrice,
     initialDuration: db.LotFactory.initialDuration,
     effectiveDate: new Date(),
     expirationDate: new Date(Date.now() + db.LotFactory.initialDurationInMs),

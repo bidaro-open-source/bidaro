@@ -20,6 +20,7 @@ export async function createReadyForClosingLot(options: Options) {
     statusName: lotStatuses.IN_TRADING_PROCESS,
     initialPrice: db.LotFactory.initialPrice,
     initialDuration: db.LotFactory.initialDuration,
+    currentPrice: db.LotFactory.initialPrice,
     effectiveDate: new Date(Date.now() - db.LotFactory.initialDurationInMs * 2),
     expirationDate: new Date(Date.now() - db.LotFactory.initialDurationInMs),
   })
@@ -32,6 +33,10 @@ export async function createReadyForClosingLot(options: Options) {
       userId: options.winnerId,
       amount: lot.initialPrice + 1000,
     })
+
+    lot.currentPrice = bet.amount
+
+    await lot.save()
   }
 
   const clear = async () => {
