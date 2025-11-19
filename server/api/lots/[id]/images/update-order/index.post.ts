@@ -1,4 +1,4 @@
-import { lotRepository } from '~~/server/repositories/lot.repository'
+import { lotImageService } from '~~/server/services/lot-image.service'
 import { lotService } from '~~/server/services/lot.service'
 import { updateImageOrderPolicy } from './index.post.policy'
 import { updateImageOrderRequest } from './index.post.request'
@@ -8,9 +8,9 @@ export default defineEventHandler(async (event) => {
 
   const request = await updateImageOrderRequest(event)
 
-  const lot = await lotRepository.findByIdOrFail(request.params.id)
+  const lot = await lotService.findByIdOrFail(request.params.id)
 
   updateImageOrderPolicy(event, lot)
 
-  await lotService.updateImageOrder(request.params.id, request.body.ids)
+  await lotImageService.updateImageOrder(request.params.id, request.body.ids)
 })

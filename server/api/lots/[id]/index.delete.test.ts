@@ -2,6 +2,7 @@ import type { GetLotRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createLot } from '~~/test/api-e2e/arrangers/create-lot'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/create-lot-published'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -53,7 +54,11 @@ describe('DELETE /api/lots/:id', async () => {
     it('should return 403 when the lot is alien', async () => {
       const uData1 = await createUser()
       const uData2 = await createUser({ withSession: true })
-      const lotData = await createPublishedLot({ sellerId: uData1.user.id })
+      const cData = await createCategory()
+      const lotData = await createPublishedLot({
+        sellerId: uData1.user.id,
+        categoryId: cData.category.id,
+      })
 
       const response = await deleteLotRequest(
         { params: { id: lotData.lot.id } },
@@ -63,6 +68,7 @@ describe('DELETE /api/lots/:id', async () => {
       expect(response.status).toBe(403)
 
       await lotData.clear()
+      await cData.clear()
       await uData2.clear()
       await uData1.clear()
     })
@@ -82,7 +88,11 @@ describe('DELETE /api/lots/:id', async () => {
 
     it('should return 400 when the lot is publish', async () => {
       const uData = await createUser({ withSession: true })
-      const lotData = await createPublishedLot({ sellerId: uData.user.id })
+      const cData = await createCategory()
+      const lotData = await createPublishedLot({
+        sellerId: uData.user.id,
+        categoryId: cData.category.id,
+      })
 
       const response = await deleteLotRequest(
         { params: { id: lotData.lot.id } },
@@ -92,6 +102,7 @@ describe('DELETE /api/lots/:id', async () => {
       expect(response.status).toBe(400)
 
       await lotData.clear()
+      await cData.clear()
       await uData.clear()
     })
   })
