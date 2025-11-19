@@ -152,6 +152,27 @@ export const lotService = {
   },
 
   /**
+   * Ships a lot.
+   *
+   * @param lot - lot instance
+   * @throws 400 when lot is not in discussion process status
+   * @returns updated lot instance
+   */
+  async shipLot(lot: Lot) {
+    if (lot.statusName !== lotStatuses.IN_DISCUSSION_PROCESS) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Bad Request',
+        message: 'Лот не може бути відправлений у поточному статусі',
+      })
+    }
+
+    lot.statusName = lotStatuses.IN_DELIVERY_PROCESS
+
+    return await lotRepository.save(lot)
+  },
+
+  /**
    * Deletes a lot.
    *
    * @throws 400 when lot is not in draft status
