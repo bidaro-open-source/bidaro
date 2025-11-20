@@ -37,20 +37,11 @@ export const categoryService = {
       keys.push(cacheKeys.childrenById(category.parentId))
     }
 
-    const cachedBreadcrumbsKeys1 = await redis.keys(
-      cacheKeys.breadcrumbsByPath(`*/${category.id}/*`),
+    const cachedBreadcrumbsKeys = await redis.keys(
+      cacheKeys.breadcrumbsByPath(`*`),
     )
-    keys.push(...cachedBreadcrumbsKeys1)
 
-    const cachedBreadcrumbsKeys2 = await redis.keys(
-      cacheKeys.breadcrumbsByPath(`${category.id}/*`),
-    )
-    keys.push(...cachedBreadcrumbsKeys2)
-
-    const cachedBreadcrumbsKeys3 = await redis.keys(
-      cacheKeys.breadcrumbsByPath(`*/${category.id}`),
-    )
-    keys.push(...cachedBreadcrumbsKeys3)
+    keys.push(...cachedBreadcrumbsKeys)
 
     await redis.del(keys)
   },
@@ -62,27 +53,12 @@ export const categoryService = {
    */
   async getRootCategories() {
     const db = useDatabase()
-    const redis = useRedis()
+
     const key = cacheKeys.root
 
-    const cachedData = await redis.get(key)
-
-    if (cachedData) {
-      try {
-        return db.Category.bulkBuild(JSON.parse(cachedData), { isNewRecord: false })
-      }
-      catch {
-        await redis.del(key)
-      }
-    }
-
-    const data = await categoryRepository.findAllByParentId(null)
-
-    const newCachedData = data.map(category => category.toJSON())
-
-    await redis.set(key, JSON.stringify(newCachedData))
-
-    return data
+    return await useDatabaseCache(key, db.Category, async () => {
+      return await categoryRepository.findAllByParentId(null)
+    })
   },
 
   /**
@@ -93,32 +69,20 @@ export const categoryService = {
    */
   async getById(id: number) {
     const db = useDatabase()
-    const redis = useRedis()
     const key = cacheKeys.byId(id)
 
-    const cachedData = await redis.get(key)
+    return await useDatabaseCache(key, db.Category, async () => {
+      const data = await categoryRepository.findById(id)
 
-    if (cachedData) {
-      try {
-        return db.Category.build(JSON.parse(cachedData), { isNewRecord: false })
+      if (!data) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
       }
-      catch {
-        await redis.del(key)
-      }
-    }
 
-    const data = await categoryRepository.findById(id)
-
-    if (!data) {
-      throw createError({
-        message: 'Категорію не знайдено',
-        status: 404,
-      })
-    }
-
-    await redis.set(key, JSON.stringify(data.toJSON()))
-
-    return data
+      return data
+    })
   },
 
   /**
@@ -129,32 +93,20 @@ export const categoryService = {
    */
   async getBySlug(slug: string) {
     const db = useDatabase()
-    const redis = useRedis()
     const key = cacheKeys.bySlug(slug)
 
-    const cachedData = await redis.get(key)
+    return await useDatabaseCache(key, db.Category, async () => {
+      const data = await categoryRepository.findBySlug(slug)
 
-    if (cachedData) {
-      try {
-        return db.Category.build(JSON.parse(cachedData), { isNewRecord: false })
+      if (!data) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
       }
-      catch {
-        await redis.del(key)
-      }
-    }
 
-    const data = await categoryRepository.findBySlug(slug)
-
-    if (!data) {
-      throw createError({
-        message: 'Категорію не знайдено',
-        status: 404,
-      })
-    }
-
-    await redis.set(key, JSON.stringify(data.toJSON()))
-
-    return data
+      return data
+    })
   },
 
   /**
@@ -165,27 +117,11 @@ export const categoryService = {
    */
   async getChildrenById(id: number) {
     const db = useDatabase()
-    const redis = useRedis()
     const key = cacheKeys.childrenById(id)
 
-    const cachedData = await redis.get(key)
-
-    if (cachedData) {
-      try {
-        return db.Category.bulkBuild(JSON.parse(cachedData), { isNewRecord: false })
-      }
-      catch {
-        await redis.del(key)
-      }
-    }
-
-    const data = await categoryRepository.findAllByParentId(id)
-
-    const newCachedData = data.map(category => category.toJSON())
-
-    await redis.set(key, JSON.stringify(newCachedData))
-
-    return data
+    return await useDatabaseCache(key, db.Category, async () => {
+      return await categoryRepository.findAllByParentId(id)
+    })
   },
 
   /**
@@ -196,31 +132,15 @@ export const categoryService = {
    */
   async getBreadcrumbsByPath(path: string) {
     const db = useDatabase()
-    const redis = useRedis()
     const key = cacheKeys.breadcrumbsByPath(path)
 
-    const cachedData = await redis.get(key)
+    return await useDatabaseCache(key, db.Category, async () => {
+      const ids = path.split('/')
 
-    if (cachedData) {
-      try {
-        return db.Category.bulkBuild(JSON.parse(cachedData), { isNewRecord: false })
-      }
-      catch {
-        await redis.del(key)
-      }
-    }
-
-    const ids = path.split('/')
-
-    const data = await Promise.all(
-      ids.map(id => categoryService.findByIdOrFail(Number(id))),
-    )
-
-    const newCachedData = data.map(category => category.toJSON())
-
-    await redis.set(key, JSON.stringify(newCachedData))
-
-    return data
+      return await Promise.all(
+        ids.map(id => categoryService.findByIdOrFail(Number(id))),
+      )
+    })
   },
 
   /**
@@ -548,8 +468,8 @@ export const categoryService = {
       })
     }
 
-    await categoryService.clearCache(category)
-
     await categoryRepository.destroy(category.id)
+
+    await categoryService.clearCache(category)
   },
 }
