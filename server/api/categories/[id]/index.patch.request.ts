@@ -1,5 +1,9 @@
 import z from 'zod'
-import { primaryKeySchema } from '~~/server/zod'
+import {
+  categoryDescriptionSchema,
+  categoryNameSchema,
+  primaryKeySchema,
+} from '~~/server/zod'
 
 export type UpdateCategoryRequest = ValidatorReturnType<typeof updateCategoryRequest>
 
@@ -8,7 +12,7 @@ export const updateCategoryRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    displayName: z.string().optional(),
-    description: z.string().optional(),
+    displayName: categoryNameSchema.optional(),
+    description: categoryDescriptionSchema.optional(),
   }),
 })
