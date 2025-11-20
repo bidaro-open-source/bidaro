@@ -20,7 +20,7 @@ async function updateLotRequest(
 }
 
 describe('PATCH /api/lots/:id', async () => {
-  await setup()
+  await setup({ host: process.env.SETUP_HOST })
 
   it('should update lot successfully and return the correct structure', async () => {
     const uData = await createUser({ withSession: true })
