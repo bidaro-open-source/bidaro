@@ -49,5 +49,6 @@ export function sendEmail(event: H3Event, payload: EmailSenderPayload) {
       subject: payload.subject,
       text: payload.template.text,
       html: payload.template.html,
+      textEncoding: 'quoted-printable',
     })
 }
