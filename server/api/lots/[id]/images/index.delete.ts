@@ -18,5 +18,5 @@ export default defineEventHandler(async (event) => {
     request.body.ids,
   )
 
-  return await imageService.destorySafely(unattachedImageIds)
+  return await imageService.destroySafely(unattachedImageIds)
 })
