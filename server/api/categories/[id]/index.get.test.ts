@@ -1,4 +1,4 @@
-import type { GetCategoryRequest } from './index.get.request'
+import type { GetCategoryRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -40,22 +40,20 @@ describe('GET /api/categories/:id', async () => {
     expect(response.status).toBe(200)
     expect(category.id).toBe(categoryData1.category.id)
     expect(category.slug).toBe(categoryData1.category.slug)
+    expect(category.path).toBe(categoryData1.category.path)
     expect(category.displayName).toBe(categoryData1.category.displayName)
     expect(category.description).toBe(categoryData1.category.description)
     expect(category.parentId).toBe(categoryData1.category.parentId)
-    expect(typeof category.countLots).toBe('number')
-    expect(category.countLots).toBe(2)
 
     expect(Array.isArray(category.children)).toBeTruthy()
     expect(category.children.length).toBe(1)
 
     expect(category.children[0]?.id).toBe(categoryData2.category.id)
     expect(category.children[0]?.slug).toBe(categoryData2.category.slug)
+    expect(category.children[0]?.path).toBe(categoryData2.category.path)
     expect(category.children[0]?.displayName).toBe(categoryData2.category.displayName)
     expect(category.children[0]?.description).toBe(categoryData2.category.description)
     expect(category.children[0]?.parentId).toBe(categoryData2.category.parentId)
-    expect(typeof category.children[0]?.countLots).toBe('number')
-    expect(category.children[0].countLots).toBe(1)
 
     await lotData2.clear()
     await lotData1.clear()

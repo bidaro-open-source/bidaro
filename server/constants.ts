@@ -8,6 +8,9 @@ export const permissions = {
   CREATE_CATEGORY: 'create_category',
   UPDATE_CATEGORY: 'update_category',
   DELETE_CATEGORY: 'delete_category',
+  VIEW_CATEGORY_COUNT: 'view_category_count',
+  UPDATE_CATEGORY_SLUG: 'update_category_slug',
+  UPDATE_CATEGORY_PARENT: 'update_category_parent',
 } as const
 
 export const lotStatuses = {

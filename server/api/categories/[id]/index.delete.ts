@@ -1,11 +1,11 @@
 import { categoryService } from '~~/server/services/category.service'
 import { deleteCateogryPolicy } from '../index.policy'
-import { deleteCategoryRequest } from './index.delete.request'
+import { getCategoryRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await deleteCategoryRequest(event)
+  const request = await getCategoryRequest(event)
 
   deleteCateogryPolicy(event)
 
