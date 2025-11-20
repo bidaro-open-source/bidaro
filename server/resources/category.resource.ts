@@ -12,3 +12,12 @@ export function createCategoryResource(entity: Category) {
     description: entity.description,
   }
 }
+
+export type CategoryBreadcrumbResource = ReturnType<typeof createCategoryResource>
+
+export function createCategoryBreadcrumbResource(entity: Category) {
+  return {
+    id: entity.id as number,
+    displayName: entity.displayName,
+  }
+}
