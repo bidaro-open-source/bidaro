@@ -15,7 +15,7 @@ async function getCategoryBreadcrumbsRequest(payload: GetCategoryRequest) {
 describe('GET /api/categories/:id/breadcrumbs', async () => {
   await setup({ host: env.SETUP_HOST })
 
-  it('should return category breadcrumbs', async () => {
+  it('should return category breadcrumbs with correct structure', async () => {
     const userData = await createUser()
 
     const categoryData1 = await createCategory()
@@ -23,19 +23,21 @@ describe('GET /api/categories/:id/breadcrumbs', async () => {
       parentId: categoryData1.category.id,
     })
 
-    const response = await getCategoryBreadcrumbsRequest(
-      { params: { id: categoryData2.category.id } },
-    )
+    for (let i = 0; i < 3; i++) {
+      const response = await getCategoryBreadcrumbsRequest(
+        { params: { id: categoryData2.category.id } },
+      )
 
-    const breadcrumbs = response._data
+      const breadcrumbs = response._data
 
-    expect(response.status).toBe(200)
-    expect(Array.isArray(breadcrumbs)).toBeTruthy()
-    expect(breadcrumbs.length).toBe(2)
-    expect(breadcrumbs[0].id).toBe(categoryData1.category.id)
-    expect(breadcrumbs[0].displayName).toBe(categoryData1.category.displayName)
-    expect(breadcrumbs[1].id).toBe(categoryData2.category.id)
-    expect(breadcrumbs[1].displayName).toBe(categoryData2.category.displayName)
+      expect(response.status).toBe(200)
+      expect(Array.isArray(breadcrumbs)).toBeTruthy()
+      expect(breadcrumbs.length).toBe(2)
+      expect(breadcrumbs[0].id).toBe(categoryData1.category.id)
+      expect(breadcrumbs[0].displayName).toBe(categoryData1.category.displayName)
+      expect(breadcrumbs[1].id).toBe(categoryData2.category.id)
+      expect(breadcrumbs[1].displayName).toBe(categoryData2.category.displayName)
+    }
 
     await categoryData2.clear()
     await categoryData1.clear()

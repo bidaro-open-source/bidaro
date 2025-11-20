@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   getCategoryCountPolicy(event)
 
-  const category = await categoryService.findByIdOrFail(request.params.id)
+  const category = await categoryService.getById(request.params.id)
   const countLots = await categoryRepository.countLotsByPath(category.path)
 
   return countLots

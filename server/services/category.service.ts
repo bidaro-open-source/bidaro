@@ -8,7 +8,189 @@ interface Options {
   transaction?: Transaction
 }
 
+const REDIS_CATEGORY_ROOT_KEY = 'categories:root'
+const REDIS_CATEGORY_ID_PREFIX = 'categories:id'
+const REDIS_CATEGORY_SLUG_PREFIX = 'categories:slug'
+const REDIS_CATEGORY_CHILDREN_PREFIX = 'categories:children:id'
+const REDIS_CATEGORY_BREADCRUMBS_PREFIX = 'categories:breadcrumbs'
+
 export const categoryService = {
+  /**
+   * Retrieves root categories, utilizing Redis caching.
+   *
+   * @returns array of category instances
+   */
+  async getRootCategories() {
+    const db = useDatabase()
+    const redis = useRedis()
+
+    const cachedData = await redis.get(REDIS_CATEGORY_ROOT_KEY)
+
+    if (cachedData) {
+      try {
+        return db.Category.bulkBuild(JSON.parse(cachedData), { isNewRecord: false })
+      }
+      catch {
+        await redis.del(REDIS_CATEGORY_ROOT_KEY)
+      }
+    }
+
+    const data = await categoryRepository.findAllByParentId(null)
+
+    const newCachedData = data.map(category => category.toJSON())
+
+    await redis.set(REDIS_CATEGORY_ROOT_KEY, JSON.stringify(newCachedData))
+
+    return data
+  },
+
+  /**
+   * Retrieves a category by ID, utilizing Redis caching.
+   *
+   * @throws 404 if the category does not exist
+   * @returns category instance
+   */
+  async getById(id: number) {
+    const db = useDatabase()
+    const redis = useRedis()
+
+    const cachedData = await redis.get(`${REDIS_CATEGORY_ID_PREFIX}:${id}`)
+
+    if (cachedData) {
+      try {
+        return db.Category.build(JSON.parse(cachedData), { isNewRecord: false })
+      }
+      catch {
+        await redis.del(`${REDIS_CATEGORY_ID_PREFIX}:${id}`)
+      }
+    }
+
+    const data = await categoryRepository.findById(id)
+
+    if (!data) {
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    await redis.set(`${REDIS_CATEGORY_ID_PREFIX}:${id}`, JSON.stringify(data.toJSON()))
+
+    return data
+  },
+
+  /**
+   * Retrieves a category by slug, utilizing Redis caching.
+   *
+   * @throws 404 if the category does not exist
+   * @returns category instance
+   */
+  async getBySlug(slug: string) {
+    const db = useDatabase()
+    const redis = useRedis()
+
+    const cachedData = await redis.get(`${REDIS_CATEGORY_SLUG_PREFIX}:${slug}`)
+
+    if (cachedData) {
+      try {
+        return db.Category.build(JSON.parse(cachedData), { isNewRecord: false })
+      }
+      catch {
+        await redis.del(`${REDIS_CATEGORY_SLUG_PREFIX}:${slug}`)
+      }
+    }
+
+    const data = await categoryRepository.findBySlug(slug)
+
+    if (!data) {
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    await redis.set(`${REDIS_CATEGORY_SLUG_PREFIX}:${slug}`, JSON.stringify(data.toJSON()))
+
+    return data
+  },
+
+  /**
+   * Retrieves a category childrens by ID, utilizing Redis caching.
+   *
+   * @throws 404 if the category does not exist
+   * @returns category instance
+   */
+  async getChildrenById(id: number) {
+    const db = useDatabase()
+    const redis = useRedis()
+
+    const cachedData = await redis.get(`${REDIS_CATEGORY_CHILDREN_PREFIX}:${id}`)
+
+    if (cachedData) {
+      try {
+        return db.Category.bulkBuild(JSON.parse(cachedData), { isNewRecord: false })
+      }
+      catch {
+        await redis.del(`${REDIS_CATEGORY_CHILDREN_PREFIX}:${id}`)
+      }
+    }
+
+    const data = await categoryRepository.findAllByParentId(id)
+
+    if (!data) {
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    const newCachedData = data.map(category => category.toJSON())
+
+    await redis.set(
+      `${REDIS_CATEGORY_CHILDREN_PREFIX}:${id}`,
+      JSON.stringify(newCachedData),
+    )
+
+    return data
+  },
+
+  /**
+   * Retrieves a categories from path, utilizing Redis caching.
+   *
+   * @param path category path
+   * @returns array of category instance
+   */
+  async getBreadcrumbsByPath(path: string) {
+    const db = useDatabase()
+    const redis = useRedis()
+
+    const cachedData = await redis.get(`${REDIS_CATEGORY_BREADCRUMBS_PREFIX}:${path}`)
+
+    if (cachedData) {
+      try {
+        return db.Category.bulkBuild(JSON.parse(cachedData), { isNewRecord: false })
+      }
+      catch {
+        await redis.del(`${REDIS_CATEGORY_BREADCRUMBS_PREFIX}:${path}`)
+      }
+    }
+
+    const ids = path.split('/')
+
+    const data = await Promise.all(
+      ids.map(id => categoryService.findByIdOrFail(Number(id))),
+    )
+
+    const newCachedData = data.map(category => category.toJSON())
+
+    await redis.set(
+      `${REDIS_CATEGORY_BREADCRUMBS_PREFIX}:${path}`,
+      JSON.stringify(newCachedData),
+    )
+
+    return data
+  },
+
   /**
    * Finds a category by their primary key or fail.
    *
@@ -19,27 +201,6 @@ export const categoryService = {
    */
   async findByIdOrFail(id: number, options: Options = {}) {
     const category = await categoryRepository.findById(id, options)
-
-    if (!category) {
-      throw createError({
-        message: 'Категорію не знайдено',
-        status: 404,
-      })
-    }
-
-    return category
-  },
-
-  /**
-   * Finds a category by their slug or fail.
-   *
-   * @param slug - category slug
-   * @param options - sequelize options
-   * @returns Category instance or null if not found
-   * @throws - if category is not exists
-   */
-  async findBySlugOrFail(slug: string, options: Options = {}) {
-    const category = await categoryRepository.findBySlug(slug, options)
 
     if (!category) {
       throw createError({
@@ -134,6 +295,8 @@ export const categoryService = {
    * @returns category instance
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
+    const redis = useRedis()
+
     await categoryService.checkSlugUnique(data.slug)
 
     if (typeof data.parentId === 'number') {
@@ -159,6 +322,13 @@ export const categoryService = {
         : `${category.id}`
 
       await category.save({ transaction })
+
+      if (category.parentId === null) {
+        await redis.del(REDIS_CATEGORY_ROOT_KEY)
+      }
+      else {
+        await redis.del(`${REDIS_CATEGORY_CHILDREN_PREFIX}:${category.parentId}`)
+      }
 
       await transaction.commit()
 
@@ -230,6 +400,7 @@ export const categoryService = {
    * @throws 422 if the slug is already taken
    */
   async updateSlug(id: number, slug: string) {
+    const redis = useRedis()
     const transaction = await useDatabaseTransaction()
 
     const category = await categoryRepository.findById(id, { transaction })
@@ -245,6 +416,7 @@ export const categoryService = {
     try {
       if (slug && slug !== category.slug) {
         await categoryService.checkSlugUnique(slug)
+        await redis.del(`${REDIS_CATEGORY_SLUG_PREFIX}:${category.slug}`)
         category.slug = slug
       }
 
@@ -271,6 +443,7 @@ export const categoryService = {
    * @throws 422 if the parent category is a child of the category itself
    */
   async updateParent(id: number, parentId: number | null) {
+    const redis = useRedis()
     const transaction = await useDatabaseTransaction()
 
     const category = await categoryRepository.findById(id, { transaction })
@@ -308,7 +481,16 @@ export const categoryService = {
         await categoryRepository.updatePaths(oldPath, newPath, { transaction })
       }
 
+      await redis.del(`${REDIS_CATEGORY_BREADCRUMBS_PREFIX}:${category.path}*`)
+
       const updatedCategory = await categoryRepository.save(category, { transaction })
+
+      if (category.parentId === null) {
+        await redis.del(REDIS_CATEGORY_ROOT_KEY)
+      }
+      else {
+        await redis.del(`${REDIS_CATEGORY_CHILDREN_PREFIX}:${category.parentId}`)
+      }
 
       await transaction.commit()
 
@@ -328,6 +510,7 @@ export const categoryService = {
    * @throws 404 if the category does not exist
    */
   async delete(id: number) {
+    const redis = useRedis()
     const category = await categoryService.findByIdOrFail(id)
 
     const children = await categoryRepository.findAllByParentId(category.id)
@@ -346,6 +529,16 @@ export const categoryService = {
         statusCode: 400,
         message: 'Не можна видалити категорію, яка має лоти',
       })
+    }
+
+    await redis.del(`${REDIS_CATEGORY_SLUG_PREFIX}:${category.slug}`)
+    await redis.del(`${REDIS_CATEGORY_CHILDREN_PREFIX}:${category.path}*`)
+
+    if (category.parentId === null) {
+      await redis.del(REDIS_CATEGORY_ROOT_KEY)
+    }
+    else {
+      await redis.del(`${REDIS_CATEGORY_CHILDREN_PREFIX}:${category.parentId}`)
     }
 
     await categoryRepository.destroy(category.id)
