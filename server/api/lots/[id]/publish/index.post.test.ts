@@ -112,5 +112,20 @@ describe('POST /api/lots/:id/publish', async () => {
       await cData.clear()
       await uData.clear()
     })
+
+    it('should return 400 when the lot have not category', async () => {
+      const uData = await createUser({ withSession: true })
+      const lotData = await createLot({ sellerId: uData.user.id })
+
+      const response = await publishLotRequest(
+        { params: { id: lotData.lot.id } },
+        { accessToken: uData.access_token },
+      )
+
+      expect(response.status).toBe(400)
+
+      await lotData.clear()
+      await uData.clear()
+    })
   })
 })

@@ -203,5 +203,20 @@ describe('PATCH /api/lots/:id', async () => {
       await lotData.clear()
       await uData.clear()
     })
+
+    it('should return 400 when category not exist', async () => {
+      const uData = await createUser({ withSession: true })
+      const lotData = await createLot({ sellerId: uData.user.id })
+
+      const response = await updateLotRequest(
+        { params: { id: lotData.lot.id }, body: { categoryId: 93475937459 } },
+        { accessToken: uData.access_token },
+      )
+
+      expect(response.status).toBe(400)
+
+      await lotData.clear()
+      await uData.clear()
+    })
   })
 })
