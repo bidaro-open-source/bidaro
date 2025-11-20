@@ -65,7 +65,7 @@ export const lotImageService = {
       const safeLinkIds = existingLinks.map(link => link.id)
       const safeImageIds = existingLinks.map(link => link.imageId)
 
-      await lotImageRepository.destoryByIds(safeLinkIds)
+      await lotImageRepository.destroyByIds(safeLinkIds)
 
       return safeImageIds
     }

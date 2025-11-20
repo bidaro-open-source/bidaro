@@ -121,7 +121,7 @@ export const lotImageRepository = {
    * @param linkIds - Array of LotImage primary keys to remove.
    * @returns Number of rows deleted.
    */
-  async destoryByIds(linkIds: number[]) {
+  async destroyByIds(linkIds: number[]) {
     const db = useDatabase()
 
     return await db.LotImage.destroy({

@@ -120,7 +120,7 @@ export const userRepository = {
   },
 
   /**
-   * Destorys a user record in the database.
+   * Destroys a user record in the database.
    *
    * @param user - user instance
    * @param options - sequelize options

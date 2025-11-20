@@ -108,7 +108,7 @@ export const imageService = {
    * @param imageId image primary key
    * @returns Image instance
    */
-  async destory(imageId: number) {
+  async destroy(imageId: number) {
     const result = await safeDeleteImage(imageId)
 
     if (!result.ok) {
@@ -126,7 +126,7 @@ export const imageService = {
    * @param imageIds image primary keys
    * @returns array of results
    */
-  async destorySafely(imageIds: number[]) {
+  async destroySafely(imageIds: number[]) {
     const deletionPromises = imageIds.map(id => safeDeleteImage(id))
 
     const results = await Promise.all(deletionPromises)

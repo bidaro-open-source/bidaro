@@ -85,6 +85,6 @@ export const up: Migration = async ({ context }) => {
 
 export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
-  // DONT'T REMOVE {} - THROWNS ERROR
+  // DON'T REMOVE {} - THROWNS ERROR
   await queryInterface.dropTable('lots', {})
 }

@@ -47,7 +47,7 @@ export const lotService = {
    * Updates a lot.
    *
    * @param lot lot instance
-   * @param updates lot properies
+   * @param updates lot properties
    * @throws 400 when lot is not editable
    * @returns updated lot instance
    */
@@ -84,8 +84,8 @@ export const lotService = {
    * Publishes a lot.
    *
    * @param lot lot instance
-   * @throws 400 when lot category is not set
    * @throws 400 when lot is already published
+   * @throws 400 when lot category is not set
    * @returns updated lot instance
    */
   async publishLot(lot: Lot) {

@@ -103,7 +103,7 @@ export const lotRepository = {
   },
 
   /**
-   * Destorys a lot record in the database.
+   * Destroys a lot record in the database.
    *
    * @param lotId - lot primary key
    * @param options - sequelize options

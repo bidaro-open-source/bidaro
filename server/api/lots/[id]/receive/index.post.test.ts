@@ -107,7 +107,7 @@ describe('POST /api/lots/:id/receive', async () => {
       await uData.clear()
     })
 
-    it('should return 400 when the lot is not in the process of discussion', async () => {
+    it('should return 400 when the lot is not in the process of delivery', async () => {
       const uData = await createUser()
       const uuData = await createUser({ withSession: true })
       const cData = await createCategory()

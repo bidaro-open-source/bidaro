@@ -18,7 +18,7 @@ async function createCategoryRequest(
   })
 }
 
-async function destoryCategory(id: number) {
+async function destroyCategory(id: number) {
   return await db.Category.destroy({ where: { id } })
 }
 
@@ -49,7 +49,7 @@ describe('POST /api/categories', async () => {
     expect(category.description).toBe(null)
     expect(category.parentId).toBe(null)
 
-    await destoryCategory(category.id)
+    await destroyCategory(category.id)
     await userData.clear()
   })
 
@@ -75,7 +75,7 @@ describe('POST /api/categories', async () => {
     expect(category.path).toBe(`${categoryData.category.path}/${category.id}`)
     expect(category.parentId).toBe(categoryData.category.id)
 
-    await destoryCategory(category.id)
+    await destroyCategory(category.id)
     await categoryData.clear()
     await userData.clear()
   })
@@ -114,7 +114,7 @@ describe('POST /api/categories', async () => {
 
         expect(response.status).toBe(201)
 
-        await destoryCategory(category.id)
+        await destroyCategory(category.id)
         await userData.clear()
       },
     )
