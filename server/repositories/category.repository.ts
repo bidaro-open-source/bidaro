@@ -1,8 +1,9 @@
-import type { Transaction } from 'sequelize'
+import type { LOCK, Transaction } from 'sequelize'
 import type { Category, CategoryAttributesOptional } from '../database/models/Category'
 import { Op, QueryTypes } from 'sequelize'
 
 interface Options {
+  lock?: LOCK
   transaction?: Transaction
 }
 
@@ -18,6 +19,22 @@ export const categoryRepository = {
     const db = useDatabase()
 
     return db.Category.findByPk(id, {
+      transaction: options.transaction,
+    })
+  },
+
+  /**
+   * Finds a category by their primary key.
+   *
+   * @param id - category primary key
+   * @param options - sequelize options
+   * @returns Category instance or null if not found
+   */
+  async findByIdWithLock(id: number, options: Required<Options>) {
+    const db = useDatabase()
+
+    return db.Category.findByPk(id, {
+      lock: options.lock,
       transaction: options.transaction,
     })
   },

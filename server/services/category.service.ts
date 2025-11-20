@@ -1,7 +1,6 @@
 import type { Transaction } from 'sequelize'
 import type { Category, CategoryAttributesOptional } from '../database'
 import { v4 as uuidv4 } from 'uuid'
-import z from 'zod'
 import { categoryRepository } from '../repositories/category.repository'
 
 interface Options {
@@ -165,105 +164,42 @@ export const categoryService = {
   },
 
   /**
-   * Checks if a category slug is unique.
-   *
-   * @param slug - The slug to check for uniqueness
-   * @throws 422 if the slug is already taken
-   * @returns The category instance if found
-   */
-  async checkSlugUnique(slug: string) {
-    const categoryBySlug = await categoryRepository.findBySlug(slug)
-
-    if (categoryBySlug) {
-      const issues: z.ZodIssue[] = [{
-        code: 'custom',
-        path: ['slug'],
-        message: 'Слаг вже зайнят',
-      }]
-
-      throw createError({
-        statusCode: 422,
-        message: 'Неправильні дані запиту',
-        data: new z.ZodError(issues).flatten(),
-      })
-    }
-  },
-
-  /**
-   * Checks if a category parent exists.
-   *
-   * @param parentId - The ID of the parent category to check
-   * @throws 422 if the parent category does not exist
-   * @returns The parent category instance
-   */
-  async checkParentExists(parentId: number) {
-    const parentCategory = await categoryRepository.findById(parentId)
-
-    if (!parentCategory) {
-      const issues: z.ZodIssue[] = [{
-        code: 'custom',
-        path: ['parentId'],
-        message: 'Батьківська категорія не знайдена',
-      }]
-
-      throw createError({
-        statusCode: 422,
-        message: 'Неправильні дані запиту',
-        data: new z.ZodError(issues).flatten(),
-      })
-    }
-  },
-
-  /**
-   * Checks that the parent category is not a child of the category itself.
-   *
-   * @param id - The ID of the category
-   * @param parentId - The ID of the parent category
-   * @throws 422 if the parent category is a child of the category itself
-   * @returns The parent category instance
-   */
-  async checkParentIsNotChildren(id: number, parentId: number) {
-    const parentCategory = await categoryService.findByIdOrFail(parentId)
-
-    if (parentCategory.path.split('/').map(Number).includes(id)) {
-      const issues: z.ZodIssue[] = [{
-        code: 'custom',
-        path: ['parentId'],
-        message: 'Батьківська категорія не може бути нащадком цієї категорії',
-      }]
-
-      throw createError({
-        statusCode: 422,
-        message: 'Неправильні дані запиту',
-        data: new z.ZodError(issues).flatten(),
-      })
-    }
-  },
-
-  /**
    * Creates a new category.
    *
    * @param data - category data
    * @returns category instance
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
-    await categoryService.checkSlugUnique(data.slug)
+    const categoryBySlug = await categoryRepository.findBySlug(data.slug)
 
-    if (typeof data.parentId === 'number') {
-      await categoryService.checkParentExists(data.parentId)
+    if (categoryBySlug) {
+      throw createError({
+        statusCode: 422,
+        message: 'Слаг вже зайнят',
+      })
     }
 
     const transaction = await useDatabaseTransaction()
 
-    try {
-      const parentCategory = data.parentId
-        ? await categoryRepository.findById(data.parentId, { transaction })
-        : null
+    let parentCategory: Category | null = null
 
+    if (data.parentId) {
+      parentCategory = await categoryRepository.findById(data.parentId, { transaction })
+
+      if (!parentCategory) {
+        await transaction.rollback()
+        throw createError({
+          message: 'Батьківську категорію не знайдено',
+          status: 422,
+        })
+      }
+    }
+
+    try {
       const category = await categoryRepository.create({
-        ...data,
         parentId: undefined,
         path: uuidv4(),
+        ...data,
       }, { transaction })
 
       category.parentId = parentCategory ? parentCategory.id : null
@@ -302,11 +238,13 @@ export const categoryService = {
   async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
     const transaction = await useDatabaseTransaction()
 
-    const category = await categoryRepository.findById(id, { transaction })
+    const category = await categoryRepository.findByIdWithLock(id, {
+      lock: transaction.LOCK.UPDATE,
+      transaction,
+    })
 
     if (!category) {
       await transaction.rollback()
-
       throw createError({
         message: 'Категорію не знайдено',
         status: 404,
@@ -349,7 +287,10 @@ export const categoryService = {
   async updateSlug(id: number, slug: string) {
     const transaction = await useDatabaseTransaction()
 
-    const category = await categoryRepository.findById(id, { transaction })
+    const category = await categoryRepository.findByIdWithLock(id, {
+      lock: transaction.LOCK.UPDATE,
+      transaction,
+    })
 
     if (!category) {
       await transaction.rollback()
@@ -359,12 +300,25 @@ export const categoryService = {
       })
     }
 
+    if (category.slug === slug) {
+      await transaction.commit()
+      return category
+    }
+
+    const categoryBySlug = await categoryRepository.findBySlug(slug)
+
+    if (categoryBySlug) {
+      await transaction.rollback()
+      throw createError({
+        statusCode: 422,
+        message: 'Слаг вже зайнят',
+      })
+    }
+
     try {
-      if (slug && slug !== category.slug) {
-        await categoryService.checkSlugUnique(slug)
-        await categoryService.clearCache(category)
-        category.slug = slug
-      }
+      await categoryService.clearCache(category)
+
+      category.slug = slug
 
       const updatedCategory = await categoryRepository.save(category, { transaction })
 
@@ -374,7 +328,13 @@ export const categoryService = {
     }
     catch (error) {
       await transaction.rollback()
-      throw error
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Unprocessable Content',
+        message: 'Невідома помилка під час оновлення слагу категорії',
+        data: error,
+      })
     }
   },
 
@@ -391,7 +351,10 @@ export const categoryService = {
   async updateParent(id: number, parentId: number | null) {
     const transaction = await useDatabaseTransaction()
 
-    const category = await categoryRepository.findById(id, { transaction })
+    const category = await categoryRepository.findByIdWithLock(id, {
+      lock: transaction.LOCK.UPDATE,
+      transaction,
+    })
 
     if (!category) {
       await transaction.rollback()
@@ -401,30 +364,43 @@ export const categoryService = {
       })
     }
 
-    try {
-      const parentIsPassed = typeof parentId === 'number' || typeof parentId === 'object'
-      const parentIsSame = parentId === category.parentId
-      const parentIsId = typeof parentId === 'number'
+    if (category.parentId === parentId) {
+      await transaction.commit()
+      return category
+    }
 
-      if (parentIsPassed && !parentIsSame) {
-        let parentCategory: Category | null = null
+    let parentCategory: Category | null = null
 
-        if (parentIsId) {
-          await categoryService.checkParentExists(parentId as number)
-          await categoryService.checkParentIsNotChildren(category.id, parentId as number)
-          parentCategory = await categoryRepository.findById(parentId as number, { transaction })
-        }
+    if (parentId) {
+      parentCategory = await categoryRepository.findById(parentId, { transaction })
 
-        const oldPath = category.path
-        const newPath = parentCategory
-          ? `${parentCategory.path}/${category.id}`
-          : `${category.id}`
-
-        category.path = newPath
-        category.parentId = parentIsId ? parentId as number : null
-
-        await categoryRepository.updatePaths(oldPath, newPath, { transaction })
+      if (!parentCategory) {
+        await transaction.rollback()
+        throw createError({
+          message: 'Батьківську категорію не знайдено',
+          status: 422,
+        })
       }
+
+      if (parentCategory.path.split('/').map(Number).includes(id)) {
+        await transaction.rollback()
+        throw createError({
+          message: 'Батьківська категорія не може бути нащадком цієї категорії',
+          status: 422,
+        })
+      }
+    }
+
+    try {
+      const oldPath = category.path
+      const newPath = parentCategory
+        ? `${parentCategory.path}/${category.id}`
+        : `${category.id}`
+
+      category.path = newPath
+      category.parentId = parentId
+
+      await categoryRepository.updatePaths(oldPath, newPath, { transaction })
 
       const updatedCategory = await categoryRepository.save(category, { transaction })
 
@@ -432,11 +408,21 @@ export const categoryService = {
 
       await categoryService.clearCache(category)
 
+      if (parentCategory) {
+        await categoryService.clearCache(parentCategory)
+      }
+
       return updatedCategory
     }
     catch (error) {
       await transaction.rollback()
-      throw error
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Unprocessable Content',
+        message: 'Невідома помилка під час оновлення батьківської категорії',
+        data: error,
+      })
     }
   },
 
@@ -448,28 +434,57 @@ export const categoryService = {
    * @throws 404 if the category does not exist
    */
   async delete(id: number) {
-    const category = await categoryService.findByIdOrFail(id)
+    const transaction = await useDatabaseTransaction()
 
-    const children = await categoryRepository.findAllByParentId(category.id)
+    const category = await categoryRepository.findByIdWithLock(id, {
+      lock: transaction.LOCK.UPDATE,
+      transaction,
+    })
+
+    if (!category) {
+      await transaction.rollback()
+      throw createError({
+        statusCode: 404,
+        message: 'Категорію не знайдено',
+      })
+    }
+
+    const children = await categoryRepository.findAllByParentId(category.id, { transaction })
 
     if (children.length > 0) {
+      await transaction.rollback()
       throw createError({
         statusCode: 400,
         message: 'Не можна видалити категорію, яка має дочірні категорії',
       })
     }
 
-    const lotsCount = await categoryRepository.countLotsByPath(category.path)
+    const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
 
     if (lotsCount > 0) {
+      await transaction.rollback()
       throw createError({
         statusCode: 400,
         message: 'Не можна видалити категорію, яка має лоти',
       })
     }
 
-    await categoryRepository.destroy(category.id)
+    try {
+      await categoryRepository.destroy(category.id, { transaction })
 
-    await categoryService.clearCache(category)
+      await transaction.commit()
+
+      await categoryService.clearCache(category)
+    }
+    catch (error) {
+      await transaction.rollback()
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Unprocessable Content',
+        message: 'Невідома помилка під час видалення категорії',
+        data: error,
+      })
+    }
   },
 }
