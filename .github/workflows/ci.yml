@@ -14,6 +14,8 @@ on:
       - develop
 
 env:
+  SETUP_MAILER_PORT: 8025
+
   NUXT_DB_CONNECTION: postgres
   NUXT_DB_HOST: localhost
   NUXT_DB_PORT: 5432
@@ -48,6 +50,8 @@ env:
   NUXT_PASSWORD_HASH_ROUNDS: 1
   NUXT_PASSWORD_RESET_TTL: 86400
   NUXT_PASSWORD_RESET_SIZE: 128
+
+  NUXT_EMAIL_TOKEN_SIZE: 64
 
 jobs:
   ci:
@@ -85,6 +89,7 @@ jobs:
         image: mailhog/mailhog:latest
         ports:
           - 1025:1025
+          - 8025:8025
 
     steps:
       - name: Checkout repository

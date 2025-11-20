@@ -37,7 +37,7 @@ describe('POST /api/profile/verification', async () => {
     const match = content.match(regex)
     const token = match ? match[1] : null
 
-    expect(token).toBeDefined()
+    expect(typeof token).toBe('string')
 
     const confirmResponse = await confirmVerificationRequest({ body: { token } })
 
@@ -82,7 +82,7 @@ describe('POST /api/profile/verification', async () => {
       const match = content.match(regex)
       const token = match ? match[1] : null
 
-      expect(token).toBeDefined()
+      expect(typeof token).toBe('string')
 
       await data.clear()
 
