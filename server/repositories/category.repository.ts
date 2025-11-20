@@ -19,10 +19,6 @@ export const categoryRepository = {
 
     return db.Category.findByPk(id, {
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
     })
   },
 
@@ -39,10 +35,6 @@ export const categoryRepository = {
     return await db.Category.findOne({
       where: { slug },
       transaction: options.transaction,
-      include: {
-        model: db.Category,
-        as: 'children',
-      },
     })
   },
 

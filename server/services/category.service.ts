@@ -182,33 +182,119 @@ export const categoryService = {
    * @param id - The ID of the category to update
    * @param data - The data to update
    * @returns The updated category instance
-   * @throws 422 if the slug is already taken or parent category does not exist
+   * @throws 404 if the category does not exist
    */
-  async update(id: number, data: Partial<Omit<CategoryAttributesOptional, 'path'>>) {
+  async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
     const transaction = await useDatabaseTransaction()
 
-    try {
-      const category = await categoryService.findByIdOrFail(id, { transaction })
+    const category = await categoryRepository.findById(id, { transaction })
 
+    if (!category) {
+      await transaction.rollback()
+
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    try {
       category.displayName = data.displayName ?? category.displayName
       category.description = data.description ?? category.description
 
-      if (data.slug && data.slug !== category.slug) {
-        await categoryService.checkSlugUnique(data.slug)
-        category.slug = data.slug
+      const updatedCategory = await categoryRepository.save(category, { transaction })
+
+      await transaction.commit()
+
+      return updatedCategory
+    }
+    catch (error) {
+      await transaction.rollback()
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Unprocessable Content',
+        message: 'Невідома помилка під час оновлення категорії',
+        data: error,
+      })
+    }
+  },
+
+  /**
+   * Updates category paths when parent changes.
+   *
+   * @param id - category primary key
+   * @param slug - new category slug
+   * @returns updated category instance
+   * @throws 404 if the category does not exist
+   * @throws 422 if the slug is already taken
+   */
+  async updateSlug(id: number, slug: string) {
+    const transaction = await useDatabaseTransaction()
+
+    const category = await categoryRepository.findById(id, { transaction })
+
+    if (!category) {
+      await transaction.rollback()
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    try {
+      if (slug && slug !== category.slug) {
+        await categoryService.checkSlugUnique(slug)
+        category.slug = slug
       }
 
-      const parentIsPassed = typeof data.parentId === 'number' || typeof data.parentId === 'object'
-      const parentIsSame = data.parentId === category.parentId
-      const parentIsId = typeof data.parentId === 'number'
+      const updatedCategory = await categoryRepository.save(category, { transaction })
+
+      await transaction.commit()
+
+      return updatedCategory
+    }
+    catch (error) {
+      await transaction.rollback()
+      throw error
+    }
+  },
+
+  /**
+   * Updates category parent.
+   *
+   * @param id - category primary key
+   * @param parentId - parent category id or null
+   * @returns updated category instance
+   * @throws 404 if the category does not exist
+   * @throws 422 if the parent category does not exist
+   * @throws 422 if the parent category is a child of the category itself
+   */
+  async updateParent(id: number, parentId: number | null) {
+    const transaction = await useDatabaseTransaction()
+
+    const category = await categoryRepository.findById(id, { transaction })
+
+    if (!category) {
+      await transaction.rollback()
+      throw createError({
+        message: 'Категорію не знайдено',
+        status: 404,
+      })
+    }
+
+    try {
+      const parentIsPassed = typeof parentId === 'number' || typeof parentId === 'object'
+      const parentIsSame = parentId === category.parentId
+      const parentIsId = typeof parentId === 'number'
 
       if (parentIsPassed && !parentIsSame) {
         let parentCategory: Category | null = null
 
         if (parentIsId) {
-          await categoryService.checkParentExists(data.parentId as number)
-          await categoryService.checkParentIsNotChildren(category.id, data.parentId as number)
-          parentCategory = await categoryRepository.findById(data.parentId as number, { transaction })
+          await categoryService.checkParentExists(parentId as number)
+          await categoryService.checkParentIsNotChildren(category.id, parentId as number)
+          parentCategory = await categoryRepository.findById(parentId as number, { transaction })
         }
 
         const oldPath = category.path
@@ -217,7 +303,7 @@ export const categoryService = {
           : `${category.id}`
 
         category.path = newPath
-        category.parentId = parentIsId ? data.parentId as number : null
+        category.parentId = parentIsId ? parentId as number : null
 
         await categoryRepository.updatePaths(oldPath, newPath, { transaction })
       }

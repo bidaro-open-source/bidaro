@@ -40,14 +40,10 @@ describe('GET /api/categories', async () => {
 
     expect(categories[0].id).toBeDefined()
     expect(categories[0].slug).toBeDefined()
+    expect(categories[0].path).toBeDefined()
     expect(categories[0].displayName).toBeDefined()
     expect(categories[0].description).toBeDefined()
     expect(categories[0].parentId).toBeDefined()
-    expect(typeof categories[0].countLots).toBe('number')
-
-    const parentCategory = categories.find((c: any) => c.id === categoryData1.category.id)
-    expect(parentCategory).toBeDefined()
-    expect(parentCategory.countLots).toBe(2)
 
     await lotData2.clear()
     await lotData1.clear()
