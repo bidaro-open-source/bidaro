@@ -1,8 +1,8 @@
 import type { Lot } from '../database'
 import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../constants'
+import { categoryRepository } from '../repositories/category.repository'
 import { lotBetRepository } from '../repositories/lot-bet.repository'
 import { lotRepository } from '../repositories/lot.repository'
-import { categoryService } from './category.service'
 
 export const lotService = {
   /**
@@ -49,6 +49,7 @@ export const lotService = {
    * @param lot lot instance
    * @param updates lot properties
    * @throws 400 when lot is not editable
+   * @throws 400 when category does not exist
    * @returns updated lot instance
    */
   async updateLot(lot: Lot, updates: Partial<Lot>) {
@@ -71,7 +72,14 @@ export const lotService = {
     }
 
     if (updates.categoryId) {
-      const category = await categoryService.findByIdOrFail(updates.categoryId)
+      const category = await categoryRepository.findById(updates.categoryId)
+
+      if (!category) {
+        throw createError({
+          statusCode: 400,
+          message: 'Вказана категорія не існує',
+        })
+      }
 
       lot.category = category
       lot.categoryId = category.id

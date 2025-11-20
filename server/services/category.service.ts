@@ -1,11 +1,6 @@
-import type { Transaction } from 'sequelize'
 import type { Category, CategoryAttributesOptional } from '../database'
 import { v4 as uuidv4 } from 'uuid'
 import { categoryRepository } from '../repositories/category.repository'
-
-interface Options {
-  transaction?: Transaction
-}
 
 const cacheKeys = {
   root: 'categories:root',
@@ -137,30 +132,20 @@ export const categoryService = {
       const ids = path.split('/')
 
       return await Promise.all(
-        ids.map(id => categoryService.findByIdOrFail(Number(id))),
+        ids.map(async (id) => {
+          const category = await categoryRepository.findById(Number(id))
+
+          if (!category) {
+            throw createError({
+              message: 'Категорія була змінена або видалена',
+              status: 500,
+            })
+          }
+
+          return category
+        }),
       )
     })
-  },
-
-  /**
-   * Finds a category by their primary key or fail.
-   *
-   * @param id - category primary key
-   * @param options - sequelize options
-   * @returns Category instance or null if not found
-   * @throws - if category is not exists
-   */
-  async findByIdOrFail(id: number, options: Options = {}) {
-    const category = await categoryRepository.findById(id, options)
-
-    if (!category) {
-      throw createError({
-        message: 'Категорію не знайдено',
-        status: 404,
-      })
-    }
-
-    return category
   },
 
   /**
