@@ -84,7 +84,7 @@ describe('GET /api/categories/:id/count', async () => {
       await userData.clear()
     })
 
-    it('should return 403 when user lacks required permission ', async () => {
+    it('should return 403 when user lacks required permission', async () => {
       const categoryData = await createCategory()
       const userData = await createUser({
         withRole: true,

@@ -3,7 +3,6 @@ import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getCategoriesRequest() {
@@ -20,33 +19,23 @@ describe('GET /api/categories', async () => {
       parentId: categoryData1.category.id,
     })
 
-    const lotData1 = await createLot({
-      sellerId: userData.user.id,
-      categoryId: categoryData1.category.id,
-    })
+    for (let i = 0; i < 3; i++) {
+      const response = await getCategoriesRequest()
 
-    const lotData2 = await createLot({
-      sellerId: userData.user.id,
-      categoryId: categoryData2.category.id,
-    })
+      const categories = response._data
 
-    const response = await getCategoriesRequest()
+      expect(response.status).toBe(200)
 
-    const categories = response._data
+      expect(Array.isArray(categories)).toBeTruthy()
 
-    expect(response.status).toBe(200)
+      expect(categories[0].id).toBeDefined()
+      expect(categories[0].slug).toBeDefined()
+      expect(categories[0].path).toBeDefined()
+      expect(categories[0].displayName).toBeDefined()
+      expect(categories[0].description).toBeDefined()
+      expect(categories[0].parentId).toBeDefined()
+    }
 
-    expect(Array.isArray(categories)).toBeTruthy()
-
-    expect(categories[0].id).toBeDefined()
-    expect(categories[0].slug).toBeDefined()
-    expect(categories[0].path).toBeDefined()
-    expect(categories[0].displayName).toBeDefined()
-    expect(categories[0].description).toBeDefined()
-    expect(categories[0].parentId).toBeDefined()
-
-    await lotData2.clear()
-    await lotData1.clear()
     await categoryData2.clear()
     await categoryData1.clear()
     await userData.clear()
