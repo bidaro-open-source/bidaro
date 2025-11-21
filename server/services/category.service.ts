@@ -14,30 +14,36 @@ export const categoryService = {
   /**
    * Clears cache for a category.
    *
-   * @param category category instance
+   * @param instance category instance or array of category instances
    */
-  async clearCache(category: Category) {
+  async clearCache(instance: (Category | null) | (Category | null)[]) {
     const redis = useRedis()
+    const categories = Array.isArray(instance) ? instance : [instance]
+    const keys = new Set<string>()
 
-    const keys = [
-      cacheKeys.byId(category.id),
-      cacheKeys.bySlug(category.slug),
-    ]
+    for (const category of categories) {
+      if (!category)
+        continue
 
-    if (category.parentId === null) {
-      keys.push(cacheKeys.root)
-    }
-    else {
-      keys.push(cacheKeys.childrenById(category.parentId))
+      keys.add(cacheKeys.byId(category.id))
+      keys.add(cacheKeys.bySlug(category.slug))
+
+      if (typeof category.parentId === 'object')
+        keys.add(cacheKeys.root)
+
+      if (typeof category.parentId === 'number')
+        keys.add(cacheKeys.childrenById(category.parentId))
     }
 
     const cachedBreadcrumbsKeys = await redis.keys(
       cacheKeys.breadcrumbsByPath(`*`),
     )
 
-    keys.push(...cachedBreadcrumbsKeys)
+    for (const key of cachedBreadcrumbsKeys) {
+      keys.add(key)
+    }
 
-    await redis.del(keys)
+    await redis.del([...keys])
   },
 
   /**
@@ -182,23 +188,27 @@ export const categoryService = {
 
     try {
       const category = await categoryRepository.create({
-        parentId: undefined,
+        parentId: null,
         path: uuidv4(),
         ...data,
       }, { transaction })
 
-      category.parentId = parentCategory ? parentCategory.id : null
-      category.path = parentCategory
+      const parentId = parentCategory ? parentCategory.id : null
+      const path = parentCategory
         ? `${parentCategory.path}/${category.id}`
         : `${category.id}`
 
-      await categoryRepository.save(category, { transaction })
+      const updatedCategory = await categoryRepository.updateById(
+        category.id,
+        { parentId, path },
+        { transaction },
+      )
 
       await transaction.commit()
 
-      await categoryService.clearCache(category)
+      await categoryService.clearCache(updatedCategory)
 
-      return category
+      return updatedCategory
     }
     catch (error) {
       await transaction.rollback()
@@ -237,10 +247,14 @@ export const categoryService = {
     }
 
     try {
-      category.displayName = data.displayName ?? category.displayName
-      category.description = data.description ?? category.description
-
-      const updatedCategory = await categoryRepository.save(category, { transaction })
+      const updatedCategory = await categoryRepository.updateById(
+        category.id,
+        {
+          displayName: data.displayName ?? category.displayName,
+          description: data.description ?? category.description,
+        },
+        { transaction },
+      )
 
       await transaction.commit()
 
@@ -301,13 +315,17 @@ export const categoryService = {
     }
 
     try {
-      await categoryService.clearCache(category)
-
       category.slug = slug
 
-      const updatedCategory = await categoryRepository.save(category, { transaction })
+      const updatedCategory = await categoryRepository.updateById(
+        category.id,
+        { slug },
+        { transaction },
+      )
 
       await transaction.commit()
+
+      await categoryService.clearCache([category, updatedCategory])
 
       return updatedCategory
     }
@@ -349,15 +367,15 @@ export const categoryService = {
       })
     }
 
-    await categoryRepository.findAllByPathWithLock(category.path, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
     if (category.parentId === parentId) {
       await transaction.commit()
       return category
     }
+
+    const children = await categoryRepository.findAllByPathWithLock(category.path, {
+      lock: transaction.LOCK.UPDATE,
+      transaction,
+    })
 
     let parentCategory: Category | null = null
 
@@ -387,20 +405,25 @@ export const categoryService = {
         ? `${parentCategory.path}/${category.id}`
         : `${category.id}`
 
-      category.path = newPath
-      category.parentId = parentId
-
       await categoryRepository.updatePaths(oldPath, newPath, { transaction })
 
-      const updatedCategory = await categoryRepository.save(category, { transaction })
+      const updatedCategory = await categoryRepository.updateById(
+        category.id,
+        {
+          path: newPath,
+          parentId,
+        },
+        { transaction },
+      )
 
       await transaction.commit()
 
-      await categoryService.clearCache(category)
-
-      if (parentCategory) {
-        await categoryService.clearCache(parentCategory)
-      }
+      await categoryService.clearCache([
+        category,
+        updatedCategory,
+        parentCategory,
+        ...children,
+      ])
 
       return updatedCategory
     }
@@ -460,7 +483,7 @@ export const categoryService = {
     }
 
     try {
-      await categoryRepository.destroy(category.id, { transaction })
+      await categoryRepository.destroyById(category.id, { transaction })
 
       await transaction.commit()
 

@@ -161,13 +161,30 @@ export const categoryRepository = {
   },
 
   /**
-   * Save a changed category in the database.
+   * Updates a category by their primary key.
    *
-   * @param category - category instance
+   * @param id - category primary key
+   * @param fields - fields to update
    * @param options - sequelize options
+   * @returns updated category instance
    */
-  async save(category: Category, options: Options = {}) {
-    return await category.save({ transaction: options.transaction })
+  async updateById(
+    id: number,
+    fields: Partial<Category>,
+    options: Options = {},
+  ) {
+    const db = useDatabase()
+
+    const [_, [category]] = await db.Category.update(
+      fields,
+      {
+        where: { id },
+        transaction: options.transaction,
+        returning: true,
+      },
+    )
+
+    return category
   },
 
   /**
@@ -177,7 +194,7 @@ export const categoryRepository = {
    * @param options - sequelize options
    * @returns category instance
    */
-  async destroy(id: number, options: Options = {}) {
+  async destroyById(id: number, options: Options = {}) {
     const db = useDatabase()
 
     return await db.Category.destroy({
