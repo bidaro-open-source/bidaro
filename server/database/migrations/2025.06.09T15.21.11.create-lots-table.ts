@@ -65,7 +65,7 @@ export const up: Migration = async ({ context }) => {
       },
       currentPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: true,
+        allowNull: false,
       },
       createdAt: {
         type: DataTypes.DATE,

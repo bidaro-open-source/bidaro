@@ -33,7 +33,7 @@ export class Lot extends Model<LotAttributes, LotCreationAttributes> {
   declare expirationDate: Date | null
   declare initialDuration: string
   declare initialPrice: number
-  declare currentPrice: number | null
+  declare currentPrice: number
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date | null>
 
@@ -174,7 +174,7 @@ export function InitializeLot(database: DatabaseOptional) {
       },
       currentPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: true,
+        allowNull: false,
         get() {
           // @ts-expect-error sequelize issue #8019
           const value: string | null = this.getDataValue('currentPrice')

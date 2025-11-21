@@ -35,6 +35,7 @@ export const lotService = {
     const lot = await lotRepository.create({
       title: 'Чернетка',
       initialPrice: 1,
+      currentPrice: 1,
       initialDuration: lotInitialDurations.THREE_DAYS,
       statusName: lotStatuses.DRAFT,
       sellerId,
@@ -155,7 +156,6 @@ export const lotService = {
         statusName: lotStatuses.IN_TRADING_PROCESS,
         effectiveDate: new Date(),
         expirationDate: new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration]),
-        currentPrice: lot.initialPrice,
       }, { transaction })
     })
   },

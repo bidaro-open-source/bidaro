@@ -45,7 +45,7 @@ export const lotBetService = {
         })
       }
 
-      if (!lot.currentPrice || lot.currentPrice >= amount) {
+      if (lot.currentPrice >= amount) {
         throw createError({
           statusCode: 400,
           message: 'Ставка повинна бути більшою за поточну ціну лоту',
