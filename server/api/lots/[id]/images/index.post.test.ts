@@ -103,7 +103,7 @@ describe('POST /api/lots/:id/images', async () => {
       const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(
-        { multipart, params: { id: 945395394 } },
+        { multipart, params: { id: 93475937459 } },
         { accessToken: userData.access_token },
       )
 

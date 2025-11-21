@@ -77,7 +77,7 @@ describe('DELETE /api/lots/:id', async () => {
       const uData = await createUser({ withSession: true })
 
       const response = await deleteLotRequest(
-        { params: { id: 123456 } },
+        { params: { id: 93475937459 } },
         { accessToken: uData.access_token },
       )
 

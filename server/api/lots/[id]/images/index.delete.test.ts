@@ -70,7 +70,7 @@ describe('DELETE /api/lots/:id/images', async () => {
       const userData = await createUser({ withSession: true })
 
       const response = await deleteLotImageRequest(
-        { body: { ids: [1] }, params: { id: 945395394 } },
+        { body: { ids: [1] }, params: { id: 93475937459 } },
         { accessToken: userData.access_token },
       )
 

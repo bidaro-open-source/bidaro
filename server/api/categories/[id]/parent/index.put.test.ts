@@ -140,7 +140,7 @@ describe('PUT /api/categories/:id/parent', async () => {
       const response = await updateCategoryParentRequest(
         {
           body: { parentId: null },
-          params: { id: 5345345 },
+          params: { id: 93475937459 },
         },
         { accessToken: userData.access_token },
       )
@@ -182,7 +182,7 @@ describe('PUT /api/categories/:id/parent', async () => {
 
       const response = await updateCategoryParentRequest(
         {
-          body: { parentId: 99999923533 },
+          body: { parentId: 93475937459 },
           params: { id: categoryData.category.id },
         },
         { accessToken: userData.access_token },
