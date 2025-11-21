@@ -6,6 +6,8 @@ import type { ModelStatic } from 'sequelize'
  * @param key - The cache key to store/retrieve the data.
  * @param model  - The Sequelize model type for building instances.
  * @param fetcher - A function that fetches the data if not present in cache.
+ * @param options - Additional options for the cache.
+ * @param options.ttl - Time to live for the cached data in seconds (default is 24 hours).
  * @returns The cached or freshly fetched data as model instances.
  */
 export async function useDatabaseCache<
@@ -15,6 +17,7 @@ export async function useDatabaseCache<
   key: string,
   model: Model,
   fetcher: () => Promise<ModelReturn>,
+  options: { ttl?: number } = {},
 ): Promise<ModelReturn> {
   const redis = useRedis()
 
@@ -31,6 +34,7 @@ export async function useDatabaseCache<
   }
   catch (error) {
     await redis.del(key)
+    // TODO: add logger
   }
 
   const data = await fetcher()
@@ -41,10 +45,10 @@ export async function useDatabaseCache<
       : data.toJSON()
 
     try {
-      await redis.set(key, JSON.stringify(newCachedData))
+      await redis.set(key, JSON.stringify(newCachedData), 'EX', options.ttl ?? 60 * 60 * 24)
     }
     catch {
-      // ignore caching errors
+      // TODO: add logger
     }
   }
 
