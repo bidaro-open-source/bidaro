@@ -90,7 +90,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uData1.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(400)
 
       await lotData.clear()
       await cData.clear()

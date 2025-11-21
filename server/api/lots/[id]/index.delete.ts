@@ -11,5 +11,5 @@ export default defineEventHandler(async (event) => {
 
   deleteLotPolicy(event, lot)
 
-  await lotService.deleteLot(lot)
+  await lotService.delete(request.params.id)
 })

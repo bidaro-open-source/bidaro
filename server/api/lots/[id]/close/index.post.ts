@@ -12,9 +12,7 @@ export default defineEventHandler(async (event) => {
 
   closeLotPolicy(event, lot)
 
-  const updatedLot = await lotService.closeLot(lot)
-
-  await updatedLot.reload()
+  const updatedLot = await lotService.close(request.params.id)
 
   return createLotResource(updatedLot)
 })

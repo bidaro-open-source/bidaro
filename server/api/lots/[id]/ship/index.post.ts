@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   shipLotPolicy(event, lot)
 
-  const updatedLot = await lotService.shipLot(lot)
+  const updatedLot = await lotService.ship(request.params.id)
 
   return createLotResource(updatedLot)
 })
