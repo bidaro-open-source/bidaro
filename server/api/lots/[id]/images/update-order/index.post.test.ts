@@ -80,7 +80,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
       const userData = await createUser({ withSession: true })
 
       const response = await updateImageOrderRequest(
-        { body: { ids: [1] }, params: { id: 945395394 } },
+        { body: { ids: [1] }, params: { id: 93475937459 } },
         { accessToken: userData.access_token },
       )
 

@@ -100,7 +100,7 @@ describe('PUT /api/categories/:id/slug', async () => {
       const response = await updateCategoryRequest(
         {
           body: { slug: uuidv4() },
-          params: { id: 5345345 },
+          params: { id: 93475937459 },
         },
         { accessToken: userData.access_token },
       )

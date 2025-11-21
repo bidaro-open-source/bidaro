@@ -98,7 +98,7 @@ describe('POST /api/lots/:id/receive', async () => {
       const uData = await createUser({ withSession: true })
 
       const response = await receiveLotRequest(
-        { params: { id: 123456 } },
+        { params: { id: 93475937459 } },
         { accessToken: uData.access_token },
       )
 

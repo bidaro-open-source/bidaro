@@ -49,7 +49,7 @@ describe('GET /api/categories/:id/breadcrumbs', async () => {
       const userData = await createUser()
 
       const response = await getCategoryBreadcrumbsRequest(
-        { params: { id: 5345345 } },
+        { params: { id: 93475937459 } },
       )
 
       expect(response.status).toBe(404)

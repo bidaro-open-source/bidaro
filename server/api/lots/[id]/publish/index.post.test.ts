@@ -84,7 +84,7 @@ describe('POST /api/lots/:id/publish', async () => {
       const uData = await createUser({ withSession: true })
 
       const response = await publishLotRequest(
-        { params: { id: 123456 } },
+        { params: { id: 93475937459 } },
         { accessToken: uData.access_token },
       )
 

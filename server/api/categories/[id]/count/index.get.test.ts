@@ -75,7 +75,7 @@ describe('GET /api/categories/:id/count', async () => {
       })
 
       const response = await getCategoryCountRequest(
-        { params: { id: 5345345 } },
+        { params: { id: 93475937459 } },
         { accessToken: userData.access_token },
       )
 

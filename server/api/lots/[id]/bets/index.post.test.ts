@@ -101,7 +101,7 @@ describe('POST /api/lots/:id/bets', async () => {
       const uData = await createUser({ withSession: true })
 
       const response = await createLotBetRequest(
-        { body: { amount: 203994 }, params: { id: 123456 } },
+        { body: { amount: 203994 }, params: { id: 93475937459 } },
         { accessToken: uData.access_token },
       )
 

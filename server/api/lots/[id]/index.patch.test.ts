@@ -131,11 +131,11 @@ describe('PATCH /api/lots/:id', async () => {
       await uData1.clear()
     })
 
-    it('should return 404 when a lot is not exists', async () => {
+    it('should return 404 when a lot is not exist', async () => {
       const uData = await createUser({ withSession: true })
 
       const response = await updateLotRequest(
-        { params: { id: 93838393 }, body: { title: 'UpdatedTitle' } },
+        { params: { id: 93475937459 }, body: { title: 'UpdatedTitle' } },
         { accessToken: uData.access_token },
       )
 

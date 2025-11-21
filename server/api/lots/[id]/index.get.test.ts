@@ -44,7 +44,7 @@ describe('GET /api/lots/:id', async () => {
   describe('error handling', () => {
     it('should return 404 when lot does not exist', async () => {
       const response = await getLotRequest(
-        { params: { id: 123456 } },
+        { params: { id: 93475937459 } },
       )
 
       expect(response.status).toBe(404)

@@ -102,7 +102,7 @@ describe('PATCH /api/categories/:id', async () => {
       const response = await updateCategoryRequest(
         {
           body: { displayName: 'new value' },
-          params: { id: 5345345 },
+          params: { id: 93475937459 },
         },
         { accessToken: userData.access_token },
       )
