@@ -10,24 +10,19 @@ export const lotImageService = {
    * @param images images instance
    */
   async attachImages(id: number, images: Image[]) {
-    const db = useDatabase()
-    const transaction = await useDatabaseTransaction()
-
-    const lot = await lotRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!lot) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Лот не знайдено',
-        status: 404,
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    try {
+      if (!lot) {
+        throw createError({
+          message: 'Лот не знайдено',
+          status: 404,
+        })
+      }
+
       const currentMaxOrder = await lotImageRepository.findMaxOrder(id, { transaction })
 
       const linksToCreate = images.map((image, index) => ({
@@ -36,19 +31,8 @@ export const lotImageService = {
         order: currentMaxOrder + 1 + index,
       }))
 
-      await db.LotImage.bulkCreate(linksToCreate, { transaction })
-
-      await transaction.commit()
-    }
-    catch (error) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Не вдалося приєднати зображення до лотів',
-        status: 500,
-        cause: error,
-      })
-    }
+      await lotImageRepository.bulkCreate(linksToCreate, { transaction })
+    })
   },
 
   /**
@@ -59,23 +43,14 @@ export const lotImageService = {
    * @returns safe image primary keys which already unattached
    */
   async unattachImages(id: number, imageIds: number[]) {
-    try {
-      const existingLinks = await lotImageRepository.findAllLinksByLotAndPks(id, imageIds)
+    const existingLinks = await lotImageRepository.findAllLinksByLotAndPks(id, imageIds)
 
-      const safeLinkIds = existingLinks.map(link => link.id)
-      const safeImageIds = existingLinks.map(link => link.imageId)
+    const safeLinkIds = existingLinks.map(link => link.id)
+    const safeImageIds = existingLinks.map(link => link.imageId)
 
-      await lotImageRepository.destroyByIds(safeLinkIds)
+    await lotImageRepository.destroyByIds(safeLinkIds)
 
-      return safeImageIds
-    }
-    catch (error) {
-      throw createError({
-        message: 'Не вдалося відкріпити зображення',
-        status: 500,
-        cause: error,
-      })
-    }
+    return safeImageIds
   },
 
   /**
@@ -94,48 +69,40 @@ export const lotImageService = {
    * @param imageIds image ids in new order
    */
   async updateImageOrder(id: number, imageIds: number[]) {
-    const transaction = await useDatabaseTransaction()
-
-    const lot = await lotRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!lot) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Лот не знайдено',
-        status: 404,
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
+      if (!lot) {
+        throw createError({
+          message: 'Лот не знайдено',
+          status: 404,
+        })
+      }
 
-    const currentImageIds = new Set(currentLinks.map(link => link.imageId))
-    const newImageIds = new Set(imageIds)
+      const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
 
-    const extraIds = newImageIds.difference(currentImageIds)
-    if (extraIds.size > 0) {
-      await transaction.rollback()
+      const currentImageIds = new Set(currentLinks.map(link => link.imageId))
+      const newImageIds = new Set(imageIds)
 
-      throw createError({
-        statusCode: 422,
-        message: 'Знайдено унікальні ідентифікатори, що не належать лоту ',
-      })
-    }
+      const extraIds = newImageIds.difference(currentImageIds)
+      if (extraIds.size > 0) {
+        throw createError({
+          statusCode: 422,
+          message: 'Знайдено унікальні ідентифікатори, що не належать лоту ',
+        })
+      }
 
-    const missingIds = currentImageIds.difference(newImageIds)
-    if (missingIds.size > 0) {
-      await transaction.rollback()
+      const missingIds = currentImageIds.difference(newImageIds)
+      if (missingIds.size > 0) {
+        throw createError({
+          statusCode: 422,
+          message: 'Кількість унікальних ідентифікаторів не відповідає кількості зображень у лоті.',
+        })
+      }
 
-      throw createError({
-        statusCode: 422,
-        message: 'Кількість унікальних ідентифікаторів не відповідає кількості зображень у лоті.',
-      })
-    }
-
-    try {
       await lotImageRepository.destroyByLotId(id, { transaction })
 
       const linksToCreate = imageIds.map((imageId, index) => {
@@ -147,17 +114,6 @@ export const lotImageService = {
       })
 
       await lotImageRepository.bulkCreate(linksToCreate, { transaction })
-
-      await transaction.commit()
-    }
-    catch (error) {
-      await transaction.rollback()
-
-      throw createError({
-        message: 'Не вдалося оновити порядок зображень',
-        status: 500,
-        cause: error,
-      })
-    }
+    })
   },
 }

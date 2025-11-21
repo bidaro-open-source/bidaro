@@ -11,22 +11,19 @@ export const userService = {
    * @throws 404 if user not found
    */
   async update(id: number, data: Pick<UserAttributesOptional, 'name' | 'surname'>) {
-    const transaction = await useDatabaseTransaction()
-
-    const user = await userRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!user) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 404,
-        message: 'Користувача не знайдено',
+    return await useDatabaseTransaction(async (transaction) => {
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    try {
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
+
       const name = Object.hasOwn(data, 'name') ? data.name : user.name
       const surname = Object.hasOwn(data, 'surname') ? data.surname : user.surname
 
@@ -39,18 +36,8 @@ export const userService = {
         { transaction },
       )
 
-      await transaction.commit()
-
       return updatedUser
-    }
-    catch (error) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 500,
-        message: 'Не вдалося оновити профіль користувача',
-        cause: error,
-      })
-    }
+    })
   },
 
   /**
@@ -63,55 +50,38 @@ export const userService = {
    * @throws 400 if email is already taken
    */
   async updateEmail(id: number, email: string) {
-    const transaction = await useDatabaseTransaction()
-
-    const user = await userRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!user) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 404,
-        message: 'Користувача не знайдено',
+    return await useDatabaseTransaction(async (transaction) => {
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    if (user.email === email) {
-      await transaction.commit()
-      return user
-    }
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
 
-    const userInDB = await userRepository.findByEmail(email, { transaction })
+      if (user.email === email) {
+        return user
+      }
 
-    if (userInDB) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 400,
-        message: 'Електронна пошта вже зайнята',
-      })
-    }
+      const userInDB = await userRepository.findByEmail(email, { transaction })
 
-    try {
-      const updatedUser = await userRepository.updateById(
+      if (userInDB) {
+        throw createError({
+          statusCode: 400,
+          message: 'Електронна пошта вже зайнята',
+        })
+      }
+
+      return await userRepository.updateById(
         id,
         { email, emailVerifiedAt: null },
         { transaction },
       )
-
-      await transaction.commit()
-
-      return updatedUser
-    }
-    catch (error) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 500,
-        message: 'Не вдалося оновити електронну пошту',
-        cause: error,
-      })
-    }
+    })
   },
 
   /**
@@ -123,42 +93,27 @@ export const userService = {
    * @throws 404 if user not found
    */
   async updatePassword(id: number, password: string) {
-    const transaction = await useDatabaseTransaction()
-
-    const user = await userRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!user) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 404,
-        message: 'Користувача не знайдено',
+    return await useDatabaseTransaction(async (transaction) => {
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    try {
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
+
       const hashedPassword = await hashPassword(password)
 
-      const updatedUser = await userRepository.updateById(
+      return await userRepository.updateById(
         id,
         { password: hashedPassword },
         { transaction },
       )
-
-      await transaction.commit()
-
-      return updatedUser
-    }
-    catch (error) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 500,
-        message: 'Не вдалося оновити пароль',
-        cause: error,
-      })
-    }
+    })
   },
 
   /**
@@ -169,40 +124,25 @@ export const userService = {
    * @throws 404 if user not found
    */
   async verifyEmail(id: number) {
-    const transaction = await useDatabaseTransaction()
-
-    const user = await userRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!user) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 404,
-        message: 'Користувача не знайдено',
+    return await useDatabaseTransaction(async (transaction) => {
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    try {
-      const updatedUser = await userRepository.updateById(
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
+
+      return await userRepository.updateById(
         id,
         { emailVerifiedAt: new Date() },
         { transaction },
       )
-
-      await transaction.commit()
-
-      return updatedUser
-    }
-    catch (error) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 500,
-        message: 'Не вдалося верифікувати електронну пошту',
-        cause: error,
-      })
-    }
+    })
   },
 
   /**
@@ -212,33 +152,20 @@ export const userService = {
    * @throws 404 if user not found
    */
   async deleteById(id: number) {
-    const transaction = await useDatabaseTransaction()
-
-    const user = await userRepository.findByIdWithLock(id, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-
-    if (!user) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 404,
-        message: 'Користувача не знайдено',
+    return await useDatabaseTransaction(async (transaction) => {
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    try {
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
+
       await userRepository.destroyById(id, { transaction })
-
-      await transaction.commit()
-    }
-    catch (error) {
-      await transaction.rollback()
-      throw createError({
-        statusCode: 500,
-        message: 'Не вдалося видалити користувача',
-        cause: error,
-      })
-    }
+    })
   },
 }
