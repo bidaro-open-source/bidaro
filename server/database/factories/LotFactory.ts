@@ -56,7 +56,7 @@ export class LotFactory extends Factory<Lot> {
       description: attr.description ?? null,
       initialPrice: attr.initialPrice ?? LotFactory.initialPrice,
       initialDuration: attr.initialDuration ?? LotFactory.initialDuration,
-      currentPrice: attr.currentPrice ?? null,
+      currentPrice: attr.currentPrice ?? attr.initialPrice ?? LotFactory.initialPrice,
       effectiveDate: attr.effectiveDate ?? null,
       expirationDate: attr.expirationDate ?? null,
     }
