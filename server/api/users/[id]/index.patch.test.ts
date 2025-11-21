@@ -107,7 +107,7 @@ describe('PATCH /api/users/:id', async () => {
       await userData.clear()
     })
 
-    it('should return 403 when updating another user\'s password', async () => {
+    it('should return 403 when updating another user', async () => {
       const userData1 = await createUser({
         withRole: true,
         withSession: true,
