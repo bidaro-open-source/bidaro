@@ -55,10 +55,7 @@ describe('PATCH /api/lots/:id', async () => {
     expect(updatedLot.description).toBe(updatedDescription)
     expect(updatedLot.initialDuration).toBe(updatedInitialDuration)
     expect(updatedLot.initialPrice).toBe(updatedInitialPrice)
-    expect(updatedLot.category?.id).toBe(cData.category.id)
-    expect(updatedLot.category?.name).toBe(cData.category.displayName)
-    expect(updatedLot.category?.slug).toBe(cData.category.slug)
-    expect(updatedLot.category?.path).toBe(cData.category.path)
+    expect(updatedLot.categoryId).toBe(cData.category.id)
 
     await lotData.clear()
     await cData.clear()

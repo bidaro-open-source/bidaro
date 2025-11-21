@@ -12,12 +12,14 @@ export function createLotResource(entity: Lot) {
           username: entity.seller.username,
         }
       : null,
+    winnerId: entity.winnerId,
     winner: entity.winner
       ? {
           id: entity.winner.id as number,
           username: entity.winner.username,
         }
       : null,
+    categoryId: entity.categoryId,
     category: entity.category
       ? {
           id: entity.category.id as number,

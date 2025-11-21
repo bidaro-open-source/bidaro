@@ -1,5 +1,5 @@
 import type { LOCK, Transaction } from 'sequelize'
-import type { Lot, LotAttributesOptional } from '../database'
+import type { LotAttributesOptional } from '../database'
 
 interface Options {
   lock?: LOCK
@@ -94,12 +94,24 @@ export const lotRepository = {
   /**
    * Save a chagned lot record in the database.
    *
-   * @param lot - lot instance
+   * @param id - lot primary key
+   * @param data - partial lot attributes to update
    * @param options - sequelize options
-   * @returns lot instance
+   * @returns updated lot instance
    */
-  async save(lot: Lot, options: Options = {}) {
-    return await lot.save({ transaction: options.transaction })
+  async updateById(id: number, data: Partial<LotAttributesOptional>, options: Options = {}) {
+    const db = useDatabase()
+
+    const [_, [lot]] = await db.Lot.update(
+      data,
+      {
+        where: { id },
+        transaction: options.transaction,
+        returning: true,
+      },
+    )
+
+    return lot
   },
 
   /**
@@ -108,7 +120,7 @@ export const lotRepository = {
    * @param lotId - lot primary key
    * @param options - sequelize options
    */
-  async destroy(lotId: number, options: Options = {}) {
+  async destroyById(lotId: number, options: Options = {}) {
     const db = useDatabase()
 
     return await db.Lot.destroy({

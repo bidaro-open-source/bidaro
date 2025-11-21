@@ -31,7 +31,7 @@ export const lotService = {
    * @param sellerId seller primary key
    * @returns created lot instance
    */
-  async createDraftLot(sellerId: number) {
+  async createDraft(sellerId: number) {
     const lot = await lotRepository.create({
       title: 'Чернетка',
       initialPrice: 1,
@@ -46,175 +46,273 @@ export const lotService = {
   /**
    * Updates a lot.
    *
-   * @param lot lot instance
+   * @param id lot primary key
    * @param updates lot properties
    * @throws 400 when lot is not editable
    * @throws 400 when category does not exist
    * @returns updated lot instance
    */
-  async updateLot(lot: Lot, updates: Partial<Lot>) {
-    const editableStatuses: string[] = [lotStatuses.DRAFT, lotStatuses.IN_TRADING_PROCESS]
-
-    if (!editableStatuses.includes(lot.statusName)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Лот не може бути змінений у поточному статусі',
+  async update(id: number, updates: Partial<Lot>) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    lot.title = updates.title ?? lot.title
-    lot.description = updates.description ?? lot.description
-
-    if (lot.statusName === lotStatuses.DRAFT) {
-      lot.initialPrice = updates.initialPrice ?? lot.initialPrice
-      lot.initialDuration = updates.initialDuration ?? lot.initialDuration
-    }
-
-    if (updates.categoryId) {
-      const category = await categoryRepository.findById(updates.categoryId)
-
-      if (!category) {
+      if (!lot) {
         throw createError({
-          statusCode: 400,
-          message: 'Вказана категорія не існує',
+          statusCode: 404,
+          message: 'Лот не знайдено',
         })
       }
 
-      lot.category = category
-      lot.categoryId = category.id
-    }
+      const editableStatuses: string[] = [lotStatuses.DRAFT, lotStatuses.IN_TRADING_PROCESS]
 
-    return await lotRepository.save(lot)
+      if (!editableStatuses.includes(lot.statusName)) {
+        throw createError({
+          statusCode: 400,
+          message: 'Лот не може бути змінений у поточному статусі',
+        })
+      }
+
+      const title = updates.title ?? lot.title
+      const description = updates.description ?? lot.description
+      let initialPrice = lot.initialPrice
+      let initialDuration = lot.initialDuration
+      let categoryId = lot.categoryId
+
+      if (lot.statusName === lotStatuses.DRAFT) {
+        initialPrice = updates.initialPrice ?? initialPrice
+        initialDuration = updates.initialDuration ?? initialDuration
+      }
+
+      if (updates.categoryId) {
+        const category = await categoryRepository.findById(
+          updates.categoryId,
+          { transaction },
+        )
+
+        if (!category) {
+          throw createError({
+            statusCode: 400,
+            message: 'Вказана категорія не існує',
+          })
+        }
+
+        categoryId = category.id
+      }
+
+      return await lotRepository.updateById(id, {
+        title,
+        description,
+        initialPrice,
+        initialDuration,
+        categoryId,
+      }, { transaction })
+    })
   },
 
   /**
    * Publishes a lot.
    *
-   * @param lot lot instance
+   * @param id lot primary key
+   * @throws 404 when lot not found
    * @throws 400 when lot is already published
    * @throws 400 when lot category is not set
    * @returns updated lot instance
    */
-  async publishLot(lot: Lot) {
-    if (lot.statusName !== lotStatuses.DRAFT) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Лот вже опубліковано',
+  async publish(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    if (!lot.categoryId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Категорія лоту не встановлена',
-      })
-    }
+      if (!lot) {
+        throw createError({
+          statusCode: 404,
+          message: 'Лот не знайдено',
+        })
+      }
 
-    lot.statusName = lotStatuses.IN_TRADING_PROCESS
-    lot.effectiveDate = new Date()
-    lot.expirationDate = new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration])
-    lot.currentPrice = lot.initialPrice
+      if (lot.statusName !== lotStatuses.DRAFT) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request',
+          message: 'Лот вже опубліковано',
+        })
+      }
 
-    return await lotRepository.save(lot)
+      if (!lot.categoryId) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request',
+          message: 'Категорія лоту не встановлена',
+        })
+      }
+
+      return await lotRepository.updateById(id, {
+        statusName: lotStatuses.IN_TRADING_PROCESS,
+        effectiveDate: new Date(),
+        expirationDate: new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration]),
+        currentPrice: lot.initialPrice,
+      }, { transaction })
+    })
   },
 
   /**
    * Closes a lot.
    *
-   * @param lot lot instance
+   * @param id lot primary key
+   * @throws 404 when lot not found
    * @throws 400 when lot is not in trading process status
    * @throws 400 when lot expiration date is not reached
    * @returns updated lot instance
    */
-  async closeLot(lot: Lot) {
-    if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Лот не може бути закритий у поточному статусі',
+  async close(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    if (!lot.expirationDate || lot.expirationDate > new Date()) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Лот не може бути закритий до завершення терміну дії',
-      })
-    }
+      if (!lot) {
+        throw createError({
+          statusCode: 404,
+          message: 'Лот не знайдено',
+        })
+      }
 
-    const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
+      if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request',
+          message: 'Лот не може бути закритий у поточному статусі',
+        })
+      }
 
-    if (latestBet) {
-      lot.winnerId = latestBet.userId
-      lot.statusName = lotStatuses.IN_DISCUSSION_PROCESS
-    }
-    else {
-      lot.statusName = lotStatuses.REJECTED
-    }
+      if (!lot.expirationDate || lot.expirationDate > new Date()) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request',
+          message: 'Лот не може бути закритий до завершення терміну дії',
+        })
+      }
 
-    return await lotRepository.save(lot)
+      const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
+
+      return await lotRepository.updateById(lot.id, {
+        winnerId: latestBet
+          ? latestBet.userId
+          : null,
+        statusName: latestBet
+          ? lotStatuses.IN_DISCUSSION_PROCESS
+          : lotStatuses.REJECTED,
+      }, { transaction })
+    })
   },
 
   /**
    * Ships a lot.
    *
-   * @param lot - lot instance
+   * @param id - lot primary key
+   * @throws 404 when lot not found
    * @throws 400 when lot is not in discussion process status
    * @returns updated lot instance
    */
-  async shipLot(lot: Lot) {
-    if (lot.statusName !== lotStatuses.IN_DISCUSSION_PROCESS) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Лот не може бути відправлений у поточному статусі',
+  async ship(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    lot.statusName = lotStatuses.IN_DELIVERY_PROCESS
+      if (!lot) {
+        throw createError({
+          statusCode: 404,
+          message: 'Лот не знайдено',
+        })
+      }
 
-    return await lotRepository.save(lot)
+      if (lot.statusName !== lotStatuses.IN_DISCUSSION_PROCESS) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request',
+          message: 'Лот не може бути відправлений у поточному статусі',
+        })
+      }
+
+      return await lotRepository.updateById(lot.id, {
+        statusName: lotStatuses.IN_DELIVERY_PROCESS,
+      }, { transaction })
+    })
   },
 
   /**
    * Receives a lot.
    *
-   * @param lot lot instance
+   * @param id lot primary key
+   * @throws 404 when lot not found
    * @throws 400 when lot is not in delivery process status
    * @returns updated lot instance
    */
-  async receiveLot(lot: Lot) {
-    if (lot.statusName !== lotStatuses.IN_DELIVERY_PROCESS) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Лот не може бути отриманий у поточному статусі',
+  async receive(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    lot.statusName = lotStatuses.RECEIVED
+      if (!lot) {
+        throw createError({
+          statusCode: 404,
+          message: 'Лот не знайдено',
+        })
+      }
 
-    return await lotRepository.save(lot)
+      if (lot.statusName !== lotStatuses.IN_DELIVERY_PROCESS) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Bad Request',
+          message: 'Лот не може бути отриманий у поточному статусі',
+        })
+      }
+
+      return await lotRepository.updateById(lot.id, {
+        statusName: lotStatuses.RECEIVED,
+      }, { transaction })
+    })
   },
 
   /**
    * Deletes a lot.
    *
+   * @param id lot primary key
+   * @throws 404 when lot not found
    * @throws 400 when lot is not in draft status
-   * @param lot lot instance
    */
-  async deleteLot(lot: Lot) {
-    if (lot.statusName !== lotStatuses.DRAFT) {
-      throw createError({
-        message: 'Цей лот не може бути видалений, оскільки він вже опублікований',
-        status: 400,
+  async delete(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
       })
-    }
 
-    await lotRepository.destroy(lot.id)
+      if (!lot) {
+        throw createError({
+          statusCode: 404,
+          message: 'Лот не знайдено',
+        })
+      }
+
+      if (lot.statusName !== lotStatuses.DRAFT) {
+        throw createError({
+          message: 'Цей лот не може бути видалений, оскільки він вже опублікований',
+          status: 400,
+        })
+      }
+
+      await lotRepository.destroyById(lot.id, { transaction })
+    })
   },
 }

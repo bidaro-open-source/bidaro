@@ -65,7 +65,7 @@ describe('POST /api/lots/:id/close', async () => {
     const lot = response._data
 
     expect(response.status).toBe(200)
-    expect(lot.winner?.id).toBe(uuData.user.id)
+    expect(lot.winnerId).toBe(uuData.user.id)
     expect(lot.statusName).toBe(lotStatuses.IN_DISCUSSION_PROCESS)
 
     await lotData.clear()
