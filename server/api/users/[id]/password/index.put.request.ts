@@ -1,5 +1,5 @@
 import z from 'zod'
-import { passwordSchema, primaryKeySchema } from '~~/server/zod'
+import { primaryKeySchema, userSchema } from '~~/server/zod'
 
 export type UpdateUserPasswordRequest = ValidatorReturnType<typeof updateUserPasswordRequest>
 
@@ -8,6 +8,6 @@ export const updateUserPasswordRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    password: passwordSchema,
+    password: userSchema.password,
   }),
 })

@@ -8,6 +8,8 @@ export const deleteSessionsRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    uuids: refreshTokenSchema.array().nonempty(),
+    uuids: refreshTokenSchema
+      .array()
+      .min(1, { message: 'Масив ідентифікаторів не може бути порожнім' }),
   }),
 })

@@ -100,7 +100,7 @@ export function createRequestValidator<Options extends ValidatorOptions>(
           statusCode: 422,
           statusMessage: 'Unprocessable Content',
           message: 'Неправильні дані запиту',
-          data: error.flatten(),
+          data: z.flattenError(error),
         })
       }
 
@@ -110,7 +110,7 @@ export function createRequestValidator<Options extends ValidatorOptions>(
           statusCode: 422,
           statusMessage: 'Unprocessable Content',
           message: 'Неправильні дані запиту',
-          data: error.data.flatten(),
+          data: z.flattenError(error.data),
         })
       }
 

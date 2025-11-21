@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!passwordsEqual) {
-    const issues: z.ZodIssue[] = [{
+    const issues: z.core.$ZodIssueCustom[] = [{
       code: 'custom',
       path: ['password'],
       message: 'Пароль неправильний',
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 422,
       message: 'Неправильні дані запиту',
-      data: new z.ZodError(issues).flatten(),
+      data: z.flattenError(new z.ZodError(issues)),
     })
   }
 

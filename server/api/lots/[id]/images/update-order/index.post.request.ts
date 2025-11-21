@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { primaryKeySchema } from '~~/server/zod/primary-key'
+import { primaryKeySchema } from '~~/server/zod'
 
 export type UpdateImageOrderRequest = ValidatorReturnType<typeof updateImageOrderRequest>
 
@@ -8,6 +8,8 @@ export const updateImageOrderRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    ids: z.number().array().nonempty(),
+    ids: z
+      .array(primaryKeySchema)
+      .min(1, { message: 'Масив ідентифікаторів не може бути порожнім' }),
   }),
 })

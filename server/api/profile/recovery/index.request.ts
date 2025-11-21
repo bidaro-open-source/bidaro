@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { emailSchema } from '~~/server/zod'
+import { userSchema } from '~~/server/zod'
 
 export type ResetPasswordRequest = ValidatorReturnType<
   typeof resetPasswordRequest
@@ -7,6 +7,6 @@ export type ResetPasswordRequest = ValidatorReturnType<
 
 export const resetPasswordRequest = createRequestValidator({
   body: z.object({
-    email: emailSchema,
+    email: userSchema.email,
   }),
 })

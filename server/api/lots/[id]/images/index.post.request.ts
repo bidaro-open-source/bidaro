@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { primaryKeySchema } from '~~/server/zod/primary-key'
+import { primaryKeySchema } from '~~/server/zod'
 
 const allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 

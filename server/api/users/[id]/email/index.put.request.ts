@@ -1,5 +1,5 @@
 import z from 'zod'
-import { emailSchema, primaryKeySchema } from '~~/server/zod'
+import { primaryKeySchema, userSchema } from '~~/server/zod'
 
 export type UpdateUserEmailRequest = ValidatorReturnType<typeof updateUserEmailRequest>
 
@@ -8,6 +8,6 @@ export const updateUserEmailRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    email: emailSchema,
+    email: userSchema.email,
   }),
 })

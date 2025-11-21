@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const userByUsername = await userRepository.findByUsername(request.body.username)
 
   if (userByEmail || userByUsername) {
-    const issues: z.ZodIssue[] = []
+    const issues: z.core.$ZodIssueCustom[] = []
 
     if (userByEmail) {
       issues.push({
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 422,
       message: 'Неправильні дані запиту',
-      data: new z.ZodError(issues).flatten(),
+      data: z.flattenError(new z.ZodError(issues)),
     })
   }
 
