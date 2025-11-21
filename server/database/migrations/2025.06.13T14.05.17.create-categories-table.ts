@@ -1,6 +1,6 @@
 import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
-import { permissions, roles } from '../../constants'
+import { permissions } from '../../constants'
 import categories from './data/categories.json'
 
 export const up: Migration = async ({ context }) => {
@@ -72,15 +72,6 @@ export const up: Migration = async ({ context }) => {
       { name: permissions.VIEW_CATEGORY_COUNT, createdAt: new Date() },
       { name: permissions.UPDATE_CATEGORY_SLUG, createdAt: new Date() },
       { name: permissions.UPDATE_CATEGORY_PARENT, createdAt: new Date() },
-    ], { transaction })
-
-    await queryInterface.bulkInsert('roles_has_permissions', [
-      { role: roles.USER, permission: permissions.CREATE_CATEGORY },
-      { role: roles.USER, permission: permissions.UPDATE_CATEGORY },
-      { role: roles.USER, permission: permissions.DELETE_CATEGORY },
-      { role: roles.USER, permission: permissions.VIEW_CATEGORY_COUNT },
-      { role: roles.USER, permission: permissions.UPDATE_CATEGORY_SLUG },
-      { role: roles.USER, permission: permissions.UPDATE_CATEGORY_PARENT },
     ], { transaction })
 
     await transaction.commit()
