@@ -56,6 +56,27 @@ export const categoryRepository = {
   },
 
   /**
+   * Finds a categories by their path.
+   *
+   * @param path - category path
+   * @param options - sequelize options
+   * @returns array of category instances
+   */
+  async findAllByPathWithLock(path: string, options: Required<Options>) {
+    const db = useDatabase()
+
+    return await db.Category.findAll({
+      lock: options.lock,
+      transaction: options.transaction,
+      where: {
+        path: {
+          [Op.like]: `${path}%`,
+        },
+      },
+    })
+  },
+
+  /**
    * Finds categories by their parent id.
    *
    * @param parentId - category parent id
