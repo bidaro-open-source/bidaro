@@ -48,6 +48,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    diagnostic: {
+      token: '',
+    },
     db: {
       host: '',
       port: '',
