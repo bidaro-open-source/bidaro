@@ -2,7 +2,7 @@ import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import { profileRecoveryService } from '~~/server/services/profile-recovery.service'
+import { profileRecoveryService } from '~~/server/services/recovery.service'
 import { userService } from '~~/server/services/user.service'
 
 export default defineEventHandler(async (event) => {

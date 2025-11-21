@@ -1,7 +1,7 @@
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import { profileVerificationService } from '~~/server/services/profile-verification.service'
 import { userService } from '~~/server/services/user.service'
+import { profileVerificationService } from '~~/server/services/verification.service'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)

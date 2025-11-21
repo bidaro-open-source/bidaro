@@ -2,7 +2,7 @@ import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
-import { profileRecoveryService } from '~~/server/services/profile-recovery.service'
+import { profileRecoveryService } from '~~/server/services/recovery.service'
 
 export default defineEventHandler(async (event) => {
   const request = await resetPasswordRequest(event)
