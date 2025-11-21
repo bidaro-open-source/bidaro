@@ -2,6 +2,7 @@ import type { Category } from '~~/server/database'
 
 interface Options {
   parentId?: number
+  description?: string | null
 }
 
 /**
@@ -11,7 +12,9 @@ interface Options {
  * @returns category instance with clear function
  */
 export async function createCategory(options: Options = {}) {
-  const category = await db.CategoryFactory.new().create()
+  const category = await db.CategoryFactory.new().create({
+    description: options.description,
+  })
 
   let parentCategory: Category | null = null
 

@@ -28,11 +28,11 @@ export const categoryService = {
       keys.add(cacheKeys.byId(category.id))
       keys.add(cacheKeys.bySlug(category.slug))
 
-      if (typeof category.parentId === 'object')
-        keys.add(cacheKeys.root)
-
-      if (typeof category.parentId === 'number')
+      if (category.parentId)
         keys.add(cacheKeys.childrenById(category.parentId))
+
+      if (category.parentId === null)
+        keys.add(cacheKeys.root)
     }
 
     const cachedBreadcrumbsKeys = await redis.keys(
@@ -113,7 +113,7 @@ export const categoryService = {
    * Retrieves a category childrens by ID, utilizing Redis caching.
    *
    * @throws 404 if the category does not exist
-   * @returns category instance
+   * @returns array of category instances
    */
   async getChildrenById(id: number) {
     const db = useDatabase()
@@ -161,16 +161,17 @@ export const categoryService = {
    * @returns category instance
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
-    const categoryBySlug = await categoryRepository.findBySlug(data.slug)
+    const transaction = await useDatabaseTransaction()
+
+    const categoryBySlug = await categoryRepository.findBySlug(data.slug, { transaction })
 
     if (categoryBySlug) {
+      await transaction.rollback()
       throw createError({
         statusCode: 422,
         message: 'Слаг вже зайнят',
       })
     }
-
-    const transaction = await useDatabaseTransaction()
 
     let parentCategory: Category | null = null
 
@@ -247,11 +248,16 @@ export const categoryService = {
     }
 
     try {
+      const displayName = data.displayName ?? category.displayName
+      const description = Object.hasOwn(data, 'description')
+        ? data.description
+        : category.description
+
       const updatedCategory = await categoryRepository.updateById(
         category.id,
         {
-          displayName: data.displayName ?? category.displayName,
-          description: data.description ?? category.description,
+          displayName,
+          description: description || null,
         },
         { transaction },
       )
@@ -275,7 +281,7 @@ export const categoryService = {
   },
 
   /**
-   * Updates category paths when parent changes.
+   * Updates category slug.
    *
    * @param id - category primary key
    * @param slug - new category slug
@@ -304,7 +310,7 @@ export const categoryService = {
       return category
     }
 
-    const categoryBySlug = await categoryRepository.findBySlug(slug)
+    const categoryBySlug = await categoryRepository.findBySlug(slug, { transaction })
 
     if (categoryBySlug) {
       await transaction.rollback()
@@ -315,8 +321,6 @@ export const categoryService = {
     }
 
     try {
-      category.slug = slug
-
       const updatedCategory = await categoryRepository.updateById(
         category.id,
         { slug },

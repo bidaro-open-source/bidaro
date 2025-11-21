@@ -15,5 +15,5 @@ export const categoryDescriptionSchema = z
     invalid_type_error: 'Опис має бути рядком',
   })
   .trim()
-  .max(1024, 'Опис має містити не більше 1028 символів')
+  .max(1024, 'Опис має містити не більше 1024 символів')
   .optional()

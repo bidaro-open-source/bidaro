@@ -49,6 +49,31 @@ describe('PATCH /api/categories/:id', async () => {
         await userData.clear()
       },
     )
+
+    it('by key "description" with empty value', async () => {
+      const categoryData = await createCategory({ description: 'initial description' })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_CATEGORY],
+      })
+
+      const response = await updateCategoryRequest(
+        {
+          body: { description: '' },
+          params: { id: categoryData.category.id },
+        },
+        { accessToken: userData.access_token },
+      )
+
+      const updatedCategory = response._data
+
+      expect(response.status).toBe(200)
+      expect(updatedCategory.description).toBe(null)
+
+      await categoryData.clear()
+      await userData.clear()
+    })
   })
 
   describe('error handling', () => {
