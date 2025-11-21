@@ -3,6 +3,10 @@ export const roles = {
 } as const
 
 export const permissions = {
+  UPDATE_OWN_PROFILE: 'update_own_profile',
+  UPDATE_OWN_EMAIL: 'update_own_email',
+  UPDATE_OWN_PASSWORD: 'update_own_password',
+
   VIEW_OWN_SESSIONS: 'view_own_sessions',
   DELETE_OWN_SESSIONS: 'delete_own_sessions',
   CREATE_CATEGORY: 'create_category',

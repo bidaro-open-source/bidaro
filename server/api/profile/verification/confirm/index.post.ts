@@ -1,6 +1,7 @@
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { profileVerificationService } from '~~/server/services/profile-verification.service'
+import { userService } from '~~/server/services/user.service'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)
@@ -20,6 +21,8 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.findById(uid)
 
   if (!user) {
+    await profileVerificationService.deleteEmailVerificationTokenByUid(uid)
+
     throw createError({
       statusCode: 404,
       statusMessage: 'Not Found',
@@ -27,9 +30,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  user.emailVerifiedAt = new Date()
-
-  await userRepository.save(user)
+  await userService.verifyEmail(user.id)
 
   await profileVerificationService.deleteEmailVerificationTokenByUid(user.id)
 })

@@ -1,7 +1,8 @@
-import type { Transaction } from 'sequelize'
-import type { User, UserAttributesOptional } from '../database'
+import type { LOCK, Transaction } from 'sequelize'
+import type { UserAttributesOptional } from '../database'
 
 interface Options {
+  lock?: LOCK
   transaction?: Transaction
 }
 
@@ -31,6 +32,22 @@ export const userRepository = {
           ],
         },
       ],
+    })
+  },
+
+  /**
+   * Finds a user by their primary key.
+   *
+   * @param id - user primary key
+   * @param options - sequelize options
+   * @returns user or null if not found
+   */
+  async findByIdWithLock(id: number, options: Required<Options>) {
+    const db = useDatabase()
+
+    return db.User.findByPk(id, {
+      lock: options.lock,
+      transaction: options.transaction,
     })
   },
 
@@ -109,23 +126,40 @@ export const userRepository = {
   },
 
   /**
-   * Save a chagned user record in the database.
+   * Updates a user record in the database.
    *
-   * @param user - user instance
+   * @param id - user primary key
+   * @param data - user attributes to update
    * @param options - sequelize options
-   * @returns lot instance
+   * @returns updated user instance
    */
-  async save(user: User, options: Options = {}) {
-    return await user.save({ transaction: options.transaction })
+  async updateById(id: number, data: Partial<UserAttributesOptional>, options: Options = {}) {
+    const db = useDatabase()
+
+    const [_, [user]] = await db.User.update(
+      data,
+      {
+        where: { id },
+        transaction: options.transaction,
+        returning: true,
+      },
+    )
+
+    return user
   },
 
   /**
    * Destroys a user record in the database.
    *
-   * @param user - user instance
+   * @param id - user primary key
    * @param options - sequelize options
    */
-  async destroy(user: User, options: Options = {}) {
-    return await user.destroy({ transaction: options.transaction })
+  async destroyById(id: number, options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.User.destroy({
+      where: { id },
+      transaction: options.transaction,
+    })
   },
 }
