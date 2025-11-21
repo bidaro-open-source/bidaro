@@ -1,4 +1,4 @@
-import type { DeleteSessionsRequest } from './index.request'
+import type { DeleteSessionsRequest } from './index.delete.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -11,7 +11,7 @@ async function deleteSessionsRequest(
   payload: DeleteSessionsRequest,
   options: { accessToken?: string } = {},
 ) {
-  return await fetch(`/api/profile/sessions`, {
+  return await fetch(`/api/users/${payload.params.id}/sessions`, {
     method: 'DELETE',
     body: payload.body,
     accessToken: options.accessToken,
@@ -29,7 +29,10 @@ describe('DELETE /api/profile/sessions', async () => {
     })
 
     const response = await deleteSessionsRequest(
-      { body: { uuids: [data.session_uuid] } },
+      {
+        body: { uuids: [data.session_uuid] },
+        params: { id: data.user.id },
+      },
       { accessToken: data.access_token },
     )
 
@@ -62,7 +65,10 @@ describe('DELETE /api/profile/sessions', async () => {
     )._data).session_uuid
 
     const response = await deleteSessionsRequest(
-      { body: { uuids: [sessionUUID1, sessionUUID2] } },
+      {
+        body: { uuids: [sessionUUID1, sessionUUID2] },
+        params: { id: data.user.id },
+      },
       { accessToken: data.access_token },
     )
 
@@ -83,7 +89,10 @@ describe('DELETE /api/profile/sessions', async () => {
     })
 
     const response = await deleteSessionsRequest(
-      { body: { uuids: ['fff'] } },
+      {
+        body: { uuids: ['fff'] },
+        params: { id: data.user.id },
+      },
       { accessToken: data.access_token },
     )
 
@@ -97,14 +106,13 @@ describe('DELETE /api/profile/sessions', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const data = await createUser({
-        withRole: true,
-        withSession: true,
-        withPermissions: [],
-      })
+      const data = await createUser({ withSession: true })
 
       const response = await deleteSessionsRequest(
-        { body: { uuids: [data.session_uuid] } },
+        {
+          body: { uuids: [data.session_uuid] },
+          params: { id: data.user.id },
+        },
       )
 
       expect(response.status).toBe(401)
@@ -120,13 +128,40 @@ describe('DELETE /api/profile/sessions', async () => {
       })
 
       const response = await deleteSessionsRequest(
-        { body: { uuids: [data.session_uuid] } },
+        {
+          body: { uuids: [data.session_uuid] },
+          params: { id: data.user.id },
+        },
         { accessToken: data.access_token },
       )
 
       expect(response.status).toBe(403)
 
       await data.clear()
+    })
+
+    it('should return 403 when deleting another user\'s sessions', async () => {
+      const data1 = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_OWN_SESSIONS],
+      })
+      const data2 = await createUser({
+        withSession: true,
+      })
+
+      const response = await deleteSessionsRequest(
+        {
+          body: { uuids: [data2.session_uuid] },
+          params: { id: data2.user.id },
+        },
+        { accessToken: data1.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await data2.clear()
+      await data1.clear()
     })
 
     it('should return 422 when session list is empty', async () => {
@@ -137,7 +172,10 @@ describe('DELETE /api/profile/sessions', async () => {
       })
 
       const response = await deleteSessionsRequest(
-        { body: { uuids: [] } },
+        {
+          body: { uuids: [] },
+          params: { id: data.user.id },
+        },
         { accessToken: data.access_token },
       )
 
