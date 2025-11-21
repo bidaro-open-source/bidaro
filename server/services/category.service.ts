@@ -349,6 +349,11 @@ export const categoryService = {
       })
     }
 
+    await categoryRepository.findAllByPathWithLock(category.path, {
+      lock: transaction.LOCK.UPDATE,
+      transaction,
+    })
+
     if (category.parentId === parentId) {
       await transaction.commit()
       return category
