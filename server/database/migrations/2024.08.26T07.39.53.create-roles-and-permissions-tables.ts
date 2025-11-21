@@ -95,6 +95,9 @@ export const up: Migration = async ({ context }) => {
     await queryInterface.bulkInsert('permissions', [
       { name: permissions.VIEW_OWN_SESSIONS, createdAt: new Date() },
       { name: permissions.DELETE_OWN_SESSIONS, createdAt: new Date() },
+      { name: permissions.UPDATE_OWN_PROFILE, createdAt: new Date() },
+      { name: permissions.UPDATE_OWN_EMAIL, createdAt: new Date() },
+      { name: permissions.UPDATE_OWN_PASSWORD, createdAt: new Date() },
     ], { transaction })
 
     await queryInterface.bulkInsert('roles_has_permissions', [

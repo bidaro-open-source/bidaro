@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.create({
     email: request.body.email,
     username: request.body.username,
-    password: await hashPassword(event, request.body.password),
+    password: await hashPassword(request.body.password),
     roleName: defaultRole.name,
   })
 

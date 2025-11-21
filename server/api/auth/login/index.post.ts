@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const passwordsEqual = await comparePassword(
-    event,
     request.body.password,
     user.password,
   )

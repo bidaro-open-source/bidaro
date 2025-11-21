@@ -3,6 +3,7 @@ import {
 } from '~~/server/api/profile/recovery/confirm/index.request'
 import { userRepository } from '~~/server/repositories/user.repository'
 import { profileRecoveryService } from '~~/server/services/profile-recovery.service'
+import { userService } from '~~/server/services/user.service'
 
 export default defineEventHandler(async (event) => {
   const request = await confirmResetPasswordRequest(event)
@@ -20,6 +21,8 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.findById(uid)
 
   if (!user) {
+    await profileRecoveryService.deletePasswordResetToken(request.body.token)
+
     throw createError({
       statusCode: 404,
       statusMessage: 'Not Found',
@@ -27,9 +30,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  user.password = await hashPassword(event, request.body.password)
-
-  await userRepository.save(user)
+  await userService.updatePassword(user.id, request.body.password)
 
   await profileRecoveryService.deletePasswordResetToken(request.body.token)
 })
