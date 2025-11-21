@@ -41,6 +41,9 @@ export default withNuxt(
         'error',
         {
           caughtErrors: 'none',
+          ignoreRestSiblings: false,
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
         },
       ],
     },
