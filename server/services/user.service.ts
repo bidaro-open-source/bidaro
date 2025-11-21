@@ -24,6 +24,14 @@ export const userService = {
         })
       }
 
+      if (data.name === undefined && data.surname === undefined) {
+        return user
+      }
+
+      if (data.name === user.name && data.surname === user.surname) {
+        return user
+      }
+
       const name = Object.hasOwn(data, 'name') ? data.name : user.name
       const surname = Object.hasOwn(data, 'surname') ? data.surname : user.surname
 
