@@ -74,6 +74,45 @@ describe('POST /api/lots/:id/close', async () => {
     await uData.clear()
   })
 
+  it('should close lot successfully with winner and send mail', async () => {
+    const uData = await createUser({ withSession: true })
+    const uuData = await createUser({ withSession: true })
+    const cData = await createCategory()
+    const lotData = await createReadyForClosingLot({
+      sellerId: uData.user.id,
+      categoryId: cData.category.id,
+      winnerId: uuData.user.id,
+    })
+
+    await closeLotRequest(
+      { params: { id: lotData.lot.id } },
+      { accessToken: uData.access_token },
+    )
+
+    const messages1 = await mailhog.getMessagesByEmail(uData.user.email)
+    const content1 = messages1[0].Content.Body.replace(/=[\r\n]+/g, '')
+    const escapedEmail1 = uuData.user.email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex1 = new RegExp(escapedEmail1)
+    const match1 = content1.match(regex1)
+    const foundEmail1 = match1 ? match1[0] : null
+
+    expect(foundEmail1).toBe(uuData.user.email)
+
+    const messages2 = await mailhog.getMessagesByEmail(uuData.user.email)
+    const content2 = messages2[0].Content.Body.replace(/=[\r\n]+/g, '')
+    const escapedEmail2 = uData.user.email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex2 = new RegExp(escapedEmail2)
+    const match2 = content2.match(regex2)
+    const foundEmail2 = match2 ? match2[0] : null
+
+    expect(foundEmail2).toBe(uData.user.email)
+
+    await lotData.clear()
+    await uuData.clear()
+    await cData.clear()
+    await uData.clear()
+  })
+
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
       const uData = await createUser({ withSession: true })
