@@ -1,6 +1,7 @@
 export * from './models/category-schema'
 export * from './models/lot-bet-schema'
 export * from './models/lot-schema'
+export * from './models/permission-schema'
 export * from './models/role-schema'
 export * from './models/user-schema'
 export * from './primary-key'
