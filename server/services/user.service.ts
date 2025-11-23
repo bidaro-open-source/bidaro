@@ -1,5 +1,10 @@
 import type { UserAttributesOptional } from '../database'
+import { lotBetRepository } from '../repositories/lot-bet.repository'
+import { lotImageRepository } from '../repositories/lot-image.repository'
+import { lotRepository } from '../repositories/lot.repository'
 import { userRepository } from '../repositories/user.repository'
+import { authService } from './authentication.service'
+import { imageService } from './image.service'
 
 export const userService = {
   /**
@@ -154,7 +159,42 @@ export const userService = {
   },
 
   /**
+   * Updates user's role.
+   *
+   * @param id - user primary key
+   * @param roleName - new role name (or null to remove role)
+   * @returns updated user instance
+   * @throws 404 if user not found
+   */
+  async updateRole(id: number, roleName: string | null) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
+
+      if (user.roleName === roleName) {
+        return user
+      }
+
+      return await userRepository.updateById(
+        id,
+        { roleName },
+        { transaction },
+      )
+    })
+  },
+
+  /**
    * Deletes a user by their primary key.
+   * Deletes all their lots (with images via cascade), bids, and sessions.
    *
    * @param id - user primary key
    * @throws 404 if user not found
@@ -171,6 +211,32 @@ export const userService = {
           statusCode: 404,
           message: 'Користувача не знайдено',
         })
+      }
+
+      const lots = await lotRepository.findAllBySellerIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      for (const lot of lots) {
+        const images = await lotImageRepository.findAllByLotId(lot.id, {
+          transaction,
+        })
+
+        const imagesIds = images.map(image => image.id)
+
+        await imageService.destroySafely(imagesIds)
+
+        await lotRepository.destroyById(lot.id, { transaction })
+      }
+
+      await lotBetRepository.destroyByUserId(id, { transaction })
+
+      const sessions = await authService.getAuthenticationSessions(id)
+      const sessionUuids = Object.values(sessions).map(session => session.uuid)
+
+      if (sessionUuids.length > 0) {
+        await authService.deleteAuthenticationSessions(id, sessionUuids)
       }
 
       await userRepository.destroyById(id, { transaction })

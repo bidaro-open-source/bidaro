@@ -25,6 +25,11 @@ export const permissions = {
   DELETE_ROLE: 'delete_role',
   VIEW_ROLE_PERMISSIONS: 'view_role_permissions',
   UPDATE_ROLE_PERMISSIONS: 'update_role_permissions',
+
+  CREATE_USER: 'create_user',
+  VERIFY_USER: 'verify_user',
+  UPDATE_USER_ROLE: 'update_user_role',
+  DELETE_USER: 'delete_user',
 } as const
 
 export const lotStatuses = {
