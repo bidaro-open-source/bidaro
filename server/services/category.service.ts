@@ -201,7 +201,7 @@ export const categoryService = {
         { transaction },
       )
 
-      transaction.afterCommit(async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.create', async () => {
         await categoryService.clearCache(updatedCategory)
       })
 
@@ -245,7 +245,7 @@ export const categoryService = {
         { transaction },
       )
 
-      transaction.afterCommit(async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.update', async () => {
         await categoryService.clearCache(updatedCategory)
       })
 
@@ -295,7 +295,7 @@ export const categoryService = {
         { transaction },
       )
 
-      transaction.afterCommit(async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.createSlug', async () => {
         await categoryService.clearCache([category, updatedCategory])
       })
 
@@ -372,7 +372,7 @@ export const categoryService = {
         { transaction },
       )
 
-      transaction.afterCommit(async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.createParent', async () => {
         await categoryService.clearCache([
           category,
           updatedCategory,
@@ -426,7 +426,7 @@ export const categoryService = {
 
       await categoryRepository.destroyById(category.id, { transaction })
 
-      transaction.afterCommit(async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.delete', async () => {
         await categoryService.clearCache(category)
       })
     })
