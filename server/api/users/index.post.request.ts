@@ -1,5 +1,5 @@
 import z from 'zod'
-import { primaryKeySchema, userSchema } from '~~/server/zod'
+import { userSchema } from '~~/server/zod'
 
 export type CreateUserRequest = ValidatorReturnType<typeof createUserRequest>
 

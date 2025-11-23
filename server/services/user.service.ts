@@ -1,6 +1,6 @@
 import type { UserAttributesOptional } from '../database'
-import { REDIS_SESSION_NAMESPACE } from './authentication.service'
 import { userRepository } from '../repositories/user.repository'
+import { REDIS_SESSION_NAMESPACE } from './authentication.service'
 
 export const userService = {
   /**
