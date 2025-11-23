@@ -1,6 +1,6 @@
 import type { UserAttributesOptional } from '../database'
 import { userRepository } from '../repositories/user.repository'
-import { REDIS_SESSION_NAMESPACE } from './authentication.service'
+import { authService } from './authentication.service'
 
 export const userService = {
   /**
@@ -211,25 +211,18 @@ export const userService = {
         })
       }
 
-      // Delete all bids made by this user
-      // (LotBet has onDelete: SET NULL but userId is NOT NULL, so we need to delete manually)
       await db.LotBet.destroy({
         where: { userId: id },
         transaction,
       })
 
-      // Delete all sessions for this user from Redis
-      const redis = useRedis()
-      const sessionKey = `${REDIS_SESSION_NAMESPACE}:${id}`
-      const tokens = await redis.smembers(sessionKey)
+      const sessions = await authService.getAuthenticationSessions(id)
+      const sessionUuids = Object.values(sessions).map(session => session.uuid)
 
-      if (tokens.length > 0) {
-        const sessionKeys = tokens.map((token: string) => `${REDIS_SESSION_NAMESPACE}:${token}`)
-        await redis.del(...sessionKeys)
-        await redis.del(sessionKey)
+      if (sessionUuids.length > 0) {
+        await authService.deleteAuthenticationSessions(id, sessionUuids)
       }
 
-      // Delete user (lots will cascade delete via database constraint)
       await userRepository.destroyById(id, { transaction })
     })
   },

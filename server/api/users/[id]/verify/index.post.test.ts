@@ -27,7 +27,6 @@ describe('POST /api/users/:id/verify', async () => {
       withPermissions: [permissions.VERIFY_USER],
     })
 
-    // Ensure email is not verified initially
     await userData.user.update({ emailVerifiedAt: null })
 
     const response = await verifyUserRequest(
@@ -40,9 +39,8 @@ describe('POST /api/users/:id/verify', async () => {
     expect(response.status).toBe(200)
     expect(user.id).toBe(userData.user.id)
 
-    // Verify the email was marked as verified in the database
-    const updatedUser = await db.User.findByPk(userData.user.id)
-    expect(updatedUser?.emailVerifiedAt).not.toBeNull()
+    await userData.user.reload()
+    expect(userData.user.emailVerifiedAt).not.toBeNull()
 
     await userData.clear()
     await adminData.clear()

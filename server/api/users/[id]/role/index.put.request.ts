@@ -1,5 +1,5 @@
 import z from 'zod'
-import { primaryKeySchema } from '~~/server/zod'
+import { primaryKeySchema, roleSchema } from '~~/server/zod'
 
 export type UpdateUserRoleRequest = ValidatorReturnType<typeof updateUserRoleRequest>
 
@@ -8,6 +8,6 @@ export const updateUserRoleRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    roleName: z.union([z.string().min(1).max(64), z.null()]),
+    roleName: z.union([roleSchema.name, z.null()]),
   }),
 })

@@ -39,9 +39,8 @@ describe('PUT /api/users/:id/role', async () => {
     expect(response.status).toBe(200)
     expect(user.id).toBe(userData.user.id)
 
-    // Verify the role was updated in the database
-    const updatedUser = await db.User.findByPk(userData.user.id)
-    expect(updatedUser?.roleName).toBe(roleData.name)
+    await userData.user.reload()
+    expect(userData.user.roleName).toBe(roleData.name)
 
     await userData.clear()
     await roleData.destroy()
@@ -66,9 +65,8 @@ describe('PUT /api/users/:id/role', async () => {
     expect(response.status).toBe(200)
     expect(user.id).toBe(userData.user.id)
 
-    // Verify the role was set to null in the database
-    const updatedUser = await db.User.findByPk(userData.user.id)
-    expect(updatedUser?.roleName).toBe(null)
+    await userData.user.reload()
+    expect(userData.user.roleName).toBe(null)
 
     await userData.clear()
     await adminData.clear()

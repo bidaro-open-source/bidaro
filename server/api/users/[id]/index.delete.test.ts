@@ -36,7 +36,6 @@ describe('DELETE /api/users/:id', async () => {
 
     expect(response.status).toBe(204)
 
-    // Verify the user was deleted from the database
     const deletedUser = await db.User.findByPk(userId)
     expect(deletedUser).toBeNull()
 
@@ -51,10 +50,8 @@ describe('DELETE /api/users/:id', async () => {
       withPermissions: [permissions.DELETE_USER],
     })
 
-    // Create a lot for the user
     const lot = await db.LotFactory.new().create({ sellerId: userData.user.id })
 
-    // Create a bid by the user on another lot
     const anotherUser = await createUser()
     const anotherLot = await db.LotFactory.new().create({ sellerId: anotherUser.user.id })
     const bet = await db.LotBetFactory.new().create({
@@ -71,15 +68,12 @@ describe('DELETE /api/users/:id', async () => {
 
     expect(response.status).toBe(204)
 
-    // Verify the user was deleted
     const deletedUser = await db.User.findByPk(userId)
     expect(deletedUser).toBeNull()
 
-    // Verify the lot was cascade deleted
     const deletedLot = await db.Lot.findByPk(lot.id)
     expect(deletedLot).toBeNull()
 
-    // Verify the bid was deleted
     const deletedBet = await db.LotBet.findByPk(bet.id)
     expect(deletedBet).toBeNull()
 
@@ -104,7 +98,6 @@ describe('DELETE /api/users/:id', async () => {
 
     expect(response.status).toBe(204)
 
-    // Verify the user was deleted
     const deletedUser = await db.User.findByPk(userId)
     expect(deletedUser).toBeNull()
 
