@@ -116,7 +116,7 @@ export const roleService = {
    *
    * @param name - role name
    * @param permissionNames - array of permission names
-   * @returns updated role instance
+   * @returns role instance
    * @throws 404 if role not found
    * @throws 400 if trying to update reserved role
    */
@@ -141,7 +141,6 @@ export const roleService = {
         })
       }
 
-      // Get all permissions to validate
       const permissions = await permissionRepository.findAllByNames(permissionNames, { transaction })
 
       if (permissions.length !== permissionNames.length) {
@@ -151,17 +150,9 @@ export const roleService = {
         })
       }
 
-      // Set permissions using repository
-      await roleRepository.setPermissions(name, permissionNames, { transaction })
+      await roleRepository.updatePermissionsByName(name, permissionNames, { transaction })
 
-      // Get updated permissions
-      const updatedPermissions = await roleRepository.findAllPermissionsByName(name, { transaction })
-
-      // Return role with updated permissions
-      return {
-        ...role,
-        permissions: updatedPermissions,
-      }
+      return role
     })
   },
 

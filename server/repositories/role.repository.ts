@@ -172,16 +172,15 @@ export const roleRepository = {
   },
 
   /**
-   * Sets permissions for a role.
+   * Updates permissions for a role.
    *
    * @param name - role primary key
    * @param permissionNames - array of permission names
    * @param options - sequelize options
    */
-  async setPermissions(name: string, permissionNames: string[], options: Options = {}) {
+  async updatePermissionsByName(name: string, permissionNames: string[], options: Options = {}) {
     const db = useDatabase()
 
-    // First, delete existing permissions
     await db.sequelize.query(
       'DELETE FROM roles_has_permissions WHERE role = :roleName',
       {
@@ -191,9 +190,7 @@ export const roleRepository = {
       },
     )
 
-    // Then, insert new permissions if any
     if (permissionNames.length > 0) {
-      // Build safe parameterized insert
       const placeholders = permissionNames.map((_, i) => `(:roleName, :permission${i})`).join(', ')
       const replacements: Record<string, string> = { roleName: name }
       permissionNames.forEach((permission, i) => {

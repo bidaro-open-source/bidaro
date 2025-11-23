@@ -1,4 +1,5 @@
-import { createPermissionResource } from '~~/server/resources/role.resource'
+import { createPermissionResource } from '~~/server/resources/permission.resource'
+import { roleRepository } from '~~/server/repositories/role.repository'
 import { roleService } from '~~/server/services/role.service'
 import { updateRolePermissionsPolicy } from './index.policy'
 import { updateRolePermissionsRequest } from './index.put.request'
@@ -10,10 +11,12 @@ export default defineEventHandler(async (event) => {
 
   updateRolePermissionsPolicy(event)
 
-  const updatedRole = await roleService.updatePermissions(
+  await roleService.updatePermissions(
     request.params.name,
     request.body.permissions,
   )
 
-  return updatedRole.permissions?.map(createPermissionResource) ?? []
+  const permissions = await roleRepository.findAllPermissionsByName(request.params.name)
+
+  return permissions.map(createPermissionResource)
 })

@@ -1,3 +1,4 @@
+import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { permissionRepository } from '~~/server/repositories/permission.repository'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
@@ -26,9 +27,5 @@ export default defineEventHandler(async (event) => {
     },
   )
 
-  return {
-    name: updatedPermission.name,
-    displayName: updatedPermission.displayName,
-    description: updatedPermission.description,
-  }
+  return createPermissionResource(updatedPermission)
 })
