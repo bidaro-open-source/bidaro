@@ -40,6 +40,7 @@ describe('POST /api/users/:id/verify', async () => {
     expect(user.id).toBe(userData.user.id)
 
     await userData.user.reload()
+
     expect(userData.user.emailVerifiedAt).not.toBeNull()
 
     await userData.clear()

@@ -10,7 +10,10 @@ export default defineEventHandler(async (event) => {
 
   updateUserRolePolicy(event)
 
-  const user = await userService.updateRole(request.params.id, request.body.roleName)
+  const user = await userService.updateRole(
+    request.params.id,
+    request.body.roleName,
+  )
 
   return createUserResource(user)
 })

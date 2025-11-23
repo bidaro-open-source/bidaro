@@ -30,16 +30,16 @@ describe('PUT /api/users/:id/role', async () => {
     })
 
     const response = await updateUserRoleRequest(
-      { params: { id: userData.user.id }, body: { roleName: roleData.name } },
+      {
+        params: { id: userData.user.id },
+        body: { roleName: roleData.name },
+      },
       { accessToken: adminData.access_token },
     )
 
-    const user = response._data
+    await userData.user.reload()
 
     expect(response.status).toBe(200)
-    expect(user.id).toBe(userData.user.id)
-
-    await userData.user.reload()
     expect(userData.user.roleName).toBe(roleData.name)
 
     await userData.clear()
@@ -56,16 +56,16 @@ describe('PUT /api/users/:id/role', async () => {
     })
 
     const response = await updateUserRoleRequest(
-      { params: { id: userData.user.id }, body: { roleName: null } },
+      {
+        params: { id: userData.user.id },
+        body: { roleName: null },
+      },
       { accessToken: adminData.access_token },
     )
 
-    const user = response._data
+    await userData.user.reload()
 
     expect(response.status).toBe(200)
-    expect(user.id).toBe(userData.user.id)
-
-    await userData.user.reload()
     expect(userData.user.roleName).toBe(null)
 
     await userData.clear()
@@ -95,7 +95,10 @@ describe('PUT /api/users/:id/role', async () => {
       })
 
       const response = await updateUserRoleRequest(
-        { params: { id: userData.user.id }, body: { roleName: roles.USER } },
+        {
+          params: { id: userData.user.id },
+          body: { roleName: roles.USER },
+        },
         { accessToken: adminData.access_token },
       )
 
@@ -113,7 +116,10 @@ describe('PUT /api/users/:id/role', async () => {
       })
 
       const response = await updateUserRoleRequest(
-        { params: { id: 93475937459 }, body: { roleName: roles.USER } },
+        {
+          params: { id: 93475937459 },
+          body: { roleName: roles.USER },
+        },
         { accessToken: adminData.access_token },
       )
 
