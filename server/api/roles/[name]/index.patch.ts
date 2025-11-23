@@ -1,7 +1,7 @@
 import { createRoleResource } from '~~/server/resources/role.resource'
 import { roleService } from '~~/server/services/role.service'
-import { updateRolePolicy } from './index.policy'
 import { updateRoleRequest } from './index.patch.request'
+import { updateRolePolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

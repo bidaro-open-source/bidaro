@@ -27,11 +27,15 @@ describe('DELETE /api/roles/:name', async () => {
       withPermissions: [permissions.DELETE_ROLE],
     })
 
-    const response = await deleteRoleRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
+    const response = await deleteRoleRequest(
+      { params: { name: roleData.name } },
+      { accessToken: userData.access_token },
+    )
 
     expect(response.status).toBe(204)
 
     const deletedRole = await db.Role.findByPk(roleData.name)
+
     expect(deletedRole).toBe(null)
 
     await userData.clear()
@@ -45,7 +49,10 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [permissions.DELETE_ROLE],
       })
 
-      const response = await deleteRoleRequest({ params: { name: 'nonexistent' } }, { accessToken: userData.access_token })
+      const response = await deleteRoleRequest(
+        { params: { name: 'nonexistent' } },
+        { accessToken: userData.access_token },
+      )
 
       expect(response.status).toBe(404)
 
@@ -59,7 +66,10 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [permissions.DELETE_ROLE],
       })
 
-      const response = await deleteRoleRequest({ params: { name: roles.USER } }, { accessToken: userData.access_token })
+      const response = await deleteRoleRequest(
+        { params: { name: roles.USER } },
+        { accessToken: userData.access_token },
+      )
 
       expect(response.status).toBe(400)
 
@@ -76,7 +86,10 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [permissions.DELETE_ROLE],
       })
 
-      const response = await deleteRoleRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
+      const response = await deleteRoleRequest(
+        { params: { name: roleData.name } },
+        { accessToken: userData.access_token },
+      )
 
       expect(response.status).toBe(400)
 
@@ -98,7 +111,10 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [],
       })
 
-      const response = await deleteRoleRequest({ params: { name: 'test' } }, { accessToken: userData.access_token })
+      const response = await deleteRoleRequest(
+        { params: { name: 'test' } },
+        { accessToken: userData.access_token },
+      )
 
       expect(response.status).toBe(403)
 

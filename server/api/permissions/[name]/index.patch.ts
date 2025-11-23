@@ -1,5 +1,5 @@
-import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { permissionRepository } from '~~/server/repositories/permission.repository'
+import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 

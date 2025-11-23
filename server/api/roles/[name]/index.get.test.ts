@@ -29,7 +29,10 @@ describe('GET /api/roles/:name', async () => {
       withPermissions: [permissions.VIEW_ROLES],
     })
 
-    const response = await getRoleRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
+    const response = await getRoleRequest(
+      { params: { name: roleData.name } },
+      { accessToken: userData.access_token },
+    )
 
     expect(response.status).toBe(200)
     expect(response._data.name).toBe(roleData.name)
@@ -51,7 +54,10 @@ describe('GET /api/roles/:name', async () => {
         withPermissions: [permissions.VIEW_ROLES],
       })
 
-      const response = await getRoleRequest({ params: { name: 'nonexistent' } }, { accessToken: userData.access_token })
+      const response = await getRoleRequest(
+        { params: { name: 'nonexistent' } },
+        { accessToken: userData.access_token },
+      )
 
       expect(response.status).toBe(404)
 
@@ -65,16 +71,21 @@ describe('GET /api/roles/:name', async () => {
     })
 
     it('should return 403 when user lacks required permission', async () => {
+      const roleData = await db.RoleFactory.new().create()
       const userData = await createUser({
         withRole: true,
         withSession: true,
         withPermissions: [],
       })
 
-      const response = await getRoleRequest({ params: { name: 'test' } }, { accessToken: userData.access_token })
+      const response = await getRoleRequest(
+        { params: { name: roleData.name } },
+        { accessToken: userData.access_token },
+      )
 
       expect(response.status).toBe(403)
 
+      await roleData.destroy()
       await userData.clear()
     })
   })

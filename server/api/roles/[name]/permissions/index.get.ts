@@ -1,7 +1,7 @@
-import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { roleRepository } from '~~/server/repositories/role.repository'
-import { viewRolePermissionsPolicy } from './index.policy'
+import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { getRoleRequest } from '../index.request'
+import { viewRolePermissionsPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -19,7 +19,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const permissions = await roleRepository.findAllPermissionsByName(request.params.name)
-
-  return permissions.map(createPermissionResource)
+  return (role.permissions || []).map(createPermissionResource)
 })

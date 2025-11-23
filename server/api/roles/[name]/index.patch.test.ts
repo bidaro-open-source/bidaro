@@ -32,7 +32,10 @@ describe('PATCH /api/roles/:name', async () => {
     const newDescription = 'Updated description'
 
     const response = await updateRoleRequest(
-      { params: { name: roleData.name }, body: { displayName: newDisplayName, description: newDescription } },
+      {
+        params: { name: roleData.name },
+        body: { displayName: newDisplayName, description: newDescription },
+      },
       { accessToken: userData.access_token },
     )
 
@@ -55,7 +58,10 @@ describe('PATCH /api/roles/:name', async () => {
     const newDisplayName = 'Updated Display Name'
 
     const response = await updateRoleRequest(
-      { params: { name: roleData.name }, body: { displayName: newDisplayName } },
+      {
+        params: { name: roleData.name },
+        body: { displayName: newDisplayName },
+      },
       { accessToken: userData.access_token },
     )
 
@@ -78,7 +84,10 @@ describe('PATCH /api/roles/:name', async () => {
     const newDescription = 'Updated description'
 
     const response = await updateRoleRequest(
-      { params: { name: roleData.name }, body: { description: newDescription } },
+      {
+        params: { name: roleData.name },
+        body: { description: newDescription },
+      },
       { accessToken: userData.access_token },
     )
 
@@ -109,14 +118,19 @@ describe('PATCH /api/roles/:name', async () => {
     })
 
     it('should return 401 when user is not authenticated', async () => {
+      const roleData = await db.RoleFactory.new().create()
       const response = await updateRoleRequest(
-        { params: { name: 'test' }, body: { displayName: 'Test' } },
+        { params: { name: roleData.name }, body: { displayName: 'Test' } },
       )
 
       expect(response.status).toBe(401)
+
+      await roleData.destroy()
     })
 
     it('should return 403 when user lacks required permission', async () => {
+      const roleData = await db.RoleFactory.new().create()
+
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -124,12 +138,16 @@ describe('PATCH /api/roles/:name', async () => {
       })
 
       const response = await updateRoleRequest(
-        { params: { name: 'test' }, body: { displayName: 'Test' } },
+        {
+          params: { name: roleData.name },
+          body: { displayName: 'Test' },
+        },
         { accessToken: userData.access_token },
       )
 
       expect(response.status).toBe(403)
 
+      await roleData.destroy()
       await userData.clear()
     })
   })

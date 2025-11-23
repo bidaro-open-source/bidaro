@@ -28,18 +28,26 @@ describe('PUT /api/roles/:name/permissions', async () => {
       withPermissions: [permissions.UPDATE_ROLE_PERMISSIONS],
     })
 
-    const permissionsToAdd = [permissions.VIEW_PERMISSIONS, permissions.UPDATE_PERMISSIONS]
+    const permissionsToAdd = [
+      permissions.VIEW_PERMISSIONS,
+      permissions.UPDATE_PERMISSIONS,
+    ]
 
     const response = await updateRolePermissionsRequest(
-      { params: { name: roleData.name }, body: { permissions: permissionsToAdd } },
+      {
+        params: { name: roleData.name },
+        body: { permissions: permissionsToAdd },
+      },
       { accessToken: userData.access_token },
     )
 
+    const responseData = Array.isArray(response._data) ? response._data : []
+    const permissionNames = responseData.map((p: any) => p.name)
+
     expect(response.status).toBe(200)
-    expect(Array.isArray(response._data)).toBe(true)
-    expect(response._data.length).toBe(2)
-    expect(response._data.map((p: any) => p.name)).toContain(permissions.VIEW_PERMISSIONS)
-    expect(response._data.map((p: any) => p.name)).toContain(permissions.UPDATE_PERMISSIONS)
+    expect(responseData.length).toBe(2)
+    expect(permissionNames).toContain(permissions.VIEW_PERMISSIONS)
+    expect(permissionNames).toContain(permissions.UPDATE_PERMISSIONS)
 
     await roleData.destroy()
     await userData.clear()
@@ -58,14 +66,19 @@ describe('PUT /api/roles/:name/permissions', async () => {
     const newPermissions = [permissions.UPDATE_PERMISSIONS]
 
     const response = await updateRolePermissionsRequest(
-      { params: { name: roleData.name }, body: { permissions: newPermissions } },
+      {
+        params: { name: roleData.name },
+        body: { permissions: newPermissions },
+      },
       { accessToken: userData.access_token },
     )
 
+    const responseData = Array.isArray(response._data) ? response._data : []
+    const permissionNames = responseData.map((p: any) => p.name)
+
     expect(response.status).toBe(200)
-    expect(Array.isArray(response._data)).toBe(true)
-    expect(response._data.length).toBe(1)
-    expect(response._data[0].name).toBe(permissions.UPDATE_PERMISSIONS)
+    expect(responseData.length).toBe(1)
+    expect(permissionNames[0]).toBe(permissions.UPDATE_PERMISSIONS)
 
     await roleData.destroy()
     await userData.clear()
@@ -103,7 +116,10 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        { params: { name: 'nonexistent' }, body: { permissions: [permissions.VIEW_PERMISSIONS] } },
+        {
+          params: { name: 'nonexistent' },
+          body: { permissions: [permissions.VIEW_PERMISSIONS] },
+        },
         { accessToken: userData.access_token },
       )
 
@@ -120,7 +136,10 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        { params: { name: roles.USER }, body: { permissions: [permissions.VIEW_PERMISSIONS] } },
+        {
+          params: { name: roles.USER },
+          body: { permissions: [permissions.VIEW_PERMISSIONS] },
+        },
         { accessToken: userData.access_token },
       )
 
@@ -138,7 +157,10 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        { params: { name: roleData.name }, body: { permissions: ['nonexistent_permission'] } },
+        {
+          params: { name: roleData.name },
+          body: { permissions: ['nonexistent_permission'] },
+        },
         { accessToken: userData.access_token },
       )
 
@@ -157,6 +179,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
     })
 
     it('should return 403 when user lacks required permission', async () => {
+      const roleData = await db.RoleFactory.new().create()
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -164,12 +187,13 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        { params: { name: 'test' }, body: { permissions: [] } },
+        { params: { name: roleData.name }, body: { permissions: [] } },
         { accessToken: userData.access_token },
       )
 
       expect(response.status).toBe(403)
 
+      await roleData.destroy()
       await userData.clear()
     })
   })
