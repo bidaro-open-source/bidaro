@@ -1,3 +1,4 @@
+import type { GetRoleRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,10 +7,10 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function deleteRoleRequest(
-  name: string,
+  payload: GetRoleRequest,
   options: { accessToken?: string } = {},
 ) {
-  return await fetch(`/api/roles/${name}`, {
+  return await fetch(`/api/roles/${payload.params.name}`, {
     method: 'DELETE',
     accessToken: options.accessToken,
   })
@@ -26,7 +27,7 @@ describe('DELETE /api/roles/:name', async () => {
       withPermissions: [permissions.DELETE_ROLE],
     })
 
-    const response = await deleteRoleRequest(roleData.name, { accessToken: userData.access_token })
+    const response = await deleteRoleRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
 
     expect(response.status).toBe(204)
 
@@ -44,7 +45,7 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [permissions.DELETE_ROLE],
       })
 
-      const response = await deleteRoleRequest('nonexistent', { accessToken: userData.access_token })
+      const response = await deleteRoleRequest({ params: { name: 'nonexistent' } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(404)
 
@@ -58,7 +59,7 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [permissions.DELETE_ROLE],
       })
 
-      const response = await deleteRoleRequest(roles.USER, { accessToken: userData.access_token })
+      const response = await deleteRoleRequest({ params: { name: roles.USER } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(400)
 
@@ -75,7 +76,7 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [permissions.DELETE_ROLE],
       })
 
-      const response = await deleteRoleRequest(roleData.name, { accessToken: userData.access_token })
+      const response = await deleteRoleRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(400)
 
@@ -85,7 +86,7 @@ describe('DELETE /api/roles/:name', async () => {
     })
 
     it('should return 401 when user is not authenticated', async () => {
-      const response = await deleteRoleRequest('test')
+      const response = await deleteRoleRequest({ params: { name: 'test' } })
 
       expect(response.status).toBe(401)
     })
@@ -97,7 +98,7 @@ describe('DELETE /api/roles/:name', async () => {
         withPermissions: [],
       })
 
-      const response = await deleteRoleRequest('test', { accessToken: userData.access_token })
+      const response = await deleteRoleRequest({ params: { name: 'test' } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(403)
 

@@ -7,11 +7,10 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function updateRolePermissionsRequest(
-  name: string,
-  payload: Omit<UpdateRolePermissionsRequest, 'params'>,
+  payload: UpdateRolePermissionsRequest,
   options: { accessToken?: string } = {},
 ) {
-  return await fetch(`/api/roles/${name}/permissions`, {
+  return await fetch(`/api/roles/${payload.params.name}/permissions`, {
     method: 'PUT',
     body: payload.body,
     accessToken: options.accessToken,
@@ -32,8 +31,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
     const permissionsToAdd = [permissions.VIEW_PERMISSIONS, permissions.UPDATE_PERMISSIONS]
 
     const response = await updateRolePermissionsRequest(
-      roleData.name,
-      { body: { permissions: permissionsToAdd } },
+      { params: { name: roleData.name }, body: { permissions: permissionsToAdd } },
       { accessToken: userData.access_token },
     )
 
@@ -60,8 +58,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
     const newPermissions = [permissions.UPDATE_PERMISSIONS]
 
     const response = await updateRolePermissionsRequest(
-      roleData.name,
-      { body: { permissions: newPermissions } },
+      { params: { name: roleData.name }, body: { permissions: newPermissions } },
       { accessToken: userData.access_token },
     )
 
@@ -85,8 +82,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
     })
 
     const response = await updateRolePermissionsRequest(
-      roleData.name,
-      { body: { permissions: [] } },
+      { params: { name: roleData.name }, body: { permissions: [] } },
       { accessToken: userData.access_token },
     )
 
@@ -107,8 +103,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        'nonexistent',
-        { body: { permissions: [permissions.VIEW_PERMISSIONS] } },
+        { params: { name: 'nonexistent' }, body: { permissions: [permissions.VIEW_PERMISSIONS] } },
         { accessToken: userData.access_token },
       )
 
@@ -125,8 +120,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        roles.USER,
-        { body: { permissions: [permissions.VIEW_PERMISSIONS] } },
+        { params: { name: roles.USER }, body: { permissions: [permissions.VIEW_PERMISSIONS] } },
         { accessToken: userData.access_token },
       )
 
@@ -144,8 +138,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        roleData.name,
-        { body: { permissions: ['nonexistent_permission'] } },
+        { params: { name: roleData.name }, body: { permissions: ['nonexistent_permission'] } },
         { accessToken: userData.access_token },
       )
 
@@ -157,8 +150,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
 
     it('should return 401 when user is not authenticated', async () => {
       const response = await updateRolePermissionsRequest(
-        'test',
-        { body: { permissions: [] } },
+        { params: { name: 'test' }, body: { permissions: [] } },
       )
 
       expect(response.status).toBe(401)
@@ -172,8 +164,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
       })
 
       const response = await updateRolePermissionsRequest(
-        'test',
-        { body: { permissions: [] } },
+        { params: { name: 'test' }, body: { permissions: [] } },
         { accessToken: userData.access_token },
       )
 

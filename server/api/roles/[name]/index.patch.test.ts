@@ -7,11 +7,10 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function updateRoleRequest(
-  name: string,
-  payload: Omit<UpdateRoleRequest, 'params'>,
+  payload: UpdateRoleRequest,
   options: { accessToken?: string } = {},
 ) {
-  return await fetch(`/api/roles/${name}`, {
+  return await fetch(`/api/roles/${payload.params.name}`, {
     method: 'PATCH',
     body: payload.body,
     accessToken: options.accessToken,
@@ -33,8 +32,7 @@ describe('PATCH /api/roles/:name', async () => {
     const newDescription = 'Updated description'
 
     const response = await updateRoleRequest(
-      roleData.name,
-      { body: { displayName: newDisplayName, description: newDescription } },
+      { params: { name: roleData.name }, body: { displayName: newDisplayName, description: newDescription } },
       { accessToken: userData.access_token },
     )
 
@@ -57,8 +55,7 @@ describe('PATCH /api/roles/:name', async () => {
     const newDisplayName = 'Updated Display Name'
 
     const response = await updateRoleRequest(
-      roleData.name,
-      { body: { displayName: newDisplayName } },
+      { params: { name: roleData.name }, body: { displayName: newDisplayName } },
       { accessToken: userData.access_token },
     )
 
@@ -81,8 +78,7 @@ describe('PATCH /api/roles/:name', async () => {
     const newDescription = 'Updated description'
 
     const response = await updateRoleRequest(
-      roleData.name,
-      { body: { description: newDescription } },
+      { params: { name: roleData.name }, body: { description: newDescription } },
       { accessToken: userData.access_token },
     )
 
@@ -103,8 +99,7 @@ describe('PATCH /api/roles/:name', async () => {
       })
 
       const response = await updateRoleRequest(
-        'nonexistent',
-        { body: { displayName: 'Test' } },
+        { params: { name: 'nonexistent' }, body: { displayName: 'Test' } },
         { accessToken: userData.access_token },
       )
 
@@ -115,8 +110,7 @@ describe('PATCH /api/roles/:name', async () => {
 
     it('should return 401 when user is not authenticated', async () => {
       const response = await updateRoleRequest(
-        'test',
-        { body: { displayName: 'Test' } },
+        { params: { name: 'test' }, body: { displayName: 'Test' } },
       )
 
       expect(response.status).toBe(401)
@@ -130,8 +124,7 @@ describe('PATCH /api/roles/:name', async () => {
       })
 
       const response = await updateRoleRequest(
-        'test',
-        { body: { displayName: 'Test' } },
+        { params: { name: 'test' }, body: { displayName: 'Test' } },
         { accessToken: userData.access_token },
       )
 

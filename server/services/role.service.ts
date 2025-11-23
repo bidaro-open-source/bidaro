@@ -17,15 +17,6 @@ export const roleService = {
   },
 
   /**
-   * Gets all roles.
-   *
-   * @returns array of roles
-   */
-  async getAll() {
-    return await roleRepository.findAll()
-  },
-
-  /**
    * Gets a role by name.
    *
    * @param name - role name

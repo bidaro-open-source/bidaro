@@ -1,3 +1,4 @@
+import type { GetRoleRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,10 +7,10 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getRoleRequest(
-  name: string,
+  payload: GetRoleRequest,
   options: { accessToken?: string } = {},
 ) {
-  return await fetch(`/api/roles/${name}`, {
+  return await fetch(`/api/roles/${payload.params.name}`, {
     method: 'GET',
     accessToken: options.accessToken,
   })
@@ -28,7 +29,7 @@ describe('GET /api/roles/:name', async () => {
       withPermissions: [permissions.VIEW_ROLES],
     })
 
-    const response = await getRoleRequest(roleData.name, { accessToken: userData.access_token })
+    const response = await getRoleRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
 
     expect(response.status).toBe(200)
     expect(response._data.name).toBe(roleData.name)
@@ -50,7 +51,7 @@ describe('GET /api/roles/:name', async () => {
         withPermissions: [permissions.VIEW_ROLES],
       })
 
-      const response = await getRoleRequest('nonexistent', { accessToken: userData.access_token })
+      const response = await getRoleRequest({ params: { name: 'nonexistent' } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(404)
 
@@ -58,7 +59,7 @@ describe('GET /api/roles/:name', async () => {
     })
 
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getRoleRequest('test')
+      const response = await getRoleRequest({ params: { name: 'test' } })
 
       expect(response.status).toBe(401)
     })
@@ -70,7 +71,7 @@ describe('GET /api/roles/:name', async () => {
         withPermissions: [],
       })
 
-      const response = await getRoleRequest('test', { accessToken: userData.access_token })
+      const response = await getRoleRequest({ params: { name: 'test' } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(403)
 

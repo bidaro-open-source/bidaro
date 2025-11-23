@@ -76,10 +76,10 @@ describe('POST /api/roles', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const { name, displayName } = db.RoleFactory.new().make()
+      const { name } = db.RoleFactory.new().make()
 
       const response = await createRoleRequest(
-        { body: { name, displayName } },
+        { body: { name } },
       )
 
       expect(response.status).toBe(401)
@@ -92,10 +92,10 @@ describe('POST /api/roles', async () => {
         withPermissions: [],
       })
 
-      const { name, displayName } = db.RoleFactory.new().make()
+      const { name } = db.RoleFactory.new().make()
 
       const response = await createRoleRequest(
-        { body: { name, displayName } },
+        { body: { name } },
         { accessToken: userData.access_token },
       )
 

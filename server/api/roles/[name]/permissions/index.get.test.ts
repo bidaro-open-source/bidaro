@@ -1,3 +1,4 @@
+import type { GetRoleRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,10 +7,10 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function getRolePermissionsRequest(
-  name: string,
+  payload: GetRoleRequest,
   options: { accessToken?: string } = {},
 ) {
-  return await fetch(`/api/roles/${name}/permissions`, {
+  return await fetch(`/api/roles/${payload.params.name}/permissions`, {
     method: 'GET',
     accessToken: options.accessToken,
   })
@@ -28,7 +29,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       withPermissions: [permissions.VIEW_ROLE_PERMISSIONS],
     })
 
-    const response = await getRolePermissionsRequest(roleData.name, { accessToken: userData.access_token })
+    const response = await getRolePermissionsRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
 
     expect(response.status).toBe(200)
     expect(Array.isArray(response._data)).toBe(true)
@@ -49,7 +50,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       withPermissions: [permissions.VIEW_ROLE_PERMISSIONS],
     })
 
-    const response = await getRolePermissionsRequest(roleData.name, { accessToken: userData.access_token })
+    const response = await getRolePermissionsRequest({ params: { name: roleData.name } }, { accessToken: userData.access_token })
 
     expect(response.status).toBe(200)
     expect(Array.isArray(response._data)).toBe(true)
@@ -67,7 +68,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         withPermissions: [permissions.VIEW_ROLE_PERMISSIONS],
       })
 
-      const response = await getRolePermissionsRequest('nonexistent', { accessToken: userData.access_token })
+      const response = await getRolePermissionsRequest({ params: { name: 'nonexistent' } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(404)
 
@@ -75,7 +76,7 @@ describe('GET /api/roles/:name/permissions', async () => {
     })
 
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getRolePermissionsRequest('test')
+      const response = await getRolePermissionsRequest({ params: { name: 'test' } })
 
       expect(response.status).toBe(401)
     })
@@ -87,7 +88,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         withPermissions: [],
       })
 
-      const response = await getRolePermissionsRequest('test', { accessToken: userData.access_token })
+      const response = await getRolePermissionsRequest({ params: { name: 'test' } }, { accessToken: userData.access_token })
 
       expect(response.status).toBe(403)
 
