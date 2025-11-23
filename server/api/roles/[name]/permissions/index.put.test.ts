@@ -18,7 +18,7 @@ async function updateRolePermissionsRequest(
   })
 }
 
-describe('PUT /api/roles/[name]/permissions', async () => {
+describe('PUT /api/roles/:name/permissions', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should update role permissions', async () => {

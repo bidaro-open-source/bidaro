@@ -15,7 +15,7 @@ async function getRolePermissionsRequest(
   })
 }
 
-describe('GET /api/roles/[name]/permissions', async () => {
+describe('GET /api/roles/:name/permissions', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should return role permissions', async () => {

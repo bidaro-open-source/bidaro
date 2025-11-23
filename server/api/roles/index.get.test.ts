@@ -35,23 +35,25 @@ describe('GET /api/roles', async () => {
     await userData.clear()
   })
 
-  it('should return 401 when user is not authenticated', async () => {
-    const response = await getRolesRequest()
+  describe('error handling', () => {
+    it('should return 401 when user is not authenticated', async () => {
+      const response = await getRolesRequest()
 
-    expect(response.status).toBe(401)
-  })
-
-  it('should return 403 when user lacks required permission', async () => {
-    const userData = await createUser({
-      withRole: true,
-      withSession: true,
-      withPermissions: [],
+      expect(response.status).toBe(401)
     })
 
-    const response = await getRolesRequest({ accessToken: userData.access_token })
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
 
-    expect(response.status).toBe(403)
+      const response = await getRolesRequest({ accessToken: userData.access_token })
 
-    await userData.clear()
+      expect(response.status).toBe(403)
+
+      await userData.clear()
+    })
   })
 })

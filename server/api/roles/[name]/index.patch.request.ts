@@ -8,7 +8,7 @@ export const updateRoleRequest = createRequestValidator({
     name: roleSchema.name,
   }),
   body: z.object({
-    displayName: roleSchema.displayName.optional(),
-    description: roleSchema.description.optional(),
+    displayName: roleSchema.displayName.optional().nullable(),
+    description: roleSchema.description.optional().nullable(),
   }),
 })

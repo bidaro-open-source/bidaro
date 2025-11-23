@@ -18,7 +18,7 @@ async function updateRoleRequest(
   })
 }
 
-describe('PATCH /api/roles/[name]', async () => {
+describe('PATCH /api/roles/:name', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should update role displayName and description', async () => {

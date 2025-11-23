@@ -15,7 +15,7 @@ async function deleteRoleRequest(
   })
 }
 
-describe('DELETE /api/roles/[name]', async () => {
+describe('DELETE /api/roles/:name', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should delete role successfully', async () => {

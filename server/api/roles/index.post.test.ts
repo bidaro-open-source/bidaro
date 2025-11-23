@@ -50,17 +50,17 @@ describe('POST /api/roles', async () => {
     await userData.clear()
   })
 
-  it('should create role without description', async () => {
+  it('should create role with only name', async () => {
     const userData = await createUser({
       withRole: true,
       withSession: true,
       withPermissions: [permissions.CREATE_ROLE],
     })
 
-    const { name, displayName } = db.RoleFactory.new().make()
+    const { name } = db.RoleFactory.new().make()
 
     const response = await createRoleRequest(
-      { body: { name, displayName } },
+      { body: { name } },
       { accessToken: userData.access_token },
     )
 
@@ -68,7 +68,7 @@ describe('POST /api/roles', async () => {
 
     expect(response.status).toBe(201)
     expect(role.name).toBe(name)
-    expect(role.displayName).toBe(displayName)
+    expect(role.displayName).toBe(null)
     expect(role.description).toBe(null)
 
     await destroyRole(role.name)

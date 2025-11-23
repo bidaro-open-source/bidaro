@@ -15,7 +15,7 @@ async function getRoleRequest(
   })
 }
 
-describe('GET /api/roles/[name]', async () => {
+describe('GET /api/roles/:name', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should return role with permissions', async () => {
@@ -42,37 +42,39 @@ describe('GET /api/roles/[name]', async () => {
     await userData.clear()
   })
 
-  it('should return 404 when role does not exist', async () => {
-    const userData = await createUser({
-      withRole: true,
-      withSession: true,
-      withPermissions: [permissions.VIEW_ROLES],
+  describe('error handling', () => {
+    it('should return 404 when role does not exist', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.VIEW_ROLES],
+      })
+
+      const response = await getRoleRequest('nonexistent', { accessToken: userData.access_token })
+
+      expect(response.status).toBe(404)
+
+      await userData.clear()
     })
 
-    const response = await getRoleRequest('nonexistent', { accessToken: userData.access_token })
+    it('should return 401 when user is not authenticated', async () => {
+      const response = await getRoleRequest('test')
 
-    expect(response.status).toBe(404)
-
-    await userData.clear()
-  })
-
-  it('should return 401 when user is not authenticated', async () => {
-    const response = await getRoleRequest('test')
-
-    expect(response.status).toBe(401)
-  })
-
-  it('should return 403 when user lacks required permission', async () => {
-    const userData = await createUser({
-      withRole: true,
-      withSession: true,
-      withPermissions: [],
+      expect(response.status).toBe(401)
     })
 
-    const response = await getRoleRequest('test', { accessToken: userData.access_token })
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
 
-    expect(response.status).toBe(403)
+      const response = await getRoleRequest('test', { accessToken: userData.access_token })
 
-    await userData.clear()
+      expect(response.status).toBe(403)
+
+      await userData.clear()
+    })
   })
 })

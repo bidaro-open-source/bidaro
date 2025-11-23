@@ -67,15 +67,6 @@ export const roleRepository = {
     return db.Role.findByPk(name, {
       lock: options.lock,
       transaction: options.transaction,
-      include: [
-        {
-          model: db.Permission,
-          as: 'permissions',
-          through: {
-            attributes: [],
-          },
-        },
-      ],
     })
   },
 
