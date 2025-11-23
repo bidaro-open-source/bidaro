@@ -8,6 +8,6 @@ export const updateUserRoleRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   body: z.object({
-    roleName: z.string().min(1).max(64).nullable(),
+    roleName: z.union([z.string().min(1).max(64), z.null()]),
   }),
 })
