@@ -1,5 +1,6 @@
 import type { LOCK, Transaction } from 'sequelize'
 import type { RoleAttributesOptional } from '../database/models/Role'
+import { QueryTypes } from 'sequelize'
 
 interface Options {
   lock?: LOCK
@@ -182,26 +183,28 @@ export const roleRepository = {
 
     // First, delete existing permissions
     await db.sequelize.query(
-      `DELETE FROM roles_has_permissions WHERE role = :roleName`,
+      'DELETE FROM roles_has_permissions WHERE role = :roleName',
       {
         replacements: { roleName: name },
+        type: QueryTypes.DELETE,
         transaction: options.transaction,
       },
     )
 
-    // Then, insert new permissions
+    // Then, insert new permissions if any
     if (permissionNames.length > 0) {
-      const values = permissionNames.map((_, index) => `(:roleName${index}, :permissionName${index})`).join(', ')
-      const replacements: Record<string, string> = {}
-      permissionNames.forEach((permissionName, index) => {
-        replacements[`roleName${index}`] = name
-        replacements[`permissionName${index}`] = permissionName
+      // Build safe parameterized insert
+      const placeholders = permissionNames.map((_, i) => `(:roleName, :permission${i})`).join(', ')
+      const replacements: Record<string, string> = { roleName: name }
+      permissionNames.forEach((permission, i) => {
+        replacements[`permission${i}`] = permission
       })
 
       await db.sequelize.query(
-        `INSERT INTO roles_has_permissions (role, permission) VALUES ${values}`,
+        `INSERT INTO roles_has_permissions (role, permission) VALUES ${placeholders}`,
         {
           replacements,
+          type: QueryTypes.INSERT,
           transaction: options.transaction,
         },
       )
