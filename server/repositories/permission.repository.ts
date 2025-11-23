@@ -52,7 +52,7 @@ export const permissionRepository = {
   },
 
   /**
-   * Save a chagned permission record in the database.
+   * Save a changed permission record in the database.
    *
    * @param name - permission primary key
    * @param data - partial permission attributes to update
