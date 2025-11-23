@@ -2,7 +2,7 @@ import type { RoleAttributesOptional } from '../database'
 import { roles } from '../constants'
 import { roleRepository } from '../repositories/role.repository'
 
-const reservedRoles = [roles.USER]
+const reservedRoles: readonly string[] = [roles.USER]
 
 export const roleService = {
   /**
@@ -12,7 +12,7 @@ export const roleService = {
    * @returns true if role is reserved
    */
   isReserved(name: string): boolean {
-    return reservedRoles.includes(name as any)
+    return reservedRoles.includes(name)
   },
 
   /**
@@ -90,7 +90,9 @@ export const roleService = {
         })
       }
 
-      const displayName = data.displayName ?? role.displayName
+      const displayName = Object.hasOwn(data, 'displayName')
+        ? data.displayName
+        : role.displayName
       const description = Object.hasOwn(data, 'description')
         ? data.description
         : role.description
@@ -98,8 +100,8 @@ export const roleService = {
       const updatedRole = await roleRepository.updateByName(
         name,
         {
-          displayName: displayName || null,
-          description: description || null,
+          displayName: displayName ?? null,
+          description: description ?? null,
         },
         { transaction },
       )
@@ -159,7 +161,14 @@ export const roleService = {
       // Reload role with permissions
       const updatedRole = await roleRepository.findByName(name, { transaction })
 
-      return updatedRole!
+      if (!updatedRole) {
+        throw createError({
+          statusCode: 500,
+          message: 'Не вдалося завантажити оновлену роль',
+        })
+      }
+
+      return updatedRole
     })
   },
 
