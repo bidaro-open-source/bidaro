@@ -1,4 +1,5 @@
 import { permissionRepository } from '~~/server/repositories/permission.repository'
+import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { getPermissionsPolicy } from './index.get.policy'
 
 export default defineEventHandler(async (event) => {
@@ -8,9 +9,5 @@ export default defineEventHandler(async (event) => {
 
   const permissions = await permissionRepository.findAll()
 
-  return permissions.map(permission => ({
-    name: permission.name,
-    displayName: permission.displayName,
-    description: permission.description,
-  }))
+  return permissions.map(createPermissionResource)
 })

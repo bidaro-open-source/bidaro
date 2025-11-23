@@ -36,7 +36,23 @@ export const permissionRepository = {
   },
 
   /**
-   * Save a chagned permission record in the database.
+   * Find all permissions by names.
+   *
+   * @param names - Array of permission names.
+   * @param options - sequelize options.
+   * @returns Array of permission records.
+   */
+  async findAllByNames(names: string[], options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.Permission.findAll({
+      where: { name: names },
+      transaction: options.transaction,
+    })
+  },
+
+  /**
+   * Save a changed permission record in the database.
    *
    * @param name - permission primary key
    * @param data - partial permission attributes to update
