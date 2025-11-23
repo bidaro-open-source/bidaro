@@ -50,7 +50,7 @@ describe('DELETE /api/users/:id', async () => {
     await adminData.clear()
   })
 
-  it('should delete user with lots and bids', async () => {
+  it('should delete user with everything related to it', async () => {
     const adminData = await createUser({
       withRole: true,
       withSession: true,
@@ -109,8 +109,8 @@ describe('DELETE /api/users/:id', async () => {
     expect(deletedImage).toBeNull()
     expect(deletedBet).toBeNull()
     expect(updatedOtherLot?.winnerId).toBeNull()
-    expect(
-      async () => await getS3Object(
+    await expect(
+      async () => getS3Object(
         imageData.image.bucket,
         imageData.image.key,
       ),
