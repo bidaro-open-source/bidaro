@@ -18,6 +18,13 @@ export const permissions = {
   VIEW_CATEGORY_COUNT: 'view_category_count',
   UPDATE_CATEGORY_SLUG: 'update_category_slug',
   UPDATE_CATEGORY_PARENT: 'update_category_parent',
+
+  VIEW_ROLES: 'view_roles',
+  CREATE_ROLE: 'create_role',
+  UPDATE_ROLE: 'update_role',
+  DELETE_ROLE: 'delete_role',
+  VIEW_ROLE_PERMISSIONS: 'view_role_permissions',
+  UPDATE_ROLE_PERMISSIONS: 'update_role_permissions',
 } as const
 
 export const lotStatuses = {

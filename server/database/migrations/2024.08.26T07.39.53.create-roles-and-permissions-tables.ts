@@ -100,6 +100,12 @@ export const up: Migration = async ({ context }) => {
       { name: permissions.UPDATE_OWN_PROFILE, createdAt: new Date() },
       { name: permissions.UPDATE_OWN_EMAIL, createdAt: new Date() },
       { name: permissions.UPDATE_OWN_PASSWORD, createdAt: new Date() },
+      { name: permissions.VIEW_ROLES, createdAt: new Date() },
+      { name: permissions.CREATE_ROLE, createdAt: new Date() },
+      { name: permissions.UPDATE_ROLE, createdAt: new Date() },
+      { name: permissions.DELETE_ROLE, createdAt: new Date() },
+      { name: permissions.VIEW_ROLE_PERMISSIONS, createdAt: new Date() },
+      { name: permissions.UPDATE_ROLE_PERMISSIONS, createdAt: new Date() },
     ], { transaction })
 
     await queryInterface.bulkInsert('roles_has_permissions', [

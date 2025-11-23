@@ -1,0 +1,18 @@
+import { createRoleResource } from '~~/server/resources/role.resource'
+import { roleService } from '~~/server/services/role.service'
+import { createRolePolicy } from './index.policy'
+import { createRoleRequest } from './index.post.request'
+
+export default defineEventHandler(async (event) => {
+  mustBeAuthenticated(event)
+
+  const request = await createRoleRequest(event)
+
+  createRolePolicy(event)
+
+  const role = await roleService.create(request.body)
+
+  setResponseStatus(event, 201)
+
+  return createRoleResource(role)
+})
