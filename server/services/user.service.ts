@@ -196,9 +196,9 @@ export const userService = {
    * @throws 404 if user not found
    */
   async deleteById(id: number) {
-    return await useDatabaseTransaction(async (transaction) => {
-      const db = useDatabase()
+    const db = useDatabase()
 
+    return await useDatabaseTransaction(async (transaction) => {
       const user = await userRepository.findByIdWithLock(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
