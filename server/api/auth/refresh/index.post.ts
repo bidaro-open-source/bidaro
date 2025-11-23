@@ -6,7 +6,7 @@ import { refreshRequest } from './index.request'
 export default defineEventHandler(async (event) => {
   const request = await refreshRequest(event)
 
-  const oldSession = await authService.getAuthenticationSession(request.body.refresh_token)
+  const oldSession = await authService.getSession(request.body.refresh_token)
 
   if (!oldSession) {
     deleteRefreshTokenCookie(event)
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const metadata = createRequestMeta(event)
 
-  const session = await authService.updateAuthenticationSession(
+  const session = await authService.updateSession(
     request.body.refresh_token,
     metadata,
   )

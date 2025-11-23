@@ -232,11 +232,11 @@ export const userService = {
 
       await lotBetRepository.destroyByUserId(id, { transaction })
 
-      const sessions = await authService.getAuthenticationSessions(id)
+      const sessions = await authService.getSessions(id)
       const sessionUuids = Object.values(sessions).map(session => session.uuid)
 
       if (sessionUuids.length > 0) {
-        await authService.deleteAuthenticationSessions(id, sessionUuids)
+        await authService.deleteSessions(id, sessionUuids)
       }
 
       await userRepository.destroyById(id, { transaction })

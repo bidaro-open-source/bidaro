@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const sessions = await authService.getAuthenticationSessions(user.id)
+  const sessions = await authService.getSessions(user.id)
 
   return Object.values(sessions)
 })

@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await logoutRequest(event)
 
-  const session = await authService.getAuthenticationSession(request.body.refresh_token)
+  const session = await authService.getSession(request.body.refresh_token)
 
   if (!session) {
     throw createError({
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await authService.deleteAuthenticationSession(session.uid, request.body.refresh_token)
+  await authService.deleteSession(session.uid, request.body.refresh_token)
 
   deleteRefreshTokenCookie(event)
 

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const sessions = await authService.deleteAuthenticationSessions(
+  const sessions = await authService.deleteSessions(
     user.id,
     request.body.uuids,
   )

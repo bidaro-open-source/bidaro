@@ -26,7 +26,7 @@ export const authService = {
    * @param refreshToken refresh token
    * @returns user session data
    */
-  async getAuthenticationSession(
+  async getSession(
     refreshToken: RefreshToken,
   ): Promise<SessionMetadata | null> {
     const redis = useRedis()
@@ -43,7 +43,7 @@ export const authService = {
    * @param uid user id
    * @returns array of user session data
    */
-  async getAuthenticationSessions(
+  async getSessions(
     uid: number,
   ): Promise<SessionMetadataCollection> {
     const redis = useRedis()
@@ -80,7 +80,7 @@ export const authService = {
    * @param refreshToken refresh token
    * @returns boolean
    */
-  async verifyAuthenticationSession(
+  async verifySession(
     refreshToken: RefreshToken,
   ): Promise<boolean> {
     return !!(await useRedis().get(`${REDIS_SESSION_NAMESPACE}:${refreshToken}`))
@@ -95,7 +95,7 @@ export const authService = {
    * @param uid user id
    * @returns pair of refresh and access tokens
    */
-  async createAuthenticationSession(
+  async createSession(
     uid: number,
     metadata?: RequestMetadata,
   ): Promise<SessionData> {
@@ -137,14 +137,14 @@ export const authService = {
    * @throw if the refresh token is not whitelisted
    * @returns pair of refresh and access tokens
    */
-  async updateAuthenticationSession(
+  async updateSession(
     refreshToken: RefreshToken,
     metadata?: RequestMetadata,
   ): Promise<SessionData> {
     const redis = useRedis()
     const runtimeConfig = useRuntimeConfig()
 
-    const session = await authService.getAuthenticationSession(refreshToken)
+    const session = await authService.getSession(refreshToken)
 
     if (!session)
       throw new Error('Refresh token not found!')
@@ -188,7 +188,7 @@ export const authService = {
    * @param refreshToken refresh token
    * @throw if the refresh token is not whitelisted
    */
-  async deleteAuthenticationSession(
+  async deleteSession(
     uid: number,
     refreshToken: RefreshToken,
   ): Promise<void> {
@@ -209,11 +209,11 @@ export const authService = {
    * @returns array of action status
    * @throw if the refresh token is not whitelisted
    */
-  async deleteAuthenticationSessions(
+  async deleteSessions(
     uid: number,
     uuids: SessionUUID[],
   ): Promise<boolean[]> {
-    const sessions = await authService.getAuthenticationSessions(uid)
+    const sessions = await authService.getSessions(uid)
 
     const handledSessions = Array
       .from<boolean>({ length: uuids.length })
@@ -226,7 +226,7 @@ export const authService = {
 
       if (sessionIndex !== -1) {
         try {
-          await authService.deleteAuthenticationSession(uid, refreshToken)
+          await authService.deleteSession(uid, refreshToken)
           handledSessions[sessionIndex] = true
         }
         catch (e) {

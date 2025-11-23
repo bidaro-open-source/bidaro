@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
 
   const metadata = createRequestMeta(event)
 
-  const session = await authService.createAuthenticationSession(user.id, metadata)
+  const session = await authService.createSession(user.id, metadata)
 
   setRefreshTokenCookie(event, session.refreshToken)
 
