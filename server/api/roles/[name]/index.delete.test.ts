@@ -28,7 +28,7 @@ describe('DELETE /api/roles/:name', async () => {
 
     const response = await deleteRoleRequest(roleData.name, { accessToken: userData.access_token })
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(204)
 
     const deletedRole = await db.Role.findByPk(roleData.name)
     expect(deletedRole).toBe(null)

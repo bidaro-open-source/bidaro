@@ -1,5 +1,6 @@
 import type { RoleAttributesOptional } from '../database'
 import { roles } from '../constants'
+import { permissionRepository } from '../repositories/permission.repository'
 import { roleRepository } from '../repositories/role.repository'
 
 const reservedRoles: readonly string[] = [roles.USER]
@@ -140,13 +141,8 @@ export const roleService = {
         })
       }
 
-      const db = useDatabase()
-
       // Get all permissions to validate
-      const permissions = await db.Permission.findAll({
-        where: { name: permissionNames },
-        transaction,
-      })
+      const permissions = await permissionRepository.findAllByNames(permissionNames, { transaction })
 
       if (permissions.length !== permissionNames.length) {
         throw createError({
@@ -155,20 +151,17 @@ export const roleService = {
         })
       }
 
-      // Set permissions
-      await role.setPermissions(permissions, { transaction })
+      // Set permissions using repository
+      await roleRepository.setPermissions(name, permissionNames, { transaction })
 
-      // Reload role with permissions
-      const updatedRole = await roleRepository.findByName(name, { transaction })
+      // Get updated permissions
+      const updatedPermissions = await roleRepository.findAllPermissionsByName(name, { transaction })
 
-      if (!updatedRole) {
-        throw createError({
-          statusCode: 500,
-          message: 'Не вдалося завантажити оновлену роль',
-        })
+      // Return role with updated permissions
+      return {
+        ...role,
+        permissions: updatedPermissions,
       }
-
-      return updatedRole
     })
   },
 

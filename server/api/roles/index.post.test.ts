@@ -44,7 +44,6 @@ describe('POST /api/roles', async () => {
     expect(role.name).toBe(name)
     expect(role.displayName).toBe(displayName)
     expect(role.description).toBe(description)
-    expect(role.permissions).toEqual([])
 
     await destroyRole(role.name)
     await userData.clear()

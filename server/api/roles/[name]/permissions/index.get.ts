@@ -1,5 +1,5 @@
 import { createPermissionResource } from '~~/server/resources/role.resource'
-import { roleService } from '~~/server/services/role.service'
+import { roleRepository } from '~~/server/repositories/role.repository'
 import { viewRolePermissionsPolicy } from './index.policy'
 import { getRoleRequest } from '../index.request'
 
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   viewRolePermissionsPolicy(event)
 
-  const role = await roleService.getByName(request.params.name)
+  const permissions = await roleRepository.findAllPermissionsByName(request.params.name)
 
-  return role.permissions?.map(createPermissionResource) ?? []
+  return permissions.map(createPermissionResource)
 })

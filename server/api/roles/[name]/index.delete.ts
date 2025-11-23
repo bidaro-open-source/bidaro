@@ -10,4 +10,6 @@ export default defineEventHandler(async (event) => {
   deleteRolePolicy(event)
 
   await roleService.delete(request.params.name)
+
+  setResponseStatus(event, 204)
 })

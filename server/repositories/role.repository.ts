@@ -143,4 +143,68 @@ export const roleRepository = {
       transaction: options.transaction,
     })
   },
+
+  /**
+   * Finds all permissions for a role by role name.
+   *
+   * @param name - role primary key
+   * @param options - sequelize options
+   * @returns array of permissions for the role
+   */
+  async findAllPermissionsByName(name: string, options: Options = {}) {
+    const db = useDatabase()
+
+    const role = await db.Role.findByPk(name, {
+      transaction: options.transaction,
+      include: [
+        {
+          model: db.Permission,
+          as: 'permissions',
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    })
+
+    return role?.permissions ?? []
+  },
+
+  /**
+   * Sets permissions for a role.
+   *
+   * @param name - role primary key
+   * @param permissionNames - array of permission names
+   * @param options - sequelize options
+   */
+  async setPermissions(name: string, permissionNames: string[], options: Options = {}) {
+    const db = useDatabase()
+
+    // First, delete existing permissions
+    await db.sequelize.query(
+      `DELETE FROM roles_has_permissions WHERE role = :roleName`,
+      {
+        replacements: { roleName: name },
+        transaction: options.transaction,
+      },
+    )
+
+    // Then, insert new permissions
+    if (permissionNames.length > 0) {
+      const values = permissionNames.map((_, index) => `(:roleName${index}, :permissionName${index})`).join(', ')
+      const replacements: Record<string, string> = {}
+      permissionNames.forEach((permissionName, index) => {
+        replacements[`roleName${index}`] = name
+        replacements[`permissionName${index}`] = permissionName
+      })
+
+      await db.sequelize.query(
+        `INSERT INTO roles_has_permissions (role, permission) VALUES ${values}`,
+        {
+          replacements,
+          transaction: options.transaction,
+        },
+      )
+    }
+  },
 }
