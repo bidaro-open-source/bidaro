@@ -7,7 +7,7 @@ import {
   BootstrapFactories,
 } from '~~/server/database'
 
-function useDatabase() {
+async function useDatabase() {
   try {
     const connection = new Sequelize({
       host: env.NUXT_DB_HOST,
@@ -19,7 +19,7 @@ function useDatabase() {
       logging: false,
     })
 
-    connection.authenticate()
+    await connection.authenticate()
 
     const database: Database = BootstrapDatabase(connection)
 
@@ -30,9 +30,9 @@ function useDatabase() {
   }
 }
 
-beforeAll(() => {
+beforeAll(async () => {
   // @ts-expect-error type
-  globalThis.db = useDatabase()
+  globalThis.db = await useDatabase()
 })
 
 afterAll(async () => {
@@ -43,5 +43,5 @@ afterAll(async () => {
 })
 
 declare global {
-  let db: ReturnType<typeof useDatabase>
+  let db: Awaited<ReturnType<typeof useDatabase>>
 }
