@@ -1,4 +1,5 @@
 import type { UserAttributesOptional } from '../database'
+import { REDIS_SESSION_NAMESPACE } from './authentication.service'
 import { userRepository } from '../repositories/user.repository'
 
 export const userService = {
@@ -154,12 +155,14 @@ export const userService = {
   },
 
   /**
-   * Deletes a user by their primary key.
+   * Updates user's role.
    *
    * @param id - user primary key
+   * @param roleName - new role name (or null to remove role)
+   * @returns updated user instance
    * @throws 404 if user not found
    */
-  async deleteById(id: number) {
+  async updateRole(id: number, roleName: string | null) {
     return await useDatabaseTransaction(async (transaction) => {
       const user = await userRepository.findByIdWithLock(id, {
         lock: transaction.LOCK.UPDATE,
@@ -173,6 +176,60 @@ export const userService = {
         })
       }
 
+      if (user.roleName === roleName) {
+        return user
+      }
+
+      return await userRepository.updateById(
+        id,
+        { roleName },
+        { transaction },
+      )
+    })
+  },
+
+  /**
+   * Deletes a user by their primary key.
+   * Deletes all their lots (with images via cascade), bids, and sessions.
+   *
+   * @param id - user primary key
+   * @throws 404 if user not found
+   */
+  async deleteById(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const db = useDatabase()
+
+      const user = await userRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      if (!user) {
+        throw createError({
+          statusCode: 404,
+          message: 'Користувача не знайдено',
+        })
+      }
+
+      // Delete all bids made by this user
+      // (LotBet has onDelete: SET NULL but userId is NOT NULL, so we need to delete manually)
+      await db.LotBet.destroy({
+        where: { userId: id },
+        transaction,
+      })
+
+      // Delete all sessions for this user from Redis
+      const redis = useRedis()
+      const sessionKey = `${REDIS_SESSION_NAMESPACE}:${id}`
+      const tokens = await redis.smembers(sessionKey)
+
+      if (tokens.length > 0) {
+        const sessionKeys = tokens.map((token: string) => `${REDIS_SESSION_NAMESPACE}:${token}`)
+        await redis.del(...sessionKeys)
+        await redis.del(sessionKey)
+      }
+
+      // Delete user (lots will cascade delete via database constraint)
       await userRepository.destroyById(id, { transaction })
     })
   },
