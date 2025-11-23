@@ -43,14 +43,28 @@ export const lotImageService = {
    * @returns safe image primary keys which already unattached
    */
   async unattachImages(id: number, imageIds: number[]) {
-    const existingLinks = await lotImageRepository.findAllLinksByLotAndPks(id, imageIds)
+    return await useDatabaseTransaction(async (transaction) => {
+      const lot = await lotRepository.findByIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
 
-    const safeLinkIds = existingLinks.map(link => link.id)
-    const safeImageIds = existingLinks.map(link => link.imageId)
+      if (!lot) {
+        throw createError({
+          message: 'Лот не знайдено',
+          status: 404,
+        })
+      }
 
-    await lotImageRepository.destroyByIds(safeLinkIds)
+      const existingLinks = await lotImageRepository.findAllLinksByLotAndPks(id, imageIds, { transaction })
 
-    return safeImageIds
+      const safeLinkIds = existingLinks.map(link => link.id)
+      const safeImageIds = existingLinks.map(link => link.imageId)
+
+      await lotImageRepository.destroyByIds(safeLinkIds, { transaction })
+
+      return safeImageIds
+    })
   },
 
   /**

@@ -36,5 +36,5 @@ export async function createWinnerLot(options: Options) {
     await lot.destroy()
   }
 
-  return { lot, clear }
+  return { lot, bet, clear }
 }

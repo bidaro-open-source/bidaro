@@ -1,6 +1,10 @@
 import type { UserAttributesOptional } from '../database'
+import { lotBetRepository } from '../repositories/lot-bet.repository'
+import { lotImageRepository } from '../repositories/lot-image.repository'
+import { lotRepository } from '../repositories/lot.repository'
 import { userRepository } from '../repositories/user.repository'
 import { authService } from './authentication.service'
+import { imageService } from './image.service'
 
 export const userService = {
   /**
@@ -196,8 +200,6 @@ export const userService = {
    * @throws 404 if user not found
    */
   async deleteById(id: number) {
-    const db = useDatabase()
-
     return await useDatabaseTransaction(async (transaction) => {
       const user = await userRepository.findByIdWithLock(id, {
         lock: transaction.LOCK.UPDATE,
@@ -211,10 +213,24 @@ export const userService = {
         })
       }
 
-      await db.LotBet.destroy({
-        where: { userId: id },
+      const lots = await lotRepository.findAllBySellerIdWithLock(id, {
+        lock: transaction.LOCK.UPDATE,
         transaction,
       })
+
+      for (const lot of lots) {
+        const images = await lotImageRepository.findAllByLotId(lot.id, {
+          transaction,
+        })
+
+        const imagesIds = images.map(image => image.id)
+
+        await imageService.destroySafely(imagesIds)
+
+        await lotRepository.destroyById(lot.id, { transaction })
+      }
+
+      await lotBetRepository.destroyByUserId(id, { transaction })
 
       const sessions = await authService.getAuthenticationSessions(id)
       const sessionUuids = Object.values(sessions).map(session => session.uuid)

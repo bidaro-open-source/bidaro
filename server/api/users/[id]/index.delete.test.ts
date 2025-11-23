@@ -3,8 +3,16 @@ import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
+import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
+import { createImage } from '~~/test/api-e2e/arrangers/create-image'
+import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { getS3Object } from '~~/test/api-e2e/arrangers/get-s3-object'
+import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
+import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
+import { createWinnerLot } from '~~/test/api-e2e/arrangers/lots/create-winner-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 
 async function deleteUserRequest(
   payload: DeleteUserRequest,
@@ -34,72 +42,79 @@ describe('DELETE /api/users/:id', async () => {
       { accessToken: adminData.access_token },
     )
 
-    expect(response.status).toBe(204)
-
     const deletedUser = await db.User.findByPk(userId)
+
+    expect(response.status).toBe(204)
     expect(deletedUser).toBeNull()
 
     await adminData.clear()
   })
 
   it('should delete user with lots and bids', async () => {
+    const adminData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_USER],
+    })
+
     const userData = await createUser()
-    const adminData = await createUser({
-      withRole: true,
-      withSession: true,
-      withPermissions: [permissions.DELETE_USER],
+    const winnerData = await createUser()
+    const otherOwnerData = await createUser()
+    const categoryData = await createCategory()
+
+    const lotDrafted = await createLot({
+      sellerId: userData.user.id,
     })
 
-    const lot = await db.LotFactory.new().create({ sellerId: userData.user.id })
+    const imageData = await createImage(resolveImage('image-normal.png').path)
+    const lotImageData = await createLotImage(lotDrafted.lot.id, imageData.image.id)
 
-    const anotherUser = await createUser()
-    const anotherLot = await db.LotFactory.new().create({ sellerId: anotherUser.user.id })
-    const bet = await db.LotBetFactory.new().create({
-      lotId: anotherLot.id,
-      userId: userData.user.id,
+    const lotPublished = await createPublishedLot({
+      sellerId: userData.user.id,
+      categoryId: categoryData.category.id,
     })
 
-    const userId = userData.user.id
+    const lotWithWinner = await createWinnerLot({
+      sellerId: userData.user.id,
+      categoryId: categoryData.category.id,
+      winnerId: winnerData.user.id,
+    })
+
+    const otherLot = await createWinnerLot({
+      sellerId: otherOwnerData.user.id,
+      categoryId: categoryData.category.id,
+      winnerId: userData.user.id,
+    })
 
     const response = await deleteUserRequest(
-      { params: { id: userId } },
+      { params: { id: userData.user.id } },
       { accessToken: adminData.access_token },
     )
 
+    const deletedUser = await db.User.findByPk(userData.user.id)
+    const deletedLotDrafted = await db.Lot.findByPk(lotDrafted.lot.id)
+    const deletedLotPublished = await db.Lot.findByPk(lotPublished.lot.id)
+    const deletedLotWithWinner = await db.Lot.findByPk(lotWithWinner.lot.id)
+    const deletedLotImage = await db.LotImage.findByPk(lotImageData.lotImage.id)
+    const deletedImage = await db.Image.findByPk(imageData.image.id)
+    const deletedBet = await db.LotBet.findByPk(lotWithWinner.bet.id)
+    const updatedOtherLot = await db.Lot.findByPk(otherLot.lot.id)
+
     expect(response.status).toBe(204)
-
-    const deletedUser = await db.User.findByPk(userId)
     expect(deletedUser).toBeNull()
-
-    const deletedLot = await db.Lot.findByPk(lot.id)
-    expect(deletedLot).toBeNull()
-
-    const deletedBet = await db.LotBet.findByPk(bet.id)
+    expect(deletedLotDrafted).toBeNull()
+    expect(deletedLotPublished).toBeNull()
+    expect(deletedLotWithWinner).toBeNull()
+    expect(deletedLotImage).toBeNull()
+    expect(deletedImage).toBeNull()
     expect(deletedBet).toBeNull()
-
-    await anotherUser.clear()
-    await adminData.clear()
-  })
-
-  it('should delete user with sessions', async () => {
-    const userData = await createUser({ withSession: true })
-    const adminData = await createUser({
-      withRole: true,
-      withSession: true,
-      withPermissions: [permissions.DELETE_USER],
-    })
-
-    const userId = userData.user.id
-
-    const response = await deleteUserRequest(
-      { params: { id: userId } },
-      { accessToken: adminData.access_token },
-    )
-
-    expect(response.status).toBe(204)
-
-    const deletedUser = await db.User.findByPk(userId)
-    expect(deletedUser).toBeNull()
+    expect(updatedOtherLot?.winnerId).toBeNull()
+    expect(
+      async () => await getS3Object(
+        imageData.image.bucket,
+        imageData.image.key,
+      ),
+    ).rejects.toThrowError()
 
     await adminData.clear()
   })

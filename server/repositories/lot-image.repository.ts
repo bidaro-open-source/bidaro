@@ -19,7 +19,6 @@ export const lotImageRepository = {
     const db = useDatabase()
 
     const lot = await db.Lot.findByPk(lotId, {
-      lock: options.lock,
       transaction: options.transaction,
       include: [
         {
@@ -121,10 +120,11 @@ export const lotImageRepository = {
    * @param linkIds - Array of LotImage primary keys to remove.
    * @returns Number of rows deleted.
    */
-  async destroyByIds(linkIds: number[]) {
+  async destroyByIds(linkIds: number[], options: Options = {}) {
     const db = useDatabase()
 
     return await db.LotImage.destroy({
+      transaction: options.transaction,
       where: {
         id: {
           [Op.in]: linkIds,

@@ -66,4 +66,20 @@ export const lotBetRepository = {
       { transaction: options.transaction },
     )
   },
+
+  /**
+   * Deletes lot bets by user id.
+   *
+   * @param userId - user primary key
+   * @param options - sequelize options
+   * @returns number of deleted records
+   */
+  async destroyByUserId(userId: number, options: Options = {}) {
+    const db = useDatabase()
+
+    return await db.LotBet.destroy({
+      where: { userId },
+      transaction: options.transaction,
+    })
+  },
 }
