@@ -80,10 +80,6 @@ describe('GET /api/lots/:id', async () => {
       expect(lotImages[0]?.key).toBe(imageData.image.key)
       expect(lotImages[0]?.bucket).toBe(imageData.image.bucket)
       expect(lotImages[0]?.mime).toBe(imageData.image.mime_type)
-
-      const lotBets = lot.bets || []
-      expect(lotBets[0]?.id).toBe(lotData.bet.id)
-      expect(lotBets[0]?.amount).toBe(lotData.bet.amount)
     }
 
     await lotImageData.clear()

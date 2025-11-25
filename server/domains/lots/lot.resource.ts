@@ -1,8 +1,8 @@
-import type { Lot } from '../../database'
+import type { LotAttributes } from '../../database'
 
 export type LotResource = ReturnType<typeof createLotResource>
 
-export function createLotResource(entity: Lot) {
+export function createLotResource(entity: LotAttributes) {
   return {
     id: entity.id as number,
     winnerId: entity.winnerId as number,

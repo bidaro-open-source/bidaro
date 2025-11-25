@@ -20,6 +20,13 @@ class LotBetRepository extends Repository<LotBet> {
     return await db.LotBet.findAll({
       transaction: options.transaction,
       where: { lotId },
+      include: [
+        {
+          model: db.User,
+          as: 'user',
+          attributes: ['username'],
+        },
+      ],
     })
   }
 

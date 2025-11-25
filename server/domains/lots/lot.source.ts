@@ -58,7 +58,12 @@ class LotSource extends Source<Lot> {
     const key = this.keys.oneBets(lotId)
 
     return await useDatabaseCache(key, async () => {
-      return await lotBetRepository.findAllByLotId(lotId)
+      const data = await lotBetRepository.findAllByLotId(lotId)
+
+      return data.map(bet => [
+        bet.toJSON(),
+        { username: bet.user?.username || 'anonymous' },
+      ] as const)
     })
   }
 
