@@ -30,7 +30,6 @@ describe('GET /api/roles', async () => {
     expect(response._data[0]).toHaveProperty('name')
     expect(response._data[0]).toHaveProperty('displayName')
     expect(response._data[0]).toHaveProperty('description')
-    expect(response._data[0]).toHaveProperty('permissions')
 
     await userData.clear()
   })

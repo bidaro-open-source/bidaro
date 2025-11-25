@@ -19,15 +19,6 @@ export const roleRepository = {
 
     return db.Role.findAll({
       transaction: options.transaction,
-      include: [
-        {
-          model: db.Permission,
-          as: 'permissions',
-          through: {
-            attributes: [],
-          },
-        },
-      ],
     })
   },
 
@@ -43,15 +34,6 @@ export const roleRepository = {
 
     return db.Role.findByPk(name, {
       transaction: options.transaction,
-      include: [
-        {
-          model: db.Permission,
-          as: 'permissions',
-          through: {
-            attributes: [],
-          },
-        },
-      ],
     })
   },
 

@@ -51,7 +51,7 @@ export function getAuthenticatedUser(event: H3Event): User {
 export function getAuthenticatedUserRole(
   event: H3Event,
 ): Role | undefined {
-  return event.context.auth?.user.role
+  return event.context.auth?.role
 }
 
 /**
@@ -66,5 +66,5 @@ export function getAuthenticatedUserRole(
 export function getAuthenticatedUserPermissions(
   event: H3Event,
 ): Permission[] | undefined {
-  return event.context.auth?.user.role?.permissions
+  return event.context.auth?.permissions
 }

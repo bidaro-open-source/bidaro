@@ -19,12 +19,6 @@ export const lotBetRepository = {
     return await db.LotBet.findAll({
       transaction: options.transaction,
       where: { lotId },
-      include: [
-        {
-          model: db.User,
-          as: 'user',
-        },
-      ],
     })
   },
 
@@ -42,12 +36,6 @@ export const lotBetRepository = {
       transaction: options.transaction,
       where: { lotId },
       order: [['createdAt', 'DESC']],
-      include: [
-        {
-          model: db.User,
-          as: 'user',
-        },
-      ],
     })
   },
 

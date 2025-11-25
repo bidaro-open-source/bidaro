@@ -38,9 +38,6 @@ describe('GET /api/roles/:name', async () => {
     expect(response._data.name).toBe(roleData.name)
     expect(response._data.displayName).toBe(roleData.displayName)
     expect(response._data.description).toBe(roleData.description)
-    expect(Array.isArray(response._data.permissions)).toBe(true)
-    expect(response._data.permissions.length).toBe(1)
-    expect(response._data.permissions[0].name).toBe(permissions.VIEW_PERMISSIONS)
 
     await roleData.destroy()
     await userData.clear()

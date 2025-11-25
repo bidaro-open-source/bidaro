@@ -126,6 +126,7 @@ describe('POST /api/lots/:id/receive', async () => {
 
       await lotData.clear()
       await cData.clear()
+      await uuData.clear()
       await uData.clear()
     })
   })

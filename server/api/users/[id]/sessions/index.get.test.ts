@@ -48,6 +48,8 @@ describe('GET /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(401)
+
+      await user.clear()
     })
 
     it('should return 403 when user lacks required permission', async () => {
