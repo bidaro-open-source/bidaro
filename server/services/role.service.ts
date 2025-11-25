@@ -132,7 +132,7 @@ export const roleService = {
 
       await roleRepository.updatePermissionsByName(name, permissionNames, { transaction })
 
-      useDatabaseAfterCommit(transaction, 'role.service.create', async () => {
+      useDatabaseAfterCommit(transaction, 'role.service.update_permissions', async () => {
         await roleSource.invalidate(role)
       })
 
@@ -180,7 +180,7 @@ export const roleService = {
 
       await roleRepository.destroyByName(name, { transaction })
 
-      useDatabaseAfterCommit(transaction, 'role.service.create', async () => {
+      useDatabaseAfterCommit(transaction, 'role.service.delete', async () => {
         await roleSource.invalidate(role)
       })
     })
