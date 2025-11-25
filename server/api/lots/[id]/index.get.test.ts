@@ -87,6 +87,7 @@ describe('GET /api/lots/:id', async () => {
     }
 
     await lotImageData.clear()
+    await imageData.clear()
     await lotData.clear()
     await categoryData2.clear()
     await categoryData1.clear()

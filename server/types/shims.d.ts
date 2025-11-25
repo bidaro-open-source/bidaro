@@ -10,6 +10,8 @@ declare module 'h3' {
   interface H3EventContext {
     auth?: {
       user: User
+      role: Role | undefined
+      permissions: Permission[] | undefined
     }
   }
 }

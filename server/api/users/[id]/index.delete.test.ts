@@ -116,6 +116,9 @@ describe('DELETE /api/users/:id', async () => {
       ),
     ).rejects.toThrowError()
 
+    await otherOwnerData.clear()
+    await winnerData.clear()
+    await categoryData.clear()
     await adminData.clear()
   })
 

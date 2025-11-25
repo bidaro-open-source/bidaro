@@ -19,19 +19,6 @@ export const userRepository = {
 
     return db.User.findByPk(id, {
       transaction: options.transaction,
-      include: [
-        {
-          model: db.Role,
-          as: 'role',
-          include: [
-            {
-              model: db.Permission,
-              as: 'permissions',
-              through: { attributes: [] },
-            },
-          ],
-        },
-      ],
     })
   },
 
@@ -64,19 +51,6 @@ export const userRepository = {
     return db.User.findOne({
       transaction: options.transaction,
       where: { email },
-      include: [
-        {
-          model: db.Role,
-          as: 'role',
-          include: [
-            {
-              model: db.Permission,
-              as: 'permissions',
-              through: { attributes: [] },
-            },
-          ],
-        },
-      ],
     })
   },
 
@@ -93,19 +67,6 @@ export const userRepository = {
     return db.User.findOne({
       transaction: options.transaction,
       where: { username },
-      include: [
-        {
-          model: db.Role,
-          as: 'role',
-          include: [
-            {
-              model: db.Permission,
-              as: 'permissions',
-              through: { attributes: [] },
-            },
-          ],
-        },
-      ],
     })
   },
 

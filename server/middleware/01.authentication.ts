@@ -1,4 +1,5 @@
-import { userRepository } from '../repositories/user.repository'
+import { roleSource } from '../sources/role.source'
+import { userSource } from '../sources/user.source'
 
 /**
  * Checks the request for an access token in the `Authorization` header.
@@ -48,15 +49,12 @@ export default defineEventHandler(async (event) => {
 
   const payload = decodeAccessToken(token)
 
-  const user = await userRepository.findById(payload.uid)
+  const user = await userSource.getById(payload.uid)
 
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Користувач до якого є доступ не існує',
-    })
-  }
+  const [role, permissions] = await Promise.all([
+    user.roleName ? roleSource.getByName(user.roleName) : Promise.resolve(undefined),
+    user.roleName ? roleSource.getPermissionsByName(user.roleName) : Promise.resolve(undefined),
+  ])
 
-  event.context.auth = { user }
+  event.context.auth = { user, role, permissions }
 })
