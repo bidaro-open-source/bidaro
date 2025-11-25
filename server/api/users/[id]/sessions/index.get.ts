@@ -9,9 +9,7 @@ export default defineEventHandler(async (event) => {
 
   getSessionsPolicy(event, request.params.id)
 
-  const user = getAuthenticatedUser(event)
-
-  const sessions = await authService.getSessions(user.id)
+  const sessions = await authService.getSessions(request.params.id)
 
   return Object.values(sessions)
 })

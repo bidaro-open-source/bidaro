@@ -9,10 +9,8 @@ export default defineEventHandler(async (event) => {
 
   deleteSessionsPolicy(event, request.params.id)
 
-  const user = getAuthenticatedUser(event)
-
   const sessions = await authService.deleteSessions(
-    user.id,
+    request.params.id,
     request.body.uuids,
   )
 
