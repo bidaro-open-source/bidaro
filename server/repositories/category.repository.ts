@@ -24,6 +24,26 @@ export const categoryRepository = {
   },
 
   /**
+   * Finds categories by their primary keys.
+   *
+   * @param ids - array of category primary key
+   * @param options - sequelize options
+   * @returns Array of category instances
+   */
+  async findByIds(ids: number[], options: Options = {}) {
+    const db = useDatabase()
+
+    return db.Category.findAll({
+      transaction: options.transaction,
+      where: {
+        id: {
+          [Op.in]: ids,
+        },
+      },
+    })
+  },
+
+  /**
    * Finds a category by their primary key.
    *
    * @param id - category primary key

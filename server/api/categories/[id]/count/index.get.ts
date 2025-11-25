@@ -1,5 +1,5 @@
 import { categoryRepository } from '~~/server/repositories/category.repository'
-import { categoryService } from '~~/server/services/category.service'
+import { categorySource } from '~~/server/sources/category.source'
 import { getCategoryRequest } from '../index.request'
 import { getCategoryCountPolicy } from './index.get.policy'
 
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   getCategoryCountPolicy(event)
 
-  const category = await categoryService.getById(request.params.id)
+  const category = await categorySource.getById(request.params.id)
   const countLots = await categoryRepository.countLotsByPath(category.path)
 
   return countLots

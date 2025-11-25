@@ -1,159 +1,9 @@
 import type { Category, CategoryAttributesOptional } from '../database'
 import { v4 as uuidv4 } from 'uuid'
 import { categoryRepository } from '../repositories/category.repository'
-
-const cacheKeys = {
-  root: 'categories:root',
-  byId: (id: number) => `categories:id:${id}`,
-  bySlug: (slug: string) => `categories:slug:${slug}`,
-  childrenById: (id: number) => `categories:children:id:${id}`,
-  breadcrumbsByPath: (path: string) => `categories:breadcrumbs:${path}`,
-}
+import { categorySource } from '../sources/category.source'
 
 export const categoryService = {
-  /**
-   * Clears cache for a category.
-   *
-   * @param instance category instance or array of category instances
-   */
-  async clearCache(instance: (Category | null) | (Category | null)[]) {
-    const redis = useRedis()
-    const categories = Array.isArray(instance) ? instance : [instance]
-    const keys = new Set<string>()
-
-    for (const category of categories) {
-      if (!category)
-        continue
-
-      keys.add(cacheKeys.byId(category.id))
-      keys.add(cacheKeys.bySlug(category.slug))
-
-      if (category.parentId)
-        keys.add(cacheKeys.childrenById(category.parentId))
-
-      if (category.parentId === null)
-        keys.add(cacheKeys.root)
-    }
-
-    const cachedBreadcrumbsKeys = await redis.keys(
-      cacheKeys.breadcrumbsByPath(`*`),
-    )
-
-    for (const key of cachedBreadcrumbsKeys) {
-      keys.add(key)
-    }
-
-    await redis.del([...keys])
-  },
-
-  /**
-   * Retrieves root categories, utilizing Redis caching.
-   *
-   * @returns array of category instances
-   */
-  async getRootCategories() {
-    const db = useDatabase()
-
-    const key = cacheKeys.root
-
-    return await useDatabaseCache(key, db.Category, async () => {
-      return await categoryRepository.findAllByParentId(null)
-    })
-  },
-
-  /**
-   * Retrieves a category by ID, utilizing Redis caching.
-   *
-   * @throws 404 if the category does not exist
-   * @returns category instance
-   */
-  async getById(id: number) {
-    const db = useDatabase()
-    const key = cacheKeys.byId(id)
-
-    return await useDatabaseCache(key, db.Category, async () => {
-      const data = await categoryRepository.findById(id)
-
-      if (!data) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
-      }
-
-      return data
-    })
-  },
-
-  /**
-   * Retrieves a category by slug, utilizing Redis caching.
-   *
-   * @throws 404 if the category does not exist
-   * @returns category instance
-   */
-  async getBySlug(slug: string) {
-    const db = useDatabase()
-    const key = cacheKeys.bySlug(slug)
-
-    return await useDatabaseCache(key, db.Category, async () => {
-      const data = await categoryRepository.findBySlug(slug)
-
-      if (!data) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
-      }
-
-      return data
-    })
-  },
-
-  /**
-   * Retrieves a category childrens by ID, utilizing Redis caching.
-   *
-   * @throws 404 if the category does not exist
-   * @returns array of category instances
-   */
-  async getChildrenById(id: number) {
-    const db = useDatabase()
-    const key = cacheKeys.childrenById(id)
-
-    return await useDatabaseCache(key, db.Category, async () => {
-      return await categoryRepository.findAllByParentId(id)
-    })
-  },
-
-  /**
-   * Retrieves a categories from path, utilizing Redis caching.
-   *
-   * @param path category path
-   * @returns array of category instance
-   */
-  async getBreadcrumbsByPath(path: string) {
-    const db = useDatabase()
-    const key = cacheKeys.breadcrumbsByPath(path)
-
-    return await useDatabaseCache(key, db.Category, async () => {
-      const ids = path.split('/')
-
-      return await Promise.all(
-        ids.map(async (id) => {
-          const category = await categoryRepository.findById(Number(id))
-
-          if (!category) {
-            throw createError({
-              message: 'Категорія була змінена або видалена',
-              status: 500,
-            })
-          }
-
-          return category
-        }),
-      )
-    })
-  },
-
   /**
    * Creates a new category.
    *
@@ -202,7 +52,7 @@ export const categoryService = {
       )
 
       useDatabaseAfterCommit(transaction, 'category.service.create', async () => {
-        await categoryService.clearCache(updatedCategory)
+        await categorySource.invalidate(updatedCategory)
       })
 
       return updatedCategory
@@ -246,7 +96,7 @@ export const categoryService = {
       )
 
       useDatabaseAfterCommit(transaction, 'category.service.update', async () => {
-        await categoryService.clearCache(updatedCategory)
+        await categorySource.invalidate(updatedCategory)
       })
 
       return updatedCategory
@@ -296,7 +146,7 @@ export const categoryService = {
       )
 
       useDatabaseAfterCommit(transaction, 'category.service.createSlug', async () => {
-        await categoryService.clearCache([category, updatedCategory])
+        await categorySource.invalidate([category, updatedCategory])
       })
 
       return updatedCategory
@@ -373,7 +223,7 @@ export const categoryService = {
       )
 
       useDatabaseAfterCommit(transaction, 'category.service.createParent', async () => {
-        await categoryService.clearCache([
+        await categorySource.invalidate([
           category,
           updatedCategory,
           parentCategory,
@@ -427,7 +277,7 @@ export const categoryService = {
       await categoryRepository.destroyById(category.id, { transaction })
 
       useDatabaseAfterCommit(transaction, 'category.service.delete', async () => {
-        await categoryService.clearCache(category)
+        await categorySource.invalidate(category)
       })
     })
   },
