@@ -1,6 +1,5 @@
-import { userRepository } from '~~/server/repositories/user.repository'
-import { createProfileResource } from '~~/server/resources/profile.resource'
-import { authService } from '~~/server/services/authentication.service'
+import { authService } from '~~/server/domains/authentication'
+import { createProfileResource, userRepository } from '~~/server/domains/users'
 import { refreshRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -17,7 +16,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await userRepository.findById(oldSession.uid)
+  const user = await userRepository.findByPk(oldSession.uid)
 
   if (!user) {
     throw createError({

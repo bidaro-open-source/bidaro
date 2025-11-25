@@ -1,0 +1,286 @@
+import type { Category, CategoryAttributesOptional } from '../../database'
+import { v4 as uuidv4 } from 'uuid'
+import { categoryRepository } from './category.repository'
+import { categorySource } from './category.source'
+
+class CategoryService {
+  /**
+   * Creates a new category.
+   *
+   * @param data - category data
+   * @returns category instance
+   */
+  async create(data: Omit<CategoryAttributesOptional, 'path'>) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const categoryBySlug = await categoryRepository.findBySlug(data.slug, { transaction })
+
+      if (categoryBySlug) {
+        throw createError({
+          statusCode: 422,
+          message: 'Слаг вже зайнят',
+        })
+      }
+
+      let parentCategory: Category | null = null
+
+      if (data.parentId) {
+        parentCategory = await categoryRepository.findByPk(data.parentId, { transaction })
+
+        if (!parentCategory) {
+          throw createError({
+            message: 'Батьківську категорію не знайдено',
+            status: 422,
+          })
+        }
+      }
+
+      const category = await categoryRepository.create({
+        parentId: null,
+        path: uuidv4(),
+        ...data,
+      }, { transaction })
+
+      const parentId = parentCategory ? parentCategory.id : null
+      const path = parentCategory
+        ? `${parentCategory.path}/${category.id}`
+        : `${category.id}`
+
+      const updatedCategory = await categoryRepository.updateByPk(
+        category.id,
+        { parentId, path },
+        { transaction },
+      )
+
+      useDatabaseAfterCommit(transaction, 'category.service.create', async () => {
+        await categorySource.invalidate(updatedCategory)
+      })
+
+      return updatedCategory
+    })
+  }
+
+  /**
+   * Updates a category.
+   *
+   * @param id - The ID of the category to update
+   * @param data - The data to update
+   * @returns The updated category instance
+   * @throws 404 if the category does not exist
+   */
+  async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const category = await categoryRepository.findByPk(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      if (!category) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
+      }
+
+      const displayName = data.displayName ?? category.displayName
+      const description = Object.hasOwn(data, 'description')
+        ? data.description
+        : category.description
+
+      const updatedCategory = await categoryRepository.updateByPk(
+        category.id,
+        {
+          displayName,
+          description: description || null,
+        },
+        { transaction },
+      )
+
+      useDatabaseAfterCommit(transaction, 'category.service.update', async () => {
+        await categorySource.invalidate(updatedCategory)
+      })
+
+      return updatedCategory
+    })
+  }
+
+  /**
+   * Updates category slug.
+   *
+   * @param id - category primary key
+   * @param slug - new category slug
+   * @returns updated category instance
+   * @throws 404 if the category does not exist
+   * @throws 422 if the slug is already taken
+   */
+  async updateSlug(id: number, slug: string) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const category = await categoryRepository.findByPk(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      if (!category) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
+      }
+
+      if (category.slug === slug) {
+        return category
+      }
+
+      const categoryBySlug = await categoryRepository.findBySlug(slug, { transaction })
+
+      if (categoryBySlug) {
+        throw createError({
+          statusCode: 422,
+          message: 'Слаг вже зайнят',
+        })
+      }
+
+      const updatedCategory = await categoryRepository.updateByPk(
+        category.id,
+        { slug },
+        { transaction },
+      )
+
+      useDatabaseAfterCommit(transaction, 'category.service.create_slug', async () => {
+        await categorySource.invalidate([category, updatedCategory])
+      })
+
+      return updatedCategory
+    })
+  }
+
+  /**
+   * Updates category parent.
+   *
+   * @param id - category primary key
+   * @param parentId - parent category id or null
+   * @returns updated category instance
+   * @throws 404 if the category does not exist
+   * @throws 422 if the parent category does not exist
+   * @throws 422 if the parent category is a child of the category itself
+   */
+  async updateParent(id: number, parentId: number | null) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const category = await categoryRepository.findByPk(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      if (!category) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
+      }
+
+      if (category.parentId === parentId) {
+        return category
+      }
+
+      const children = await categoryRepository.findAllByPathWithLock(category.path, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      let parentCategory: Category | null = null
+
+      if (parentId) {
+        parentCategory = await categoryRepository.findByPk(parentId, { transaction })
+
+        if (!parentCategory) {
+          throw createError({
+            message: 'Батьківську категорію не знайдено',
+            status: 422,
+          })
+        }
+
+        if (parentCategory.path.split('/').map(Number).includes(id)) {
+          throw createError({
+            message: 'Батьківська категорія не може бути нащадком цієї категорії',
+            status: 422,
+          })
+        }
+      }
+
+      const oldPath = category.path
+      const newPath = parentCategory
+        ? `${parentCategory.path}/${category.id}`
+        : `${category.id}`
+
+      await categoryRepository.updatePaths(oldPath, newPath, { transaction })
+
+      const updatedCategory = await categoryRepository.updateByPk(
+        category.id,
+        {
+          path: newPath,
+          parentId,
+        },
+        { transaction },
+      )
+
+      useDatabaseAfterCommit(transaction, 'category.service.create_parent', async () => {
+        await categorySource.invalidate([
+          category,
+          updatedCategory,
+          parentCategory,
+          ...children,
+        ])
+      })
+
+      return updatedCategory
+    })
+  }
+
+  /**
+   * Deletes a category.
+   *
+   * @param id - The ID of the category to delete
+   * @throws 400 if the category has children or lots
+   * @throws 404 if the category does not exist
+   */
+  async delete(id: number) {
+    return await useDatabaseTransaction(async (transaction) => {
+      const category = await categoryRepository.findByPk(id, {
+        lock: transaction.LOCK.UPDATE,
+        transaction,
+      })
+
+      if (!category) {
+        throw createError({
+          statusCode: 404,
+          message: 'Категорію не знайдено',
+        })
+      }
+
+      const children = await categoryRepository.findAllByParentId(category.id, { transaction })
+
+      if (children.length > 0) {
+        throw createError({
+          statusCode: 400,
+          message: 'Не можна видалити категорію, яка має дочірні категорії',
+        })
+      }
+
+      const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
+
+      if (lotsCount > 0) {
+        throw createError({
+          statusCode: 400,
+          message: 'Не можна видалити категорію, яка має лоти',
+        })
+      }
+
+      await categoryRepository.destroyByPk(category.id, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'category.service.delete', async () => {
+        await categorySource.invalidate(category)
+      })
+    })
+  }
+}
+
+export const categoryService = new CategoryService()

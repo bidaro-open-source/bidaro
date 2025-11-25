@@ -1,5 +1,6 @@
-import { roleSource } from '../sources/role.source'
-import { userSource } from '../sources/user.source'
+import { authService } from '../domains/authentication'
+import { roleSource } from '../domains/authorization'
+import { userSource } from '../domains/users'
 
 /**
  * Checks the request for an access token in the `Authorization` header.
@@ -37,7 +38,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const verifed = verifyAccessToken(token)
+  const verifed = authService.verifyAccessToken(token)
 
   if (!verifed) {
     throw createError({
@@ -47,13 +48,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const payload = decodeAccessToken(token)
+  const payload = authService.decodeAccessToken(token)
 
-  const user = await userSource.getById(payload.uid)
+  const user = await userSource.getByPk(payload.uid)
 
   const [role, permissions] = await Promise.all([
-    user.roleName ? roleSource.getByName(user.roleName) : Promise.resolve(undefined),
-    user.roleName ? roleSource.getPermissionsByName(user.roleName) : Promise.resolve(undefined),
+    user.roleName ? roleSource.getByPk(user.roleName) : Promise.resolve(undefined),
+    user.roleName ? roleSource.getPermissionsByPk(user.roleName) : Promise.resolve(undefined),
   ])
 
   event.context.auth = { user, role, permissions }

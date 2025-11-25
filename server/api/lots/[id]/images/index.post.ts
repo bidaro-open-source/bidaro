@@ -1,7 +1,5 @@
-import { createImageResource } from '~~/server/resources/lot-image.resource'
-import { imageService } from '~~/server/services/image.service'
-import { lotImageService } from '~~/server/services/lot-image.service'
-import { lotSource } from '~~/server/sources/lot.source'
+import { createImageResource, lotImageService, lotSource } from '~~/server/domains/lots'
+import { imageService } from '~~/server/domains/storage'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'
 

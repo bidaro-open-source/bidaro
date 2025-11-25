@@ -1,14 +1,13 @@
 import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
-import { userRepository } from '~~/server/repositories/user.repository'
-import { profileRecoveryService } from '~~/server/services/recovery.service'
-import { userService } from '~~/server/services/user.service'
+import { recoveryService } from '~~/server/domains/authentication'
+import { userRepository, userService } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await confirmResetPasswordRequest(event)
 
-  const uid = await profileRecoveryService.getUserIdByResetToken(request.body.token)
+  const uid = await recoveryService.getUserIdByToken(request.body.token)
 
   if (!uid) {
     throw createError({
@@ -18,10 +17,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await userRepository.findById(uid)
+  const user = await userRepository.findByPk(uid)
 
   if (!user) {
-    await profileRecoveryService.deletePasswordResetToken(request.body.token)
+    await recoveryService.deleteToken(request.body.token)
 
     throw createError({
       statusCode: 404,
@@ -32,5 +31,5 @@ export default defineEventHandler(async (event) => {
 
   await userService.updatePassword(user.id, request.body.password)
 
-  await profileRecoveryService.deletePasswordResetToken(request.body.token)
+  await recoveryService.deleteToken(request.body.token)
 })

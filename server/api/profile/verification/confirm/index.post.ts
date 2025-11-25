@@ -1,12 +1,11 @@
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
-import { userRepository } from '~~/server/repositories/user.repository'
-import { userService } from '~~/server/services/user.service'
-import { profileVerificationService } from '~~/server/services/verification.service'
+import { verificationService } from '~~/server/domains/authentication'
+import { userRepository, userService } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)
 
-  const uid = await profileVerificationService.getUserIdByEmailVerificationToken(
+  const uid = await verificationService.getUserIdByToken(
     request.body.token,
   )
 
@@ -18,10 +17,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await userRepository.findById(uid)
+  const user = await userRepository.findByPk(uid)
 
   if (!user) {
-    await profileVerificationService.deleteEmailVerificationTokenByUid(uid)
+    await verificationService.deleteTokenByUserId(uid)
 
     throw createError({
       statusCode: 404,
@@ -32,5 +31,5 @@ export default defineEventHandler(async (event) => {
 
   await userService.verifyEmail(user.id)
 
-  await profileVerificationService.deleteEmailVerificationTokenByUid(user.id)
+  await verificationService.deleteTokenByUserId(user.id)
 })

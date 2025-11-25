@@ -1,0 +1,181 @@
+import type { SourceInvalidateParams } from '~~/server/class/Source'
+import type { Category } from '../../database'
+import { Source } from '~~/server/class/Source'
+import { categoryRepository } from './category.repository'
+
+class CategorySource extends Source<Category> {
+  protected scope = 'cat'
+
+  protected get keys() {
+    return {
+      ...super.keys,
+      tree: `${this.scope}:tree`,
+      one: (id: number) => `${this.scope}:id:${id}`,
+      slug: (slug: string) => `${this.scope}:slug:${slug}`,
+      children: (id: number) => `${this.scope}:children:${id}`,
+      breadcrumbs: (path: string) => `${this.scope}:crumbs:${path}`,
+    }
+  }
+
+  protected getEntityKeys(category: Category): string[] {
+    return [
+      this.keys.one(category.id),
+      this.keys.slug(category.slug),
+      ...(category.parentId ? [this.keys.children(category.parentId)] : []),
+      ...(category.parentId === null ? [this.keys.tree] : []),
+    ]
+  }
+
+  /**
+   * Retrieve root categories, using Redis caching.
+   *
+   * @returns Array of root category instances
+   */
+  async getRoot() {
+    const db = useDatabase()
+
+    return await useDatabaseCache(this.keys.tree, db.Category, async () => {
+      return await categoryRepository.findAllByParentId(null)
+    })
+  }
+
+  /**
+   * Retrieve a category by ID, using Redis caching.
+   *
+   * @param id - Category primary key
+   * @throws 404 if the category does not exist
+   * @returns The category instance
+   */
+  async getById(id: number) {
+    const db = useDatabase()
+    const key = this.keys.one(id)
+
+    return await useDatabaseCache(key, db.Category, async () => {
+      const data = await categoryRepository.findByPk(id)
+
+      if (!data) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
+      }
+
+      return data
+    })
+  }
+
+  /**
+   * Retrieve a category by slug, using Redis caching.
+   *
+   * @param slug - Category slug
+   * @throws 404 if the category does not exist
+   * @returns The category instance
+   */
+  async getBySlug(slug: string) {
+    const db = useDatabase()
+    const key = this.keys.slug(slug)
+
+    return await useDatabaseCache(key, db.Category, async () => {
+      const data = await categoryRepository.findBySlug(slug)
+
+      if (!data) {
+        throw createError({
+          message: 'Категорію не знайдено',
+          status: 404,
+        })
+      }
+
+      return data
+    })
+  }
+
+  /**
+   * Retrieve the children of a category by ID, using Redis caching.
+   *
+   * @param id - Parent category ID
+   * @returns Array of child category instances
+   */
+  async getChildrenById(id: number) {
+    const db = useDatabase()
+    const key = this.keys.children(id)
+
+    return await useDatabaseCache(key, db.Category, async () => {
+      return await categoryRepository.findAllByParentId(id)
+    })
+  }
+
+  /**
+   * Retrieve the breadcrumb categories for a given category ID, using Redis caching.
+   *
+   * @param id - Category primary key
+   * @throws 500 if one or more categories in the path are missing
+   * @returns Ordered array of categories representing the breadcrumb path
+   */
+  async getBreadcrumbsById(id: number) {
+    const db = useDatabase()
+
+    const category = await this.getById(id)
+
+    const key = this.keys.breadcrumbs(category.path)
+
+    return await useDatabaseCache(key, db.Category, async () => {
+      const ids = category.path.split('/').map(id => Number(id))
+
+      const categories = await categoryRepository.findByPks(ids)
+
+      if (categories.length !== ids.length) {
+        throw createError({
+          message: 'Категорія була змінена або видалена',
+          status: 500,
+        })
+      }
+
+      categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
+
+      return categories
+    })
+  }
+
+  /**
+   * Retrieve the breadcrumb categories for a given category path, using Redis caching.
+   *
+   * @param path - Category path string (e.g. "1/2/3")
+   * @throws 500 if one or more categories in the path are missing
+   * @returns Ordered array of categories representing the breadcrumb path
+   */
+  async getBreadcrumbsByPath(path: string) {
+    const db = useDatabase()
+    const key = this.keys.breadcrumbs(path)
+
+    return await useDatabaseCache(key, db.Category, async () => {
+      const ids = path.split('/').map(id => Number(id))
+
+      const categories = await categoryRepository.findByPks(ids)
+
+      if (categories.length !== ids.length) {
+        throw createError({
+          message: 'Категорія була змінена або видалена',
+          status: 500,
+        })
+      }
+
+      categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
+
+      return categories
+    })
+  }
+
+  async invalidate(instance: SourceInvalidateParams<Category>) {
+    const redis = useRedis()
+
+    const cachedBreadcrumbsKeys = await redis.keys(
+      this.keys.breadcrumbs(`*`),
+    )
+
+    await redis.del(cachedBreadcrumbsKeys)
+
+    await super.invalidate(instance)
+  }
+}
+
+export const categorySource = new CategorySource()

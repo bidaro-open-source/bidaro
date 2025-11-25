@@ -1,4 +1,4 @@
-import { userService } from '~~/server/services/user.service'
+import { userService } from '~~/server/domains/users'
 import { deleteUserPolicy } from './index.delete.policy'
 import { deleteUserRequest } from './index.delete.request'
 
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   deleteUserPolicy(event)
 
-  await userService.deleteById(request.params.id)
+  await userService.delete(request.params.id)
 
   setResponseStatus(event, 204)
 })

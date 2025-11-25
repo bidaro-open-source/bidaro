@@ -1,7 +1,4 @@
-import { permissionRepository } from '~~/server/repositories/permission.repository'
-import { createPermissionResource } from '~~/server/resources/permission.resource'
-import { permissionSource } from '~~/server/sources/permission.source'
-import { roleSource } from '~~/server/sources/role.source'
+import { createPermissionResource, permissionRepository, permissionSource, roleSource } from '~~/server/domains/authorization'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 
@@ -12,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await updatePermissionRequest(event)
 
-  const permission = await permissionRepository.findByName(request.params.name)
+  const permission = await permissionRepository.findByPk(request.params.name)
 
   if (!permission) {
     throw createError({
@@ -21,11 +18,19 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const updatedPermission = await permissionRepository.updateById(
+  const displayName = Object.hasOwn(request.body, 'displayName')
+    ? request.body.displayName
+    : permission.displayName
+
+  const description = Object.hasOwn(request.body, 'description')
+    ? request.body.description
+    : permission.description
+
+  const updatedPermission = await permissionRepository.updateByPk(
     request.params.name,
     {
-      displayName: permission.displayName ?? request.body.displayName,
-      description: permission.description ?? request.body.description,
+      displayName: displayName || null,
+      description: description || null,
     },
   )
 

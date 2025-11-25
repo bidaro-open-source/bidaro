@@ -1,5 +1,4 @@
-import { createCategoryResource } from '~~/server/resources/category.resource'
-import { categoryService } from '~~/server/services/category.service'
+import { categoryService, createCategoryResource } from '~~/server/domains/categories'
 import { updateCategoryPolicy } from '../index.policy'
 import { updateCategoryRequest } from './index.patch.request'
 

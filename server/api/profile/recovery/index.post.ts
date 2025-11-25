@@ -1,8 +1,8 @@
 import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
-import { userRepository } from '~~/server/repositories/user.repository'
-import { profileRecoveryService } from '~~/server/services/recovery.service'
+import { recoveryService } from '~~/server/domains/authentication'
+import { userRepository } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await resetPasswordRequest(event)
@@ -17,11 +17,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const token = await profileRecoveryService.createPasswordResetToken(user.id)
+  const token = await recoveryService.createToken(user.id)
 
   const config = useRuntimeConfig()
 
-  await sendEmail(event, {
+  await sendMail(event, {
     to: request.body.email,
     subject: 'Скидання пароля - Bidaro',
     template: {

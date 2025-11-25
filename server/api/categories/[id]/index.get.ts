@@ -1,5 +1,4 @@
-import { createCategoryResource } from '~~/server/resources/category.resource'
-import { categorySource } from '~~/server/sources/category.source'
+import { categorySource, createCategoryResource } from '~~/server/domains/categories'
 import { getCategoryRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

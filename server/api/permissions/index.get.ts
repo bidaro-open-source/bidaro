@@ -1,5 +1,4 @@
-import { createPermissionResource } from '~~/server/resources/permission.resource'
-import { permissionSource } from '~~/server/sources/permission.source'
+import { createPermissionResource, permissionSource } from '~~/server/domains/authorization'
 import { getPermissionsPolicy } from './index.get.policy'
 
 export default defineEventHandler(async (event) => {

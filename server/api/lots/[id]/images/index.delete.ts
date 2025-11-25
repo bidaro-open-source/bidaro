@@ -1,6 +1,5 @@
-import { imageService } from '~~/server/services/image.service'
-import { lotImageService } from '~~/server/services/lot-image.service'
-import { lotSource } from '~~/server/sources/lot.source'
+import { lotImageService, lotSource } from '~~/server/domains/lots'
+import { imageService } from '~~/server/domains/storage'
 import { deleteLotImagePolicy } from './index.delete.policy'
 import { deleteLotImageRequest } from './index.delete.request'
 
