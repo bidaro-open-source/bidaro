@@ -3,6 +3,7 @@ import { lotBetRepository } from '../repositories/lot-bet.repository'
 import { lotImageRepository } from '../repositories/lot-image.repository'
 import { lotRepository } from '../repositories/lot.repository'
 import { userRepository } from '../repositories/user.repository'
+import { userSource } from '../sources/user.source'
 import { authService } from './authentication.service'
 import { imageService } from './image.service'
 
@@ -49,6 +50,13 @@ export const userService = {
         { transaction },
       )
 
+      useDatabaseAfterCommit(transaction, 'user.service.update', async () => {
+        await userSource.invalidate([
+          user,
+          updatedUser,
+        ])
+      })
+
       return updatedUser
     })
   },
@@ -89,11 +97,20 @@ export const userService = {
         })
       }
 
-      return await userRepository.updateById(
+      const updatedUser = await userRepository.updateById(
         id,
         { email, emailVerifiedAt: null },
         { transaction },
       )
+
+      useDatabaseAfterCommit(transaction, 'user.service.update_email', async () => {
+        await userSource.invalidate([
+          user,
+          updatedUser,
+        ])
+      })
+
+      return updatedUser
     })
   },
 
@@ -121,11 +138,20 @@ export const userService = {
 
       const hashedPassword = await hashPassword(password)
 
-      return await userRepository.updateById(
+      const updatedUser = await userRepository.updateById(
         id,
         { password: hashedPassword },
         { transaction },
       )
+
+      useDatabaseAfterCommit(transaction, 'user.service.update-password', async () => {
+        await userSource.invalidate([
+          user,
+          updatedUser,
+        ])
+      })
+
+      return updatedUser
     })
   },
 
@@ -150,11 +176,20 @@ export const userService = {
         })
       }
 
-      return await userRepository.updateById(
+      const updatedUser = await userRepository.updateById(
         id,
         { emailVerifiedAt: new Date() },
         { transaction },
       )
+
+      useDatabaseAfterCommit(transaction, 'user.service.verify_email', async () => {
+        await userSource.invalidate([
+          user,
+          updatedUser,
+        ])
+      })
+
+      return updatedUser
     })
   },
 
@@ -184,11 +219,20 @@ export const userService = {
         return user
       }
 
-      return await userRepository.updateById(
+      const updatedUser = await userRepository.updateById(
         id,
         { roleName },
         { transaction },
       )
+
+      useDatabaseAfterCommit(transaction, 'user.service.update_role', async () => {
+        await userSource.invalidate([
+          user,
+          updatedUser,
+        ])
+      })
+
+      return updatedUser
     })
   },
 
@@ -240,6 +284,10 @@ export const userService = {
       }
 
       await userRepository.destroyById(id, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'user.service.delete', async () => {
+        await userSource.invalidate(user)
+      })
     })
   },
 }
