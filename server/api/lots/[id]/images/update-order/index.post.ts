@@ -1,5 +1,5 @@
 import { lotImageService } from '~~/server/services/lot-image.service'
-import { lotService } from '~~/server/services/lot.service'
+import { lotSource } from '~~/server/sources/lot.source'
 import { updateImageOrderPolicy } from './index.post.policy'
 import { updateImageOrderRequest } from './index.post.request'
 
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await updateImageOrderRequest(event)
 
-  const lot = await lotService.findByIdOrFail(request.params.id)
+  const lot = await lotSource.getById(request.params.id)
 
   updateImageOrderPolicy(event, lot)
 

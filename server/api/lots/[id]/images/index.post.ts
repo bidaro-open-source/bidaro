@@ -1,7 +1,7 @@
 import { createImageResource } from '~~/server/resources/lot-image.resource'
 import { imageService } from '~~/server/services/image.service'
 import { lotImageService } from '~~/server/services/lot-image.service'
-import { lotService } from '~~/server/services/lot.service'
+import { lotSource } from '~~/server/sources/lot.source'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'
 
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await uploadLotImageRequest(event)
 
-  const lot = await lotService.findByIdOrFail(request.params.id)
+  const lot = await lotSource.getById(request.params.id)
 
   uploadLotImagePolicy(event, lot)
 

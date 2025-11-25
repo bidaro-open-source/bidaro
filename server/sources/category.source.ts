@@ -91,6 +91,37 @@ export const categorySource = {
   },
 
   /**
+   * Retrieves a categories path by id, utilizing Redis caching.
+   *
+   * @param id category primary key
+   * @returns array of category instance
+   */
+  async getBreadcrumbsById(id: number) {
+    const db = useDatabase()
+
+    const category = await categorySource.getById(id)
+
+    const key = keys.breadcrumbs(category.path)
+
+    return await useDatabaseCache(key, db.Category, async () => {
+      const ids = category.path.split('/').map(id => Number(id))
+
+      const categories = await categoryRepository.findByIds(ids)
+
+      if (categories.length !== ids.length) {
+        throw createError({
+          message: 'Категорія була змінена або видалена',
+          status: 500,
+        })
+      }
+
+      categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
+
+      return categories
+    })
+  },
+
+  /**
    * Retrieves a categories from path, utilizing Redis caching.
    *
    * @param path category path

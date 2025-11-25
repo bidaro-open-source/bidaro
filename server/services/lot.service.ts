@@ -3,28 +3,9 @@ import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../co
 import { categoryRepository } from '../repositories/category.repository'
 import { lotBetRepository } from '../repositories/lot-bet.repository'
 import { lotRepository } from '../repositories/lot.repository'
+import { lotSource } from '../sources/lot.source'
 
 export const lotService = {
-  /**
-   * Returns a lot instance or throw.
-   *
-   * @param id lot primary key
-   * @throws 404 when lot not found
-   * @returns lot instance
-   */
-  async findByIdOrFail(id: number) {
-    const lot = await lotRepository.findById(id)
-
-    if (!lot) {
-      throw createError({
-        message: 'Лот не знайдено',
-        status: 404,
-      })
-    }
-
-    return lot
-  },
-
   /**
    * Creates a draft lot for the given seller.
    *
@@ -103,13 +84,19 @@ export const lotService = {
         categoryId = category.id
       }
 
-      return await lotRepository.updateById(id, {
+      const updatedLot = await lotRepository.updateById(id, {
         title,
         description,
         initialPrice,
         initialDuration,
         categoryId,
       }, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot.service.update', async () => {
+        await lotSource.invalidate([lot, updatedLot])
+      })
+
+      return updatedLot
     })
   },
 
@@ -152,11 +139,17 @@ export const lotService = {
         })
       }
 
-      return await lotRepository.updateById(id, {
+      const updatedLot = await lotRepository.updateById(id, {
         statusName: lotStatuses.IN_TRADING_PROCESS,
         effectiveDate: new Date(),
         expirationDate: new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration]),
       }, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot.service.publish', async () => {
+        await lotSource.invalidate([lot, updatedLot])
+      })
+
+      return updatedLot
     })
   },
 
@@ -201,7 +194,7 @@ export const lotService = {
 
       const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
 
-      return await lotRepository.updateById(lot.id, {
+      const updatedLot = await lotRepository.updateById(lot.id, {
         winnerId: latestBet
           ? latestBet.userId
           : null,
@@ -209,6 +202,12 @@ export const lotService = {
           ? lotStatuses.IN_DISCUSSION_PROCESS
           : lotStatuses.REJECTED,
       }, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot.service.close', async () => {
+        await lotSource.invalidate([lot, updatedLot])
+      })
+
+      return updatedLot
     })
   },
 
@@ -242,9 +241,15 @@ export const lotService = {
         })
       }
 
-      return await lotRepository.updateById(lot.id, {
+      const updatedLot = await lotRepository.updateById(lot.id, {
         statusName: lotStatuses.IN_DELIVERY_PROCESS,
       }, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot.service.ship', async () => {
+        await lotSource.invalidate([lot, updatedLot])
+      })
+
+      return updatedLot
     })
   },
 
@@ -278,9 +283,15 @@ export const lotService = {
         })
       }
 
-      return await lotRepository.updateById(lot.id, {
+      const updatedLot = await lotRepository.updateById(lot.id, {
         statusName: lotStatuses.RECEIVED,
       }, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot.service.receive', async () => {
+        await lotSource.invalidate([lot, updatedLot])
+      })
+
+      return updatedLot
     })
   },
 
@@ -313,6 +324,10 @@ export const lotService = {
       }
 
       await lotRepository.destroyById(lot.id, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot.service.close', async () => {
+        await lotSource.invalidate(lot)
+      })
     })
   },
 }

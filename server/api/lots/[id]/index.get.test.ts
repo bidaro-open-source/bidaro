@@ -2,9 +2,14 @@ import type { GetLotRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
+import { createImage } from '~~/test/api-e2e/arrangers/create-image'
+import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
+import { createWinnerLot } from '~~/test/api-e2e/arrangers/lots/create-winner-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 
 async function getLotRequest(payload: GetLotRequest) {
   return await fetch(`/api/lots/${payload.params.id}`, {
@@ -28,7 +33,6 @@ describe('GET /api/lots/:id', async () => {
     expect(lot).toHaveProperty('seller')
     expect(lot).toHaveProperty('seller.id')
     expect(lot).toHaveProperty('seller.username')
-    expect(lot).toHaveProperty('winner')
     expect(lot).toHaveProperty('title')
     expect(lot).toHaveProperty('initialPrice')
     expect(lot).toHaveProperty('currentPrice')
@@ -38,6 +42,56 @@ describe('GET /api/lots/:id', async () => {
     expect(lot).toHaveProperty('statusName')
 
     await lotData.clear()
+    await uData.clear()
+  })
+
+  it('should retrieve published lot with correct structure', async () => {
+    const uData = await createUser({ withSession: true })
+
+    const categoryData1 = await createCategory()
+    const categoryData2 = await createCategory({ parentId: categoryData1.category.id })
+    const winnerData = await createUser()
+    const sellerData = await createUser()
+
+    const lotData = await createWinnerLot({
+      sellerId: sellerData.user.id,
+      winnerId: winnerData.user.id,
+      categoryId: categoryData2.category.id,
+    })
+
+    const imageData = await createImage(resolveImage('image-normal.png').path)
+    const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
+
+    for (let i = 0; i < 3; i++) {
+      const response = await getLotRequest({ params: { id: lotData.lot.id } })
+
+      const lot = response._data
+
+      expect(response.status).toBe(200)
+
+      const lotWinner = lot.winner || {}
+      expect(lotWinner.id).toBe(winnerData.user.id)
+
+      const lotCategory = lot.category || {}
+      expect(lotCategory.id).toBe(categoryData2.category.id)
+
+      const lotImages = lot.images || []
+      expect(lotImages[0]?.id).toBe(imageData.image.id)
+      expect(lotImages[0]?.key).toBe(imageData.image.key)
+      expect(lotImages[0]?.bucket).toBe(imageData.image.bucket)
+      expect(lotImages[0]?.mime).toBe(imageData.image.mime_type)
+
+      const lotBets = lot.bets || []
+      expect(lotBets[0]?.id).toBe(lotData.bet.id)
+      expect(lotBets[0]?.amount).toBe(lotData.bet.amount)
+    }
+
+    await lotImageData.clear()
+    await lotData.clear()
+    await categoryData2.clear()
+    await categoryData1.clear()
+    await winnerData.clear()
+    await sellerData.clear()
     await uData.clear()
   })
 
