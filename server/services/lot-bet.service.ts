@@ -2,6 +2,7 @@ import { lotStatuses } from '../constants'
 import { lotBetRepository } from '../repositories/lot-bet.repository'
 import { lotRepository } from '../repositories/lot.repository'
 import { userRepository } from '../repositories/user.repository'
+import { lotSource } from '../sources/lot.source'
 
 export const lotBetService = {
   /**
@@ -78,6 +79,10 @@ export const lotBetService = {
         { currentPrice: amount },
         { transaction },
       )
+
+      useDatabaseAfterCommit(transaction, 'lot-bet.service.create', async () => {
+        await lotSource.invalidate(lot)
+      })
 
       return bet
     })
