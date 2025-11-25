@@ -1,13 +1,25 @@
+import crypto from 'node:crypto'
+
 export const REDIS_EMAIL_VERIFICATION_NAMESPACE = 'email-verification'
 
-export const profileVerificationService = {
+export const verificationService = {
+  /**
+   * Returns reset token.
+   *
+   * @returns random bytes
+   */
+  generateVerifyToken() {
+    const runtimeConfig = useRuntimeConfig()
+    return crypto.randomBytes(+runtimeConfig.email.tokenSize).toString('hex')
+  },
+
   /**
    * Generates token.
    *
    * @param verifyToken verify token
    * @returns user id
    */
-  async getUserIdByEmailVerificationToken(
+  async getUserIdByToken(
     verifyToken: string,
   ): Promise<number | null> {
     const redis = useRedis()
@@ -25,12 +37,12 @@ export const profileVerificationService = {
    * @param uid user id
    * @returns token for verify email
    */
-  async createEmailVerificationToken(
+  async createToken(
     uid: number,
   ): Promise<string> {
     const redis = useRedis()
 
-    const token = createVerifyToken()
+    const token = verificationService.generateVerifyToken()
 
     await redis
       .multi()
@@ -52,7 +64,7 @@ export const profileVerificationService = {
    *
    * @param verifyToken verify token
    */
-  async deleteEmailVerificationToken(
+  async deleteToken(
     verifyToken: string,
   ): Promise<void> {
     const redis = useRedis()
@@ -73,7 +85,7 @@ export const profileVerificationService = {
    *
    * @param uid user primary key
    */
-  async deleteEmailVerificationTokenByUid(
+  async deleteTokenByUserId(
     uid: number,
   ): Promise<void> {
     const redis = useRedis()
