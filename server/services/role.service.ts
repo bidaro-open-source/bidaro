@@ -2,6 +2,7 @@ import type { RoleAttributesOptional } from '../database'
 import { roles } from '../constants'
 import { permissionRepository } from '../repositories/permission.repository'
 import { roleRepository } from '../repositories/role.repository'
+import { roleSource } from '../sources/role.source'
 
 const reservedRoles: readonly string[] = [roles.USER]
 
@@ -14,26 +15,6 @@ export const roleService = {
    */
   isReserved(name: string): boolean {
     return reservedRoles.includes(name)
-  },
-
-  /**
-   * Gets a role by name.
-   *
-   * @param name - role name
-   * @returns role instance
-   * @throws 404 if role not found
-   */
-  async getByName(name: string) {
-    const role = await roleRepository.findByName(name)
-
-    if (!role) {
-      throw createError({
-        statusCode: 404,
-        message: 'Роль не знайдено',
-      })
-    }
-
-    return role
   },
 
   /**
@@ -55,6 +36,10 @@ export const roleService = {
       }
 
       const role = await roleRepository.create(data, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'role.service.create', async () => {
+        await roleSource.invalidate(role)
+      })
 
       return role
     })
@@ -97,6 +82,10 @@ export const roleService = {
         },
         { transaction },
       )
+
+      useDatabaseAfterCommit(transaction, 'role.service.update', async () => {
+        await roleSource.invalidate([role, updatedRole])
+      })
 
       return updatedRole
     })
@@ -143,6 +132,10 @@ export const roleService = {
 
       await roleRepository.updatePermissionsByName(name, permissionNames, { transaction })
 
+      useDatabaseAfterCommit(transaction, 'role.service.create', async () => {
+        await roleSource.invalidate(role)
+      })
+
       return role
     })
   },
@@ -186,6 +179,10 @@ export const roleService = {
       }
 
       await roleRepository.destroyByName(name, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'role.service.create', async () => {
+        await roleSource.invalidate(role)
+      })
     })
   },
 }

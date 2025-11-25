@@ -1,5 +1,5 @@
 import { createRoleResource } from '~~/server/resources/role.resource'
-import { roleService } from '~~/server/services/role.service'
+import { roleSource } from '~~/server/sources/role.source'
 import { viewRolePolicy } from './index.policy'
 import { getRoleRequest } from './index.request'
 
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   viewRolePolicy(event)
 
-  const role = await roleService.getByName(request.params.name)
+  const role = await roleSource.getByName(request.params.name)
 
   return createRoleResource(role)
 })

@@ -1,6 +1,7 @@
 import { permissionRepository } from '~~/server/repositories/permission.repository'
 import { createPermissionResource } from '~~/server/resources/permission.resource'
 import { permissionSource } from '~~/server/sources/permission.source'
+import { roleSource } from '~~/server/sources/role.source'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 
@@ -28,6 +29,7 @@ export default defineEventHandler(async (event) => {
     },
   )
 
+  await roleSource.invalidateAll()
   await permissionSource.invalidateAll()
 
   return createPermissionResource(updatedPermission)

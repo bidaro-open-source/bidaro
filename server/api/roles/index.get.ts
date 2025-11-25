@@ -1,5 +1,5 @@
-import { roleRepository } from '~~/server/repositories/role.repository'
 import { createRoleResource } from '~~/server/resources/role.resource'
+import { roleSource } from '~~/server/sources/role.source'
 import { viewRolesPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   viewRolesPolicy(event)
 
-  const roles = await roleRepository.findAll()
+  const roles = await roleSource.getAll()
 
   return roles.map(createRoleResource)
 })
