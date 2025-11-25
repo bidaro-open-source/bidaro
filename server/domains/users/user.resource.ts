@@ -1,8 +1,8 @@
-import type { User } from '../../database'
+import type { UserAttributes } from '../../database'
 
 export type UserResource = ReturnType<typeof createUserResource>
 
-export function createUserResource(entity: User) {
+export function createUserResource(entity: UserAttributes) {
   return {
     id: entity.id as number,
     name: entity.name,
@@ -13,7 +13,7 @@ export function createUserResource(entity: User) {
 
 export type ProfileResource = ReturnType<typeof createProfileResource>
 
-export function createProfileResource(entity: User) {
+export function createProfileResource(entity: UserAttributes) {
   return {
     id: entity.id as number,
     name: entity.name,
