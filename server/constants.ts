@@ -33,6 +33,8 @@ export const permissions = {
   VERIFY_USER: 'verify_user',
   UPDATE_USER_ROLE: 'update_user_role',
   DELETE_USER: 'delete_user',
+
+  VIEW_LOTS: 'view_lots',
 } as const
 
 export const lotStatuses = {

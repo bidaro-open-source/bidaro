@@ -1,9 +1,11 @@
 import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
-import { lotInitialDurations } from '../../constants'
+import { lotInitialDurations, permissions } from '../../constants'
 
 export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
+
+  const transaction = await queryInterface.sequelize.transaction()
 
   try {
     await queryInterface.createTable('lots', {
@@ -87,9 +89,16 @@ export const up: Migration = async ({ context }) => {
         type: DataTypes.DATE,
         allowNull: true,
       },
-    })
+    }, { transaction })
+
+    await queryInterface.bulkInsert('permissions', [
+      { name: permissions.VIEW_LOTS, createdAt: new Date() },
+    ], { transaction })
+
+    await transaction.commit()
   }
   catch (error: any) {
+    await transaction.rollback()
     throw new Error(error)
   }
 }
