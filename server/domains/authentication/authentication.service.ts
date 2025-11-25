@@ -1,6 +1,14 @@
+import crypto from 'node:crypto'
+import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 
+export type AccessToken = string
+export type RefreshToken = string
 export type SessionUUID = string
+
+export interface AccessTokenPayload {
+  uid: number
+}
 
 export interface SessionData {
   uuid: SessionUUID
@@ -20,6 +28,62 @@ export interface SessionMetadataCollection {
 export const REDIS_SESSION_NAMESPACE = 'refresh-session'
 
 export const authService = {
+  /**
+   * Returns refresh token.
+   *
+   * @returns random bytes
+   */
+  createRefreshToken(event?: H3Event) {
+    const runtimeConfig = useRuntimeConfig(event)
+
+    return crypto.randomBytes(+runtimeConfig.jwt.refreshSize).toString('hex')
+  },
+
+  /**
+   * Creates and signs a new JWT access token with the provided payload.
+   *
+   * @param payload token data
+   * @returns signed access token string
+   */
+  createAccessToken(payload: AccessTokenPayload): AccessToken {
+    const runtimeConfig = useRuntimeConfig()
+
+    return jwt.sign(
+      payload,
+      runtimeConfig.jwt.secret,
+      { algorithm: 'HS512', expiresIn: +runtimeConfig.jwt.accessTTL },
+    )
+  },
+
+  /**
+   * Verifies if the provided access token is valid and not expired.
+   *
+   * @param token token access token string to verify
+   * @returns true if token is valid, false otherwise
+   */
+  verifyAccessToken(token: AccessToken): boolean {
+    try {
+      jwt.verify(token, useRuntimeConfig().jwt.secret)
+      return true
+    }
+    catch (e) {
+      return false
+    }
+  },
+
+  /**
+   * Returns token payload without verification. Decodes the JWT access token
+   * and extracts the payload data containing user information.
+   *
+   * Please, verify the token before using this function.
+   *
+   * @param token access token string to decode
+   * @returns decoded token payload containing user data
+   */
+  decodeAccessToken(token: AccessToken): AccessTokenPayload {
+    return jwt.decode(token) as AccessTokenPayload
+  },
+
   /**
    * Returns user refresh session by refresh token.
    *
@@ -103,8 +167,8 @@ export const authService = {
     const runtimeConfig = useRuntimeConfig()
 
     const uuid = uuidv4()
-    const accessToken = createAccessToken({ uid })
-    const refreshToken = createRefreshToken()
+    const accessToken = authService.createAccessToken({ uid })
+    const refreshToken = authService.createRefreshToken()
     const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
     const sessionMetadata = { uid, uuid, ...metadata }
 
@@ -151,8 +215,8 @@ export const authService = {
 
     const uid = session.uid
     const uuid = uuidv4()
-    const newAccessToken = createAccessToken({ uid })
-    const newRefreshToken = createRefreshToken()
+    const newAccessToken = authService.createAccessToken({ uid })
+    const newRefreshToken = authService.createRefreshToken()
     const refreshTokenTTL = +runtimeConfig.jwt.refreshTTL
 
     const sessionMetadata = { uid, uuid, ...metadata }

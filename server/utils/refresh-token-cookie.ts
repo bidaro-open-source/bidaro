@@ -1,3 +1,5 @@
+import type { RefreshToken } from '../domains/authentication'
+
 export const REFRESH_TOKEN_COOKIE_NAME = 'jwt'
 export const REFRESH_TOKEN_BODY_NAME = 'refresh_token'
 

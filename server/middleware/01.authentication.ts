@@ -1,3 +1,4 @@
+import { authService } from '../domains/authentication'
 import { roleSource } from '../domains/authorization'
 import { userSource } from '../domains/users'
 
@@ -37,7 +38,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const verifed = verifyAccessToken(token)
+  const verifed = authService.verifyAccessToken(token)
 
   if (!verifed) {
     throw createError({
@@ -47,7 +48,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const payload = decodeAccessToken(token)
+  const payload = authService.decodeAccessToken(token)
 
   const user = await userSource.getByPk(payload.uid)
 
