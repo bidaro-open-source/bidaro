@@ -13,10 +13,9 @@ const keys = {
 
 export const roleSource = {
   /**
-   * Retrieves a role by ID, utilizing Redis caching.
+   * Retrieve all roles, using Redis caching.
    *
-   * @throws 404 if the role does not exist
-   * @returns role instance
+   * @returns Array of role instances
    */
   async getAll() {
     const db = useDatabase()
@@ -28,10 +27,11 @@ export const roleSource = {
   },
 
   /**
-   * Retrieves a role by ID, utilizing Redis caching.
+   * Retrieve a role by name, using Redis caching.
    *
+   * @param name - Role name
    * @throws 404 if the role does not exist
-   * @returns role instance
+   * @returns The role instance
    */
   async getByName(name: string) {
     const db = useDatabase()
@@ -52,10 +52,10 @@ export const roleSource = {
   },
 
   /**
-   * Retrieves a role by ID, utilizing Redis caching.
+   * Retrieve permissions for a role by name, using Redis caching.
    *
-   * @throws 404 if the role does not exist
-   * @returns role instance
+   * @param name - Role name
+   * @returns Array of permissions for the specified role
    */
   async getPermissionsByName(name: string) {
     const db = useDatabase()
@@ -67,9 +67,9 @@ export const roleSource = {
   },
 
   /**
-   * Clears cache for a role.
+   * Clears cache entries for one or more role instances.
    *
-   * @param instance role instance or array of role instances
+   * @param instance - A role instance or an array of role instances to invalidate
    */
   async invalidate(instance: SourceInvalidateParams<Role>) {
     const db = useDatabase()
@@ -91,7 +91,7 @@ export const roleSource = {
   },
 
   /**
-   * Invalidates all category-related cache entries.
+   * Invalidates all role-related cache entries.
    */
   async invalidateAll() {
     const redis = useRedis()

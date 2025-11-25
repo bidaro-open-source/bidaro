@@ -15,9 +15,9 @@ const keys = {
 
 export const categorySource = {
   /**
-   * Retrieves root categories, utilizing Redis caching.
+   * Retrieve root categories, using Redis caching.
    *
-   * @returns array of category instances
+   * @returns Array of root category instances
    */
   async getRoot() {
     const db = useDatabase()
@@ -28,10 +28,11 @@ export const categorySource = {
   },
 
   /**
-   * Retrieves a category by ID, utilizing Redis caching.
+   * Retrieve a category by ID, using Redis caching.
    *
+   * @param id - Category primary key
    * @throws 404 if the category does not exist
-   * @returns category instance
+   * @returns The category instance
    */
   async getById(id: number) {
     const db = useDatabase()
@@ -52,10 +53,11 @@ export const categorySource = {
   },
 
   /**
-   * Retrieves a category by slug, utilizing Redis caching.
+   * Retrieve a category by slug, using Redis caching.
    *
+   * @param slug - Category slug
    * @throws 404 if the category does not exist
-   * @returns category instance
+   * @returns The category instance
    */
   async getBySlug(slug: string) {
     const db = useDatabase()
@@ -76,10 +78,10 @@ export const categorySource = {
   },
 
   /**
-   * Retrieves a category childrens by ID, utilizing Redis caching.
+   * Retrieve the children of a category by ID, using Redis caching.
    *
-   * @throws 404 if the category does not exist
-   * @returns array of category instances
+   * @param id - Parent category ID
+   * @returns Array of child category instances
    */
   async getChildrenById(id: number) {
     const db = useDatabase()
@@ -91,10 +93,11 @@ export const categorySource = {
   },
 
   /**
-   * Retrieves a categories path by id, utilizing Redis caching.
+   * Retrieve the breadcrumb categories for a given category ID, using Redis caching.
    *
-   * @param id category primary key
-   * @returns array of category instance
+   * @param id - Category primary key
+   * @throws 500 if one or more categories in the path are missing
+   * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsById(id: number) {
     const db = useDatabase()
@@ -122,10 +125,11 @@ export const categorySource = {
   },
 
   /**
-   * Retrieves a categories from path, utilizing Redis caching.
+   * Retrieve the breadcrumb categories for a given category path, using Redis caching.
    *
-   * @param path category path
-   * @returns array of category instance
+   * @param path - Category path string (e.g. "1/2/3")
+   * @throws 500 if one or more categories in the path are missing
+   * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsByPath(path: string) {
     const db = useDatabase()
@@ -150,9 +154,9 @@ export const categorySource = {
   },
 
   /**
-   * Clears cache for a category.
+   * Clears cache entries for one or more category instances.
    *
-   * @param instance category instance or array of category instances
+   * @param instance - A category instance or an array of category instances to invalidate
    */
   async invalidate(instance: SourceInvalidateParams<Category>) {
     const db = useDatabase()
@@ -187,6 +191,8 @@ export const categorySource = {
 
   /**
    * Invalidates all category-related cache entries.
+   *
+   * @returns Promise<void>
    */
   async invalidateAll() {
     const redis = useRedis()
