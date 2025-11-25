@@ -22,7 +22,7 @@ class PermissionSource extends Source<Permission> {
    * @returns Array of permission instances
    */
   async getAll() {
-    await useDatabaseCache(this.keys.list, async () => {
+    return await useDatabaseCache(this.keys.list, async () => {
       return await permissionRepository.findAll()
     })
   }
