@@ -34,6 +34,17 @@ export const up: Migration = async ({ context }) => {
           key: 'id',
         },
       },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+        references: {
+          model: 'categories',
+          key: 'id',
+        },
+      },
       title: {
         type: DataTypes.STRING(128),
         allowNull: false,

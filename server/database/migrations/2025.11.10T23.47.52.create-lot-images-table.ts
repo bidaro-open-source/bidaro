@@ -7,45 +7,6 @@ export const up: Migration = async ({ context }) => {
   const transaction = await queryInterface.sequelize.transaction()
 
   try {
-    await queryInterface.createTable('images', {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false,
-      },
-      bucket: {
-        allowNull: false,
-        type: DataTypes.STRING,
-      },
-      key: {
-        allowNull: false,
-        type: DataTypes.STRING,
-        unique: true,
-      },
-      mime_type: {
-        allowNull: false,
-        type: DataTypes.STRING,
-      },
-      size_bytes: {
-        allowNull: false,
-        type: DataTypes.BIGINT,
-      },
-      metadata: {
-        allowNull: true,
-        type: DataTypes.JSONB,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
-    }, { transaction })
-
     await queryInterface.createTable('lot_images', {
       id: {
         type: DataTypes.INTEGER,
@@ -106,5 +67,4 @@ export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
 
   await queryInterface.dropTable('lot_images')
-  await queryInterface.dropTable('images')
 }

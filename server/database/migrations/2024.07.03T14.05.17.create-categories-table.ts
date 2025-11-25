@@ -46,18 +46,6 @@ export const up: Migration = async ({ context }) => {
       },
     }, { transaction })
 
-    await queryInterface.addColumn('lots', 'categoryId', {
-      type: DataTypes.INTEGER,
-      defaultValue: null,
-      allowNull: true,
-      onUpdate: 'CASCADE',
-      onDelete: 'SET NULL',
-      references: {
-        model: 'categories',
-        key: 'id',
-      },
-    }, { transaction })
-
     await queryInterface.bulkInsert('categories', categories, { transaction })
 
     await queryInterface.sequelize.query(`
@@ -85,6 +73,5 @@ export const up: Migration = async ({ context }) => {
 export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
 
-  await queryInterface.removeColumn('lots', 'categoryId')
   await queryInterface.dropTable('categories')
 }
