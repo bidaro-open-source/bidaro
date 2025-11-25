@@ -68,6 +68,7 @@ export const up: Migration = async ({ context }) => {
       { name: permissions.UPDATE_OWN_PROFILE, createdAt: new Date() },
       { name: permissions.UPDATE_OWN_EMAIL, createdAt: new Date() },
       { name: permissions.UPDATE_OWN_PASSWORD, createdAt: new Date() },
+      { name: permissions.VIEW_USERS, createdAt: new Date() },
       { name: permissions.CREATE_USER, createdAt: new Date() },
       { name: permissions.VERIFY_USER, createdAt: new Date() },
       { name: permissions.UPDATE_USER_ROLE, createdAt: new Date() },
