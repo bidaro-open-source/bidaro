@@ -1,13 +1,13 @@
-import type { LOCK, Transaction } from 'sequelize'
-import type { LotImageAttributesOptional } from '../../database'
+import type { RepositoryOptions } from '~~/server/class/Repository'
+import type { LotImage, LotImageAttributesOptional } from '../../database'
 import { Op } from 'sequelize'
+import { Repository } from '~~/server/class/Repository'
 
-interface Options {
-  lock?: LOCK
-  transaction?: Transaction
-}
+class LotImageRepository extends Repository<LotImage> {
+  protected get model() {
+    return useDatabase().LotImage
+  }
 
-export const lotImageRepository = {
   /**
    * Find all images attached to a lot.
    *
@@ -15,25 +15,25 @@ export const lotImageRepository = {
    * @param options - sequelize options
    * @returns Promise resolving to an array of Image instances (may be empty).
    */
-  async findAllByLotId(lotId: number, options: Options = {}) {
+  async findAllByLotId(lotId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
-    const lot = await db.Lot.findByPk(lotId, {
+    const lotImages = await this.model.findAll({
+      where: { lotId },
       transaction: options.transaction,
       include: [
         {
           model: db.Image,
-          as: 'images',
-          through: { attributes: [] },
-          order: [
-            [db.LotImage, 'order', 'ASC'],
-          ],
+          as: 'image',
         },
       ],
+      order: [['order', 'ASC']],
     })
 
-    return lot && lot.images ? lot.images : []
-  },
+    return lotImages
+      .map(link => link.image)
+      .filter(image => image !== undefined)
+  }
 
   /**
    * Fetch links (join rows) for a lot returning only imageId attribute.
@@ -42,15 +42,13 @@ export const lotImageRepository = {
    * @param options - sequelize options
    * @returns Promise resolving to an array of LotImage rows containing imageId.
    */
-  async findAllLinksByLotId(lotId: number, options: Options = {}) {
-    const db = useDatabase()
-
-    return await db.LotImage.findAll({
+  async findAllLinksByLotId(lotId: number, options: RepositoryOptions = {}) {
+    return await this.model.findAll({
       where: { lotId },
       attributes: ['imageId'],
       transaction: options.transaction,
     })
-  },
+  }
 
   /**
    * Find lot-image link rows for given image primary keys.
@@ -60,10 +58,12 @@ export const lotImageRepository = {
    * @param options - sequelize options
    * @returns Promise resolving to matching LotImage rows.
    */
-  async findAllLinksByLotAndPks(lotId: number, imageIds: number[], options: Options = {}) {
-    const db = useDatabase()
-
-    return await db.LotImage.findAll({
+  async findAllLinksByLotAndPks(
+    lotId: number,
+    imageIds: number[],
+    options: RepositoryOptions = {},
+  ) {
+    return await this.model.findAll({
       lock: options.lock,
       transaction: options.transaction,
       where: {
@@ -73,7 +73,7 @@ export const lotImageRepository = {
         },
       },
     })
-  },
+  }
 
   /**
    * Finds maximum 'order' value among lot-image links for a lot.
@@ -82,10 +82,10 @@ export const lotImageRepository = {
    * @param options - sequelize options
    * @returns Promise resolving to the max order (returns 1 if none found).
    */
-  async findMaxOrder(lotId: number, options: Options = {}) {
+  async findMaxOrder(lotId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
-    const result = await db.LotImage.findOne({
+    const result = await this.model.findOne({
       raw: true,
       where: { lotId },
       transaction: options.transaction,
@@ -96,7 +96,7 @@ export const lotImageRepository = {
 
     // @ts-expect-error used raw reqeust
     return result.max_order ?? 1
-  },
+  }
 
   /**
    * Destroy all lot-image links for a given lot id.
@@ -105,33 +105,12 @@ export const lotImageRepository = {
    * @param options - sequelize options
    * @returns Number of rows deleted.
    */
-  async destroyByLotId(lotId: number, options: Options = {}) {
-    const db = useDatabase()
-
-    return await db.LotImage.destroy({
+  async destroyByLotPk(lotId: number, options: RepositoryOptions = {}) {
+    return await this.model.destroy({
       where: { lotId },
       transaction: options.transaction,
     })
-  },
-
-  /**
-   * Destroy lot-image links by their link ids.
-   *
-   * @param linkIds - Array of LotImage primary keys to remove.
-   * @returns Number of rows deleted.
-   */
-  async destroyByIds(linkIds: number[], options: Options = {}) {
-    const db = useDatabase()
-
-    return await db.LotImage.destroy({
-      transaction: options.transaction,
-      where: {
-        id: {
-          [Op.in]: linkIds,
-        },
-      },
-    })
-  },
+  }
 
   /**
    * Bulk create lot-image link records.
@@ -140,12 +119,11 @@ export const lotImageRepository = {
    * @param options - sequelize options
    * @returns Promise resolving to created LotImage instances.
    */
-  async bulkCreate(records: LotImageAttributesOptional[], options: Options = {}) {
-    const db = useDatabase()
-
-    return await db.LotImage.bulkCreate(records, {
+  async bulkCreate(records: LotImageAttributesOptional[], options: RepositoryOptions = {}) {
+    return await this.model.bulkCreate(records, {
       transaction: options.transaction,
     })
-  },
-
+  }
 }
+
+export const lotImageRepository = new LotImageRepository()

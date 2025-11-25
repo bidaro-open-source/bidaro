@@ -1,6 +1,6 @@
-import { categorySource, createCategoryResource } from '~~/server/modules/categories'
-import { createImageResource, createLotBetResource, createLotResource, lotSource } from '~~/server/modules/lots'
-import { createUserResource, userSource } from '~~/server/modules/users'
+import { categorySource, createCategoryResource } from '~~/server/domains/categories'
+import { createImageResource, createLotBetResource, createLotResource, lotSource } from '~~/server/domains/lots'
+import { createUserResource, userSource } from '~~/server/domains/users'
 import { getLotRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -11,8 +11,8 @@ export default defineEventHandler(async (event) => {
   const [bets, images, seller, winner, category] = await Promise.all([
     lotSource.getAllBetsById(lot.id),
     lotSource.getAllImagesById(lot.id),
-    userSource.getById(lot.sellerId),
-    lot.winnerId ? userSource.getById(lot.winnerId) : Promise.resolve(),
+    userSource.getByPk(lot.sellerId),
+    lot.winnerId ? userSource.getByPk(lot.winnerId) : Promise.resolve(),
     lot.categoryId ? categorySource.getById(lot.categoryId) : Promise.resolve(),
   ])
 

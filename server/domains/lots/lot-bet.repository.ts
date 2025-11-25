@@ -1,11 +1,12 @@
-import type { Transaction } from 'sequelize'
-import type { LotBetAttributesOptional } from '../../database/models/LotBet'
+import type { RepositoryOptions } from '~~/server/class/Repository'
+import type { LotBet } from '../../database/models/LotBet'
+import { Repository } from '~~/server/class/Repository'
 
-interface Options {
-  transaction?: Transaction
-}
+class LotBetRepository extends Repository<LotBet> {
+  protected get model() {
+    return useDatabase().LotBet
+  }
 
-export const lotBetRepository = {
   /**
    * Finds a lot by their primary key.
    *
@@ -13,14 +14,14 @@ export const lotBetRepository = {
    * @param options - sequelize options
    * @returns lot or null if not found
    */
-  async findAllByLotId(lotId: number, options: Options = {}) {
+  async findAllByLotId(lotId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
     return await db.LotBet.findAll({
       transaction: options.transaction,
       where: { lotId },
     })
-  },
+  }
 
   /**
    * Finds the latest lot bet by lot id.
@@ -29,7 +30,7 @@ export const lotBetRepository = {
    * @param options - sequelize options
    * @returns lot bet or null if not found
    */
-  async findLatestByLotId(lotId: number, options: Options = {}) {
+  async findLatestByLotId(lotId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
     return await db.LotBet.findOne({
@@ -37,23 +38,7 @@ export const lotBetRepository = {
       where: { lotId },
       order: [['createdAt', 'DESC']],
     })
-  },
-
-  /**
-   * Creates a new lot bet record in the database.
-   *
-   * @param fields - bet attributes
-   * @param options - sequelize options
-   * @returns LotBet instance
-   */
-  async create(fields: LotBetAttributesOptional, options: Options = {}) {
-    const db = useDatabase()
-
-    return await db.LotBet.create(
-      fields,
-      { transaction: options.transaction },
-    )
-  },
+  }
 
   /**
    * Deletes lot bets by user id.
@@ -62,12 +47,14 @@ export const lotBetRepository = {
    * @param options - sequelize options
    * @returns number of deleted records
    */
-  async destroyByUserId(userId: number, options: Options = {}) {
+  async destroyByUserId(userId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
     return await db.LotBet.destroy({
       where: { userId },
       transaction: options.transaction,
     })
-  },
+  }
 }
+
+export const lotBetRepository = new LotBetRepository()

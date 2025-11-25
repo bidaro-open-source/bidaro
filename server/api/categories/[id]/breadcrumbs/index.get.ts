@@ -1,4 +1,4 @@
-import { categorySource, createCategoryBreadcrumbResource } from '~~/server/modules/categories'
+import { categorySource, createCategoryBreadcrumbResource } from '~~/server/domains/categories'
 import { getCategoryRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {

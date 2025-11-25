@@ -26,7 +26,7 @@ export const roleService = {
    */
   async create(data: RoleAttributesOptional) {
     return await useDatabaseTransaction(async (transaction) => {
-      const existingRole = await roleRepository.findByName(data.name, { transaction })
+      const existingRole = await roleRepository.findByPk(data.name, { transaction })
 
       if (existingRole) {
         throw createError({
@@ -55,7 +55,7 @@ export const roleService = {
    */
   async update(name: string, data: Partial<Pick<RoleAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
-      const role = await roleRepository.findByNameWithLock(name, {
+      const role = await roleRepository.findByPk(name, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -70,11 +70,12 @@ export const roleService = {
       const displayName = Object.hasOwn(data, 'displayName')
         ? data.displayName
         : role.displayName
+
       const description = Object.hasOwn(data, 'description')
         ? data.description
         : role.description
 
-      const updatedRole = await roleRepository.updateByName(
+      const updatedRole = await roleRepository.updateByPk(
         name,
         {
           displayName: displayName ?? null,
@@ -102,7 +103,7 @@ export const roleService = {
    */
   async updatePermissions(name: string, permissionNames: string[]) {
     return await useDatabaseTransaction(async (transaction) => {
-      const role = await roleRepository.findByNameWithLock(name, {
+      const role = await roleRepository.findByPk(name, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -121,7 +122,7 @@ export const roleService = {
         })
       }
 
-      const permissions = await permissionRepository.findAllByNames(permissionNames, { transaction })
+      const permissions = await permissionRepository.findByPks(permissionNames, { transaction })
 
       if (permissions.length !== permissionNames.length) {
         throw createError({
@@ -130,7 +131,7 @@ export const roleService = {
         })
       }
 
-      await roleRepository.updatePermissionsByName(name, permissionNames, { transaction })
+      await roleRepository.updatePermissionsByPk(name, permissionNames, { transaction })
 
       useDatabaseAfterCommit(transaction, 'role.service.update_permissions', async () => {
         await roleSource.invalidate(role)
@@ -150,7 +151,7 @@ export const roleService = {
    */
   async delete(name: string) {
     return await useDatabaseTransaction(async (transaction) => {
-      const role = await roleRepository.findByNameWithLock(name, {
+      const role = await roleRepository.findByPk(name, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -178,7 +179,7 @@ export const roleService = {
         })
       }
 
-      await roleRepository.destroyByName(name, { transaction })
+      await roleRepository.destroyByPk(name, { transaction })
 
       useDatabaseAfterCommit(transaction, 'role.service.delete', async () => {
         await roleSource.invalidate(role)

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { roles } from '~~/server/constants'
-import { authService } from '~~/server/modules/authentication'
-import { roleRepository } from '~~/server/modules/authorization'
-import { createProfileResource, userRepository } from '~~/server/modules/users'
+import { authService } from '~~/server/domains/authentication'
+import { roleRepository } from '~~/server/domains/authorization'
+import { createProfileResource, userRepository } from '~~/server/domains/users'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const defaultRole = await roleRepository.findByName(roles.USER)
+  const defaultRole = await roleRepository.findByPk(roles.USER)
 
   if (!defaultRole) {
     throw createError({

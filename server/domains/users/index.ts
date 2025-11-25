@@ -1,4 +1,3 @@
-export * from './profile.resource'
 export * from './user.repository'
 export * from './user.resource'
 export * from './user.service'

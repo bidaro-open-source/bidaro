@@ -1,4 +1,4 @@
-import { categorySource, createCategoryResource } from '~~/server/modules/categories'
+import { categorySource, createCategoryResource } from '~~/server/domains/categories'
 
 export default defineEventHandler(async () => {
   const categories = await categorySource.getRoot()

@@ -1,4 +1,4 @@
-import { createLotResource, lotService } from '~~/server/modules/lots'
+import { createLotResource, lotService } from '~~/server/domains/lots'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

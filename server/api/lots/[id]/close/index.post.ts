@@ -1,5 +1,5 @@
-import { createLotResource, lotService, lotSource } from '~~/server/modules/lots'
-import { createUserResource, userSource } from '~~/server/modules/users'
+import { createLotResource, lotService, lotSource } from '~~/server/domains/lots'
+import { createUserResource, userSource } from '~~/server/domains/users'
 import { getLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 
@@ -14,11 +14,11 @@ export default defineEventHandler(async (event) => {
 
   const updatedLot = await lotService.close(request.params.id)
   const winner = updatedLot.winnerId
-    ? await userSource.getById(updatedLot.winnerId)
+    ? await userSource.getByPk(updatedLot.winnerId)
     : null
 
   if (updatedLot.winnerId) {
-    const seller = await userSource.getById(updatedLot.sellerId)
+    const seller = await userSource.getByPk(updatedLot.sellerId)
 
     winner && await sendEmail(event, {
       to: winner.email,

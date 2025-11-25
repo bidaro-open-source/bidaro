@@ -1,4 +1,4 @@
-import { createUserResource, userService } from '~~/server/modules/users'
+import { createUserResource, userService } from '~~/server/domains/users'
 import { updateUserPolicy } from './index.patch.policy'
 import { updateUserRequest } from './index.patch.request'
 

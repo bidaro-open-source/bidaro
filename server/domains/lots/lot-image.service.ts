@@ -11,7 +11,7 @@ export const lotImageService = {
    */
   async attachImages(id: number, images: Image[]) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -44,7 +44,7 @@ export const lotImageService = {
    */
   async unattachImages(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -61,7 +61,7 @@ export const lotImageService = {
       const safeLinkIds = existingLinks.map(link => link.id)
       const safeImageIds = existingLinks.map(link => link.imageId)
 
-      await lotImageRepository.destroyByIds(safeLinkIds, { transaction })
+      await lotImageRepository.destroyByPks(safeLinkIds, { transaction })
 
       return safeImageIds
     })
@@ -84,7 +84,7 @@ export const lotImageService = {
    */
   async updateImageOrder(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -117,7 +117,7 @@ export const lotImageService = {
         })
       }
 
-      await lotImageRepository.destroyByLotId(id, { transaction })
+      await lotImageRepository.destroyByLotPk(id, { transaction })
 
       const linksToCreate = imageIds.map((imageId, index) => {
         return {

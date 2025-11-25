@@ -1,4 +1,4 @@
-import { profileVerificationService } from '~~/server/modules/authentication'
+import { profileVerificationService } from '~~/server/domains/authentication'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

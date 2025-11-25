@@ -1,7 +1,7 @@
-import { permissionSource, roleSource } from '../modules/authorization'
-import { categorySource } from '../modules/categories'
-import { lotSource } from '../modules/lots'
-import { userSource } from '../modules/users'
+import { permissionSource, roleSource } from '../domains/authorization'
+import { categorySource } from '../domains/categories'
+import { lotSource } from '../domains/lots'
+import { userSource } from '../domains/users'
 import { clearCachePolicy } from './cache.delete.policy'
 
 export default defineEventHandler(async (event) => {

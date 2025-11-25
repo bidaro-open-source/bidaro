@@ -1,8 +1,8 @@
 import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
-import { profileRecoveryService } from '~~/server/modules/authentication'
-import { userRepository } from '~~/server/modules/users'
+import { profileRecoveryService } from '~~/server/domains/authentication'
+import { userRepository } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await resetPasswordRequest(event)

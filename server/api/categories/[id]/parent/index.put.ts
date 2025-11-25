@@ -1,4 +1,4 @@
-import { categoryService, createCategoryResource } from '~~/server/modules/categories'
+import { categoryService, createCategoryResource } from '~~/server/domains/categories'
 import { updateCategoryParentPolicy } from './index.get.policy'
 import { updateCategoryParentRequest } from './index.put.request'
 

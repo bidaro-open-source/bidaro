@@ -1,4 +1,4 @@
-import { lotImageService, lotSource } from '~~/server/modules/lots'
+import { lotImageService, lotSource } from '~~/server/domains/lots'
 import { updateImageOrderPolicy } from './index.post.policy'
 import { updateImageOrderRequest } from './index.post.request'
 

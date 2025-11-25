@@ -36,7 +36,7 @@ export const lotService = {
    */
   async update(id: number, updates: Partial<Lot>) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -69,7 +69,7 @@ export const lotService = {
       }
 
       if (updates.categoryId) {
-        const category = await categoryRepository.findById(
+        const category = await categoryRepository.findByPk(
           updates.categoryId,
           { transaction },
         )
@@ -84,7 +84,7 @@ export const lotService = {
         categoryId = category.id
       }
 
-      const updatedLot = await lotRepository.updateById(id, {
+      const updatedLot = await lotRepository.updateByPk(id, {
         title,
         description,
         initialPrice,
@@ -111,7 +111,7 @@ export const lotService = {
    */
   async publish(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -139,7 +139,7 @@ export const lotService = {
         })
       }
 
-      const updatedLot = await lotRepository.updateById(id, {
+      const updatedLot = await lotRepository.updateByPk(id, {
         statusName: lotStatuses.IN_TRADING_PROCESS,
         effectiveDate: new Date(),
         expirationDate: new Date(Date.now() + lotInitialDurationsInMs[lot.initialDuration]),
@@ -164,7 +164,7 @@ export const lotService = {
    */
   async close(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -194,7 +194,7 @@ export const lotService = {
 
       const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
 
-      const updatedLot = await lotRepository.updateById(lot.id, {
+      const updatedLot = await lotRepository.updateByPk(lot.id, {
         winnerId: latestBet
           ? latestBet.userId
           : null,
@@ -221,7 +221,7 @@ export const lotService = {
    */
   async ship(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -241,7 +241,7 @@ export const lotService = {
         })
       }
 
-      const updatedLot = await lotRepository.updateById(lot.id, {
+      const updatedLot = await lotRepository.updateByPk(lot.id, {
         statusName: lotStatuses.IN_DELIVERY_PROCESS,
       }, { transaction })
 
@@ -263,7 +263,7 @@ export const lotService = {
    */
   async receive(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -283,7 +283,7 @@ export const lotService = {
         })
       }
 
-      const updatedLot = await lotRepository.updateById(lot.id, {
+      const updatedLot = await lotRepository.updateByPk(lot.id, {
         statusName: lotStatuses.RECEIVED,
       }, { transaction })
 
@@ -304,7 +304,7 @@ export const lotService = {
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(id, {
+      const lot = await lotRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -323,7 +323,7 @@ export const lotService = {
         })
       }
 
-      await lotRepository.destroyById(lot.id, { transaction })
+      await lotRepository.destroyByPk(lot.id, { transaction })
 
       useDatabaseAfterCommit(transaction, 'lot.service.delete', async () => {
         await lotSource.invalidate(lot)

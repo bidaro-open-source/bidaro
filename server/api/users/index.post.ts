@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createUserResource, userRepository } from '~~/server/modules/users'
+import { createUserResource, userRepository } from '~~/server/domains/users'
 import { createUserPolicy } from './index.policy'
 import { createUserRequest } from './index.post.request'
 

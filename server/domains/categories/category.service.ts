@@ -24,7 +24,7 @@ export const categoryService = {
       let parentCategory: Category | null = null
 
       if (data.parentId) {
-        parentCategory = await categoryRepository.findById(data.parentId, { transaction })
+        parentCategory = await categoryRepository.findByPk(data.parentId, { transaction })
 
         if (!parentCategory) {
           throw createError({
@@ -45,7 +45,7 @@ export const categoryService = {
         ? `${parentCategory.path}/${category.id}`
         : `${category.id}`
 
-      const updatedCategory = await categoryRepository.updateById(
+      const updatedCategory = await categoryRepository.updateByPk(
         category.id,
         { parentId, path },
         { transaction },
@@ -69,7 +69,7 @@ export const categoryService = {
    */
   async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
-      const category = await categoryRepository.findByIdWithLock(id, {
+      const category = await categoryRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -86,7 +86,7 @@ export const categoryService = {
         ? data.description
         : category.description
 
-      const updatedCategory = await categoryRepository.updateById(
+      const updatedCategory = await categoryRepository.updateByPk(
         category.id,
         {
           displayName,
@@ -114,7 +114,7 @@ export const categoryService = {
    */
   async updateSlug(id: number, slug: string) {
     return await useDatabaseTransaction(async (transaction) => {
-      const category = await categoryRepository.findByIdWithLock(id, {
+      const category = await categoryRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -139,7 +139,7 @@ export const categoryService = {
         })
       }
 
-      const updatedCategory = await categoryRepository.updateById(
+      const updatedCategory = await categoryRepository.updateByPk(
         category.id,
         { slug },
         { transaction },
@@ -165,7 +165,7 @@ export const categoryService = {
    */
   async updateParent(id: number, parentId: number | null) {
     return await useDatabaseTransaction(async (transaction) => {
-      const category = await categoryRepository.findByIdWithLock(id, {
+      const category = await categoryRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -189,7 +189,7 @@ export const categoryService = {
       let parentCategory: Category | null = null
 
       if (parentId) {
-        parentCategory = await categoryRepository.findById(parentId, { transaction })
+        parentCategory = await categoryRepository.findByPk(parentId, { transaction })
 
         if (!parentCategory) {
           throw createError({
@@ -213,7 +213,7 @@ export const categoryService = {
 
       await categoryRepository.updatePaths(oldPath, newPath, { transaction })
 
-      const updatedCategory = await categoryRepository.updateById(
+      const updatedCategory = await categoryRepository.updateByPk(
         category.id,
         {
           path: newPath,
@@ -244,7 +244,7 @@ export const categoryService = {
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const category = await categoryRepository.findByIdWithLock(id, {
+      const category = await categoryRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -274,7 +274,7 @@ export const categoryService = {
         })
       }
 
-      await categoryRepository.destroyById(category.id, { transaction })
+      await categoryRepository.destroyByPk(category.id, { transaction })
 
       useDatabaseAfterCommit(transaction, 'category.service.delete', async () => {
         await categorySource.invalidate(category)

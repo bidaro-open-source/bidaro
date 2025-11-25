@@ -1,6 +1,6 @@
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
-import { profileVerificationService } from '~~/server/modules/authentication'
-import { userRepository, userService } from '~~/server/modules/users'
+import { profileVerificationService } from '~~/server/domains/authentication'
+import { userRepository, userService } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await userRepository.findById(uid)
+  const user = await userRepository.findByPk(uid)
 
   if (!user) {
     await profileVerificationService.deleteEmailVerificationTokenByUid(uid)

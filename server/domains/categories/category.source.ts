@@ -1,19 +1,31 @@
+import type { SourceInvalidateParams } from '~~/server/class/Source'
 import type { Category } from '../../database'
-import type { SourceInvalidateParams } from '../../types/sources'
+import { Source } from '~~/server/class/Source'
 import { categoryRepository } from './category.repository'
 
-const SCOPE = 'cat'
+class CategorySource extends Source<Category> {
+  protected scope = 'cat'
 
-const keys = {
-  all: `${SCOPE}:*`,
-  tree: `${SCOPE}:tree`,
-  one: (id: number) => `${SCOPE}:id:${id}`,
-  slug: (slug: string) => `${SCOPE}:slug:${slug}`,
-  children: (id: number) => `${SCOPE}:children:${id}`,
-  breadcrumbs: (path: string) => `${SCOPE}:crumbs:${path}`,
-}
+  protected get keys() {
+    return {
+      ...super.keys,
+      tree: `${this.scope}:tree`,
+      one: (id: number) => `${this.scope}:id:${id}`,
+      slug: (slug: string) => `${this.scope}:slug:${slug}`,
+      children: (id: number) => `${this.scope}:children:${id}`,
+      breadcrumbs: (path: string) => `${this.scope}:crumbs:${path}`,
+    }
+  }
 
-export const categorySource = {
+  protected getEntityKeys(category: Category): string[] {
+    return [
+      this.keys.one(category.id),
+      this.keys.slug(category.slug),
+      ...(category.parentId ? [this.keys.children(category.parentId)] : []),
+      ...(category.parentId === null ? [this.keys.tree] : []),
+    ]
+  }
+
   /**
    * Retrieve root categories, using Redis caching.
    *
@@ -22,10 +34,10 @@ export const categorySource = {
   async getRoot() {
     const db = useDatabase()
 
-    return await useDatabaseCache(keys.tree, db.Category, async () => {
+    return await useDatabaseCache(this.keys.tree, db.Category, async () => {
       return await categoryRepository.findAllByParentId(null)
     })
-  },
+  }
 
   /**
    * Retrieve a category by ID, using Redis caching.
@@ -36,10 +48,10 @@ export const categorySource = {
    */
   async getById(id: number) {
     const db = useDatabase()
-    const key = keys.one(id)
+    const key = this.keys.one(id)
 
     return await useDatabaseCache(key, db.Category, async () => {
-      const data = await categoryRepository.findById(id)
+      const data = await categoryRepository.findByPk(id)
 
       if (!data) {
         throw createError({
@@ -50,7 +62,7 @@ export const categorySource = {
 
       return data
     })
-  },
+  }
 
   /**
    * Retrieve a category by slug, using Redis caching.
@@ -61,7 +73,7 @@ export const categorySource = {
    */
   async getBySlug(slug: string) {
     const db = useDatabase()
-    const key = keys.slug(slug)
+    const key = this.keys.slug(slug)
 
     return await useDatabaseCache(key, db.Category, async () => {
       const data = await categoryRepository.findBySlug(slug)
@@ -75,7 +87,7 @@ export const categorySource = {
 
       return data
     })
-  },
+  }
 
   /**
    * Retrieve the children of a category by ID, using Redis caching.
@@ -85,12 +97,12 @@ export const categorySource = {
    */
   async getChildrenById(id: number) {
     const db = useDatabase()
-    const key = keys.children(id)
+    const key = this.keys.children(id)
 
     return await useDatabaseCache(key, db.Category, async () => {
       return await categoryRepository.findAllByParentId(id)
     })
-  },
+  }
 
   /**
    * Retrieve the breadcrumb categories for a given category ID, using Redis caching.
@@ -102,14 +114,14 @@ export const categorySource = {
   async getBreadcrumbsById(id: number) {
     const db = useDatabase()
 
-    const category = await categorySource.getById(id)
+    const category = await this.getById(id)
 
-    const key = keys.breadcrumbs(category.path)
+    const key = this.keys.breadcrumbs(category.path)
 
     return await useDatabaseCache(key, db.Category, async () => {
       const ids = category.path.split('/').map(id => Number(id))
 
-      const categories = await categoryRepository.findByIds(ids)
+      const categories = await categoryRepository.findByPks(ids)
 
       if (categories.length !== ids.length) {
         throw createError({
@@ -122,7 +134,7 @@ export const categorySource = {
 
       return categories
     })
-  },
+  }
 
   /**
    * Retrieve the breadcrumb categories for a given category path, using Redis caching.
@@ -133,12 +145,12 @@ export const categorySource = {
    */
   async getBreadcrumbsByPath(path: string) {
     const db = useDatabase()
-    const key = keys.breadcrumbs(path)
+    const key = this.keys.breadcrumbs(path)
 
     return await useDatabaseCache(key, db.Category, async () => {
       const ids = path.split('/').map(id => Number(id))
 
-      const categories = await categoryRepository.findByIds(ids)
+      const categories = await categoryRepository.findByPks(ids)
 
       if (categories.length !== ids.length) {
         throw createError({
@@ -151,54 +163,19 @@ export const categorySource = {
 
       return categories
     })
-  },
+  }
 
-  /**
-   * Clears cache entries for one or more category instances.
-   *
-   * @param instance - A category instance or an array of category instances to invalidate
-   */
   async invalidate(instance: SourceInvalidateParams<Category>) {
-    const db = useDatabase()
     const redis = useRedis()
-    const categories = Array.isArray(instance) ? instance : [instance]
-    const keysForDelete = new Set<string>()
-
-    for (const category of categories) {
-      if (!category || !(category instanceof db.Category))
-        continue
-
-      keysForDelete.add(keys.one(category.id))
-      keysForDelete.add(keys.slug(category.slug))
-
-      if (category.parentId)
-        keysForDelete.add(keys.children(category.parentId))
-
-      if (category.parentId === null)
-        keysForDelete.add(keys.tree)
-    }
 
     const cachedBreadcrumbsKeys = await redis.keys(
-      keys.breadcrumbs(`*`),
+      this.keys.breadcrumbs(`*`),
     )
 
-    for (const key of cachedBreadcrumbsKeys) {
-      keysForDelete.add(key)
-    }
+    await redis.del(cachedBreadcrumbsKeys)
 
-    await redis.del([...keysForDelete])
-  },
-
-  /**
-   * Invalidates all category-related cache entries.
-   *
-   * @returns Promise<void>
-   */
-  async invalidateAll() {
-    const redis = useRedis()
-    const keysForDelete = await redis.keys(keys.all)
-    if (keysForDelete.length > 0) {
-      await redis.del(keysForDelete)
-    }
-  },
+    await super.invalidate(instance)
+  }
 }
+
+export const categorySource = new CategorySource()

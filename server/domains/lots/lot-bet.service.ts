@@ -19,7 +19,7 @@ export const lotBetService = {
    */
   async create(lotId: number, userId: number, amount: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const lot = await lotRepository.findByIdWithLock(lotId, {
+      const lot = await lotRepository.findByPk(lotId, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -53,7 +53,7 @@ export const lotBetService = {
         })
       }
 
-      const user = await userRepository.findById(userId, { transaction })
+      const user = await userRepository.findByPk(userId, { transaction })
 
       if (!user) {
         throw createError({
@@ -74,7 +74,7 @@ export const lotBetService = {
         { transaction },
       )
 
-      await lotRepository.updateById(
+      await lotRepository.updateByPk(
         lot.id,
         { currentPrice: amount },
         { transaction },

@@ -1,8 +1,8 @@
 import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
-import { profileRecoveryService } from '~~/server/modules/authentication'
-import { userRepository, userService } from '~~/server/modules/users'
+import { profileRecoveryService } from '~~/server/domains/authentication'
+import { userRepository, userService } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await confirmResetPasswordRequest(event)
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await userRepository.findById(uid)
+  const user = await userRepository.findByPk(uid)
 
   if (!user) {
     await profileRecoveryService.deletePasswordResetToken(request.body.token)

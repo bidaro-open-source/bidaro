@@ -16,7 +16,7 @@ export const userService = {
    */
   async update(id: number, data: Pick<UserAttributesOptional, 'name' | 'surname'>) {
     return await useDatabaseTransaction(async (transaction) => {
-      const user = await userRepository.findByIdWithLock(id, {
+      const user = await userRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -39,7 +39,7 @@ export const userService = {
       const name = Object.hasOwn(data, 'name') ? data.name : user.name
       const surname = Object.hasOwn(data, 'surname') ? data.surname : user.surname
 
-      const updatedUser = await userRepository.updateById(
+      const updatedUser = await userRepository.updateByPk(
         id,
         {
           name: name || null,
@@ -70,7 +70,7 @@ export const userService = {
    */
   async updateEmail(id: number, email: string) {
     return await useDatabaseTransaction(async (transaction) => {
-      const user = await userRepository.findByIdWithLock(id, {
+      const user = await userRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -95,7 +95,7 @@ export const userService = {
         })
       }
 
-      const updatedUser = await userRepository.updateById(
+      const updatedUser = await userRepository.updateByPk(
         id,
         { email, emailVerifiedAt: null },
         { transaction },
@@ -122,7 +122,7 @@ export const userService = {
    */
   async updatePassword(id: number, password: string) {
     return await useDatabaseTransaction(async (transaction) => {
-      const user = await userRepository.findByIdWithLock(id, {
+      const user = await userRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -136,7 +136,7 @@ export const userService = {
 
       const hashedPassword = await hashPassword(password)
 
-      const updatedUser = await userRepository.updateById(
+      const updatedUser = await userRepository.updateByPk(
         id,
         { password: hashedPassword },
         { transaction },
@@ -162,7 +162,7 @@ export const userService = {
    */
   async verifyEmail(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const user = await userRepository.findByIdWithLock(id, {
+      const user = await userRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -174,7 +174,7 @@ export const userService = {
         })
       }
 
-      const updatedUser = await userRepository.updateById(
+      const updatedUser = await userRepository.updateByPk(
         id,
         { emailVerifiedAt: new Date() },
         { transaction },
@@ -201,7 +201,7 @@ export const userService = {
    */
   async updateRole(id: number, roleName: string | null) {
     return await useDatabaseTransaction(async (transaction) => {
-      const user = await userRepository.findByIdWithLock(id, {
+      const user = await userRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -217,7 +217,7 @@ export const userService = {
         return user
       }
 
-      const updatedUser = await userRepository.updateById(
+      const updatedUser = await userRepository.updateByPk(
         id,
         { roleName },
         { transaction },
@@ -241,9 +241,9 @@ export const userService = {
    * @param id - user primary key
    * @throws 404 if user not found
    */
-  async deleteById(id: number) {
+  async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
-      const user = await userRepository.findByIdWithLock(id, {
+      const user = await userRepository.findByPk(id, {
         lock: transaction.LOCK.UPDATE,
         transaction,
       })
@@ -269,7 +269,7 @@ export const userService = {
 
         await imageService.destroySafely(imagesIds)
 
-        await lotRepository.destroyById(lot.id, { transaction })
+        await lotRepository.destroyByPk(lot.id, { transaction })
       }
 
       await lotBetRepository.destroyByUserId(id, { transaction })
@@ -281,7 +281,7 @@ export const userService = {
         await authService.deleteSessions(id, sessionUuids)
       }
 
-      await userRepository.destroyById(id, { transaction })
+      await userRepository.destroyByPk(id, { transaction })
 
       useDatabaseAfterCommit(transaction, 'user.service.delete', async () => {
         await userSource.invalidate(user)
