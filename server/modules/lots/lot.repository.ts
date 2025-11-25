@@ -75,7 +75,7 @@ export const lotRepository = {
   },
 
   /**
-   * Save a chagned lot record in the database.
+   * Save a changed lot record in the database.
    *
    * @param id - lot primary key
    * @param data - partial lot attributes to update

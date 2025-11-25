@@ -81,7 +81,7 @@ export const lotSource = {
     const keysForDelete = new Set<string>()
 
     for (const lot of lots) {
-      if (!lot || !(lot instanceof db.Role))
+      if (!lot || !(lot instanceof db.Lot))
         continue
 
       keysForDelete.add(keys.one(lot.id))

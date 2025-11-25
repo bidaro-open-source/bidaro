@@ -32,7 +32,7 @@ export const imageService = {
   },
 
   /**
-   * Uploads one image to s3 and creates recond in database.
+   * Uploads one image to s3 and creates record in database.
    *
    * This function follows a "create-then-upload" pattern with rollback.
    *
