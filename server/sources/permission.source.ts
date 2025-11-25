@@ -4,9 +4,9 @@ const SCOPE = 'permissions'
 
 export const permissionSource = {
   /**
-   * Retrieves all permission, utilizing Redis caching.
+   * Retrieve all permissions, using Redis caching.
    *
-   * @returns array of permission instances
+   * @returns Array of permission instances
    */
   async getAll() {
     const db = useDatabase()

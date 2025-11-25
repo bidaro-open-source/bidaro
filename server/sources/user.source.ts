@@ -11,10 +11,11 @@ const keys = {
 
 export const userSource = {
   /**
-   * Retrieves a user by ID, utilizing Redis caching.
+   * Retrieve a user by ID, using Redis caching.
    *
+   * @param id - User primary key
    * @throws 404 if the user does not exist
-   * @returns user instance
+   * @returns The user instance
    */
   async getById(id: number) {
     const db = useDatabase()
@@ -35,9 +36,9 @@ export const userSource = {
   },
 
   /**
-   * Clears cache for a user.
+   * Clears cache entries for one or more user instances.
    *
-   * @param instance user instance or array of user instances
+   * @param instance - A user instance or an array of user instances to invalidate
    */
   async invalidate(instance: SourceInvalidateParams<User>) {
     const db = useDatabase()

@@ -15,10 +15,11 @@ const keys = {
 
 export const lotSource = {
   /**
-   * Retrieves a role by ID, utilizing Redis caching.
+   * Retrieve a lot by ID, utilizing Redis caching.
    *
-   * @throws 404 if the role does not exist
-   * @returns role instance
+   * @param id - The ID of the lot to fetch.
+   * @throws 404 if the lot does not exist
+   * @returns The lot instance
    */
   async getById(id: number) {
     const db = useDatabase()
@@ -39,10 +40,10 @@ export const lotSource = {
   },
 
   /**
-   * Retrieves a role by ID, utilizing Redis caching.
+   * Retrieve all bets for a given lot, utilizing Redis caching.
    *
-   * @throws 404 if the role does not exist
-   * @returns role instance
+   * @param lotId - The ID of the lot whose bets should be fetched.
+   * @returns Array of lot bets for the specified lot
    */
   async getAllBetsById(lotId: number) {
     const db = useDatabase()
@@ -54,10 +55,10 @@ export const lotSource = {
   },
 
   /**
-   * Retrieves a role by ID, utilizing Redis caching.
+   * Retrieve all images for a given lot, utilizing Redis caching.
    *
-   * @throws 404 if the role does not exist
-   * @returns role instance
+   * @param lotId - The ID of the lot whose images should be fetched.
+   * @returns Array of images for the specified lot
    */
   async getAllImagesById(lotId: number) {
     const db = useDatabase()
@@ -69,9 +70,9 @@ export const lotSource = {
   },
 
   /**
-   * Clears cache for a role.
+   * Clears cache for one or more lot instances.
    *
-   * @param instance role instance or array of role instances
+   * @param instance - A lot instance or array of lot instances to invalidate from cache
    */
   async invalidate(instance: SourceInvalidateParams<Lot>) {
     const db = useDatabase()
@@ -92,7 +93,7 @@ export const lotSource = {
   },
 
   /**
-   * Invalidates all category-related cache entries.
+   * Invalidates all lot-related cache entries.
    */
   async invalidateAll() {
     const redis = useRedis()
