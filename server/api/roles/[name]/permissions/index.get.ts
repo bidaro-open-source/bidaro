@@ -1,5 +1,5 @@
-import { roleRepository } from '~~/server/repositories/role.repository'
 import { createPermissionResource } from '~~/server/resources/permission.resource'
+import { roleSource } from '~~/server/sources/role.source'
 import { getRoleRequest } from '../index.request'
 import { viewRolePermissionsPolicy } from './index.policy'
 
@@ -10,14 +10,9 @@ export default defineEventHandler(async (event) => {
 
   viewRolePermissionsPolicy(event)
 
-  const role = await roleRepository.findByName(request.params.name)
+  const role = await roleSource.getByName(request.params.name)
 
-  if (!role) {
-    throw createError({
-      statusCode: 404,
-      message: 'Роль не знайдено',
-    })
-  }
+  const permissions = await roleSource.getPermissionsByName(role.name)
 
-  return (role.permissions || []).map(createPermissionResource)
+  return permissions.map(createPermissionResource)
 })
