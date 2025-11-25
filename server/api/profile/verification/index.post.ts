@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const config = useRuntimeConfig()
 
-  await sendEmail(event, {
+  await sendMail(event, {
     to: user.email,
     subject: 'Верифікуй свою пошту - Bidaro',
     template: {

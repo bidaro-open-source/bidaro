@@ -22,7 +22,7 @@ export interface EmailSenderPayload {
  * @param payload - Containing the email details (recipient, subject, template).
  * @returns A Promise that resolves with Nodemailer's message.
  */
-export function sendEmail(event: H3Event, payload: EmailSenderPayload) {
+export function sendMail(event: H3Event, payload: EmailSenderPayload) {
   const transporter = useNodemailer(event)
   const runtimeConfig = useRuntimeConfig(event)
 

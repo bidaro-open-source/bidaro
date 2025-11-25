@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   if (updatedLot.winnerId) {
     const seller = await userSource.getByPk(updatedLot.sellerId)
 
-    winner && await sendEmail(event, {
+    winner && await sendMail(event, {
       to: winner.email,
       subject: 'Вітаємо! Ви виграли лот на Bidaro',
       template: {
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    seller && await sendEmail(event, {
+    seller && await sendMail(event, {
       to: seller.email,
       subject: 'Ваш лот було продано на Bidaro',
       template: {
