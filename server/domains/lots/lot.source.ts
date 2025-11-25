@@ -32,10 +32,9 @@ class LotSource extends Source<Lot> {
    * @returns The lot instance
    */
   async getById(id: number) {
-    const db = useDatabase()
     const key = this.keys.one(id)
 
-    return await useDatabaseCache(key, db.Lot, async () => {
+    return await useDatabaseCache(key, async () => {
       const data = await lotRepository.findByPk(id)
 
       if (!data) {
@@ -56,10 +55,9 @@ class LotSource extends Source<Lot> {
    * @returns Array of lot bets for the specified lot
    */
   async getAllBetsById(lotId: number) {
-    const db = useDatabase()
     const key = this.keys.oneBets(lotId)
 
-    return await useDatabaseCache(key, db.LotBet, async () => {
+    return await useDatabaseCache(key, async () => {
       return await lotBetRepository.findAllByLotId(lotId)
     })
   }
@@ -71,10 +69,9 @@ class LotSource extends Source<Lot> {
    * @returns Array of images for the specified lot
    */
   async getAllImagesById(lotId: number) {
-    const db = useDatabase()
     const key = this.keys.oneImages(lotId)
 
-    return await useDatabaseCache(key, db.Image, async () => {
+    return await useDatabaseCache(key, async () => {
       return await lotImageRepository.findAllByLotId(lotId)
     })
   }

@@ -26,10 +26,9 @@ class UserSource extends Source<User> {
    * @returns The user instance
    */
   async getByPk(id: number) {
-    const db = useDatabase()
     const key = this.keys.one(id)
 
-    return await useDatabaseCache(key, db.User, async () => {
+    return await useDatabaseCache(key, async () => {
       const data = await userRepository.findByPk(id)
 
       if (!data) {

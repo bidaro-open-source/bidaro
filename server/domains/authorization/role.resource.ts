@@ -1,13 +1,11 @@
-import type { Role } from '../../database'
-import { createPermissionResource } from './permission.resource'
+import type { RoleAttributes } from '../../database'
 
 export type RoleResource = ReturnType<typeof createRoleResource>
 
-export function createRoleResource(entity: Role) {
+export function createRoleResource(entity: RoleAttributes) {
   return {
     name: entity.name,
     displayName: entity.displayName,
     description: entity.description,
-    permissions: entity.permissions?.map(createPermissionResource),
   }
 }

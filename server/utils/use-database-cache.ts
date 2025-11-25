@@ -1,55 +1,82 @@
-import type { ModelStatic } from 'sequelize'
+import type { InferAttributes } from 'sequelize'
+import { Model } from 'sequelize'
+
+/**
+ * Unwraps Sequelize model instances to their attribute types.
+ *
+ * @template T - The type to unwrap.
+ */
+export type UnwrapSequelize<T> = T extends Array<infer U>
+  ? Array<UnwrapSequelize<U>>
+  : T extends Model<any, any>
+    ? InferAttributes<T>
+    : T
 
 /**
  * A utility function to cache database query results using Redis.
  *
  * @param key - The cache key to store/retrieve the data.
- * @param model  - The Sequelize model type for building instances.
  * @param fetcher - A function that fetches the data if not present in cache.
  * @param options - Additional options for the cache.
  * @param options.ttl - Time to live for the cached data in seconds (default is 24 hours).
  * @returns The cached or freshly fetched data as model instances.
  */
-export async function useDatabaseCache<
-  Model extends ModelStatic<any>,
-  ModelReturn extends InstanceType<Model> | InstanceType<Model>[],
->(
+export async function useDatabaseCache<T>(
   key: string,
-  model: Model,
-  fetcher: () => Promise<ModelReturn>,
+  fetcher: () => Promise<T>,
   options: { ttl?: number } = {},
-): Promise<ModelReturn> {
+): Promise<UnwrapSequelize<T>> {
   const redis = useRedis()
 
   try {
     const cachedData = await redis.get(key)
 
     if (cachedData) {
-      const parsed = JSON.parse(cachedData)
-
-      return Array.isArray(parsed)
-        ? model.bulkBuild(parsed, { isNewRecord: false }) as ModelReturn
-        : model.build(parsed, { isNewRecord: false })
+      return JSON.parse(cachedData) as UnwrapSequelize<T>
     }
   }
   catch (error) {
     await redis.del(key)
-    // TODO: add logger
+    console.warn(`Failed to retrieve cache for key ${key}:`, error)
   }
 
   const data = await fetcher()
 
-  if (data) {
-    const newCachedData = Array.isArray(data)
-      ? data.map((item: InstanceType<Model>) => item.toJSON())
-      : data.toJSON()
+  const plainData = normalizeSequelizeData(data)
 
+  if (plainData) {
     try {
-      await redis.set(key, JSON.stringify(newCachedData), 'EX', options.ttl ?? 60 * 60 * 24)
+      await redis.set(
+        key,
+        JSON.stringify(plainData),
+        'EX',
+        options.ttl ?? 86400,
+      )
     }
     catch {
-      // TODO: add logger
+      console.warn(`Failed to set cache for key ${key}`)
     }
+  }
+
+  return plainData as UnwrapSequelize<T>
+}
+
+/**
+ * Normalizes Sequelize model instances to plain JavaScript objects.
+ *
+ * @param data - The data to normalize.
+ * @returns The normalized data.
+ */
+function normalizeSequelizeData(data: any): any {
+  if (!data)
+    return data
+
+  if (Array.isArray(data)) {
+    return data.map(item => (item instanceof Model ? item.toJSON() : item))
+  }
+
+  if (data instanceof Model) {
+    return data.toJSON()
   }
 
   return data

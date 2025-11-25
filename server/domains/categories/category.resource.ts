@@ -1,8 +1,8 @@
-import type { Category } from '../../database'
+import type { CategoryAttributes } from '../../database'
 
 export type CategoryResource = ReturnType<typeof createCategoryResource>
 
-export function createCategoryResource(entity: Category) {
+export function createCategoryResource(entity: CategoryAttributes) {
   return {
     id: entity.id as number,
     parentId: entity.parentId as number,
@@ -15,7 +15,7 @@ export function createCategoryResource(entity: Category) {
 
 export type CategoryBreadcrumbResource = ReturnType<typeof createCategoryResource>
 
-export function createCategoryBreadcrumbResource(entity: Category) {
+export function createCategoryBreadcrumbResource(entity: CategoryAttributes) {
   return {
     id: entity.id as number,
     displayName: entity.displayName,

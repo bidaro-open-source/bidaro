@@ -28,8 +28,7 @@ class RoleSource extends Source<Role> {
    * @returns Array of role instances
    */
   async getAll() {
-    const db = useDatabase()
-    return await useDatabaseCache(this.keys.list, db.Role, async () => {
+    return await useDatabaseCache(this.keys.list, async () => {
       return await roleRepository.findAll()
     })
   }
@@ -42,10 +41,9 @@ class RoleSource extends Source<Role> {
    * @returns The role instance
    */
   async getByPk(name: string) {
-    const db = useDatabase()
     const key = this.keys.one(name)
 
-    return await useDatabaseCache(key, db.Role, async () => {
+    return await useDatabaseCache(key, async () => {
       const data = await roleRepository.findByPk(name)
 
       if (!data) {
@@ -66,10 +64,9 @@ class RoleSource extends Source<Role> {
    * @returns Array of permissions for the specified role
    */
   async getPermissionsByPk(name: string) {
-    const db = useDatabase()
     const key = this.keys.permissions(name)
 
-    return await useDatabaseCache(key, db.Permission, async () => {
+    return await useDatabaseCache(key, async () => {
       return await roleRepository.findAllPermissionsByPk(name)
     })
   }

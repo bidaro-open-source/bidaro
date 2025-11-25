@@ -32,9 +32,7 @@ class CategorySource extends Source<Category> {
    * @returns Array of root category instances
    */
   async getRoot() {
-    const db = useDatabase()
-
-    return await useDatabaseCache(this.keys.tree, db.Category, async () => {
+    return await useDatabaseCache(this.keys.tree, async () => {
       return await categoryRepository.findAllByParentId(null)
     })
   }
@@ -47,10 +45,9 @@ class CategorySource extends Source<Category> {
    * @returns The category instance
    */
   async getById(id: number) {
-    const db = useDatabase()
     const key = this.keys.one(id)
 
-    return await useDatabaseCache(key, db.Category, async () => {
+    return await useDatabaseCache(key, async () => {
       const data = await categoryRepository.findByPk(id)
 
       if (!data) {
@@ -72,10 +69,9 @@ class CategorySource extends Source<Category> {
    * @returns The category instance
    */
   async getBySlug(slug: string) {
-    const db = useDatabase()
     const key = this.keys.slug(slug)
 
-    return await useDatabaseCache(key, db.Category, async () => {
+    return await useDatabaseCache(key, async () => {
       const data = await categoryRepository.findBySlug(slug)
 
       if (!data) {
@@ -96,10 +92,9 @@ class CategorySource extends Source<Category> {
    * @returns Array of child category instances
    */
   async getChildrenById(id: number) {
-    const db = useDatabase()
     const key = this.keys.children(id)
 
-    return await useDatabaseCache(key, db.Category, async () => {
+    return await useDatabaseCache(key, async () => {
       return await categoryRepository.findAllByParentId(id)
     })
   }
@@ -112,13 +107,11 @@ class CategorySource extends Source<Category> {
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsById(id: number) {
-    const db = useDatabase()
-
     const category = await this.getById(id)
 
     const key = this.keys.breadcrumbs(category.path)
 
-    return await useDatabaseCache(key, db.Category, async () => {
+    return await useDatabaseCache(key, async () => {
       const ids = category.path.split('/').map(id => Number(id))
 
       const categories = await categoryRepository.findByPks(ids)
@@ -144,10 +137,9 @@ class CategorySource extends Source<Category> {
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsByPath(path: string) {
-    const db = useDatabase()
     const key = this.keys.breadcrumbs(path)
 
-    return await useDatabaseCache(key, db.Category, async () => {
+    return await useDatabaseCache(key, async () => {
       const ids = path.split('/').map(id => Number(id))
 
       const categories = await categoryRepository.findByPks(ids)
