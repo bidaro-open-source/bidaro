@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   return betsWithUser.map(([bet, user]) => ({
     ...createLotBetResource(bet),
     user: {
-      username: `${user.username.at(0)}******${user.username.at(-1)}`,
+      username: `${user.username.at(0) || ''}******${user.username.at(-1) || ''}`,
     },
   }))
 })

@@ -53,6 +53,9 @@ export abstract class Repository<
       where: options.where,
       transaction: options.transaction,
       lock: options.lock,
+      limit: options.limit,
+      offset: options.offset,
+      order: options.order,
     })
   }
 
