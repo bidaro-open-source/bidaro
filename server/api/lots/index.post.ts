@@ -1,4 +1,4 @@
-import { createOnlyLotResource } from '~~/server/resources/lot.resource'
+import { createLotResource } from '~~/server/resources/lot.resource'
 import { lotService } from '~~/server/services/lot.service'
 
 export default defineEventHandler(async (event) => {
@@ -10,5 +10,5 @@ export default defineEventHandler(async (event) => {
 
   setResponseStatus(event, 201)
 
-  return createOnlyLotResource(lot)
+  return createLotResource(lot)
 })

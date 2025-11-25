@@ -19,40 +19,6 @@ export const lotRepository = {
 
     return await db.Lot.findByPk(id, {
       transaction: options.transaction,
-      include: [
-        {
-          model: db.Image,
-          as: 'images',
-          through: { attributes: [] },
-          order: [
-            [db.LotImage, 'order', 'ASC'],
-          ],
-        },
-        {
-          model: db.User,
-          as: 'seller',
-        },
-        {
-          model: db.User,
-          as: 'winner',
-        },
-        {
-          model: db.Category,
-          as: 'category',
-        },
-        {
-          model: db.LotBet,
-          as: 'bets',
-          limit: 1,
-          order: [['createdAt', 'DESC']],
-          include: [
-            {
-              model: db.User,
-              as: 'user',
-            },
-          ],
-        },
-      ],
     })
   },
 

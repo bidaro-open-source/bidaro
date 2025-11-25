@@ -1,6 +1,8 @@
-import { userRepository } from '~~/server/repositories/user.repository'
 import { createLotResource } from '~~/server/resources/lot.resource'
+import { createUserResource } from '~~/server/resources/user.resource'
 import { lotService } from '~~/server/services/lot.service'
+import { lotSource } from '~~/server/sources/lot.source'
+import { userSource } from '~~/server/sources/user.source'
 import { getLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 
@@ -9,15 +11,17 @@ export default defineEventHandler(async (event) => {
 
   const request = await getLotRequest(event)
 
-  const lot = await lotService.findByIdOrFail(request.params.id)
+  const lot = await lotSource.getById(request.params.id)
 
   closeLotPolicy(event, lot)
 
   const updatedLot = await lotService.close(request.params.id)
+  const winner = updatedLot.winnerId
+    ? await userSource.getById(updatedLot.winnerId)
+    : null
 
   if (updatedLot.winnerId) {
-    const winner = await userRepository.findById(updatedLot.winnerId)
-    const seller = await userRepository.findById(updatedLot.sellerId)
+    const seller = await userSource.getById(updatedLot.sellerId)
 
     winner && await sendEmail(event, {
       to: winner.email,
@@ -38,5 +42,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return createLotResource(updatedLot)
+  return {
+    ...createLotResource(updatedLot),
+    winner: winner ? createUserResource(winner) : null,
+  }
 })
