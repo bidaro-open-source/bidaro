@@ -1,9 +1,8 @@
 import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
-import { userRepository } from '~~/server/repositories/user.repository'
-import { profileRecoveryService } from '~~/server/services/recovery.service'
-import { userService } from '~~/server/services/user.service'
+import { profileRecoveryService } from '~~/server/modules/authentication'
+import { userRepository, userService } from '~~/server/modules/users'
 
 export default defineEventHandler(async (event) => {
   const request = await confirmResetPasswordRequest(event)

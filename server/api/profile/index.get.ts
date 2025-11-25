@@ -1,6 +1,5 @@
-import { createPermissionResource } from '~~/server/resources/permission.resource'
-import { createProfileResource } from '~~/server/resources/profile.resource'
-import { createRoleResource } from '~~/server/resources/role.resource'
+import { createPermissionResource, createRoleResource } from '~~/server/modules/authorization'
+import { createProfileResource } from '~~/server/modules/users'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

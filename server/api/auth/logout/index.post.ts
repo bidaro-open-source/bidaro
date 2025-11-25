@@ -1,4 +1,4 @@
-import { authService } from '~~/server/services/authentication.service'
+import { authService } from '~~/server/modules/authentication'
 import { logoutRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

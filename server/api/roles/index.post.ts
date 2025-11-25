@@ -1,5 +1,4 @@
-import { createRoleResource } from '~~/server/resources/role.resource'
-import { roleService } from '~~/server/services/role.service'
+import { createRoleResource, roleService } from '~~/server/modules/authorization'
 import { createRolePolicy } from './index.policy'
 import { createRoleRequest } from './index.post.request'
 

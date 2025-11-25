@@ -1,7 +1,6 @@
 import { z } from 'zod'
-import { userRepository } from '~~/server/repositories/user.repository'
-import { createProfileResource } from '~~/server/resources/profile.resource'
-import { authService } from '~~/server/services/authentication.service'
+import { authService } from '~~/server/modules/authentication'
+import { createProfileResource, userRepository } from '~~/server/modules/users'
 import { loginRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

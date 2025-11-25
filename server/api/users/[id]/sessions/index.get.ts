@@ -1,4 +1,4 @@
-import { authService } from '~~/server/services/authentication.service'
+import { authService } from '~~/server/modules/authentication'
 import { getSessionsRequest } from './index.get.request'
 import { getSessionsPolicy } from './index.policy'
 

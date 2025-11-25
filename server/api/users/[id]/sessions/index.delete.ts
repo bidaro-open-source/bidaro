@@ -1,4 +1,4 @@
-import { authService } from '~~/server/services/authentication.service'
+import { authService } from '~~/server/modules/authentication'
 import { deleteSessionsRequest } from './index.delete.request'
 import { deleteSessionsPolicy } from './index.policy'
 

@@ -1,5 +1,4 @@
-import { createPermissionResource } from '~~/server/resources/permission.resource'
-import { roleSource } from '~~/server/sources/role.source'
+import { createPermissionResource, roleSource } from '~~/server/modules/authorization'
 import { getRoleRequest } from '../index.request'
 import { viewRolePermissionsPolicy } from './index.policy'
 

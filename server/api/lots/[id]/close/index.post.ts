@@ -1,8 +1,5 @@
-import { createLotResource } from '~~/server/resources/lot.resource'
-import { createUserResource } from '~~/server/resources/user.resource'
-import { lotService } from '~~/server/services/lot.service'
-import { lotSource } from '~~/server/sources/lot.source'
-import { userSource } from '~~/server/sources/user.source'
+import { createLotResource, lotService, lotSource } from '~~/server/modules/lots'
+import { createUserResource, userSource } from '~~/server/modules/users'
 import { getLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 

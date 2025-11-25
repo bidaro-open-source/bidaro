@@ -1,5 +1,4 @@
-import { createRoleResource } from '~~/server/resources/role.resource'
-import { roleSource } from '~~/server/sources/role.source'
+import { createRoleResource, roleSource } from '~~/server/modules/authorization'
 import { viewRolesPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {

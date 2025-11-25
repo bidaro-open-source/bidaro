@@ -1,11 +1,6 @@
-import { createCategoryResource } from '~~/server/resources/category.resource'
-import { createLotBetResource } from '~~/server/resources/lot-bet.resource'
-import { createImageResource } from '~~/server/resources/lot-image.resource'
-import { createLotResource } from '~~/server/resources/lot.resource'
-import { createUserResource } from '~~/server/resources/user.resource'
-import { categorySource } from '~~/server/sources/category.source'
-import { lotSource } from '~~/server/sources/lot.source'
-import { userSource } from '~~/server/sources/user.source'
+import { categorySource, createCategoryResource } from '~~/server/modules/categories'
+import { createImageResource, createLotBetResource, createLotResource, lotSource } from '~~/server/modules/lots'
+import { createUserResource, userSource } from '~~/server/modules/users'
 import { getLotRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

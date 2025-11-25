@@ -1,5 +1,4 @@
-import { categoryRepository } from '~~/server/repositories/category.repository'
-import { categorySource } from '~~/server/sources/category.source'
+import { categoryRepository, categorySource } from '~~/server/modules/categories'
 import { getCategoryRequest } from '../index.request'
 import { getCategoryCountPolicy } from './index.get.policy'
 

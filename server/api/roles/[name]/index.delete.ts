@@ -1,4 +1,4 @@
-import { roleService } from '~~/server/services/role.service'
+import { roleService } from '~~/server/modules/authorization'
 import { deleteRolePolicy } from './index.policy'
 import { getRoleRequest } from './index.request'
 

@@ -1,6 +1,4 @@
-import { roleRepository } from '~~/server/repositories/role.repository'
-import { createPermissionResource } from '~~/server/resources/permission.resource'
-import { roleService } from '~~/server/services/role.service'
+import { createPermissionResource, roleRepository, roleService } from '~~/server/modules/authorization'
 import { updateRolePermissionsPolicy } from './index.policy'
 import { updateRolePermissionsRequest } from './index.put.request'
 

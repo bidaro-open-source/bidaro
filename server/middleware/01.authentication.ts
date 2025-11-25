@@ -1,5 +1,5 @@
-import { roleSource } from '../sources/role.source'
-import { userSource } from '../sources/user.source'
+import { roleSource } from '../modules/authorization'
+import { userSource } from '../modules/users'
 
 /**
  * Checks the request for an access token in the `Authorization` header.

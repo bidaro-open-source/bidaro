@@ -1,5 +1,4 @@
-import { createUserResource } from '~~/server/resources/user.resource'
-import { userSource } from '~~/server/sources/user.source'
+import { createUserResource, userSource } from '~~/server/modules/users'
 import { getUserRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

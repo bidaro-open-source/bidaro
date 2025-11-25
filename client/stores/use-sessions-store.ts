@@ -1,4 +1,4 @@
-import type { SessionMetadata } from '~~/server/services/authentication'
+import type { SessionMetadata } from '~~/server/modules/authentication'
 import { defineStore } from 'pinia'
 
 interface AuthStoreState {

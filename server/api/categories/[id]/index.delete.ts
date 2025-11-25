@@ -1,4 +1,4 @@
-import { categoryService } from '~~/server/services/category.service'
+import { categoryService } from '~~/server/modules/categories'
 import { deleteCateogryPolicy } from '../index.policy'
 import { getCategoryRequest } from './index.request'
 

@@ -1,6 +1,4 @@
-import { lotImageRepository } from '~~/server/repositories/lot-image.repository'
-import { createImageResource } from '~~/server/resources/lot-image.resource'
-import { lotSource } from '~~/server/sources/lot.source'
+import { createImageResource, lotImageRepository, lotSource } from '~~/server/modules/lots'
 import { getLotRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {
