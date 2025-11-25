@@ -1,8 +1,8 @@
 import { createCategoryResource } from '~~/server/resources/category.resource'
-import { categoryService } from '~~/server/services/category.service'
+import { categorySource } from '~~/server/sources/category.source'
 
 export default defineEventHandler(async () => {
-  const categories = await categoryService.getRootCategories()
+  const categories = await categorySource.getRoot()
 
   return categories.map(createCategoryResource)
 })

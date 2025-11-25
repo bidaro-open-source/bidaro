@@ -1,12 +1,12 @@
 import { createCategoryBreadcrumbResource } from '~~/server/resources/category.resource'
-import { categoryService } from '~~/server/services/category.service'
+import { categorySource } from '~~/server/sources/category.source'
 import { getCategoryRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {
   const request = await getCategoryRequest(event)
 
-  const category = await categoryService.getById(request.params.id)
-  const breadcrumbs = await categoryService.getBreadcrumbsByPath(category.path)
+  const category = await categorySource.getById(request.params.id)
+  const breadcrumbs = await categorySource.getBreadcrumbsByPath(category.path)
 
   return breadcrumbs.map(createCategoryBreadcrumbResource)
 })
