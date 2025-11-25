@@ -3,6 +3,8 @@ export const roles = {
 } as const
 
 export const permissions = {
+  CLEAR_CACHE: 'clear_cache',
+
   VIEW_PERMISSIONS: 'view_permissions',
   UPDATE_PERMISSIONS: 'update_permissions',
 

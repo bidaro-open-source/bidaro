@@ -93,6 +93,7 @@ export const up: Migration = async ({ context }) => {
     }], { transaction })
 
     await queryInterface.bulkInsert('permissions', [
+      { name: permissions.CLEAR_CACHE, createdAt: new Date() },
       { name: permissions.VIEW_PERMISSIONS, createdAt: new Date() },
       { name: permissions.UPDATE_PERMISSIONS, createdAt: new Date() },
       { name: permissions.VIEW_OWN_SESSIONS, createdAt: new Date() },
