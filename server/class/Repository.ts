@@ -4,6 +4,13 @@ import { Op } from 'sequelize'
 
 type PrimaryKey = number | string
 
+interface RepositoryFindAllOptions<DataEntity extends Model> {
+  where?: WhereOptions<DataEntity>
+  limit?: number
+  offset?: number
+  order?: Array<[string, 'ASC' | 'DESC']>
+}
+
 export interface RepositoryOptions {
   lock?: LOCK
   transaction?: Transaction
@@ -41,11 +48,28 @@ export abstract class Repository<
    *
    * @param options - Optional repository options including where clause
    */
-  async findAll(options: RepositoryOptions & { where?: WhereOptions<DataEntity> } = {}): Promise<DataEntity[]> {
+  async findAll(options: RepositoryOptions & RepositoryFindAllOptions<DataEntity> = {}) {
     return this.model.findAll({
       where: options.where,
       transaction: options.transaction,
       lock: options.lock,
+    })
+  }
+
+  /**
+   * Find all records matching specific criteria and count it.
+   * If no options provided, returns all records.
+   *
+   * @param options - Optional repository options including where clause
+   */
+  async findAllAndCount(options: RepositoryOptions & RepositoryFindAllOptions<DataEntity> = {}) {
+    return this.model.findAndCountAll({
+      transaction: options.transaction,
+      where: options.where,
+      lock: options.lock,
+      limit: options.limit,
+      offset: options.offset,
+      order: options.order,
     })
   }
 
