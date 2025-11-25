@@ -1,6 +1,7 @@
 import type { Image } from '../../database'
 import { lotImageRepository } from './lot-image.repository'
 import { lotRepository } from './lot.repository'
+import { lotSource } from './lot.source'
 
 class LotImageService {
   /**
@@ -32,6 +33,10 @@ class LotImageService {
       }))
 
       await lotImageRepository.bulkCreate(linksToCreate, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot-image.service.attach-images', async () => {
+        await lotSource.invalidate(lot)
+      })
     })
   }
 
@@ -62,6 +67,10 @@ class LotImageService {
       const safeImageIds = existingLinks.map(link => link.imageId)
 
       await lotImageRepository.destroyByPks(safeLinkIds, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot-image.service.unattach-images', async () => {
+        await lotSource.invalidate(lot)
+      })
 
       return safeImageIds
     })
@@ -128,6 +137,10 @@ class LotImageService {
       })
 
       await lotImageRepository.bulkCreate(linksToCreate, { transaction })
+
+      useDatabaseAfterCommit(transaction, 'lot-image.service.update-images-order', async () => {
+        await lotSource.invalidate(lot)
+      })
     })
   }
 }
