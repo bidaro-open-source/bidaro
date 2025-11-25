@@ -5,7 +5,7 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getProfileRequest(
+async function viewProfileRequest(
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/profile`, {
@@ -23,7 +23,7 @@ describe('GET /api/profile', async () => {
       withSession: true,
     })
 
-    const response = await getProfileRequest({
+    const response = await viewProfileRequest({
       accessToken: data.access_token,
     })
 
@@ -46,7 +46,7 @@ describe('GET /api/profile', async () => {
       withSession: true,
     })
 
-    const response = await getProfileRequest({
+    const response = await viewProfileRequest({
       accessToken: data.access_token,
     })
 
@@ -67,7 +67,7 @@ describe('GET /api/profile', async () => {
       withPermissions: [permissions.VIEW_OWN_SESSIONS],
     })
 
-    const response = await getProfileRequest({
+    const response = await viewProfileRequest({
       accessToken: data.access_token,
     })
 
@@ -85,7 +85,7 @@ describe('GET /api/profile', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getProfileRequest()
+      const response = await viewProfileRequest()
 
       expect(response.status).toBe(401)
     })

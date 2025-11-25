@@ -1,9 +1,9 @@
 import z from 'zod'
 import { roleSchema } from '~~/server/zod'
 
-export type GetRoleRequest = ValidatorReturnType<typeof getRoleRequest>
+export type ViewRoleRequest = ValidatorReturnType<typeof viewRoleRequest>
 
-export const getRoleRequest = createRequestValidator({
+export const viewRoleRequest = createRequestValidator({
   params: z.object({
     name: roleSchema.name,
   }),

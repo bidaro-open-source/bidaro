@@ -1,4 +1,4 @@
-import type { GetCategoryRequest } from '../index.request'
+import type { ViewCategoryRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,7 +6,7 @@ import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getCategoryBreadcrumbsRequest(payload: GetCategoryRequest) {
+async function viewCategoryBreadcrumbsRequest(payload: ViewCategoryRequest) {
   return await fetch(`/api/categories/${payload.params.id}/breadcrumbs`, {
     method: 'GET',
   })
@@ -24,7 +24,7 @@ describe('GET /api/categories/:id/breadcrumbs', async () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      const response = await getCategoryBreadcrumbsRequest(
+      const response = await viewCategoryBreadcrumbsRequest(
         { params: { id: categoryData2.category.id } },
       )
 
@@ -48,7 +48,7 @@ describe('GET /api/categories/:id/breadcrumbs', async () => {
     it('should return 404 when category does not exist', async () => {
       const userData = await createUser()
 
-      const response = await getCategoryBreadcrumbsRequest(
+      const response = await viewCategoryBreadcrumbsRequest(
         { params: { id: 93475937459 } },
       )
 

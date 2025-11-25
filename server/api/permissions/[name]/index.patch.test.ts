@@ -6,7 +6,7 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getPermissionRequest(
+async function viewPermissionRequest(
   payload: UpdatePermissionRequest,
   options: { accessToken?: string } = {},
 ) {
@@ -30,7 +30,7 @@ describe('PATCH /api/permissions/:id', async () => {
       withPermissions: [permissions.UPDATE_PERMISSIONS],
     })
 
-    const response = await getPermissionRequest(
+    const response = await viewPermissionRequest(
       {
         body: { displayName, description },
         params: { name: permissions.UPDATE_PERMISSIONS },
@@ -50,7 +50,7 @@ describe('PATCH /api/permissions/:id', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getPermissionRequest(
+      const response = await viewPermissionRequest(
         {
           body: { displayName, description },
           params: { name: permissions.UPDATE_PERMISSIONS },
@@ -67,7 +67,7 @@ describe('PATCH /api/permissions/:id', async () => {
         withPermissions: [],
       })
 
-      const response = await getPermissionRequest(
+      const response = await viewPermissionRequest(
         {
           body: { displayName, description },
           params: { name: permissions.UPDATE_PERMISSIONS },

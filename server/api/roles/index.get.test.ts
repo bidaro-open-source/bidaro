@@ -5,7 +5,7 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getRolesRequest(options: { accessToken?: string } = {}) {
+async function viewRolesRequest(options: { accessToken?: string } = {}) {
   return await fetch(`/api/roles`, {
     method: 'GET',
     accessToken: options.accessToken,
@@ -22,7 +22,7 @@ describe('GET /api/roles', async () => {
       withPermissions: [permissions.VIEW_ROLES],
     })
 
-    const response = await getRolesRequest({ accessToken: userData.access_token })
+    const response = await viewRolesRequest({ accessToken: userData.access_token })
 
     expect(response.status).toBe(200)
     expect(Array.isArray(response._data)).toBe(true)
@@ -36,7 +36,7 @@ describe('GET /api/roles', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getRolesRequest()
+      const response = await viewRolesRequest()
 
       expect(response.status).toBe(401)
     })
@@ -48,7 +48,7 @@ describe('GET /api/roles', async () => {
         withPermissions: [],
       })
 
-      const response = await getRolesRequest({ accessToken: userData.access_token })
+      const response = await viewRolesRequest({ accessToken: userData.access_token })
 
       expect(response.status).toBe(403)
 

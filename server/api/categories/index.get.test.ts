@@ -5,7 +5,7 @@ import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getCategoriesRequest() {
+async function viewCategoriesRequest() {
   return await fetch(`/api/categories`, { method: 'GET' })
 }
 
@@ -20,7 +20,7 @@ describe('GET /api/categories', async () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      const response = await getCategoriesRequest()
+      const response = await viewCategoriesRequest()
 
       const categories = response._data
 

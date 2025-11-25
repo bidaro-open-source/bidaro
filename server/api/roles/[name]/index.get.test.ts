@@ -1,4 +1,4 @@
-import type { GetRoleRequest } from './index.request'
+import type { ViewRoleRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,8 +6,8 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getRoleRequest(
-  payload: GetRoleRequest,
+async function viewRoleRequest(
+  payload: ViewRoleRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/roles/${payload.params.name}`, {
@@ -29,7 +29,7 @@ describe('GET /api/roles/:name', async () => {
       withPermissions: [permissions.VIEW_ROLES],
     })
 
-    const response = await getRoleRequest(
+    const response = await viewRoleRequest(
       { params: { name: roleData.name } },
       { accessToken: userData.access_token },
     )
@@ -51,7 +51,7 @@ describe('GET /api/roles/:name', async () => {
         withPermissions: [permissions.VIEW_ROLES],
       })
 
-      const response = await getRoleRequest(
+      const response = await viewRoleRequest(
         { params: { name: 'nonexistent' } },
         { accessToken: userData.access_token },
       )
@@ -62,7 +62,7 @@ describe('GET /api/roles/:name', async () => {
     })
 
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getRoleRequest({ params: { name: 'test' } })
+      const response = await viewRoleRequest({ params: { name: 'test' } })
 
       expect(response.status).toBe(401)
     })
@@ -75,7 +75,7 @@ describe('GET /api/roles/:name', async () => {
         withPermissions: [],
       })
 
-      const response = await getRoleRequest(
+      const response = await viewRoleRequest(
         { params: { name: roleData.name } },
         { accessToken: userData.access_token },
       )

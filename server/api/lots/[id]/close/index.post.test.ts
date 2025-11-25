@@ -1,4 +1,4 @@
-import type { GetLotRequest } from '../index.request'
+import type { ViewLotRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -11,7 +11,7 @@ import { createReadyForClosingLot } from '~~/test/api-e2e/arrangers/lots/create-
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function closeLotRequest(
-  payload: GetLotRequest,
+  payload: ViewLotRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/lots/${payload.params.id}/close`, {

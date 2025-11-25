@@ -1,12 +1,12 @@
-import type { GetUserRequest } from './index.request'
+import type { ViewUserRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getUserRequest(
-  payload: GetUserRequest,
+async function viewUserRequest(
+  payload: ViewUserRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/users/${payload.params.id}`, {
@@ -21,7 +21,7 @@ describe('GET /api/users/:id', async () => {
   it('should retrieve user profile with correct structure for authenticated user', async () => {
     const data = await createUser({ withSession: true })
 
-    const response = await getUserRequest(
+    const response = await viewUserRequest(
       { params: { id: data.user.id } },
       { accessToken: data.access_token },
     )
@@ -39,7 +39,7 @@ describe('GET /api/users/:id', async () => {
   it('should retrieve user profile with correct structure for anonymous user', async () => {
     const data = await createUser()
 
-    const response = await getUserRequest({ params: { id: data.user.id } })
+    const response = await viewUserRequest({ params: { id: data.user.id } })
 
     const user = response._data
 
@@ -53,7 +53,7 @@ describe('GET /api/users/:id', async () => {
 
   describe('error handling', () => {
     it('should return 404 when user does not exist', async () => {
-      const response = await getUserRequest({ params: { id: 93475937459 } })
+      const response = await viewUserRequest({ params: { id: 93475937459 } })
 
       expect(response.status).toBe(404)
     })

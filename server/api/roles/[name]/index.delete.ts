@@ -1,11 +1,11 @@
 import { roleService } from '~~/server/domains/authorization'
 import { deleteRolePolicy } from './index.policy'
-import { getRoleRequest } from './index.request'
+import { viewRoleRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await getRoleRequest(event)
+  const request = await viewRoleRequest(event)
 
   deleteRolePolicy(event)
 

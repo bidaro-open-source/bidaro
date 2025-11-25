@@ -1,4 +1,4 @@
-import type { GetCategoryRequest } from '../index.request'
+import type { ViewCategoryRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -8,8 +8,8 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getCategoryCountRequest(
-  payload: GetCategoryRequest,
+async function viewCategoryCountRequest(
+  payload: ViewCategoryRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/categories/${payload.params.id}/count`, {
@@ -43,7 +43,7 @@ describe('GET /api/categories/:id/count', async () => {
       categoryId: categoryData2.category.id,
     })
 
-    const response1 = await getCategoryCountRequest(
+    const response1 = await viewCategoryCountRequest(
       { params: { id: categoryData1.category.id } },
       { accessToken: userData.access_token },
     )
@@ -51,7 +51,7 @@ describe('GET /api/categories/:id/count', async () => {
     expect(response1.status).toBe(200)
     expect(response1._data).toBe(2)
 
-    const response2 = await getCategoryCountRequest(
+    const response2 = await viewCategoryCountRequest(
       { params: { id: categoryData2.category.id } },
       { accessToken: userData.access_token },
     )
@@ -74,7 +74,7 @@ describe('GET /api/categories/:id/count', async () => {
         withPermissions: [permissions.VIEW_CATEGORY_COUNT],
       })
 
-      const response = await getCategoryCountRequest(
+      const response = await viewCategoryCountRequest(
         { params: { id: 93475937459 } },
         { accessToken: userData.access_token },
       )
@@ -92,7 +92,7 @@ describe('GET /api/categories/:id/count', async () => {
         withPermissions: [],
       })
 
-      const response = await getCategoryCountRequest(
+      const response = await viewCategoryCountRequest(
         { params: { id: categoryData.category.id } },
         { accessToken: userData.access_token },
       )

@@ -1,4 +1,4 @@
-import type { GetSessionsRequest } from './index.get.request'
+import type { ViewSessionsRequest } from './index.get.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,8 +6,8 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getSessionsRequest(
-  payload: GetSessionsRequest,
+async function viewSessionsRequest(
+  payload: ViewSessionsRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/users/${payload.params.id}/sessions`, {
@@ -26,7 +26,7 @@ describe('GET /api/profile/sessions', async () => {
       withPermissions: [permissions.VIEW_OWN_SESSIONS],
     })
 
-    const response = await getSessionsRequest(
+    const response = await viewSessionsRequest(
       { params: { id: data.user.id } },
       { accessToken: data.access_token },
     )
@@ -43,7 +43,7 @@ describe('GET /api/profile/sessions', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const user = await createUser({ withSession: true })
 
-      const response = await getSessionsRequest(
+      const response = await viewSessionsRequest(
         { params: { id: user.user.id } },
       )
 
@@ -59,7 +59,7 @@ describe('GET /api/profile/sessions', async () => {
         withPermissions: [],
       })
 
-      const response = await getSessionsRequest(
+      const response = await viewSessionsRequest(
         { params: { id: data.user.id } },
         { accessToken: data.access_token },
       )

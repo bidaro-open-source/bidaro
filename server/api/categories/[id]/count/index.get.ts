@@ -1,13 +1,13 @@
 import { categoryRepository, categorySource } from '~~/server/domains/categories'
-import { getCategoryRequest } from '../index.request'
-import { getCategoryCountPolicy } from './index.get.policy'
+import { viewCategoryRequest } from '../index.request'
+import { viewCategoryCountPolicy } from './index.get.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await getCategoryRequest(event)
+  const request = await viewCategoryRequest(event)
 
-  getCategoryCountPolicy(event)
+  viewCategoryCountPolicy(event)
 
   const category = await categorySource.getById(request.params.id)
   const countLots = await categoryRepository.countLotsByPath(category.path)

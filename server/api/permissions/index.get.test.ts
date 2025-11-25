@@ -5,7 +5,7 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getPermissionsRequest(options: { accessToken?: string } = {}) {
+async function viewPermissionsRequest(options: { accessToken?: string } = {}) {
   return await fetch(`/api/permissions`, {
     method: 'GET',
     accessToken: options.accessToken,
@@ -22,7 +22,7 @@ describe('GET /api/permissions', async () => {
       withPermissions: [permissions.VIEW_PERMISSIONS],
     })
 
-    const response = await getPermissionsRequest({ accessToken: uData.access_token })
+    const response = await viewPermissionsRequest({ accessToken: uData.access_token })
 
     const permission = response._data ? response._data[0] : null
 
@@ -36,7 +36,7 @@ describe('GET /api/permissions', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const response = await getPermissionsRequest()
+      const response = await viewPermissionsRequest()
 
       expect(response.status).toBe(401)
     })
@@ -48,7 +48,7 @@ describe('GET /api/permissions', async () => {
         withPermissions: [],
       })
 
-      const response = await getPermissionsRequest({ accessToken: uData.access_token })
+      const response = await viewPermissionsRequest({ accessToken: uData.access_token })
 
       expect(response.status).toBe(403)
 

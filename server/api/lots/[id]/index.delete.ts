@@ -1,11 +1,11 @@
 import { lotService, lotSource } from '~~/server/domains/lots'
 import { deleteLotPolicy } from './index.delete.policy'
-import { getLotRequest } from './index.request'
+import { viewLotRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await getLotRequest(event)
+  const request = await viewLotRequest(event)
 
   const lot = await lotSource.getById(request.params.id)
 

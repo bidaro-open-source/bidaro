@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { primaryKeySchema } from '~~/server/zod'
 
-export type GetSessionsRequest = ValidatorReturnType<typeof getSessionsRequest>
+export type ViewSessionsRequest = ValidatorReturnType<typeof viewSessionsRequest>
 
-export const getSessionsRequest = createRequestValidator({
+export const viewSessionsRequest = createRequestValidator({
   params: z.object({
     id: primaryKeySchema,
   }),

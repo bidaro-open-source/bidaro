@@ -1,8 +1,8 @@
 import { createImageResource, lotImageRepository, lotSource } from '~~/server/domains/lots'
-import { getLotRequest } from '../index.request'
+import { viewLotRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {
-  const request = await getLotRequest(event)
+  const request = await viewLotRequest(event)
 
   const lot = await lotSource.getById(request.params.id)
 

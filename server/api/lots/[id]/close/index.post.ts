@@ -1,12 +1,12 @@
 import { createLotResource, lotService, lotSource } from '~~/server/domains/lots'
 import { createUserResource, userSource } from '~~/server/domains/users'
-import { getLotRequest } from '../index.request'
+import { viewLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await getLotRequest(event)
+  const request = await viewLotRequest(event)
 
   const lot = await lotSource.getById(request.params.id)
 

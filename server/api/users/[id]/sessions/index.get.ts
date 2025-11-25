@@ -1,13 +1,13 @@
 import { authService } from '~~/server/domains/authentication'
-import { getSessionsRequest } from './index.get.request'
-import { getSessionsPolicy } from './index.policy'
+import { viewSessionsRequest } from './index.get.request'
+import { viewSessionsPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await getSessionsRequest(event)
+  const request = await viewSessionsRequest(event)
 
-  getSessionsPolicy(event, request.params.id)
+  viewSessionsPolicy(event, request.params.id)
 
   const sessions = await authService.getSessions(request.params.id)
 

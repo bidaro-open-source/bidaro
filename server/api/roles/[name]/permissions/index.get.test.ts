@@ -1,4 +1,4 @@
-import type { GetRoleRequest } from '../index.request'
+import type { ViewRoleRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,8 +6,8 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getRolePermissionsRequest(
-  payload: GetRoleRequest,
+async function viewRolePermissionsRequest(
+  payload: ViewRoleRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/roles/${payload.params.name}/permissions`, {
@@ -32,7 +32,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       withPermissions: [permissions.VIEW_ROLE_PERMISSIONS],
     })
 
-    const response = await getRolePermissionsRequest(
+    const response = await viewRolePermissionsRequest(
       { params: { name: roleData.name } },
       { accessToken: userData.access_token },
     )
@@ -56,7 +56,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       withPermissions: [permissions.VIEW_ROLE_PERMISSIONS],
     })
 
-    const response = await getRolePermissionsRequest(
+    const response = await viewRolePermissionsRequest(
       { params: { name: roleData.name } },
       { accessToken: userData.access_token },
     )
@@ -77,7 +77,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         withPermissions: [permissions.VIEW_ROLE_PERMISSIONS],
       })
 
-      const response = await getRolePermissionsRequest(
+      const response = await viewRolePermissionsRequest(
         { params: { name: 'nonexistent' } },
         { accessToken: userData.access_token },
       )
@@ -89,7 +89,7 @@ describe('GET /api/roles/:name/permissions', async () => {
 
     it('should return 401 when user is not authenticated', async () => {
       const roleData = await db.RoleFactory.new().create()
-      const response = await getRolePermissionsRequest(
+      const response = await viewRolePermissionsRequest(
         { params: { name: roleData.name } },
       )
 
@@ -106,7 +106,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         withPermissions: [],
       })
 
-      const response = await getRolePermissionsRequest(
+      const response = await viewRolePermissionsRequest(
         { params: { name: roleData.name } },
         { accessToken: userData.access_token },
       )

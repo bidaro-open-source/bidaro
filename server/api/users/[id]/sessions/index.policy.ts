@@ -1,6 +1,6 @@
 import { permissions } from '~~/server/constants'
 
-export const getSessionsPolicy = createRequestPolicy((event: H3Event, userId: number) => {
+export const viewSessionsPolicy = createRequestPolicy((event: H3Event, userId: number) => {
   const user = getAuthenticatedUser(event)
   const userPermissions = getAuthenticatedUserPermissions(event)
   if (!userPermissions)

@@ -1,9 +1,9 @@
 import z from 'zod'
 import { primaryKeySchema } from '~~/server/zod'
 
-export type GetCategoryRequest = ValidatorReturnType<typeof getCategoryRequest>
+export type ViewCategoryRequest = ValidatorReturnType<typeof viewCategoryRequest>
 
-export const getCategoryRequest = createRequestValidator({
+export const viewCategoryRequest = createRequestValidator({
   params: z.object({
     id: primaryKeySchema,
   }),

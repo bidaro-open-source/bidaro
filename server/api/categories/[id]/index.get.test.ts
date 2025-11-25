@@ -1,4 +1,4 @@
-import type { GetCategoryRequest } from './index.request'
+import type { ViewCategoryRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -6,7 +6,7 @@ import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function getCategoryRequest(payload: GetCategoryRequest) {
+async function viewCategoryRequest(payload: ViewCategoryRequest) {
   return await fetch(`/api/categories/${payload.params.id}`, { method: 'GET' })
 }
 
@@ -21,7 +21,7 @@ describe('GET /api/categories/:id', async () => {
     })
 
     for (let i = 0; i < 3; i++) {
-      const response = await getCategoryRequest(
+      const response = await viewCategoryRequest(
         { params: { id: categoryData1.category.id } },
       )
 
@@ -53,7 +53,7 @@ describe('GET /api/categories/:id', async () => {
 
   describe('error handling', () => {
     it('should return 404 when category does not exist', async () => {
-      const response = await getCategoryRequest(
+      const response = await viewCategoryRequest(
         { params: { id: 93475937459 } },
       )
 

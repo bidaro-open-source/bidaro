@@ -1,4 +1,4 @@
-import type { GetLotRequest } from '../index.request'
+import type { ViewLotRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -10,7 +10,7 @@ import { createWinnerLot } from '~~/test/api-e2e/arrangers/lots/create-winner-lo
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function receiveLotRequest(
-  payload: GetLotRequest,
+  payload: ViewLotRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/lots/${payload.params.id}/receive`, {

@@ -1,11 +1,11 @@
 import { createPermissionResource, roleSource } from '~~/server/domains/authorization'
-import { getRoleRequest } from '../index.request'
+import { viewRoleRequest } from '../index.request'
 import { viewRolePermissionsPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  const request = await getRoleRequest(event)
+  const request = await viewRoleRequest(event)
 
   viewRolePermissionsPolicy(event)
 

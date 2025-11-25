@@ -1,4 +1,4 @@
-import type { GetLotRequest } from '../index.request'
+import type { ViewLotRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -9,8 +9,8 @@ import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 
-async function getLotImageRequest(
-  payload: GetLotRequest,
+async function viewLotImageRequest(
+  payload: ViewLotRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/lots/${payload.params.id}/images`, {
@@ -30,7 +30,7 @@ describe('GET /api/lots/:id/images', async () => {
     const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
 
-    const response = await getLotImageRequest(
+    const response = await viewLotImageRequest(
       { params: { id: lotData.lot.id } },
     )
 
@@ -60,7 +60,7 @@ describe('GET /api/lots/:id/images', async () => {
     const imageData2 = await createImage(IMAGE_PATH)
     const lotImageData2 = await createLotImage(lotData.lot.id, imageData2.image.id)
 
-    const response = await getLotImageRequest(
+    const response = await viewLotImageRequest(
       { params: { id: lotData.lot.id } },
     )
 
@@ -84,7 +84,7 @@ describe('GET /api/lots/:id/images', async () => {
     it('should return 404 when lot does not exist', async () => {
       const userData = await createUser({ withSession: true })
 
-      const response = await getLotImageRequest(
+      const response = await viewLotImageRequest(
         { params: { id: 93475937459 } },
         { accessToken: userData.access_token },
       )

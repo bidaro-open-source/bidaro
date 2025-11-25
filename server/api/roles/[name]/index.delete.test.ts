@@ -1,4 +1,4 @@
-import type { GetRoleRequest } from './index.request'
+import type { ViewRoleRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
@@ -7,7 +7,7 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
 async function deleteRoleRequest(
-  payload: GetRoleRequest,
+  payload: ViewRoleRequest,
   options: { accessToken?: string } = {},
 ) {
   return await fetch(`/api/roles/${payload.params.name}`, {

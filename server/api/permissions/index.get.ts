@@ -1,10 +1,10 @@
 import { createPermissionResource, permissionSource } from '~~/server/domains/authorization'
-import { getPermissionsPolicy } from './index.get.policy'
+import { viewPermissionsPolicy } from './index.get.policy'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
-  getPermissionsPolicy(event)
+  viewPermissionsPolicy(event)
 
   const permissions = await permissionSource.getAll()
 
