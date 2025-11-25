@@ -1,13 +1,25 @@
+import crypto from 'node:crypto'
+
 export const REDIS_PASSWORD_RESET_NAMESPACE = 'password-reset-token'
 
-export const profileRecoveryService = {
+export const recoveryService = {
+  /**
+   * Returns reset token.
+   *
+   * @returns random bytes
+   */
+  generateResetToken() {
+    const runtimeConfig = useRuntimeConfig()
+    return crypto.randomBytes(+runtimeConfig.password.resetSize).toString('hex')
+  },
+
   /**
    * Generates token.
    *
    * @param resetToken refresh token
    * @returns user id
    */
-  async getUserIdByResetToken(
+  async getUserIdByToken(
     resetToken: string,
   ): Promise<number | null> {
     const redis = useRedis()
@@ -25,12 +37,12 @@ export const profileRecoveryService = {
    * @param uid user id
    * @returns token for reset password
    */
-  async createPasswordResetToken(
+  async createToken(
     uid: number,
   ): Promise<string> {
     const redis = useRedis()
 
-    const token = createResetToken()
+    const token = recoveryService.generateResetToken()
 
     await redis.set(
       `${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`,
@@ -48,7 +60,7 @@ export const profileRecoveryService = {
    * @param resetToken refresh token
    * @returns user session data
    */
-  async deletePasswordResetToken(
+  async deleteToken(
     resetToken: string,
   ): Promise<void> {
     await useRedis().del(`${REDIS_PASSWORD_RESET_NAMESPACE}:${resetToken}`)
