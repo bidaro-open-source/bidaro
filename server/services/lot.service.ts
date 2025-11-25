@@ -325,7 +325,7 @@ export const lotService = {
 
       await lotRepository.destroyById(lot.id, { transaction })
 
-      useDatabaseAfterCommit(transaction, 'lot.service.close', async () => {
+      useDatabaseAfterCommit(transaction, 'lot.service.delete', async () => {
         await lotSource.invalidate(lot)
       })
     })

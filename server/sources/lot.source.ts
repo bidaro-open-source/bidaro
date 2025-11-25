@@ -30,7 +30,7 @@ export const lotSource = {
 
       if (!data) {
         throw createError({
-          message: 'Роль не знайдена',
+          message: 'Лот не знайдено',
           status: 404,
         })
       }
@@ -77,16 +77,16 @@ export const lotSource = {
   async invalidate(instance: SourceInvalidateParams<Lot>) {
     const db = useDatabase()
     const redis = useRedis()
-    const roles = Array.isArray(instance) ? instance : [instance]
+    const lots = Array.isArray(instance) ? instance : [instance]
     const keysForDelete = new Set<string>()
 
-    for (const role of roles) {
-      if (!role || !(role instanceof db.Role))
+    for (const lot of lots) {
+      if (!lot || !(lot instanceof db.Role))
         continue
 
-      keysForDelete.add(keys.one(role.id))
-      keysForDelete.add(keys.oneBets(role.id))
-      keysForDelete.add(keys.oneImages(role.id))
+      keysForDelete.add(keys.one(lot.id))
+      keysForDelete.add(keys.oneBets(lot.id))
+      keysForDelete.add(keys.oneImages(lot.id))
     }
 
     await redis.del([...keysForDelete])
