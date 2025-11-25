@@ -4,18 +4,23 @@ import { permissionRepository } from './permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'
 
-const reservedRoles: readonly string[] = [roles.USER]
+class RoleService {
+  /**
+   * Reserved role names.
+   */
+  private reservedRoles: readonly string[] = [
+    roles.USER,
+  ]
 
-export const roleService = {
   /**
    * Checks if a role is reserved.
    *
    * @param name - role name
    * @returns true if role is reserved
    */
-  isReserved(name: string): boolean {
-    return reservedRoles.includes(name)
-  },
+  private isReserved(name: string): boolean {
+    return this.reservedRoles.includes(name)
+  }
 
   /**
    * Creates a new role.
@@ -43,7 +48,7 @@ export const roleService = {
 
       return role
     })
-  },
+  }
 
   /**
    * Updates a role.
@@ -90,7 +95,7 @@ export const roleService = {
 
       return updatedRole
     })
-  },
+  }
 
   /**
    * Updates role permissions.
@@ -115,7 +120,7 @@ export const roleService = {
         })
       }
 
-      if (roleService.isReserved(name)) {
+      if (this.isReserved(name)) {
         throw createError({
           statusCode: 400,
           message: 'Не можна змінювати права зарезервованої ролі',
@@ -139,7 +144,7 @@ export const roleService = {
 
       return role
     })
-  },
+  }
 
   /**
    * Deletes a role.
@@ -163,7 +168,7 @@ export const roleService = {
         })
       }
 
-      if (roleService.isReserved(name)) {
+      if (this.isReserved(name)) {
         throw createError({
           statusCode: 400,
           message: 'Не можна видалити зарезервовану роль',
@@ -185,5 +190,7 @@ export const roleService = {
         await roleSource.invalidate(role)
       })
     })
-  },
+  }
 }
+
+export const roleService = new RoleService()

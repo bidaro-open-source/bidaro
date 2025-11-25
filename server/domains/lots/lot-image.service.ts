@@ -2,7 +2,7 @@ import type { Image } from '../../database'
 import { lotImageRepository } from './lot-image.repository'
 import { lotRepository } from './lot.repository'
 
-export const lotImageService = {
+class LotImageService {
   /**
    * Attach images to lot by primary key.
    *
@@ -33,7 +33,7 @@ export const lotImageService = {
 
       await lotImageRepository.bulkCreate(linksToCreate, { transaction })
     })
-  },
+  }
 
   /**
    * Unattach images from lot by primary key.
@@ -65,7 +65,7 @@ export const lotImageService = {
 
       return safeImageIds
     })
-  },
+  }
 
   /**
    * Atomically updates (fully "re-creates") the order of images for a lot.
@@ -129,5 +129,7 @@ export const lotImageService = {
 
       await lotImageRepository.bulkCreate(linksToCreate, { transaction })
     })
-  },
+  }
 }
+
+export const lotImageService = new LotImageService()

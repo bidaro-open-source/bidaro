@@ -15,21 +15,21 @@ interface ErrorHandling {
   cause?: string
 }
 
-export const imageService = {
+class ImageService {
   /**
    * Simple utils for image service.
    *
    * @param data multipart data
    * @returns metadata values
    */
-  getMeta(data: UploadPayload) {
+  private getMeta(data: UploadPayload) {
     const extension = path.extname(data.filename || '').toLowerCase()
     const size = data.data?.length || 0
     const type = data.type || 'application/octet-stream'
     const key = `${uuidv4()}${extension}`
 
     return { size, type, key }
-  },
+  }
 
   /**
    * Uploads one image to s3 and creates record in database.
@@ -48,7 +48,7 @@ export const imageService = {
   async upload(data: UploadPayload) {
     const db = useDatabase()
     const { s3, Bucket } = useObjectStorage()
-    const { size, type, key } = imageService.getMeta(data)
+    const { size, type, key } = this.getMeta(data)
 
     let image: Image | null = null
 
@@ -100,7 +100,7 @@ export const imageService = {
         cause: error,
       })
     }
-  },
+  }
 
   /**
    * Deletes image in s3 and database and throw an error if exists.
@@ -109,7 +109,7 @@ export const imageService = {
    * @returns Image instance
    */
   async destroy(imageId: number) {
-    const result = await safeDeleteImage(imageId)
+    const result = await this.safeDeleteImage(imageId)
 
     if (!result.ok) {
       throw createError({
@@ -118,7 +118,7 @@ export const imageService = {
         cause: result.cause,
       })
     }
-  },
+  }
 
   /**
    * Deletes images in s3 and database and returns result for every image.
@@ -127,58 +127,60 @@ export const imageService = {
    * @returns array of results
    */
   async destroySafely(imageIds: number[]) {
-    const deletionPromises = imageIds.map(id => safeDeleteImage(id))
+    const deletionPromises = imageIds.map(id => this.safeDeleteImage(id))
 
     const results = await Promise.all(deletionPromises)
 
     return results
-  },
+  }
+
+  /**
+   * Deletes image in s3 and database without throw
+   *
+   * @param imageId image primary key
+   * @returns Image instance
+   */
+  private async safeDeleteImage(imageId: number): Promise<ErrorHandling> {
+    const db = useDatabase()
+    const { s3 } = useObjectStorage()
+
+    const result: ErrorHandling = { ok: false, id: imageId }
+
+    const image = await db.Image.findByPk(imageId)
+
+    if (!image) {
+      result.cause = 'Зображення не знайдено'
+
+      return result
+    }
+
+    try {
+      const s3Command = new DeleteObjectCommand({
+        Bucket: image.bucket,
+        Key: image.key,
+      })
+
+      await s3.send(s3Command)
+    }
+    catch (error) {
+      result.cause = 'Зображення не вдалося видалити зі сховища об\'єктів'
+
+      return result
+    }
+
+    try {
+      await image.destroy()
+    }
+    catch (error) {
+      result.cause = 'Зображення не вдалося видалити з бази даних'
+
+      return result
+    }
+
+    result.ok = true
+
+    return result
+  }
 }
 
-/**
- * Deletes image in s3 and database without throw
- *
- * @param imageId image primary key
- * @returns Image instance
- */
-async function safeDeleteImage(imageId: number): Promise<ErrorHandling> {
-  const db = useDatabase()
-  const { s3 } = useObjectStorage()
-
-  const result: ErrorHandling = { ok: false, id: imageId }
-
-  const image = await db.Image.findByPk(imageId)
-
-  if (!image) {
-    result.cause = 'Зображення не знайдено'
-
-    return result
-  }
-
-  try {
-    const s3Command = new DeleteObjectCommand({
-      Bucket: image.bucket,
-      Key: image.key,
-    })
-
-    await s3.send(s3Command)
-  }
-  catch (error) {
-    result.cause = 'Зображення не вдалося видалити зі сховища об\'єктів'
-
-    return result
-  }
-
-  try {
-    await image.destroy()
-  }
-  catch (error) {
-    result.cause = 'Зображення не вдалося видалити з бази даних'
-
-    return result
-  }
-
-  result.ok = true
-
-  return result
-}
+export const imageService = new ImageService()

@@ -5,7 +5,7 @@ import { imageService } from '../storage'
 import { userRepository } from './user.repository'
 import { userSource } from './user.source'
 
-export const userService = {
+class UserService {
   /**
    * Updates user's profile.
    *
@@ -57,7 +57,7 @@ export const userService = {
 
       return updatedUser
     })
-  },
+  }
 
   /**
    * Updates user's email.
@@ -110,7 +110,7 @@ export const userService = {
 
       return updatedUser
     })
-  },
+  }
 
   /**
    * Updates user's password.
@@ -151,7 +151,7 @@ export const userService = {
 
       return updatedUser
     })
-  },
+  }
 
   /**
    * Verifies user's email.
@@ -189,7 +189,7 @@ export const userService = {
 
       return updatedUser
     })
-  },
+  }
 
   /**
    * Updates user's role.
@@ -232,7 +232,7 @@ export const userService = {
 
       return updatedUser
     })
-  },
+  }
 
   /**
    * Deletes a user by their primary key.
@@ -287,5 +287,7 @@ export const userService = {
         await userSource.invalidate(user)
       })
     })
-  },
+  }
 }
+
+export const userService = new UserService()

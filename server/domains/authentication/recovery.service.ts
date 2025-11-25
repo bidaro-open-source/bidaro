@@ -1,68 +1,69 @@
 import crypto from 'node:crypto'
 
-export const REDIS_PASSWORD_RESET_NAMESPACE = 'password-reset-token'
+const REDIS_PASSWORD_RESET_NAMESPACE = 'password-reset-token'
 
-export const recoveryService = {
+class RecoveryService {
   /**
-   * Returns reset token.
+   * Returns Redis key for the given token.
    *
-   * @returns random bytes
+   * @param token reset token
+   * @returns Redis key
    */
-  generateResetToken() {
+  private getKey(token: string) {
+    return `${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`
+  }
+
+  /**
+   * Generates reset token.
+   *
+   * @returns reset token
+   */
+  private generateResetToken() {
     const runtimeConfig = useRuntimeConfig()
     return crypto.randomBytes(+runtimeConfig.password.resetSize).toString('hex')
-  },
+  }
 
   /**
-   * Generates token.
+   * Gets user primary key by token.
    *
-   * @param resetToken refresh token
-   * @returns user id
+   * @param resetToken reset token
+   * @returns user primary key or null if not found
    */
-  async getUserIdByToken(
-    resetToken: string,
-  ): Promise<number | null> {
+  async getUserIdByToken(resetToken: string) {
     const redis = useRedis()
+    const key = this.getKey(resetToken)
 
-    const data = await redis.get(
-      `${REDIS_PASSWORD_RESET_NAMESPACE}:${resetToken}`,
-    )
+    const data = await redis.get(key)
 
     return Number.isInteger(Number(data)) ? Number(data) : null
-  },
+  }
 
   /**
-   * Generates token.
+   * Creates token for reset password.
    *
-   * @param uid user id
+   * @param uid - user primary key
    * @returns token for reset password
    */
-  async createToken(
-    uid: number,
-  ): Promise<string> {
+  async createToken(uid: number) {
     const redis = useRedis()
 
-    const token = recoveryService.generateResetToken()
+    const token = this.generateResetToken()
+    const key = this.getKey(token)
 
-    await redis.set(
-      `${REDIS_PASSWORD_RESET_NAMESPACE}:${token}`,
-      uid,
-      'EX',
-      86400,
-    )
+    await redis.set(key, uid, 'EX', 86400)
 
     return token
-  },
+  }
 
   /**
-   * Generates token.
+   * Deletes reset token.
    *
-   * @param resetToken refresh token
-   * @returns user session data
+   * @param resetToken reset token
    */
-  async deleteToken(
-    resetToken: string,
-  ): Promise<void> {
-    await useRedis().del(`${REDIS_PASSWORD_RESET_NAMESPACE}:${resetToken}`)
-  },
+  async deleteToken(resetToken: string) {
+    const key = this.getKey(resetToken)
+    await useRedis().del(key)
+  }
 }
+
+export const recoveryService = new RecoveryService()

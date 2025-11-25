@@ -4,7 +4,7 @@ import { lotBetRepository } from './lot-bet.repository'
 import { lotRepository } from './lot.repository'
 import { lotSource } from './lot.source'
 
-export const lotBetService = {
+class LotBetService {
   /**
    * Creates a lot bet.
    *
@@ -86,5 +86,7 @@ export const lotBetService = {
 
       return bet
     })
-  },
+  }
 }
+
+export const lotBetService = new LotBetService()

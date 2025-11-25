@@ -5,7 +5,7 @@ import { lotBetRepository } from './lot-bet.repository'
 import { lotRepository } from './lot.repository'
 import { lotSource } from './lot.source'
 
-export const lotService = {
+class LotService {
   /**
    * Creates a draft lot for the given seller.
    *
@@ -23,7 +23,7 @@ export const lotService = {
     })
 
     return lot
-  },
+  }
 
   /**
    * Updates a lot.
@@ -98,7 +98,7 @@ export const lotService = {
 
       return updatedLot
     })
-  },
+  }
 
   /**
    * Publishes a lot.
@@ -151,7 +151,7 @@ export const lotService = {
 
       return updatedLot
     })
-  },
+  }
 
   /**
    * Closes a lot.
@@ -209,7 +209,7 @@ export const lotService = {
 
       return updatedLot
     })
-  },
+  }
 
   /**
    * Ships a lot.
@@ -251,7 +251,7 @@ export const lotService = {
 
       return updatedLot
     })
-  },
+  }
 
   /**
    * Receives a lot.
@@ -293,7 +293,7 @@ export const lotService = {
 
       return updatedLot
     })
-  },
+  }
 
   /**
    * Deletes a lot.
@@ -329,5 +329,7 @@ export const lotService = {
         await lotSource.invalidate(lot)
       })
     })
-  },
+  }
 }
+
+export const lotService = new LotService()

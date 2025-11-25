@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { categoryRepository } from './category.repository'
 import { categorySource } from './category.source'
 
-export const categoryService = {
+class CategoryService {
   /**
    * Creates a new category.
    *
@@ -57,7 +57,7 @@ export const categoryService = {
 
       return updatedCategory
     })
-  },
+  }
 
   /**
    * Updates a category.
@@ -101,7 +101,7 @@ export const categoryService = {
 
       return updatedCategory
     })
-  },
+  }
 
   /**
    * Updates category slug.
@@ -145,13 +145,13 @@ export const categoryService = {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'category.service.createSlug', async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.create_slug', async () => {
         await categorySource.invalidate([category, updatedCategory])
       })
 
       return updatedCategory
     })
-  },
+  }
 
   /**
    * Updates category parent.
@@ -222,7 +222,7 @@ export const categoryService = {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'category.service.createParent', async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.create_parent', async () => {
         await categorySource.invalidate([
           category,
           updatedCategory,
@@ -233,7 +233,7 @@ export const categoryService = {
 
       return updatedCategory
     })
-  },
+  }
 
   /**
    * Deletes a category.
@@ -280,5 +280,7 @@ export const categoryService = {
         await categorySource.invalidate(category)
       })
     })
-  },
+  }
 }
+
+export const categoryService = new CategoryService()

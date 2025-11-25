@@ -2,102 +2,111 @@ import crypto from 'node:crypto'
 
 export const REDIS_EMAIL_VERIFICATION_NAMESPACE = 'email-verification'
 
-export const verificationService = {
+class VerificationService {
+  /**
+   * Redis keys.
+   */
+  private get keys() {
+    return {
+      token: (token: string) =>
+        `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:token:${token}`,
+      tokens: (uid: number) =>
+        `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:user:${uid}`,
+    }
+  }
+
   /**
    * Returns reset token.
    *
    * @returns random bytes
    */
-  generateVerifyToken() {
+  private generateVerifyToken() {
     const runtimeConfig = useRuntimeConfig()
     return crypto.randomBytes(+runtimeConfig.email.tokenSize).toString('hex')
-  },
+  }
 
   /**
-   * Generates token.
+   * Gets user primary key by token.
    *
    * @param verifyToken verify token
-   * @returns user id
+   * @returns user primary key
    */
-  async getUserIdByToken(
-    verifyToken: string,
-  ): Promise<number | null> {
+  async getUserIdByToken(verifyToken: string) {
     const redis = useRedis()
+    const key = this.keys.token(verifyToken)
 
-    const uid = await redis.get(
-      `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:tokens:${verifyToken}`,
-    )
+    const uid = await redis.get(key)
 
     return Number.isInteger(Number(uid)) ? Number(uid) : null
-  },
+  }
 
   /**
-   * Generates token.
+   * Creates token for verify email.
    *
-   * @param uid user id
+   * @param uid user primary key
    * @returns token for verify email
    */
-  async createToken(
-    uid: number,
-  ): Promise<string> {
+  async createToken(uid: number) {
     const redis = useRedis()
 
-    const token = verificationService.generateVerifyToken()
+    const token = this.generateVerifyToken()
+    const tokenKey = this.keys.token(token)
+    const tokensKey = this.keys.tokens(uid)
 
     await redis
       .multi()
-      .set(
-        `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:users:${uid}`,
-        token,
-      )
-      .set(
-        `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:tokens:${token}`,
-        uid,
-      )
+      .set(tokenKey, uid)
+      .set(tokensKey, token)
       .exec()
 
     return token
-  },
+  }
 
   /**
    * Delete email verification token by token.
    *
    * @param verifyToken verify token
    */
-  async deleteToken(
-    verifyToken: string,
-  ): Promise<void> {
+  async deleteToken(verifyToken: string) {
     const redis = useRedis()
 
-    const uid = await redis.get(
-      `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:tokens:${verifyToken}`,
-    )
+    const tokenKey = this.keys.token(verifyToken)
 
-    await redis
-      .multi()
-      .del(`${REDIS_EMAIL_VERIFICATION_NAMESPACE}:tokens:${verifyToken}`)
-      .del(`${REDIS_EMAIL_VERIFICATION_NAMESPACE}:users:${uid}`)
-      .exec()
-  },
+    const uid = await redis.get(tokenKey)
+
+    if (uid) {
+      const tokensKey = this.keys.tokens(Number(uid))
+
+      await redis
+        .multi()
+        .del(tokenKey)
+        .del(tokensKey)
+        .exec()
+    }
+  }
 
   /**
-   * Delete email verification token by user id.
+   * Delete email verification token by user primary key.
    *
    * @param uid user primary key
    */
-  async deleteTokenByUserId(
-    uid: number,
-  ): Promise<void> {
+  async deleteTokenByUserId(uid: number) {
     const redis = useRedis()
 
-    const token = await redis.get(
-      `${REDIS_EMAIL_VERIFICATION_NAMESPACE}:users:${uid}`,
-    )
+    const tokensKey = this.keys.tokens(uid)
 
-    await redis
-      .multi()
-      .del(`${REDIS_EMAIL_VERIFICATION_NAMESPACE}:tokens:${token}`)
-      .del(`${REDIS_EMAIL_VERIFICATION_NAMESPACE}:users:${uid}`)
-      .exec()
-  },
+    const token = await redis.get(tokensKey)
+
+    if (token) {
+      const tokenKey = this.keys.token(token)
+
+      await redis
+        .multi()
+        .del(tokenKey)
+        .del(tokensKey)
+        .exec()
+    }
+  }
 }
+
+export const verificationService = new VerificationService()
