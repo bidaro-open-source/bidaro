@@ -2,7 +2,7 @@ import type { WhereOptions } from 'sequelize'
 import type { LotAttributes } from '~~/server/database'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { lotRepository } from '~~/server/domains/auction'
+import { createLotResource, lotRepository } from '~~/server/domains/auction'
 import { categoryRepository } from '~~/server/domains/categories'
 import { viewCatalogRequest } from './index.get.request'
 
@@ -26,16 +26,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const db = useDatabase()
-
-    const categoryIds = await db.Category.findAll({
-      attributes: ['id'],
-      where: {
-        path: {
-          [Op.like]: `${category.path}%`,
-        },
-      },
-    }).then(categories => categories.map(c => c.id))
+    const categoryIds = await categoryRepository.findIdsByPath(category.path)
 
     whereClause.categoryId = { [Op.in]: categoryIds }
   }
@@ -48,21 +39,7 @@ export default defineEventHandler(async (event) => {
   })
 
   return {
-    data: rows.map(row => ({
-      id: row.id,
-      sellerId: row.sellerId,
-      winnerId: row.winnerId,
-      categoryId: row.categoryId,
-      title: row.title,
-      description: row.description,
-      statusName: row.statusName,
-      initialPrice: row.initialPrice,
-      currentPrice: row.currentPrice,
-      effectiveDate: row.effectiveDate,
-      expirationDate: row.expirationDate,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    })),
+    data: rows.map(createLotResource),
     meta: {
       totalItems: count,
       currentPage: request.query.page,
