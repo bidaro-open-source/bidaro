@@ -1,4 +1,4 @@
-import type { Permission } from '../../database'
+import type { Permission } from '../../../database'
 import { Repository } from '~~/server/class/Repository'
 
 class PermissionRepository extends Repository<Permission> {

@@ -1,5 +1,5 @@
 import type { SourceInvalidateParams } from '~~/server/class/Source'
-import type { Role } from '../../database'
+import type { Role } from '../../../database'
 import { Source } from '~~/server/class/Source'
 import { roleRepository } from './role.repository'
 

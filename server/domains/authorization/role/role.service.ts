@@ -1,6 +1,6 @@
-import type { RoleAttributesOptional } from '../../database'
-import { roles } from '../../constants'
-import { permissionRepository } from './permission.repository'
+import type { RoleAttributesOptional } from '../../../database'
+import { roles } from '../../../constants'
+import { permissionRepository } from '../permission/permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'
 
