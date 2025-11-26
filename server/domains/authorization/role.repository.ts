@@ -1,8 +1,8 @@
 import type { RepositoryOptions } from '~~/server/class/Repository'
-import type { Role, RoleAttributesOptional } from '../../database'
+import type { Role } from '../../database'
 import { Repository } from '~~/server/class/Repository'
 
-class RoleRepository extends Repository<Role, RoleAttributesOptional> {
+class RoleRepository extends Repository<Role> {
   protected get model() {
     return useDatabase().Role
   }

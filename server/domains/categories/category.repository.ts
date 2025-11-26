@@ -1,9 +1,9 @@
 import type { RepositoryOptions } from '~~/server/class/Repository'
-import type { Category, CategoryAttributesOptional } from '../../database/models/Category'
+import type { Category } from '../../database/models/Category'
 import { Op, QueryTypes } from 'sequelize'
 import { Repository } from '~~/server/class/Repository'
 
-class CategoryRepository extends Repository<Category, CategoryAttributesOptional> {
+class CategoryRepository extends Repository<Category> {
   protected get model() {
     return useDatabase().Category
   }
