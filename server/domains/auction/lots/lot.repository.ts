@@ -1,19 +1,20 @@
+import type { WhereOptions } from 'sequelize'
 import type { RepositoryOptions } from '~~/server/class/Repository'
+import type { LotAttributes } from '~~/server/database'
 import type { Lot } from '../../../database'
 import { Repository } from '~~/server/class/Repository'
+
+interface FindAllForCatalogOptions extends RepositoryOptions {
+  where?: WhereOptions<LotAttributes>
+  limit?: number
+  offset?: number
+}
 
 class LotRepository extends Repository<Lot> {
   protected get model() {
     return useDatabase().Lot
   }
 
-  /**
-   * Finds all lots by seller id with lock.
-   *
-   * @param sellerId - seller primary key
-   * @param options - sequelize options
-   * @returns lots array
-   */
   async findAllBySellerIdWithLock(sellerId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
@@ -21,6 +22,46 @@ class LotRepository extends Repository<Lot> {
       where: { sellerId },
       transaction: options.transaction,
       lock: options.lock,
+    })
+  }
+
+  async findAllForCatalog(options: FindAllForCatalogOptions = {}) {
+    const db = useDatabase()
+
+    return await db.Lot.findAndCountAll({
+      where: options.where,
+      limit: options.limit,
+      offset: options.offset,
+      transaction: options.transaction,
+      order: [['expirationDate', 'ASC']],
+      include: [
+        {
+          model: db.LotImage,
+          as: 'cover',
+          required: false,
+          include: [
+            {
+              model: db.Image,
+              as: 'image',
+            },
+          ],
+        },
+        {
+          model: db.Category,
+          as: 'category',
+          attributes: ['id', 'displayName'],
+        },
+        {
+          model: db.User,
+          as: 'seller',
+          attributes: ['name', 'surname', 'username'],
+        },
+        {
+          model: db.User,
+          as: 'winner',
+          attributes: ['username'],
+        },
+      ],
     })
   }
 }

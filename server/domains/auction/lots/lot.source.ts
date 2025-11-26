@@ -1,8 +1,21 @@
-import type { Lot } from '../../../database'
+import type { WhereOptions } from 'sequelize'
+import type { Lot, LotAttributes } from '../../../database'
 import { Source } from '~~/server/class/Source'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'
 import { lotRepository } from './lot.repository'
+
+function maskUsername(username: string | undefined): string {
+  if (!username || username.length < 2)
+    return '***'
+  return username[0] + '*'.repeat(username.length - 2) + username[username.length - 1]
+}
+
+interface GetAllForCatalogOptions {
+  where?: WhereOptions<LotAttributes>
+  limit?: number
+  offset?: number
+}
 
 class LotSource extends Source<Lot> {
   protected readonly scope = 'lots'
@@ -23,13 +36,6 @@ class LotSource extends Source<Lot> {
     ]
   }
 
-  /**
-   * Retrieve a lot by ID, utilizing Redis caching.
-   *
-   * @param id - The ID of the lot to fetch.
-   * @throws 404 if the lot does not exist
-   * @returns The lot instance
-   */
   async getById(id: number) {
     const key = this.keys.one(id)
 
@@ -47,12 +53,6 @@ class LotSource extends Source<Lot> {
     })
   }
 
-  /**
-   * Retrieve all bets for a given lot, utilizing Redis caching.
-   *
-   * @param lotId - The ID of the lot whose bets should be fetched.
-   * @returns Array of lot bets for the specified lot
-   */
   async getAllBetsById(lotId: number) {
     const key = this.keys.oneBets(lotId)
 
@@ -66,18 +66,53 @@ class LotSource extends Source<Lot> {
     })
   }
 
-  /**
-   * Retrieve all images for a given lot, utilizing Redis caching.
-   *
-   * @param lotId - The ID of the lot whose images should be fetched.
-   * @returns Array of images for the specified lot
-   */
   async getAllImagesById(lotId: number) {
     const key = this.keys.oneImages(lotId)
 
     return await useDatabaseCache(key, async () => {
       return await lotImageRepository.findAllByLotId(lotId)
     })
+  }
+
+  async getAllForCatalog(options: GetAllForCatalogOptions = {}) {
+    const { rows, count } = await lotRepository.findAllForCatalog({
+      where: options.where,
+      limit: options.limit,
+      offset: options.offset,
+    })
+
+    return {
+      count,
+      rows: rows.map((lot) => {
+        const coverImage = lot.cover?.image
+
+        return {
+          id: lot.id,
+          title: lot.title,
+          description: lot.description,
+          initialPrice: lot.initialPrice,
+          currentPrice: lot.currentPrice,
+          effectiveDate: lot.effectiveDate,
+          expirationDate: lot.expirationDate,
+          initialDuration: lot.initialDuration,
+          statusName: lot.statusName,
+          createdAt: lot.createdAt,
+          updatedAt: lot.updatedAt,
+          cover: coverImage
+            ? { bucket: coverImage.bucket, key: coverImage.key }
+            : null,
+          category: lot.category
+            ? { id: lot.category.id, displayName: lot.category.displayName }
+            : null,
+          seller: lot.seller
+            ? { name: lot.seller.name, surname: lot.seller.surname, username: lot.seller.username }
+            : null,
+          winner: lot.winner
+            ? { username: maskUsername(lot.winner.username) }
+            : null,
+        }
+      }),
+    }
   }
 }
 

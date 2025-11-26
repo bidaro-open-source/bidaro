@@ -14,7 +14,7 @@ export const viewCatalogRequest = createRequestValidator({
     limit: z.coerce.number()
       .int()
       .min(1)
-      .max(100)
+      .max(40)
       .optional()
       .default(20),
 

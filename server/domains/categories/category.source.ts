@@ -13,6 +13,7 @@ class CategorySource extends Source<Category> {
       slug: (slug: string) => `${this.scope}:slug:${slug}`,
       children: (id: number) => `${this.scope}:children:${id}`,
       breadcrumbs: (path: string) => `${this.scope}:crumbs:${path}`,
+      idsByPath: (path: string) => `${this.scope}:ids:${path}`,
     }
   }
 
@@ -156,6 +157,14 @@ class CategorySource extends Source<Category> {
     })
   }
 
+  async getIdsByPath(path: string) {
+    const key = this.keys.idsByPath(path)
+
+    return await useDatabaseCache(key, async () => {
+      return await categoryRepository.findIdsByPath(path)
+    })
+  }
+
   async invalidate(instance: SourceInvalidateParams<Category>) {
     const redis = useRedis()
 
@@ -163,7 +172,11 @@ class CategorySource extends Source<Category> {
       this.keys.breadcrumbs(`*`),
     )
 
-    await redis.del(cachedBreadcrumbsKeys)
+    const cachedIdsByPathKeys = await redis.keys(
+      this.keys.idsByPath(`*`),
+    )
+
+    await redis.del([...cachedBreadcrumbsKeys, ...cachedIdsByPathKeys])
 
     await super.invalidate(instance)
   }
