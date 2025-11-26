@@ -3,11 +3,10 @@ import { Source } from '~~/server/class/Source'
 import { permissionRepository } from './permission.repository'
 
 class PermissionSource extends Source<Permission> {
-  protected scope = 'permissions'
+  protected readonly scope = 'permissions'
 
   protected get keys() {
     return {
-      ...super.keys,
       list: `${this.scope}:list`,
     }
   }

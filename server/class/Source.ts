@@ -16,12 +16,11 @@ export type SourceInvalidateParams<DataEntity extends Model> = Instance<DataEnti
  * @example
  * ```typescript
  * class RoleSource extends Source<Role> {
- *   protected scope = 'roles'
+ *   protected readonly scope = 'roles'
  *
  *   protected getEntityKeys(role: Role) {
  *     return {
- *       ...super.keys,
- *       one: `${this.scope}:id:${role.id}`,
+ *        one: `${this.scope}:id:${role.id}`,
  *     }
  *   }
  *
@@ -33,7 +32,7 @@ export abstract class Source<DataEntity extends Model> {
   /**
    * Unique scope for Redis keys.
    */
-  protected abstract scope: string
+  protected readonly abstract scope: string
 
   /**
    * Determines cache keys associated with a specific instance.
@@ -46,9 +45,7 @@ export abstract class Source<DataEntity extends Model> {
    * Can be extended or overridden in subclasses via getter.
    */
   protected get keys() {
-    return {
-      all: `${this.scope}:*`,
-    }
+    return {}
   }
 
   /**
@@ -89,7 +86,7 @@ export abstract class Source<DataEntity extends Model> {
    */
   async invalidateAll() {
     const redis = useRedis()
-    const keys = await redis.keys(this.keys.all)
+    const keys = await redis.keys(`${this.scope}:*`)
     if (keys.length > 0) {
       await redis.del(keys)
     }

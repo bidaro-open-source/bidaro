@@ -4,11 +4,10 @@ import { Source } from '~~/server/class/Source'
 import { categoryRepository } from './category.repository'
 
 class CategorySource extends Source<Category> {
-  protected scope = 'cat'
+  protected readonly scope = 'cat'
 
   protected get keys() {
     return {
-      ...super.keys,
       tree: `${this.scope}:tree`,
       one: (id: number) => `${this.scope}:id:${id}`,
       slug: (slug: string) => `${this.scope}:slug:${slug}`,

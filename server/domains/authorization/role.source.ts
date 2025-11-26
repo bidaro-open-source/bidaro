@@ -4,11 +4,10 @@ import { Source } from '~~/server/class/Source'
 import { roleRepository } from './role.repository'
 
 class RoleSource extends Source<Role> {
-  protected scope = 'roles'
+  protected readonly scope = 'roles'
 
   protected get keys() {
     return {
-      ...super.keys,
       list: `${this.scope}:list`,
       one: (name: string) => `${this.scope}:name:${name}`,
       permissions: (name: string) => `${this.scope}:name:${name}:permissions`,

@@ -5,11 +5,10 @@ import { lotImageRepository } from '../images/lot-image.repository'
 import { lotRepository } from './lot.repository'
 
 class LotSource extends Source<Lot> {
-  protected scope = 'lots'
+  protected readonly scope = 'lots'
 
   protected get keys() {
     return {
-      ...super.keys,
       one: (id: number) => `${this.scope}:id:${id}`,
       oneBets: (id: number) => `${this.scope}:id:${id}:bets`,
       oneImages: (id: number) => `${this.scope}:id:${id}:images`,

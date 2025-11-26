@@ -3,11 +3,10 @@ import { Source } from '~~/server/class/Source'
 import { userRepository } from './user.repository'
 
 class UserSource extends Source<User> {
-  protected scope = 'users'
+  protected readonly scope = 'users'
 
   protected get keys() {
     return {
-      ...super.keys,
       one: (id: number) => `${this.scope}:id:${id}`,
     }
   }
