@@ -1,4 +1,4 @@
-import type { ImageAttributes } from '../../database'
+import type { ImageAttributes } from '../../../database'
 
 export type ImageResource = ReturnType<typeof createImageResource>
 

@@ -1,5 +1,5 @@
+import { createImageResource, createLotResource, lotSource } from '~~/server/domains/auction'
 import { categorySource, createCategoryResource } from '~~/server/domains/categories'
-import { createImageResource, createLotResource, lotSource } from '~~/server/domains/lots'
 import { createUserResource, userSource } from '~~/server/domains/users'
 import { viewLotRequest } from './index.request'
 

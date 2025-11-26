@@ -1,6 +1,6 @@
+import { lotSource } from '../domains/auction'
 import { permissionSource, roleSource } from '../domains/authorization'
 import { categorySource } from '../domains/categories'
-import { lotSource } from '../domains/lots'
 import { userSource } from '../domains/users'
 import { clearCachePolicy } from './cache.delete.policy'
 

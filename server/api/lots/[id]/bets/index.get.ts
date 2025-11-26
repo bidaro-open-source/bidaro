@@ -1,4 +1,4 @@
-import { createLotBetResource, lotSource } from '~~/server/domains/lots'
+import { createLotBetResource, lotSource } from '~~/server/domains/auction'
 import { viewLotRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {
@@ -7,6 +7,8 @@ export default defineEventHandler(async (event) => {
   const lot = await lotSource.getById(request.params.id)
 
   const betsWithUser = await lotSource.getAllBetsById(lot.id)
+
+  console.log(betsWithUser)
 
   return betsWithUser.map(([bet, user]) => ({
     ...createLotBetResource(bet),

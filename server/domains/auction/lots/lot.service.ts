@@ -1,7 +1,7 @@
-import type { Lot } from '../../database'
-import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../../constants'
-import { categoryRepository } from '../categories'
-import { lotBetRepository } from './lot-bet.repository'
+import type { Lot } from '../../../database'
+import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../../../constants'
+import { categoryRepository } from '../../categories'
+import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotRepository } from './lot.repository'
 import { lotSource } from './lot.source'
 

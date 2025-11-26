@@ -1,7 +1,7 @@
-import type { Lot } from '../../database'
+import type { Lot } from '../../../database'
 import { Source } from '~~/server/class/Source'
-import { lotBetRepository } from './lot-bet.repository'
-import { lotImageRepository } from './lot-image.repository'
+import { lotBetRepository } from '../bets/lot-bet.repository'
+import { lotImageRepository } from '../images/lot-image.repository'
 import { lotRepository } from './lot.repository'
 
 class LotSource extends Source<Lot> {
@@ -61,7 +61,7 @@ class LotSource extends Source<Lot> {
       const data = await lotBetRepository.findAllByLotId(lotId)
 
       return data.map(bet => [
-        bet.toJSON(),
+        bet,
         { username: bet.user?.username || 'anonymous' },
       ] as const)
     })

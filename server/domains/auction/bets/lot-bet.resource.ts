@@ -1,4 +1,4 @@
-import type { LotBetAttributes } from '../../database'
+import type { LotBetAttributes } from '../../../database'
 
 export type LotBetResource = ReturnType<typeof createLotBetResource>
 

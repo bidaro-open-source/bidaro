@@ -1,4 +1,4 @@
-import { lotImageService, lotSource } from '~~/server/domains/lots'
+import { lotImageService, lotSource } from '~~/server/domains/auction'
 import { imageService } from '~~/server/domains/storage'
 import { deleteLotImagePolicy } from './index.delete.policy'
 import { deleteLotImageRequest } from './index.delete.request'

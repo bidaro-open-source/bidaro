@@ -1,5 +1,5 @@
 import type { RepositoryOptions } from '~~/server/class/Repository'
-import type { LotBet } from '../../database/models/LotBet'
+import type { LotBet } from '../../../database/models/LotBet'
 import { Repository } from '~~/server/class/Repository'
 
 class LotBetRepository extends Repository<LotBet> {

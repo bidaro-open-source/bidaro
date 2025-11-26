@@ -1,8 +1,8 @@
-import { lotStatuses } from '../../constants'
-import { userRepository } from '../users'
+import { lotStatuses } from '../../../constants'
+import { userRepository } from '../../users'
+import { lotRepository } from '../lots/lot.repository'
+import { lotSource } from '../lots/lot.source'
 import { lotBetRepository } from './lot-bet.repository'
-import { lotRepository } from './lot.repository'
-import { lotSource } from './lot.source'
 
 class LotBetService {
   /**

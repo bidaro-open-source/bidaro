@@ -1,5 +1,5 @@
 import type { RepositoryOptions } from '~~/server/class/Repository'
-import type { LotImage, LotImageAttributesOptional } from '../../database'
+import type { LotImage, LotImageAttributesOptional } from '../../../database'
 import { Op } from 'sequelize'
 import { Repository } from '~~/server/class/Repository'
 

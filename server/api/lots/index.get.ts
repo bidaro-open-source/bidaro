@@ -2,7 +2,7 @@ import type { WhereOptions } from 'sequelize'
 import type { LotAttributes } from '~~/server/database'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { lotRepository } from '~~/server/domains/lots'
+import { lotRepository } from '~~/server/domains/auction'
 import { viewLotsRequest } from './index.get.request'
 import { viewLotsPolicy } from './index.policy'
 

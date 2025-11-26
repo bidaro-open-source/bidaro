@@ -1,6 +1,6 @@
 import type { UserAttributesOptional } from '../../database'
+import { lotBetRepository, lotImageRepository, lotRepository } from '../auction'
 import { authService } from '../authentication'
-import { lotBetRepository, lotImageRepository, lotRepository } from '../lots'
 import { imageService } from '../storage'
 import { userRepository } from './user.repository'
 import { userSource } from './user.source'

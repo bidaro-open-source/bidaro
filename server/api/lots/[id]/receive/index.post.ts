@@ -1,4 +1,4 @@
-import { createLotResource, lotService, lotSource } from '~~/server/domains/lots'
+import { createLotResource, lotService, lotSource } from '~~/server/domains/auction'
 import { viewLotRequest } from '../index.request'
 import { receiveLotPolicy } from './index.post.policy'
 

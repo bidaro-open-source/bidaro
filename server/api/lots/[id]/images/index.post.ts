@@ -1,4 +1,4 @@
-import { createImageResource, lotImageService, lotSource } from '~~/server/domains/lots'
+import { createImageResource, lotImageService, lotSource } from '~~/server/domains/auction'
 import { imageService } from '~~/server/domains/storage'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'

@@ -1,4 +1,4 @@
-import { lotBetService } from '~~/server/domains/lots'
+import { lotBetService } from '~~/server/domains/auction'
 import { createLotBetRequest } from './index.post.request'
 
 export default defineEventHandler(async (event) => {

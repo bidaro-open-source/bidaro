@@ -1,4 +1,4 @@
-import { createLotResource, lotService, lotSource } from '~~/server/domains/lots'
+import { createLotResource, lotService, lotSource } from '~~/server/domains/auction'
 import { updateLotPolicy } from './index.patch.policy'
 import { updateLotRequest } from './index.patch.request'
 
