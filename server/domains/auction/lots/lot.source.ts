@@ -13,6 +13,7 @@ interface GetAllForCatalogOptions {
   where?: WhereOptions<LotAttributes>
   limit?: number
   offset?: number
+  categoryPath?: string
 }
 
 class LotSource extends Source<Lot> {
@@ -23,6 +24,8 @@ class LotSource extends Source<Lot> {
       one: (id: number) => `${this.scope}:id:${id}`,
       oneBets: (id: number) => `${this.scope}:id:${id}:bets`,
       oneImages: (id: number) => `${this.scope}:id:${id}:images`,
+      catalog: (limit: number, offset: number, categoryPath: string) =>
+        `${this.scope}:catalog:${limit}:${offset}:${categoryPath}`,
     }
   }
 
@@ -94,37 +97,45 @@ class LotSource extends Source<Lot> {
   /**
    * Retrieve all lots for the catalog with formatted data.
    *
-   * @param options - query options including where, limit, offset
+   * @param options - query options including where, limit, offset, categoryPath
    * @returns formatted lots with count for pagination
    */
   async getAllForCatalog(options: GetAllForCatalogOptions = {}) {
-    const { rows, count } = await lotRepository.findAllForCatalog({
-      where: options.where,
-      limit: options.limit,
-      offset: options.offset,
-    })
+    const limit = options.limit ?? 20
+    const offset = options.offset ?? 0
+    const categoryPath = options.categoryPath ?? ''
+    const key = this.keys.catalog(limit, offset, categoryPath)
 
-    return {
-      count,
-      rows: rows.map((lot) => {
-        if (!lot.seller) {
-          throw createError({
-            message: 'Продавця лоту не знайдено',
-            status: 500,
-          })
-        }
+    return await useDatabaseCache(key, async () => {
+      const { rows, count } = await lotRepository.findAllForCatalog({
+        where: options.where,
+        limit,
+        offset,
+        categoryPath: options.categoryPath,
+      })
 
-        const coverImage = lot.cover?.image
+      return {
+        count,
+        rows: rows.map((lot) => {
+          if (!lot.seller) {
+            throw createError({
+              message: 'Продавця лоту не знайдено',
+              status: 500,
+            })
+          }
 
-        return {
-          ...createLotResource(lot),
-          cover: coverImage ? createImageResource(coverImage) : null,
-          category: lot.category ? createCategoryBreadcrumbResource(lot.category) : null,
-          seller: createUserResource(lot.seller),
-          winner: lot.winner ? createUserAnonymousResource(lot.winner) : null,
-        }
-      }),
-    }
+          const coverImage = lot.cover?.image
+
+          return {
+            ...createLotResource(lot),
+            cover: coverImage ? createImageResource(coverImage) : null,
+            category: lot.category ? createCategoryBreadcrumbResource(lot.category) : null,
+            seller: createUserResource(lot.seller),
+            winner: lot.winner ? createUserAnonymousResource(lot.winner) : null,
+          }
+        }),
+      }
+    }, { ttl: 900 })
   }
 }
 

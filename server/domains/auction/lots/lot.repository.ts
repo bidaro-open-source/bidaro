@@ -2,12 +2,14 @@ import type { WhereOptions } from 'sequelize'
 import type { RepositoryOptions } from '~~/server/class/Repository'
 import type { LotAttributes } from '~~/server/database'
 import type { Lot } from '../../../database'
+import { Op } from 'sequelize'
 import { Repository } from '~~/server/class/Repository'
 
 interface FindAllForCatalogOptions extends RepositoryOptions {
   where?: WhereOptions<LotAttributes>
   limit?: number
   offset?: number
+  categoryPath?: string
 }
 
 class LotRepository extends Repository<Lot> {
@@ -35,7 +37,7 @@ class LotRepository extends Repository<Lot> {
   /**
    * Finds all lots for the catalog with associations.
    *
-   * @param options - query options including where, limit, offset
+   * @param options - query options including where, limit, offset, categoryPath
    * @returns lots with count and associated data
    */
   async findAllForCatalog(options: FindAllForCatalogOptions = {}) {
@@ -65,6 +67,10 @@ class LotRepository extends Repository<Lot> {
           model: db.Category,
           as: 'category',
           attributes: ['id', 'displayName'],
+          where: options.categoryPath
+            ? { path: { [Op.like]: `${options.categoryPath}%` } }
+            : undefined,
+          required: !!options.categoryPath,
         },
         {
           model: db.User,

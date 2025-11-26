@@ -41,20 +41,6 @@ class CategoryRepository extends Repository<Category> {
     })
   }
 
-  async findIdsByPath(path: string, options: RepositoryOptions = {}) {
-    const categories = await this.model.findAll({
-      attributes: ['id'],
-      transaction: options.transaction,
-      where: {
-        path: {
-          [Op.like]: `${path}%`,
-        },
-      },
-    })
-
-    return categories.map(c => c.id)
-  }
-
   /**
    * Finds categories by their parent id.
    *

@@ -16,18 +16,18 @@ export default defineEventHandler(async (event) => {
     expirationDate: { [Op.gt]: new Date() },
   }
 
+  let categoryPath: string | undefined
+
   if (request.query.category_slug) {
     const category = await categorySource.getBySlug(request.query.category_slug)
-
-    const categoryIds = await categorySource.getIdsByPath(category.path)
-
-    whereClause.categoryId = { [Op.in]: categoryIds }
+    categoryPath = category.path
   }
 
   const { rows, count } = await lotSource.getAllForCatalog({
     limit: request.query.limit,
     offset,
     where: whereClause,
+    categoryPath,
   })
 
   return {
