@@ -60,10 +60,10 @@ class LotSource extends Source<Lot> {
     return await useDatabaseCache(key, async () => {
       const data = await lotBetRepository.findAllByLotId(lotId)
 
-      return data.map(bet => [
-        bet,
-        { username: bet.user?.username || 'anonymous' },
-      ] as const)
+      return data.map(bet => ({
+        ...bet.toJSON(),
+        user: { username: bet.user?.username || 'anonymous' },
+      }))
     })
   }
 

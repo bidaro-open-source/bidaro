@@ -1,4 +1,5 @@
 import { createLotBetResource, lotSource } from '~~/server/domains/auction'
+import { createUserAnonymousResource } from '~~/server/domains/users'
 import { viewLotRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {
@@ -8,12 +9,8 @@ export default defineEventHandler(async (event) => {
 
   const betsWithUser = await lotSource.getAllBetsById(lot.id)
 
-  console.log(betsWithUser)
-
-  return betsWithUser.map(([bet, user]) => ({
+  return betsWithUser.map(bet => ({
     ...createLotBetResource(bet),
-    user: {
-      username: `${user.username.at(0) || ''}******${user.username.at(-1) || ''}`,
-    },
+    user: createUserAnonymousResource(bet.user),
   }))
 })

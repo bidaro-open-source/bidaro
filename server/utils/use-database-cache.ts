@@ -1,5 +1,4 @@
-import type { InferAttributes } from 'sequelize'
-import { Model } from 'sequelize'
+import type { InferAttributes, Model } from 'sequelize'
 
 /**
  * Unwraps Sequelize model instances to their attribute types.
@@ -42,13 +41,11 @@ export async function useDatabaseCache<T>(
 
   const data = await fetcher()
 
-  const plainData = normalizeSequelizeData(data)
-
-  if (plainData) {
+  if (data) {
     try {
       await redis.set(
         key,
-        JSON.stringify(plainData),
+        JSON.stringify(data),
         'EX',
         options.ttl ?? 86400,
       )
@@ -58,26 +55,5 @@ export async function useDatabaseCache<T>(
     }
   }
 
-  return plainData as UnwrapSequelize<T>
-}
-
-/**
- * Normalizes Sequelize model instances to plain JavaScript objects.
- *
- * @param data - The data to normalize.
- * @returns The normalized data.
- */
-function normalizeSequelizeData(data: any): any {
-  if (!data)
-    return data
-
-  if (Array.isArray(data)) {
-    return data.map(item => (item instanceof Model ? item.toJSON() : item))
-  }
-
-  if (data instanceof Model) {
-    return data.toJSON()
-  }
-
-  return data
+  return data as UnwrapSequelize<T>
 }
