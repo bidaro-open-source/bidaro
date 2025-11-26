@@ -21,6 +21,11 @@ export const up: Migration = async ({ context }) => {
         type: DataTypes.STRING(1024),
         allowNull: true,
       },
+      isReserved: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
@@ -89,6 +94,7 @@ export const up: Migration = async ({ context }) => {
       name: roles.USER,
       displayName: 'Користувач',
       description: 'Роль за замовчуванням',
+      isReserved: true,
       createdAt: new Date(),
     }], { transaction })
 
@@ -104,6 +110,34 @@ export const up: Migration = async ({ context }) => {
       { name: permissions.UPDATE_ROLE_PERMISSIONS, createdAt: new Date() },
     ], { transaction })
 
+    // Create trigger to prevent modification of isReserved and name fields for reserved roles
+    await queryInterface.sequelize.query(`
+      CREATE OR REPLACE FUNCTION prevent_reserved_role_modification()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        IF OLD."isReserved" = true THEN
+          IF NEW."isReserved" IS DISTINCT FROM OLD."isReserved" THEN
+            RAISE EXCEPTION 'Cannot modify isReserved field for reserved roles';
+          END IF;
+          IF NEW.name IS DISTINCT FROM OLD.name THEN
+            RAISE EXCEPTION 'Cannot modify name field for reserved roles';
+          END IF;
+        END IF;
+        IF NEW."isReserved" = true AND OLD."isReserved" = false THEN
+          RAISE EXCEPTION 'Cannot set isReserved to true through update';
+        END IF;
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `, { transaction })
+
+    await queryInterface.sequelize.query(`
+      CREATE TRIGGER prevent_reserved_role_modification_trigger
+      BEFORE UPDATE ON roles
+      FOR EACH ROW
+      EXECUTE FUNCTION prevent_reserved_role_modification();
+    `, { transaction })
+
     await transaction.commit()
   }
   catch (error: any) {
@@ -114,6 +148,15 @@ export const up: Migration = async ({ context }) => {
 
 export const down: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
+
+  // Drop trigger and function first
+  await queryInterface.sequelize.query(`
+    DROP TRIGGER IF EXISTS prevent_reserved_role_modification_trigger ON roles;
+  `)
+
+  await queryInterface.sequelize.query(`
+    DROP FUNCTION IF EXISTS prevent_reserved_role_modification();
+  `)
 
   await queryInterface.dropTable('roles_has_permissions')
   await queryInterface.dropTable('permissions')

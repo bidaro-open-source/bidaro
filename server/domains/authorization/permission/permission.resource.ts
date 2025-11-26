@@ -7,6 +7,5 @@ export function createPermissionResource(entity: PermissionAttributes) {
     name: entity.name,
     displayName: entity.displayName,
     description: entity.description,
-    isReserved: entity.isReserved,
   }
 }
