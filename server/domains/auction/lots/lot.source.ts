@@ -1,17 +1,8 @@
-import type { WhereOptions } from 'sequelize'
-import type { Lot, LotAttributes } from '../../../database'
+import type { Lot } from '../../../database'
 import { Source } from '~~/server/class/Source'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'
 import { lotRepository } from './lot.repository'
-
-interface GetAllForCatalogOptions {
-  where?: WhereOptions<LotAttributes>
-  limit: number
-  offset: number
-  categoryPath?: string
-  order?: Array<[string, 'ASC' | 'DESC']>
-}
 
 class LotSource extends Source<Lot> {
   protected readonly scope = 'lots'
@@ -21,8 +12,6 @@ class LotSource extends Source<Lot> {
       one: (id: number) => `${this.scope}:id:${id}`,
       oneBets: (id: number) => `${this.scope}:id:${id}:bets`,
       oneImages: (id: number) => `${this.scope}:id:${id}:images`,
-      catalog: (limit: number, offset: number, categoryPath: string) =>
-        `${this.scope}:catalog:${limit}:${offset}:${categoryPath}`,
     }
   }
 
@@ -89,47 +78,6 @@ class LotSource extends Source<Lot> {
     return await useDatabaseCache(key, async () => {
       return await lotImageRepository.findAllByLotId(lotId)
     })
-  }
-
-  /**
-   * Retrieve all lots for the catalog with formatted data.
-   *
-   * @param options - query options including where, limit, offset, categoryPath, order
-   * @returns formatted lots with count for pagination
-   */
-  async getAllForCatalog(options: GetAllForCatalogOptions) {
-    const categoryPath = options.categoryPath ?? ''
-    const key = this.keys.catalog(options.limit, options.offset, categoryPath)
-
-    return await useDatabaseCache(key, async () => {
-      const { rows, count } = await lotRepository.findAllForCatalog({
-        where: options.where,
-        limit: options.limit,
-        offset: options.offset,
-        categoryPath: categoryPath || undefined,
-        order: options.order,
-      })
-
-      return {
-        count,
-        rows: rows.map((lot) => {
-          if (!lot.seller) {
-            throw createError({
-              message: 'Продавця лоту не знайдено',
-              status: 500,
-            })
-          }
-
-          return {
-            ...lot.toJSON(),
-            cover: lot.cover?.image?.toJSON() ?? null,
-            category: lot.category?.toJSON() ?? null,
-            seller: lot.seller.toJSON(),
-            winner: lot.winner?.toJSON() ?? null,
-          }
-        }),
-      }
-    }, { ttl: 900 })
   }
 }
 

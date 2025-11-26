@@ -2,7 +2,7 @@ import type { WhereOptions } from 'sequelize'
 import type { LotAttributes } from '~~/server/database'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { lotSource } from '~~/server/domains/auction'
+import { lotCatalogSource } from '~~/server/domains/auction'
 import { categorySource } from '~~/server/domains/categories'
 import { viewCatalogRequest } from './index.get.request'
 
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     categoryPath = category.path
   }
 
-  const { rows, count } = await lotSource.getAllForCatalog({
+  const { rows, count } = await lotCatalogSource.getAllForCatalog({
     limit: request.query.limit,
     offset,
     where: whereClause,
