@@ -15,6 +15,13 @@ class LotRepository extends Repository<Lot> {
     return useDatabase().Lot
   }
 
+  /**
+   * Finds all lots by seller id with lock.
+   *
+   * @param sellerId - seller primary key
+   * @param options - sequelize options
+   * @returns lots array
+   */
   async findAllBySellerIdWithLock(sellerId: number, options: RepositoryOptions = {}) {
     const db = useDatabase()
 
@@ -25,6 +32,12 @@ class LotRepository extends Repository<Lot> {
     })
   }
 
+  /**
+   * Finds all lots for the catalog with associations.
+   *
+   * @param options - query options including where, limit, offset
+   * @returns lots with count and associated data
+   */
   async findAllForCatalog(options: FindAllForCatalogOptions = {}) {
     const db = useDatabase()
 
@@ -38,6 +51,7 @@ class LotRepository extends Repository<Lot> {
         {
           model: db.LotImage,
           as: 'cover',
+          where: { order: 0 },
           required: false,
           include: [
             {

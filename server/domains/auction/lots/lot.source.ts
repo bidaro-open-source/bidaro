@@ -1,15 +1,13 @@
 import type { WhereOptions } from 'sequelize'
 import type { Lot, LotAttributes } from '../../../database'
 import { Source } from '~~/server/class/Source'
+import { createCategoryBreadcrumbResource } from '~~/server/domains/categories'
+import { createUserAnonymousResource, createUserResource } from '~~/server/domains/users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'
+import { createImageResource } from '../images/lot-image.resource'
 import { lotRepository } from './lot.repository'
-
-function maskUsername(username: string | undefined): string {
-  if (!username || username.length < 2)
-    return '***'
-  return username[0] + '*'.repeat(username.length - 2) + username[username.length - 1]
-}
+import { createLotResource } from './lot.resource'
 
 interface GetAllForCatalogOptions {
   where?: WhereOptions<LotAttributes>
@@ -36,6 +34,13 @@ class LotSource extends Source<Lot> {
     ]
   }
 
+  /**
+   * Retrieve a lot by ID, utilizing Redis caching.
+   *
+   * @param id - The ID of the lot to fetch.
+   * @throws 404 if the lot does not exist
+   * @returns The lot instance
+   */
   async getById(id: number) {
     const key = this.keys.one(id)
 
@@ -53,6 +58,12 @@ class LotSource extends Source<Lot> {
     })
   }
 
+  /**
+   * Retrieve all bets for a given lot, utilizing Redis caching.
+   *
+   * @param lotId - The ID of the lot whose bets should be fetched.
+   * @returns Array of lot bets for the specified lot
+   */
   async getAllBetsById(lotId: number) {
     const key = this.keys.oneBets(lotId)
 
@@ -66,6 +77,12 @@ class LotSource extends Source<Lot> {
     })
   }
 
+  /**
+   * Retrieve all images for a given lot, utilizing Redis caching.
+   *
+   * @param lotId - The ID of the lot whose images should be fetched.
+   * @returns Array of images for the specified lot
+   */
   async getAllImagesById(lotId: number) {
     const key = this.keys.oneImages(lotId)
 
@@ -74,6 +91,12 @@ class LotSource extends Source<Lot> {
     })
   }
 
+  /**
+   * Retrieve all lots for the catalog with formatted data.
+   *
+   * @param options - query options including where, limit, offset
+   * @returns formatted lots with count for pagination
+   */
   async getAllForCatalog(options: GetAllForCatalogOptions = {}) {
     const { rows, count } = await lotRepository.findAllForCatalog({
       where: options.where,
@@ -84,32 +107,21 @@ class LotSource extends Source<Lot> {
     return {
       count,
       rows: rows.map((lot) => {
+        if (!lot.seller) {
+          throw createError({
+            message: 'Продавця лоту не знайдено',
+            status: 500,
+          })
+        }
+
         const coverImage = lot.cover?.image
 
         return {
-          id: lot.id,
-          title: lot.title,
-          description: lot.description,
-          initialPrice: lot.initialPrice,
-          currentPrice: lot.currentPrice,
-          effectiveDate: lot.effectiveDate,
-          expirationDate: lot.expirationDate,
-          initialDuration: lot.initialDuration,
-          statusName: lot.statusName,
-          createdAt: lot.createdAt,
-          updatedAt: lot.updatedAt,
-          cover: coverImage
-            ? { bucket: coverImage.bucket, key: coverImage.key }
-            : null,
-          category: lot.category
-            ? { id: lot.category.id, displayName: lot.category.displayName }
-            : null,
-          seller: lot.seller
-            ? { name: lot.seller.name, surname: lot.seller.surname, username: lot.seller.username }
-            : null,
-          winner: lot.winner
-            ? { username: maskUsername(lot.winner.username) }
-            : null,
+          ...createLotResource(lot),
+          cover: coverImage ? createImageResource(coverImage) : null,
+          category: lot.category ? createCategoryBreadcrumbResource(lot.category) : null,
+          seller: createUserResource(lot.seller),
+          winner: lot.winner ? createUserAnonymousResource(lot.winner) : null,
         }
       }),
     }
