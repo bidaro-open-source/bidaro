@@ -2,8 +2,9 @@ import type { WhereOptions } from 'sequelize'
 import type { LotAttributes } from '~~/server/database'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { lotCatalogSource } from '~~/server/domains/auction'
-import { categorySource } from '~~/server/domains/categories'
+import { createImageResource, createLotResource, lotCatalogRepository } from '~~/server/domains/auction'
+import { categorySource, createCategoryResource } from '~~/server/domains/categories'
+import { createUserResource } from '~~/server/domains/users'
 import { viewCatalogRequest } from './index.get.request'
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     categoryPath = category.path
   }
 
-  const { rows, count } = await lotCatalogSource.getAllForCatalog({
+  const { rows, count } = await lotCatalogRepository.findAllForCatalog({
     limit: request.query.limit,
     offset,
     where: whereClause,
@@ -31,11 +32,26 @@ export default defineEventHandler(async (event) => {
   })
 
   return {
-    data: rows,
     meta: {
       totalItems: count,
       currentPage: request.query.page,
       itemsPerPage: request.query.limit,
     },
+    data: rows.map((lot) => {
+      if (!lot.seller) {
+        throw createError({
+          message: 'Продавця лоту не знайдено',
+          status: 500,
+        })
+      }
+
+      return {
+        ...createLotResource(lot),
+        cover: lot.cover?.image ? createImageResource(lot.cover?.image) : null,
+        category: lot.category ? createCategoryResource(lot.category) : null,
+        seller: createUserResource(lot.seller),
+        winner: lot.winner ? createUserResource(lot.winner) : null,
+      }
+    }),
   }
 })

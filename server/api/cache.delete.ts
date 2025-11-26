@@ -1,4 +1,4 @@
-import { lotCatalogSource, lotSource } from '../domains/auction'
+import { lotSource } from '../domains/auction'
 import { permissionSource, roleSource } from '../domains/authorization'
 import { categorySource } from '../domains/categories'
 import { userSource } from '../domains/users'
@@ -14,5 +14,4 @@ export default defineEventHandler(async (event) => {
   await categorySource.invalidateAll()
   await userSource.invalidateAll()
   await lotSource.invalidateAll()
-  await lotCatalogSource.invalidateAll()
 })

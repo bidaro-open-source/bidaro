@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { lotStatuses } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
+import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -102,12 +103,9 @@ describe('GET /api/catalog', async () => {
       categoryId: categoryData.category.id,
     })
 
-    const draftLot = await db.LotFactory.new().create({
+    const draftLot = await createLot({
       sellerId: userData.user.id,
       categoryId: categoryData.category.id,
-      statusName: lotStatuses.DRAFT,
-      initialPrice: db.LotFactory.initialPrice,
-      initialDuration: db.LotFactory.initialDuration,
     })
 
     const discussionLot = await db.LotFactory.new().create({
@@ -154,7 +152,9 @@ describe('GET /api/catalog', async () => {
       expirationDate: new Date(Date.now() - 1000),
     })
 
-    const response = await viewCatalogRequest()
+    const response = await viewCatalogRequest({
+      category_slug: categoryData.category.slug,
+    })
 
     expect(response.status).toBe(200)
 
@@ -162,7 +162,7 @@ describe('GET /api/catalog', async () => {
     const lotIds = body.data.map((lot: { id: number }) => lot.id)
 
     expect(lotIds).toContain(publishedLot.lot.id)
-    expect(lotIds).not.toContain(draftLot.id)
+    expect(lotIds).not.toContain(draftLot.lot.id)
     expect(lotIds).not.toContain(discussionLot.id)
     expect(lotIds).not.toContain(deliveryLot.id)
     expect(lotIds).not.toContain(receivedLot.id)
@@ -172,7 +172,7 @@ describe('GET /api/catalog', async () => {
     await receivedLot.destroy()
     await deliveryLot.destroy()
     await discussionLot.destroy()
-    await draftLot.destroy()
+    await draftLot.clear()
     await publishedLot.clear()
     await categoryData.clear()
     await userData.clear()
@@ -198,7 +198,9 @@ describe('GET /api/catalog', async () => {
       expirationDate: new Date(Date.now() - 1000),
     })
 
-    const response = await viewCatalogRequest()
+    const response = await viewCatalogRequest({
+      category_slug: categoryData.category.slug,
+    })
 
     expect(response.status).toBe(200)
 
