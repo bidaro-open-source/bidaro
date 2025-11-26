@@ -111,7 +111,7 @@ class LotSource extends Source<Lot> {
         where: options.where,
         limit,
         offset,
-        categoryPath: options.categoryPath,
+        categoryPath: categoryPath || undefined,
       })
 
       return {
