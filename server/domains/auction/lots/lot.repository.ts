@@ -43,6 +43,7 @@ class LotRepository extends Repository<Lot> {
             {
               model: db.Image,
               as: 'image',
+              required: false,
             },
           ],
         },
