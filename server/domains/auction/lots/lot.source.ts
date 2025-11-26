@@ -1,19 +1,16 @@
 import type { WhereOptions } from 'sequelize'
 import type { Lot, LotAttributes } from '../../../database'
 import { Source } from '~~/server/class/Source'
-import { createCategoryBreadcrumbResource } from '~~/server/domains/categories'
-import { createUserAnonymousResource, createUserResource } from '~~/server/domains/users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'
-import { createImageResource } from '../images/lot-image.resource'
 import { lotRepository } from './lot.repository'
-import { createLotResource } from './lot.resource'
 
 interface GetAllForCatalogOptions {
   where?: WhereOptions<LotAttributes>
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
   categoryPath?: string
+  order?: Array<[string, 'ASC' | 'DESC']>
 }
 
 class LotSource extends Source<Lot> {
@@ -97,21 +94,20 @@ class LotSource extends Source<Lot> {
   /**
    * Retrieve all lots for the catalog with formatted data.
    *
-   * @param options - query options including where, limit, offset, categoryPath
+   * @param options - query options including where, limit, offset, categoryPath, order
    * @returns formatted lots with count for pagination
    */
-  async getAllForCatalog(options: GetAllForCatalogOptions = {}) {
-    const limit = options.limit ?? 20
-    const offset = options.offset ?? 0
+  async getAllForCatalog(options: GetAllForCatalogOptions) {
     const categoryPath = options.categoryPath ?? ''
-    const key = this.keys.catalog(limit, offset, categoryPath)
+    const key = this.keys.catalog(options.limit, options.offset, categoryPath)
 
     return await useDatabaseCache(key, async () => {
       const { rows, count } = await lotRepository.findAllForCatalog({
         where: options.where,
-        limit,
-        offset,
+        limit: options.limit,
+        offset: options.offset,
         categoryPath: categoryPath || undefined,
+        order: options.order,
       })
 
       return {
@@ -124,14 +120,12 @@ class LotSource extends Source<Lot> {
             })
           }
 
-          const coverImage = lot.cover?.image
-
           return {
-            ...createLotResource(lot),
-            cover: coverImage ? createImageResource(coverImage) : null,
-            category: lot.category ? createCategoryBreadcrumbResource(lot.category) : null,
-            seller: createUserResource(lot.seller),
-            winner: lot.winner ? createUserAnonymousResource(lot.winner) : null,
+            ...lot.toJSON(),
+            cover: lot.cover?.image?.toJSON() ?? null,
+            category: lot.category?.toJSON() ?? null,
+            seller: lot.seller.toJSON(),
+            winner: lot.winner?.toJSON() ?? null,
           }
         }),
       }

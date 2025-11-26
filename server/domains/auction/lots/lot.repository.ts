@@ -7,9 +7,10 @@ import { Repository } from '~~/server/class/Repository'
 
 interface FindAllForCatalogOptions extends RepositoryOptions {
   where?: WhereOptions<LotAttributes>
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
   categoryPath?: string
+  order?: Array<[string, 'ASC' | 'DESC']>
 }
 
 class LotRepository extends Repository<Lot> {
@@ -37,10 +38,10 @@ class LotRepository extends Repository<Lot> {
   /**
    * Finds all lots for the catalog with associations.
    *
-   * @param options - query options including where, limit, offset, categoryPath
+   * @param options - query options including where, limit, offset, categoryPath, order
    * @returns lots with count and associated data
    */
-  async findAllForCatalog(options: FindAllForCatalogOptions = {}) {
+  async findAllForCatalog(options: FindAllForCatalogOptions) {
     const db = useDatabase()
 
     return await db.Lot.findAndCountAll({
@@ -48,7 +49,7 @@ class LotRepository extends Repository<Lot> {
       limit: options.limit,
       offset: options.offset,
       transaction: options.transaction,
-      order: [['expirationDate', 'ASC']],
+      order: options.order ?? [['expirationDate', 'ASC']],
       include: [
         {
           model: db.LotImage,
