@@ -11,6 +11,12 @@ interface FindAllForCatalogOptions {
 }
 
 class LotCatalogRepository {
+  /**
+   * Finds all lots for the catalog with associations.
+   *
+   * @param options - query options including where, limit, offset, categoryPath, order
+   * @returns lots with count and associated data
+   */
   async findAllForCatalog(options: FindAllForCatalogOptions) {
     const db = useDatabase()
 
@@ -23,7 +29,6 @@ class LotCatalogRepository {
         {
           model: db.LotImage,
           as: 'cover',
-          where: { order: 0 },
           required: false,
           include: [
             {

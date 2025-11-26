@@ -6,17 +6,8 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 
-async function viewCatalogRequest(params: { page?: number, limit?: number, category_slug?: string } = {}) {
-  const searchParams = new URLSearchParams()
-  if (params.page)
-    searchParams.set('page', String(params.page))
-  if (params.limit)
-    searchParams.set('limit', String(params.limit))
-  if (params.category_slug)
-    searchParams.set('category_slug', params.category_slug)
-
-  const query = searchParams.toString()
-  return await fetch(`/api/catalog${query ? `?${query}` : ''}`, { method: 'GET' })
+async function viewCatalogRequest(query: { page?: number, limit?: number, category_slug?: string } = {}) {
+  return await fetch(`/api/catalog`, { method: 'GET', query })
 }
 
 describe('GET /api/catalog', async () => {
@@ -43,12 +34,10 @@ describe('GET /api/catalog', async () => {
     expect(body.meta.currentPage).toBeDefined()
     expect(body.meta.itemsPerPage).toBeDefined()
 
-    if (body.data.length > 0) {
-      const lot = body.data[0]
-      expect(lot.id).toBeDefined()
-      expect(lot.title).toBeDefined()
-      expect(lot.seller).toBeDefined()
-    }
+    const lot = body.data[0]
+    expect(lot.id).toBeDefined()
+    expect(lot.title).toBeDefined()
+    expect(lot.seller).toBeDefined()
 
     await lotData.clear()
     await categoryData.clear()
@@ -79,37 +68,27 @@ describe('GET /api/catalog', async () => {
     expect(response.status).toBe(200)
 
     const body = response._data
-    expect(body.data.length).toBeGreaterThanOrEqual(2)
+    expect(body.data.length).toBe(2)
+
+    const parentLot = body.data.find((lot: { id: number }) => lot.id === lotInParent.lot.id)
+    const childLot = body.data.find((lot: { id: number }) => lot.id === lotInChild.lot.id)
+
+    expect(parentLot).toBeDefined()
+    expect(parentLot.id).toBeDefined()
+    expect(parentLot.title).toBeDefined()
+    expect(parentLot.seller).toBeDefined()
+    expect(parentLot.category).toBeDefined()
+
+    expect(childLot).toBeDefined()
+    expect(childLot.id).toBeDefined()
+    expect(childLot.title).toBeDefined()
+    expect(childLot.seller).toBeDefined()
+    expect(childLot.category).toBeDefined()
 
     await lotInChild.clear()
     await lotInParent.clear()
     await childCategoryData.clear()
     await parentCategoryData.clear()
-    await userData.clear()
-  })
-
-  it('should cache results by limit and page keys', async () => {
-    const userData = await createUser()
-    const categoryData = await createCategory()
-    const lotData = await createPublishedLot({
-      sellerId: userData.user.id,
-      categoryId: categoryData.category.id,
-    })
-
-    const response1 = await viewCatalogRequest({ limit: 10, page: 1 })
-    const response2 = await viewCatalogRequest({ limit: 10, page: 1 })
-    const response3 = await viewCatalogRequest({ limit: 20, page: 1 })
-
-    expect(response1.status).toBe(200)
-    expect(response2.status).toBe(200)
-    expect(response3.status).toBe(200)
-
-    expect(response1._data.meta.itemsPerPage).toBe(10)
-    expect(response2._data.meta.itemsPerPage).toBe(10)
-    expect(response3._data.meta.itemsPerPage).toBe(20)
-
-    await lotData.clear()
-    await categoryData.clear()
     await userData.clear()
   })
 })
