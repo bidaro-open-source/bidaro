@@ -3,6 +3,7 @@ import type { UploadLotImageRequest } from './index.post.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
@@ -42,7 +43,11 @@ describe('POST /api/lots/:id/images', async () => {
       IMAGE_JPEG,
       IMAGE_WEBP,
     ])('should upload file "%s"', async (filename: string) => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
       const lotData = await createLot({ sellerId: userData.user.id })
       const multipart = createMultipartConfig(resolveImage(filename))
 
@@ -71,7 +76,11 @@ describe('POST /api/lots/:id/images', async () => {
       IMAGE_TO_BIG,
       IMAGE_AVIF,
     ])('should upload file "%s"', async (filename: string) => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
       const lotData = await createLot({ sellerId: userData.user.id })
       const multipart = createMultipartConfig(resolveImage(filename))
 
@@ -98,8 +107,32 @@ describe('POST /api/lots/:id/images', async () => {
       expect(response.status).toBe(401)
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+      const multipart = createMultipartConfig(resolveImage(IMAGE))
+
+      const response = await uploadLotImageRequest(
+        { multipart, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
     it('should return 404 when lot does not exist', async () => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
       const multipart = createMultipartConfig(resolveImage(IMAGE))
 
       const response = await uploadLotImageRequest(
@@ -114,7 +147,11 @@ describe('POST /api/lots/:id/images', async () => {
 
     it('should return 403 when user is not the lot owner', async () => {
       const user1Data = await createUser()
-      const user2Data = await createUser({ withSession: true })
+      const user2Data = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
       const lotData = await createLot({ sellerId: user1Data.user.id })
       const multipart = createMultipartConfig(resolveImage(IMAGE))
 

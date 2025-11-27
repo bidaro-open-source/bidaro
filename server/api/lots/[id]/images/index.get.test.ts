@@ -2,6 +2,7 @@ import type { ViewLotRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -25,13 +26,18 @@ describe('GET /api/lots/:id/images', async () => {
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should retrieve lot image with correct structure and metadata', async () => {
-    const userData = await createUser({ withSession: true })
+    const userData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.VIEW_LOT_IMAGES],
+    })
     const lotData = await createLot({ sellerId: userData.user.id })
     const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
 
     const response = await viewLotImageRequest(
       { params: { id: lotData.lot.id } },
+      { accessToken: userData.access_token },
     )
 
     const result = response._data
@@ -51,7 +57,11 @@ describe('GET /api/lots/:id/images', async () => {
   })
 
   it('should retrieve lot images in correct order', async () => {
-    const userData = await createUser({ withSession: true })
+    const userData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.VIEW_LOT_IMAGES],
+    })
     const lotData = await createLot({ sellerId: userData.user.id })
 
     const imageData1 = await createImage(IMAGE_PATH)
@@ -62,6 +72,7 @@ describe('GET /api/lots/:id/images', async () => {
 
     const response = await viewLotImageRequest(
       { params: { id: lotData.lot.id } },
+      { accessToken: userData.access_token },
     )
 
     const result = response._data
@@ -81,8 +92,49 @@ describe('GET /api/lots/:id/images', async () => {
   })
 
   describe('error handling', () => {
+    it('should return 401 when user is not authenticated', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.VIEW_LOT_IMAGES],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+
+      const response = await viewLotImageRequest(
+        { params: { id: lotData.lot.id } },
+      )
+
+      expect(response.status).toBe(401)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+
+      const response = await viewLotImageRequest(
+        { params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
     it('should return 404 when lot does not exist', async () => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.VIEW_LOT_IMAGES],
+      })
 
       const response = await viewLotImageRequest(
         { params: { id: 93475937459 } },

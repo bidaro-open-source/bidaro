@@ -2,6 +2,7 @@ import type { DeleteLotImageRequest } from './index.delete.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -26,7 +27,11 @@ describe('DELETE /api/lots/:id/images', async () => {
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should delete lot image successfully and return deletion status', async () => {
-    const userData = await createUser({ withSession: true })
+    const userData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_LOT_IMAGE],
+    })
     const lotData = await createLot({ sellerId: userData.user.id })
     const imageData = await createImage(IMAGE_PATH)
     const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
@@ -66,8 +71,31 @@ describe('DELETE /api/lots/:id/images', async () => {
       await userData.clear()
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+
+      const response = await deleteLotImageRequest(
+        { body: { ids: [1] }, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
     it('should return 404 when lot does not exist', async () => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT_IMAGE],
+      })
 
       const response = await deleteLotImageRequest(
         { body: { ids: [1] }, params: { id: 93475937459 } },
@@ -80,8 +108,16 @@ describe('DELETE /api/lots/:id/images', async () => {
     })
 
     it('should return empty array when user is not the lot owner', async () => {
-      const user1Data = await createUser({ withSession: true })
-      const user2Data = await createUser({ withSession: true })
+      const user1Data = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT_IMAGE],
+      })
+      const user2Data = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT_IMAGE],
+      })
       const lot1Data = await createLot({ sellerId: user1Data.user.id })
       const lot2Data = await createLot({ sellerId: user2Data.user.id })
       const imageData = await createImage(IMAGE_PATH)

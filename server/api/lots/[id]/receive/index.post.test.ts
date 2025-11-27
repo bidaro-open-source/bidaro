@@ -2,7 +2,7 @@ import type { ViewLotRequest } from '../index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { lotStatuses } from '~~/server/constants'
+import { lotStatuses, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createShippedLot } from '~~/test/api-e2e/arrangers/lots/create-shipped-lot'
@@ -24,7 +24,11 @@ describe('POST /api/lots/:id/receive', async () => {
 
   it('should ship lot successfully', async () => {
     const uData = await createUser()
-    const uuData = await createUser({ withSession: true })
+    const uuData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.RECEIVE_LOT],
+    })
     const cData = await createCategory()
     const lotData = await createShippedLot({
       sellerId: uData.user.id,
@@ -71,8 +75,39 @@ describe('POST /api/lots/:id/receive', async () => {
       await uData.clear()
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const uData = await createUser()
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const cData = await createCategory()
+      const lotData = await createShippedLot({
+        sellerId: uData.user.id,
+        winnerId: uuData.user.id,
+        categoryId: cData.category.id,
+      })
+
+      const response = await receiveLotRequest(
+        { params: { id: lotData.lot.id } },
+        { accessToken: uuData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await cData.clear()
+      await uuData.clear()
+      await uData.clear()
+    })
+
     it('should return 403 when the lot is alien', async () => {
-      const uData1 = await createUser({ withSession: true })
+      const uData1 = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.RECEIVE_LOT],
+      })
       const uData2 = await createUser()
       const cData = await createCategory()
       const lotData = await createWinnerLot({
@@ -95,7 +130,11 @@ describe('POST /api/lots/:id/receive', async () => {
     })
 
     it('should return 404 when lot does not exist', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.RECEIVE_LOT],
+      })
 
       const response = await receiveLotRequest(
         { params: { id: 93475937459 } },
@@ -109,7 +148,11 @@ describe('POST /api/lots/:id/receive', async () => {
 
     it('should return 400 when the lot is not in the process of delivery', async () => {
       const uData = await createUser()
-      const uuData = await createUser({ withSession: true })
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.RECEIVE_LOT],
+      })
       const cData = await createCategory()
       const lotData = await createWinnerLot({
         sellerId: uData.user.id,

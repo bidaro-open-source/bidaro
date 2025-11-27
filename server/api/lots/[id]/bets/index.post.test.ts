@@ -2,6 +2,7 @@ import type { CreateLotBetRequest } from './index.post.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
@@ -25,7 +26,11 @@ describe('POST /api/lots/:id/bets', async () => {
 
   it('should create bet successfully', async () => {
     const uData = await createUser()
-    const uuData = await createUser({ withSession: true })
+    const uuData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.CREATE_LOT_BET],
+    })
     const cData = await createCategory()
     const lotData = await createPublishedLot({
       sellerId: uData.user.id,
@@ -75,8 +80,40 @@ describe('POST /api/lots/:id/bets', async () => {
       await uData.clear()
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const uData = await createUser()
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const cData = await createCategory()
+      const lotData = await createPublishedLot({
+        sellerId: uData.user.id,
+        categoryId: cData.category.id,
+      })
+
+      const amount = lotData.lot.initialPrice * 2
+
+      const response = await createLotBetRequest(
+        { body: { amount }, params: { id: lotData.lot.id } },
+        { accessToken: uuData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await cData.clear()
+      await uuData.clear()
+      await uData.clear()
+    })
+
     it('should return 403 when user is seller', async () => {
-      const uData1 = await createUser({ withSession: true })
+      const uData1 = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT_BET],
+      })
       const cData = await createCategory()
       const lotData = await createPublishedLot({
         sellerId: uData1.user.id,
@@ -98,7 +135,11 @@ describe('POST /api/lots/:id/bets', async () => {
     })
 
     it('should return 404 when lot does not exist', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT_BET],
+      })
 
       const response = await createLotBetRequest(
         { body: { amount: 203994 }, params: { id: 93475937459 } },
@@ -112,7 +153,11 @@ describe('POST /api/lots/:id/bets', async () => {
 
     it('should return 400 when the lot is not in the process of trading', async () => {
       const uData = await createUser()
-      const uuData = await createUser({ withSession: true })
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT_BET],
+      })
       const cData = await createCategory()
       const lotData = await createLot({
         sellerId: uData.user.id,
@@ -136,7 +181,11 @@ describe('POST /api/lots/:id/bets', async () => {
 
     it('should return 400 when the lot is ready for closing', async () => {
       const uData = await createUser()
-      const uuData = await createUser({ withSession: true })
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT_BET],
+      })
       const cData = await createCategory()
       const lotData = await createReadyForClosingLot({
         sellerId: uData.user.id,
@@ -160,7 +209,11 @@ describe('POST /api/lots/:id/bets', async () => {
 
     it('should return 400 when the amount is less than lot price', async () => {
       const uData = await createUser()
-      const uuData = await createUser({ withSession: true })
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT_BET],
+      })
       const cData = await createCategory()
       const lotData = await createPublishedLot({
         sellerId: uData.user.id,

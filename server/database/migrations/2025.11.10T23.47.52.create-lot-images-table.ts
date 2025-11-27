@@ -1,5 +1,6 @@
 import type { Migration } from '../console/migrator-cli'
 import { DataTypes } from 'sequelize'
+import { permissions } from '../../constants'
 
 export const up: Migration = async ({ context }) => {
   const queryInterface = context.sequelize.getQueryInterface()
@@ -54,6 +55,13 @@ export const up: Migration = async ({ context }) => {
       name: 'lot_images_lotId_imageId_uk',
       transaction,
     })
+
+    await queryInterface.bulkInsert('permissions', [
+      { name: permissions.VIEW_LOT_IMAGES, createdAt: new Date() },
+      { name: permissions.UPLOAD_LOT_IMAGE, createdAt: new Date() },
+      { name: permissions.DELETE_LOT_IMAGE, createdAt: new Date() },
+      { name: permissions.UPDATE_LOT_IMAGE_ORDER, createdAt: new Date() },
+    ], { transaction })
 
     await transaction.commit()
   }

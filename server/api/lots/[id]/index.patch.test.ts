@@ -1,7 +1,7 @@
 import type { UpdateLotRequest } from './index.patch.request'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { lotInitialDurations } from '~~/server/constants'
+import { lotInitialDurations, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
@@ -23,7 +23,11 @@ describe('PATCH /api/lots/:id', async () => {
   await setup({ host: process.env.SETUP_HOST })
 
   it('should update lot successfully and return the correct structure', async () => {
-    const uData = await createUser({ withSession: true })
+    const uData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.UPDATE_LOT],
+    })
     const cData = await createCategory()
     const lotData = await createLot({ sellerId: uData.user.id })
 
@@ -63,7 +67,11 @@ describe('PATCH /api/lots/:id', async () => {
   })
 
   it('should not update lot initial values for a published lot', async () => {
-    const uData = await createUser({ withSession: true })
+    const uData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.UPDATE_LOT],
+    })
     const cData = await createCategory()
     const lotData = await createPublishedLot({
       sellerId: uData.user.id,
@@ -98,7 +106,11 @@ describe('PATCH /api/lots/:id', async () => {
 
   describe('error handling', async () => {
     it('should return 401 when user is not authenticated', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData.user.id })
 
       const response = await updateLotRequest(
@@ -111,9 +123,32 @@ describe('PATCH /api/lots/:id', async () => {
       await uData.clear()
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const lotData = await createLot({ sellerId: uData.user.id })
+
+      const response = await updateLotRequest(
+        { body: { title: 'UpdatedTitle' }, params: { id: lotData.lot.id } },
+        { accessToken: uData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await uData.clear()
+    })
+
     it('should return 403 when a lot is alien', async () => {
       const uData1 = await createUser()
-      const uData2 = await createUser({ withSession: true })
+      const uData2 = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData1.user.id })
 
       const response = await updateLotRequest(
@@ -129,7 +164,11 @@ describe('PATCH /api/lots/:id', async () => {
     })
 
     it('should return 404 when a lot is not exist', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
 
       const response = await updateLotRequest(
         { params: { id: 93475937459 }, body: { title: 'UpdatedTitle' } },
@@ -142,7 +181,11 @@ describe('PATCH /api/lots/:id', async () => {
     })
 
     it('should return 422 when initial amount is less than min', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData.user.id })
 
       const initialPrice = db.LotFactory.minAmount - 0.01
@@ -162,7 +205,11 @@ describe('PATCH /api/lots/:id', async () => {
     })
 
     it('should return 422 when initial amount is more than max', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData.user.id })
 
       const initialPrice = db.LotFactory.maxAmount + 0.01
@@ -182,7 +229,11 @@ describe('PATCH /api/lots/:id', async () => {
     })
 
     it('should return 422 when initial duration is incorrect', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData.user.id })
 
       const initialDuration = db.LotFactory.incorrectInitialDuration as any
@@ -202,7 +253,11 @@ describe('PATCH /api/lots/:id', async () => {
     })
 
     it('should return 400 when category not exist', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData.user.id })
 
       const response = await updateLotRequest(

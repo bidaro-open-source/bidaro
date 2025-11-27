@@ -35,6 +35,20 @@ export const permissions = {
   DELETE_USER: 'delete_user',
 
   VIEW_LOTS: 'view_lots',
+  CREATE_LOT: 'create_lot',
+  UPDATE_LOT: 'update_lot',
+  DELETE_LOT: 'delete_lot',
+  PUBLISH_LOT: 'publish_lot',
+  CLOSE_LOT: 'close_lot',
+  SHIP_LOT: 'ship_lot',
+  RECEIVE_LOT: 'receive_lot',
+
+  CREATE_LOT_BET: 'create_lot_bet',
+
+  VIEW_LOT_IMAGES: 'view_lot_images',
+  UPLOAD_LOT_IMAGE: 'upload_lot_image',
+  DELETE_LOT_IMAGE: 'delete_lot_image',
+  UPDATE_LOT_IMAGE_ORDER: 'update_lot_image_order',
 } as const
 
 export const lotStatuses = {

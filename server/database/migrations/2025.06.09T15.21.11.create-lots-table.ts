@@ -93,6 +93,14 @@ export const up: Migration = async ({ context }) => {
 
     await queryInterface.bulkInsert('permissions', [
       { name: permissions.VIEW_LOTS, createdAt: new Date() },
+      { name: permissions.CREATE_LOT, createdAt: new Date() },
+      { name: permissions.UPDATE_LOT, createdAt: new Date() },
+      { name: permissions.DELETE_LOT, createdAt: new Date() },
+      { name: permissions.PUBLISH_LOT, createdAt: new Date() },
+      { name: permissions.CLOSE_LOT, createdAt: new Date() },
+      { name: permissions.SHIP_LOT, createdAt: new Date() },
+      { name: permissions.RECEIVE_LOT, createdAt: new Date() },
+      { name: permissions.CREATE_LOT_BET, createdAt: new Date() },
     ], { transaction })
 
     await transaction.commit()

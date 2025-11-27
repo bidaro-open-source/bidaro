@@ -1,6 +1,7 @@
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -21,7 +22,11 @@ describe('POST /api/lots', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should create draft lot successfully for authenticated user', async () => {
-    const data = await createUser({ withSession: true })
+    const data = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.CREATE_LOT],
+    })
 
     const response = await createLotRequest(
       { accessToken: data.access_token },
@@ -45,6 +50,22 @@ describe('POST /api/lots', async () => {
       const response = await createLotRequest()
 
       expect(response.status).toBe(401)
+    })
+
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+
+      const response = await createLotRequest(
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await userData.clear()
     })
   })
 })

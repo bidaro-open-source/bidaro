@@ -2,6 +2,7 @@ import type { ViewLotRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
@@ -22,7 +23,11 @@ describe('DELETE /api/lots/:id', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should delete lot successfully and return deletion status', async () => {
-    const uData = await createUser({ withSession: true })
+    const uData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_LOT],
+    })
     const lotData = await createLot({ sellerId: uData.user.id })
 
     const response = await deleteLotRequest(
@@ -38,7 +43,11 @@ describe('DELETE /api/lots/:id', async () => {
 
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT],
+      })
       const lotData = await createLot({ sellerId: uData.user.id })
 
       const response = await deleteLotRequest(
@@ -51,9 +60,32 @@ describe('DELETE /api/lots/:id', async () => {
       await uData.clear()
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const lotData = await createLot({ sellerId: uData.user.id })
+
+      const response = await deleteLotRequest(
+        { params: { id: lotData.lot.id } },
+        { accessToken: uData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await uData.clear()
+    })
+
     it('should return 403 when the lot is alien', async () => {
       const uData1 = await createUser()
-      const uData2 = await createUser({ withSession: true })
+      const uData2 = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT],
+      })
       const cData = await createCategory()
       const lotData = await createPublishedLot({
         sellerId: uData1.user.id,
@@ -74,7 +106,11 @@ describe('DELETE /api/lots/:id', async () => {
     })
 
     it('should return 404 when lot does not exist', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT],
+      })
 
       const response = await deleteLotRequest(
         { params: { id: 93475937459 } },
@@ -87,7 +123,11 @@ describe('DELETE /api/lots/:id', async () => {
     })
 
     it('should return 400 when the lot is publish', async () => {
-      const uData = await createUser({ withSession: true })
+      const uData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.DELETE_LOT],
+      })
       const cData = await createCategory()
       const lotData = await createPublishedLot({
         sellerId: uData.user.id,

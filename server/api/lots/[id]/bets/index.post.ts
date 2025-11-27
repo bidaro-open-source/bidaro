@@ -1,8 +1,11 @@
 import { lotBetService } from '~~/server/domains/auction'
+import { createLotBetPolicy } from './index.post.policy'
 import { createLotBetRequest } from './index.post.request'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
+
+  createLotBetPolicy(event)
 
   const user = getAuthenticatedUser(event)
 
