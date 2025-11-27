@@ -15,10 +15,12 @@ export default defineEventHandler(async (event) => {
 
   updateUserPasswordPolicy(event, request.params.id)
 
-  const updatedUser = await userService.updatePassword(
-    request.params.id,
-    request.body.password,
-  )
+  const updatedUser = await useActionLimiter(event, 'update_password', 3, async () => {
+    return await userService.updatePassword(
+      request.params.id,
+      request.body.password,
+    )
+  })
 
   return userResource.make(updatedUser)
 })

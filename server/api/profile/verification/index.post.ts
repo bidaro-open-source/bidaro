@@ -11,18 +11,20 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  await verificationService.deleteTokenByUserId(user.id)
+  await useActionLimiter(event, 'email_verification_request', 3, async () => {
+    await verificationService.deleteTokenByUserId(user.id)
 
-  const token = await verificationService.createToken(user.id)
+    const token = await verificationService.createToken(user.id)
 
-  const config = useRuntimeConfig()
+    const config = useRuntimeConfig()
 
-  await sendMail(event, {
-    to: user.email,
-    subject: 'Верифікуй свою пошту - Bidaro',
-    template: {
-      html: `Верифікуй свою пошту, клікнувши <a href="${config.public.appUrl}/profile/verification/${token}">сюди</a>`,
-      text: `Токен верифікації: ${token}`,
-    },
+    await sendMail(event, {
+      to: user.email,
+      subject: 'Верифікуй свою пошту - Bidaro',
+      template: {
+        html: `Верифікуй свою пошту, клікнувши <a href="${config.public.appUrl}/profile/verification/${token}">сюди</a>`,
+        text: `Токен верифікації: ${token}`,
+      },
+    })
   })
 })

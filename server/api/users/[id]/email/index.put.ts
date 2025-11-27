@@ -15,10 +15,12 @@ export default defineEventHandler(async (event) => {
 
   updateUserEmailPolicy(event, request.params.id)
 
-  const updatedUser = await userService.updateEmail(
-    request.params.id,
-    request.body.email,
-  )
+  const updatedUser = await useActionLimiter(event, 'update_email', 3, async () => {
+    return await userService.updateEmail(
+      request.params.id,
+      request.body.email,
+    )
+  })
 
   return userResource.make(updatedUser)
 })
