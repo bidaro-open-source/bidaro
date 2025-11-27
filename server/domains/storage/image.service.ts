@@ -1,12 +1,14 @@
 import type { Image } from '#database'
+import type { Buffer } from 'node:buffer'
 import * as path from 'node:path'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { v4 as uuidv4 } from 'uuid'
 
 interface UploadPayload {
-  data: any
-  type?: string
-  filename?: string
+  fieldname: string
+  filename: string
+  mimetype: string
+  buffer: Buffer
 }
 
 interface ErrorHandling {
@@ -24,8 +26,8 @@ class ImageService {
    */
   private getMeta(data: UploadPayload) {
     const extension = path.extname(data.filename || '').toLowerCase()
-    const size = data.data?.length || 0
-    const type = data.type || 'application/octet-stream'
+    const size = data.buffer?.length || 0
+    const type = data.mimetype || 'application/octet-stream'
     const key = `${uuidv4()}${extension}`
 
     return { size, type, key }
@@ -71,7 +73,7 @@ class ImageService {
     try {
       const s3Command = new PutObjectCommand({
         Key: key,
-        Body: data.data,
+        Body: data.buffer,
         ContentType: type,
         ContentLength: size,
         ACL: 'public-read',
