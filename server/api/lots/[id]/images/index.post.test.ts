@@ -72,17 +72,14 @@ describe('POST /api/lots/:id/images', async () => {
   })
 
   describe('invalid file uploads', () => {
-    it.each([
-      IMAGE_TO_BIG,
-      IMAGE_AVIF,
-    ])('should upload file "%s"', async (filename: string) => {
+    it('return 422 when file is not passed', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
         withPermissions: [permissions.UPLOAD_LOT_IMAGE],
       })
       const lotData = await createLot({ sellerId: userData.user.id })
-      const multipart = createMultipartConfig(resolveImage(filename))
+      const multipart = createMultipartConfig([])
 
       const response = await uploadLotImageRequest(
         { multipart, params: { id: lotData.lot.id } },
@@ -90,6 +87,46 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(422)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
+    it('return 413 when file is too heavy', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+      const multipart = createMultipartConfig(resolveImage(IMAGE_TO_BIG))
+
+      const response = await uploadLotImageRequest(
+        { multipart, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(413)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
+    it('return 415 when file is not allowed type', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+      const multipart = createMultipartConfig(resolveImage(IMAGE_AVIF))
+
+      const response = await uploadLotImageRequest(
+        { multipart, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(415)
 
       await lotData.clear()
       await userData.clear()

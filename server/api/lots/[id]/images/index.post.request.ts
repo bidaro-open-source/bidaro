@@ -1,8 +1,6 @@
 import { z } from 'zod'
 import { primaryKeySchema } from '~~/server/zod'
 
-const allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-
 export type UploadLotImageRequest = ValidatorReturnType<typeof uploadLotImageRequest>
 
 export const uploadLotImageRequest = createRequestValidator({
@@ -10,17 +8,19 @@ export const uploadLotImageRequest = createRequestValidator({
     id: primaryKeySchema,
   }),
   multipart: async (event) => {
-    const files = await readMultipartFormData(event)
+    const multipart = await readMultipartSafely(event, {
+      allowedMimeTypes: [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp',
+      ],
+      limits: {
+        files: 1,
+      },
+    })
 
-    if (!files) {
-      throw new z.ZodError([{
-        code: 'custom',
-        path: ['files'],
-        message: 'Файли не завантажені',
-      }])
-    }
-
-    if (!files[0]) {
+    if (!multipart.files[0]) {
       throw new z.ZodError([{
         code: 'custom',
         path: ['files'],
@@ -28,22 +28,6 @@ export const uploadLotImageRequest = createRequestValidator({
       }])
     }
 
-    if (!allowedMime.includes(files[0].type || '')) {
-      throw new z.ZodError([{
-        code: 'custom',
-        path: ['files'],
-        message: 'Невалідний тип файлу',
-      }])
-    }
-
-    if (files[0].data.length > 5 * 1024 * 1024) {
-      throw new z.ZodError([{
-        code: 'custom',
-        path: ['files'],
-        message: 'Файл перевищує 5MB',
-      }])
-    }
-
-    return files[0]
+    return multipart.files[0]
   },
 })
