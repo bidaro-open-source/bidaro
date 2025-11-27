@@ -1,27 +1,11 @@
 import type { RoleAttributesOptional } from '../../../database'
-import { roles } from '../../../constants'
 import { permissionRepository } from '../permission/permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'
 
+type RoleCreateData = Omit<RoleAttributesOptional, 'isReserved'>
+
 class RoleService {
-  /**
-   * Reserved role names.
-   */
-  private reservedRoles: readonly string[] = [
-    roles.USER,
-  ]
-
-  /**
-   * Checks if a role is reserved.
-   *
-   * @param name - role name
-   * @returns true if role is reserved
-   */
-  private isReserved(name: string): boolean {
-    return this.reservedRoles.includes(name)
-  }
-
   /**
    * Creates a new role.
    *
@@ -29,7 +13,7 @@ class RoleService {
    * @returns role instance
    * @throws 422 if role name already exists
    */
-  async create(data: RoleAttributesOptional) {
+  async create(data: RoleCreateData) {
     return await useDatabaseTransaction(async (transaction) => {
       const existingRole = await roleRepository.findByPk(data.name, { transaction })
 
@@ -120,7 +104,7 @@ class RoleService {
         })
       }
 
-      if (this.isReserved(name)) {
+      if (role.isReserved) {
         throw createError({
           statusCode: 400,
           message: 'Не можна змінювати права зарезервованої ролі',
@@ -168,7 +152,7 @@ class RoleService {
         })
       }
 
-      if (this.isReserved(name)) {
+      if (role.isReserved) {
         throw createError({
           statusCode: 400,
           message: 'Не можна видалити зарезервовану роль',

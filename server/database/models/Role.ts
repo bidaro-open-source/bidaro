@@ -28,6 +28,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
   declare name: string
   declare displayName: string | null
   declare description: string | null
+  declare isReserved: CreationOptional<boolean>
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date>
 
@@ -87,6 +88,19 @@ export function InitializeRole(database: DatabaseOptional) {
       description: {
         type: DataTypes.STRING(1024),
         allowNull: true,
+      },
+      isReserved: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        set(value: boolean) {
+          // Prevent setting isReserved to true at model level
+          // This field can only be set to true through migrations
+          if (value === true) {
+            throw new Error('Cannot set isReserved to true')
+          }
+          this.setDataValue('isReserved', value)
+        },
       },
       createdAt: {
         type: DataTypes.DATE,

@@ -7,5 +7,6 @@ export function createRoleResource(entity: RoleAttributes) {
     name: entity.name,
     displayName: entity.displayName,
     description: entity.description,
+    isReserved: entity.isReserved,
   }
 }
