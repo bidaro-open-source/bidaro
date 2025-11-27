@@ -3,6 +3,8 @@ import { permissionRepository } from '../permission/permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'
 
+type RoleCreateData = Omit<RoleAttributesOptional, 'isReserved'>
+
 class RoleService {
   /**
    * Creates a new role.
@@ -11,7 +13,7 @@ class RoleService {
    * @returns role instance
    * @throws 422 if role name already exists
    */
-  async create(data: RoleAttributesOptional) {
+  async create(data: RoleCreateData) {
     return await useDatabaseTransaction(async (transaction) => {
       const existingRole = await roleRepository.findByPk(data.name, { transaction })
 
