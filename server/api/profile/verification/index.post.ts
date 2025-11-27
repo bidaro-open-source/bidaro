@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  await useActionLimiter(event, 'email_verification_request', 3, async () => {
+  await useActionLimiter(event, 'email_verification_request', actionLimits.EMAIL_VERIFICATION_REQUEST, async () => {
     await verificationService.deleteTokenByUserId(user.id)
 
     const token = await verificationService.createToken(user.id)

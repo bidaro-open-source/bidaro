@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const lot = await useActionLimiter(event, 'create_lot', 6, async () => {
+  const lot = await useActionLimiter(event, 'create_lot', actionLimits.CREATE_LOT, async () => {
     return await lotService.createDraft(user.id)
   })
 

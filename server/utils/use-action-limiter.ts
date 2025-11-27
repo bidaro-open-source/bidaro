@@ -6,6 +6,22 @@ import type { H3Event } from 'h3'
 const ONE_DAY_IN_SECONDS = 86400
 
 /**
+ * Action limits per day for various user actions.
+ */
+export const actionLimits = {
+  /** Maximum number of lots a user can create per day */
+  CREATE_LOT: 6,
+  /** Maximum number of bets a user can place per day */
+  CREATE_LOT_BET: 30,
+  /** Maximum number of email verification requests per day */
+  EMAIL_VERIFICATION_REQUEST: 3,
+  /** Maximum number of email updates per day */
+  UPDATE_EMAIL: 3,
+  /** Maximum number of password updates per day */
+  UPDATE_PASSWORD: 3,
+} as const
+
+/**
  * Lua script to perform atomic action limit check and increment.
  * 1. Gets the current count for the action key.
  * 2. If key doesn't exist, defaults to 0.

@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   const request = await createLotBetRequest(event)
 
-  const lotBet = await useActionLimiter(event, 'create_lot_bet', 30, async () => {
+  const lotBet = await useActionLimiter(event, 'create_lot_bet', actionLimits.CREATE_LOT_BET, async () => {
     return await lotBetService.create(
       request.params.id,
       user.id,
