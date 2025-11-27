@@ -24,7 +24,7 @@ export interface RepositoryOptions {
  * @template DataEntity - The Sequelize Model instance type
  * @template CAttributes - Creation attributes (input payload for create)
  */
-export abstract class Repository<
+export abstract class BaseRepository<
   DataEntity extends Model,
   CAttributes extends object = MakeNullishOptional<InferCreationAttributes<DataEntity>>,
 > {

@@ -1,9 +1,9 @@
-import type { RepositoryOptions } from '~~/server/class/Repository'
+import type { RepositoryOptions } from '~~/server/class/BaseRepository'
 import type { LotImage, LotImageAttributesOptional } from '../../../database'
 import { Op } from 'sequelize'
-import { Repository } from '~~/server/class/Repository'
+import { BaseRepository } from '~~/server/class/BaseRepository'
 
-class LotImageRepository extends Repository<LotImage> {
+class LotImageRepository extends BaseRepository<LotImage> {
   protected get model() {
     return useDatabase().LotImage
   }

@@ -1,8 +1,8 @@
-import type { RepositoryOptions } from '~~/server/class/Repository'
+import type { RepositoryOptions } from '~~/server/class/BaseRepository'
 import type { Lot } from '../../../database'
-import { Repository } from '~~/server/class/Repository'
+import { BaseRepository } from '~~/server/class/BaseRepository'
 
-class LotRepository extends Repository<Lot> {
+class LotRepository extends BaseRepository<Lot> {
   protected get model() {
     return useDatabase().Lot
   }

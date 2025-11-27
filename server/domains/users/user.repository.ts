@@ -1,8 +1,8 @@
-import type { RepositoryOptions } from '~~/server/class/Repository'
+import type { RepositoryOptions } from '~~/server/class/BaseRepository'
 import type { User } from '../../database'
-import { Repository } from '~~/server/class/Repository'
+import { BaseRepository } from '~~/server/class/BaseRepository'
 
-class UserRepository extends Repository<User> {
+class UserRepository extends BaseRepository<User> {
   protected get model() {
     return useDatabase().User
   }
