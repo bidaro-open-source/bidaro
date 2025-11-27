@@ -31,7 +31,7 @@ class AuthenticationService {
   /**
    * Redis keys.
    */
-  private get keys() {
+  get keys() {
     return {
       token: (token: string) => `${REDIS_SESSION_NAMESPACE}:t:${token}`,
       tokens: (uid: number) => `${REDIS_SESSION_NAMESPACE}:u:${uid}`,

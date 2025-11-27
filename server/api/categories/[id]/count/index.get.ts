@@ -5,6 +5,12 @@ import { viewCategoryCountPolicy } from './index.get.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 60,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await viewCategoryRequest(event)
 
   viewCategoryCountPolicy(event)

@@ -5,6 +5,12 @@ import { updateRolePolicy } from './index.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await updateRoleRequest(event)
 
   updateRolePolicy(event)

@@ -3,6 +3,12 @@ import { userProfileResource, userRepository } from '#domains/users'
 import { refreshRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await refreshRequest(event)
 
   const oldSession = await authService.getSession(request.body.refresh_token)

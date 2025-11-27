@@ -5,6 +5,12 @@ import { updatePermissionRequest } from './index.patch.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   updatePermissionPolicy(event)
 
   const request = await updatePermissionRequest(event)

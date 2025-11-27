@@ -9,6 +9,11 @@ import { lotStatuses } from '~~/server/constants'
 import { viewCatalogRequest } from './index.get.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 40,
+    anonymousLimit: 200,
+  })
+
   const request = await viewCatalogRequest(event)
 
   const offset = (request.query.page - 1) * request.query.limit

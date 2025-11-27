@@ -8,6 +8,12 @@ import { viewUsersPolicy } from './index.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 60,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   viewUsersPolicy(event)
 
   const request = await viewUsersRequest(event)

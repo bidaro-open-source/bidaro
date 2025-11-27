@@ -6,6 +6,12 @@ import { roles } from '~~/server/constants'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 0,
+    anonymousLimit: 5,
+    duration: 60,
+  })
+
   const request = await registerRequest(event)
 
   const userByEmail = await userRepository.findByEmail(request.body.email)

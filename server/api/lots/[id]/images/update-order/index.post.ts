@@ -5,6 +5,12 @@ import { updateImageOrderRequest } from './index.post.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 20,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await updateImageOrderRequest(event)
 
   const lot = await lotSource.getById(request.params.id)

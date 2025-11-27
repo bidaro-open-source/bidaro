@@ -5,6 +5,12 @@ import { deleteSessionsPolicy } from './index.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 20,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await deleteSessionsRequest(event)
 
   deleteSessionsPolicy(event, request.params.id)

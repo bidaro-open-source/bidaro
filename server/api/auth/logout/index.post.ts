@@ -4,6 +4,12 @@ import { logoutRequest } from './index.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 5,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const user = getAuthenticatedUser(event)
 
   const request = await logoutRequest(event)

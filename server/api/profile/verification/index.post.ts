@@ -3,6 +3,12 @@ import { verificationService } from '#domains/authentication'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const user = getAuthenticatedUser(event)
 
   await verificationService.deleteTokenByUserId(user.id)

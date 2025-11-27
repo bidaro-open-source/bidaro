@@ -6,6 +6,12 @@ import { deleteLotImageRequest } from './index.delete.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 20,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await deleteLotImageRequest(event)
 
   const lot = await lotSource.getById(request.params.id)

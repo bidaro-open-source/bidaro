@@ -5,6 +5,12 @@ import { viewCategoryRequest } from './index.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await viewCategoryRequest(event)
 
   deleteCateogryPolicy(event)

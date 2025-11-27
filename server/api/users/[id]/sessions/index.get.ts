@@ -5,6 +5,12 @@ import { viewSessionsPolicy } from './index.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 40,
+    anonymousLimit: 300,
+    duration: 60,
+  })
+
   const request = await viewSessionsRequest(event)
 
   viewSessionsPolicy(event, request.params.id)

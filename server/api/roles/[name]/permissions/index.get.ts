@@ -5,6 +5,12 @@ import { viewRolePermissionsPolicy } from './index.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 40,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await viewRoleRequest(event)
 
   viewRolePermissionsPolicy(event)
