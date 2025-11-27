@@ -28,6 +28,18 @@ export const uploadLotImageRequest = createRequestValidator({
       }])
     }
 
-    return multipart.files[0]
+    const image = multipart.files[0]
+
+    const meta = await useImageValidator(image.buffer, {
+      allowedFormats: ['jpeg', 'png', 'webp'],
+      maxDimension: 8192,
+    })
+
+    return {
+      ...image,
+      mimetype: `image/${meta.format}`,
+      width: meta.width,
+      height: meta.height,
+    }
   },
 })

@@ -13,6 +13,9 @@ const images = {
   'image-normal.jpeg': 'image/jpeg',
   'image-normal.webp': 'image/webp',
   'image-unsupport.avif': 'image/avif',
+  'image-not-jpg-is-png.jpg': 'image/jpg',
+  'image-invalid-dimension-by-width.png': 'image/png',
+  'image-invalid-dimension-by-height.png': 'image/png',
 } as const
 
 /**
