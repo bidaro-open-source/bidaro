@@ -16,6 +16,7 @@ class UserSource extends EntitySource<User> {
   getEntityKeys(user: User): string[] {
     return [
       this.keys.one(user.id),
+      this.keys.oneAuth(user.id),
     ]
   }
 
@@ -54,7 +55,7 @@ class UserSource extends EntitySource<User> {
    *
    * @param id - User primary key
    * @throws 404 if the user does not exist
-   * @returns The user instance
+   * @returns User authentication data including role and permissions
    */
   async getByPkWithAuth(id: number) {
     const key = this.keys.oneAuth(id)
