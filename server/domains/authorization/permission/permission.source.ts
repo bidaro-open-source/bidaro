@@ -1,18 +1,13 @@
-import type { Permission } from '~~/server/database'
-import { Source } from '~~/server/class/Source'
+import { BaseSource } from '~~/server/class/BaseSource'
 import { permissionRepository } from './permission.repository'
 
-class PermissionSource extends Source<Permission> {
-  protected readonly scope = 'permissions'
+class PermissionSource extends BaseSource {
+  readonly scope = 'permissions'
 
-  protected get keys() {
+  get keys() {
     return {
       list: `${this.scope}:list`,
     }
-  }
-
-  protected getEntityKeys(): string[] {
-    return []
   }
 
   /**

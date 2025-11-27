@@ -1,12 +1,11 @@
-import type { SourceInvalidateParams } from '~~/server/class/Source'
 import type { Role } from '../../../database'
-import { Source } from '~~/server/class/Source'
+import { EntitySource } from '~~/server/class/EntitySource'
 import { roleRepository } from './role.repository'
 
-class RoleSource extends Source<Role> {
-  protected readonly scope = 'roles'
+class RoleSource extends EntitySource<Role> {
+  readonly scope = 'roles'
 
-  protected get keys() {
+  get keys() {
     return {
       list: `${this.scope}:list`,
       one: (name: string) => `${this.scope}:name:${name}`,
@@ -14,10 +13,23 @@ class RoleSource extends Source<Role> {
     }
   }
 
-  protected getEntityKeys(role: Role): string[] {
+  get tags() {
+    return {
+      one: (name: string) => `${this.scope}:tags:${name}`,
+    }
+  }
+
+  getEntityKeys(role: Role): string[] {
     return [
+      this.keys.list,
       this.keys.one(role.name),
       this.keys.permissions(role.name),
+    ]
+  }
+
+  getEntityTags(role: Role): string[] {
+    return [
+      this.tags.one(role.name),
     ]
   }
 
@@ -68,14 +80,6 @@ class RoleSource extends Source<Role> {
     return await useDatabaseCache(key, async () => {
       return await roleRepository.findAllPermissionsByPk(name)
     })
-  }
-
-  override async invalidate(instance: SourceInvalidateParams<Role>) {
-    const redis = useRedis()
-
-    await redis.del(this.keys.list)
-
-    await super.invalidate(instance)
   }
 }
 

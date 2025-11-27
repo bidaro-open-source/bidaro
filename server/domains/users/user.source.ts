@@ -1,19 +1,26 @@
 import type { User } from '../../database'
-import { Source } from '~~/server/class/Source'
+import { EntitySource } from '~~/server/class/EntitySource'
 import { userRepository } from './user.repository'
 
-class UserSource extends Source<User> {
-  protected readonly scope = 'users'
+class UserSource extends EntitySource<User> {
+  readonly scope = 'users'
 
-  protected get keys() {
+  get keys() {
     return {
       one: (id: number) => `${this.scope}:id:${id}`,
+      tag: (id: number) => `${this.scope}:tags:${id}`,
     }
   }
 
-  protected getEntityKeys(user: User): string[] {
+  getEntityKeys(user: User): string[] {
     return [
       this.keys.one(user.id),
+    ]
+  }
+
+  getEntityTags(user: User): string[] {
+    return [
+      this.keys.tag(user.id),
     ]
   }
 

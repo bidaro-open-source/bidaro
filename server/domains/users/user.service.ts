@@ -49,10 +49,7 @@ class UserService {
       )
 
       useDatabaseAfterCommit(transaction, 'user.service.update', async () => {
-        await userSource.invalidate([
-          user,
-          updatedUser,
-        ])
+        await userSource.invalidate([user, updatedUser])
       })
 
       return updatedUser
@@ -102,10 +99,7 @@ class UserService {
       )
 
       useDatabaseAfterCommit(transaction, 'user.service.update_email', async () => {
-        await userSource.invalidate([
-          user,
-          updatedUser,
-        ])
+        await userSource.invalidate([user, updatedUser])
       })
 
       return updatedUser
@@ -143,10 +137,7 @@ class UserService {
       )
 
       useDatabaseAfterCommit(transaction, 'user.service.update-password', async () => {
-        await userSource.invalidate([
-          user,
-          updatedUser,
-        ])
+        await userSource.invalidate([user, updatedUser])
       })
 
       return updatedUser
@@ -181,10 +172,7 @@ class UserService {
       )
 
       useDatabaseAfterCommit(transaction, 'user.service.verify_email', async () => {
-        await userSource.invalidate([
-          user,
-          updatedUser,
-        ])
+        await userSource.invalidate([user, updatedUser])
       })
 
       return updatedUser
@@ -224,10 +212,7 @@ class UserService {
       )
 
       useDatabaseAfterCommit(transaction, 'user.service.update_role', async () => {
-        await userSource.invalidate([
-          user,
-          updatedUser,
-        ])
+        await userSource.invalidate([user, updatedUser])
       })
 
       return updatedUser
