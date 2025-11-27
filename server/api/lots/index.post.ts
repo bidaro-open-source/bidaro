@@ -1,4 +1,5 @@
 import { lotResource, lotService } from '#domains/auction'
+import { actionLimits } from '~~/server/constants'
 import { createLotPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {

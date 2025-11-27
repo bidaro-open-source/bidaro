@@ -86,12 +86,21 @@ export async function useActionLimiter<T>(
   duration: number = ONE_DAY_IN_SECONDS,
 ): Promise<T> {
   const user = getAuthenticatedUser(event)
+
+  if (!user) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Unauthorized',
+      message: 'Using action limiter requires authenticated user',
+    })
+  }
+
   const redis = useRedis()
 
   const key = `action_limit:${actionKey}:${user.id}`
 
-  // Stage 1: Pre-execution limit check
   let allowed: number
+
   try {
     allowed = await redis.eval(
       ACTION_LIMIT_CHECK_SCRIPT,
@@ -118,12 +127,10 @@ export async function useActionLimiter<T>(
     })
   }
 
-  // Execute the callback with error rollback
   try {
     return await callback()
   }
   catch (error) {
-    // Stage 2: Error rollback - decrement the counter
     try {
       await redis.eval(
         ACTION_LIMIT_DECREMENT_SCRIPT,
@@ -132,7 +139,7 @@ export async function useActionLimiter<T>(
       )
     }
     catch {
-      // Ignore rollback errors, but still propagate the original error
+      console.warn('Failed to rollback action limit counter in Redis')
     }
 
     throw error

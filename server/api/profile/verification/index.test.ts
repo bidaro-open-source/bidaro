@@ -97,10 +97,12 @@ describe('POST /api/profile/verification', async () => {
 
       for (let i = 0; i < actionLimits.EMAIL_VERIFICATION_REQUEST; i++) {
         const response = await sendVerificationRequest({ accessToken: data.access_token })
+
         expect(response.status).toBe(204)
       }
 
       const response = await sendVerificationRequest({ accessToken: data.access_token })
+
       expect(response.status).toBe(429)
 
       await data.clear()

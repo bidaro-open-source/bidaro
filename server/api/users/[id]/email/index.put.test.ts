@@ -168,6 +168,7 @@ describe('PUT /api/users/:id/email', async () => {
 
       for (let i = 0; i < actionLimits.UPDATE_EMAIL; i++) {
         const { email } = db.UserFactory.new().make()
+
         const response = await updateUserEmailRequest(
           {
             body: { email },
@@ -175,10 +176,12 @@ describe('PUT /api/users/:id/email', async () => {
           },
           { accessToken: userData.access_token },
         )
+
         expect(response.status).toBe(200)
       }
 
       const { email } = db.UserFactory.new().make()
+
       const response = await updateUserEmailRequest(
         {
           body: { email },

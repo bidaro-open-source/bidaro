@@ -79,16 +79,20 @@ describe('POST /api/lots', async () => {
 
       for (let i = 0; i < actionLimits.CREATE_LOT; i++) {
         const response = await createLotRequest({ accessToken: userData.access_token })
+
         expect(response.status).toBe(201)
+
         lotIds.push(response._data.id)
       }
 
       const response = await createLotRequest({ accessToken: userData.access_token })
+
       expect(response.status).toBe(429)
 
       for (const id of lotIds) {
         await destroyLot(id)
       }
+
       await userData.clear()
     })
   })

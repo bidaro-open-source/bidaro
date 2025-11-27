@@ -120,6 +120,7 @@ describe('PUT /api/users/:id/password', async () => {
           },
           { accessToken: userData.access_token },
         )
+
         expect(response.status).toBe(200)
       }
 

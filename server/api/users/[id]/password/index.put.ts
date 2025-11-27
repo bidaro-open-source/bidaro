@@ -1,4 +1,5 @@
 import { userResource, userService } from '#domains/users'
+import { actionLimits } from '~~/server/constants'
 import { updateUserPasswordPolicy } from './index.put.policy'
 import { updateUserPasswordRequest } from './index.put.request'
 
