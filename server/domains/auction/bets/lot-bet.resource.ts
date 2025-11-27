@@ -1,10 +1,18 @@
 import type { LotBetAttributes } from '../../../database'
+import { BaseResource } from '~~/server/class/BaseResource'
 
-export type LotBetResource = ReturnType<typeof createLotBetResource>
+export interface LotBetDto {
+  id: number
+  amount: number
+}
 
-export function createLotBetResource(entity: LotBetAttributes) {
-  return {
-    id: entity.id as number,
-    amount: entity.amount,
+class LotBetResource extends BaseResource<LotBetAttributes, LotBetDto> {
+  protected transform(entity: LotBetAttributes): LotBetDto {
+    return {
+      id: entity.id,
+      amount: entity.amount,
+    }
   }
 }
+
+export const lotBetResource = new LotBetResource()

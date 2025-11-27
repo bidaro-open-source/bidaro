@@ -1,4 +1,4 @@
-import { categoryService, createCategoryResource } from '~~/server/domains/categories'
+import { categoryResource, categoryService } from '~~/server/domains/categories'
 import { updateCategorySlugPolicy } from './index.get.policy'
 import { updateCategorySlugRequest } from './index.put.request'
 
@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
     request.body.slug,
   )
 
-  return createCategoryResource(updatedCategory)
+  return categoryResource.make(updatedCategory)
 })

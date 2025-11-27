@@ -1,5 +1,5 @@
-import { createLotResource, lotService, lotSource } from '~~/server/domains/auction'
-import { createUserResource, userSource } from '~~/server/domains/users'
+import { lotResource, lotService, lotSource } from '~~/server/domains/auction'
+import { userResource, userSource } from '~~/server/domains/users'
 import { viewLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    ...createLotResource(updatedLot),
-    winner: winner ? createUserResource(winner) : null,
+    ...lotResource.make(updatedLot),
+    winner: userResource.make(winner),
   }
 })

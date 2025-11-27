@@ -1,5 +1,5 @@
-import { createImageResource, lotImageService, lotSource } from '~~/server/domains/auction'
-import { imageService } from '~~/server/domains/storage'
+import { lotImageService, lotSource } from '~~/server/domains/auction'
+import { imageResource, imageService } from '~~/server/domains/storage'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'
 
@@ -16,5 +16,5 @@ export default defineEventHandler(async (event) => {
 
   await lotImageService.attachImages(request.params.id, [image])
 
-  return createImageResource(image)
+  return imageResource.make(image)
 })

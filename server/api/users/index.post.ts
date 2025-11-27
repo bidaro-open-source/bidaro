@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createUserResource, userRepository } from '~~/server/domains/users'
+import { userRepository, userResource } from '~~/server/domains/users'
 import { createUserPolicy } from './index.policy'
 import { createUserRequest } from './index.post.request'
 
@@ -48,5 +48,5 @@ export default defineEventHandler(async (event) => {
 
   setResponseStatus(event, 201)
 
-  return createUserResource(user)
+  return userResource.make(user)
 })

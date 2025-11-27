@@ -1,4 +1,4 @@
-import { createUserResource, userService } from '~~/server/domains/users'
+import { userResource, userService } from '~~/server/domains/users'
 import { updateUserRolePolicy } from './index.put.policy'
 import { updateUserRoleRequest } from './index.put.request'
 
@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
     request.body.roleName,
   )
 
-  return createUserResource(user)
+  return userResource.make(user)
 })

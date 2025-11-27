@@ -1,4 +1,4 @@
-import { categorySource, createCategoryResource } from '~~/server/domains/categories'
+import { categoryResource, categorySource } from '~~/server/domains/categories'
 import { viewCategoryRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const children = await categorySource.getChildrenById(category.id)
 
   return {
-    ...createCategoryResource(category),
-    children: children.map(createCategoryResource),
+    ...categoryResource.make(category),
+    children: categoryResource.collection(children),
   }
 })

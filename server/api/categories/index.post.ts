@@ -1,4 +1,4 @@
-import { categoryService, createCategoryResource } from '~~/server/domains/categories'
+import { categoryResource, categoryService } from '~~/server/domains/categories'
 import { createCategoryPolicy } from './index.policy'
 import { createCategoryRequest } from './index.post.request'
 
@@ -13,5 +13,5 @@ export default defineEventHandler(async (event) => {
 
   setResponseStatus(event, 201)
 
-  return createCategoryResource(category)
+  return categoryResource.make(category)
 })

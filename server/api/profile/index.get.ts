@@ -1,5 +1,5 @@
 import { createPermissionResource, createRoleResource, roleSource } from '~~/server/domains/authorization'
-import { createProfileResource, userSource } from '~~/server/domains/users'
+import { userProfileResource, userSource } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   ])
 
   return {
-    ...createProfileResource(user),
+    ...userProfileResource.make(user),
     role: role ? createRoleResource(role) : null,
     permissions: (permissions || []).map(createPermissionResource),
   }

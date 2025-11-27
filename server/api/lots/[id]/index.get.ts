@@ -1,6 +1,7 @@
-import { createImageResource, createLotResource, lotSource } from '~~/server/domains/auction'
-import { categorySource, createCategoryResource } from '~~/server/domains/categories'
-import { createUserResource, userSource } from '~~/server/domains/users'
+import { lotResource, lotSource } from '~~/server/domains/auction'
+import { categoryResource, categorySource } from '~~/server/domains/categories'
+import { imageResource } from '~~/server/domains/storage'
+import { userResource, userSource } from '~~/server/domains/users'
 import { viewLotRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -16,10 +17,10 @@ export default defineEventHandler(async (event) => {
   ])
 
   return {
-    ...createLotResource(lot),
-    images: images.map(createImageResource),
-    seller: createUserResource(seller),
-    winner: winner ? createUserResource(winner) : null,
-    category: category ? createCategoryResource(category) : null,
+    ...lotResource.make(lot),
+    images: imageResource.collection(images),
+    seller: userResource.make(seller),
+    winner: userResource.make(winner || null),
+    category: categoryResource.make(category || null),
   }
 })

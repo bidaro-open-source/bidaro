@@ -1,4 +1,4 @@
-import { createUserResource, userService } from '~~/server/domains/users'
+import { userResource, userService } from '~~/server/domains/users'
 import { updateUserPolicy } from './index.patch.policy'
 import { updateUserRequest } from './index.patch.request'
 
@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
     request.body,
   )
 
-  return createUserResource(updatedUser)
+  return userResource.make(updatedUser)
 })

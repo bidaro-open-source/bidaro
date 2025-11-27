@@ -1,4 +1,4 @@
-import { createLotResource, lotService, lotSource } from '~~/server/domains/auction'
+import { lotResource, lotService, lotSource } from '~~/server/domains/auction'
 import { viewLotRequest } from '../index.request'
 import { receiveLotPolicy } from './index.post.policy'
 
@@ -13,5 +13,5 @@ export default defineEventHandler(async (event) => {
 
   const updatedLot = await lotService.receive(request.params.id)
 
-  return createLotResource(updatedLot)
+  return lotResource.make(updatedLot)
 })

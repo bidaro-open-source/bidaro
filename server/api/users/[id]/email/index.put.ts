@@ -1,4 +1,4 @@
-import { createUserResource, userService } from '~~/server/domains/users'
+import { userResource, userService } from '~~/server/domains/users'
 import { updateUserEmailPolicy } from './index.put.policy'
 import { updateUserEmailRequest } from './index.put.request'
 
@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
     request.body.email,
   )
 
-  return createUserResource(updatedUser)
+  return userResource.make(updatedUser)
 })

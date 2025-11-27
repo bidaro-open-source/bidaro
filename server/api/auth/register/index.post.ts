@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { roles } from '~~/server/constants'
 import { authService } from '~~/server/domains/authentication'
 import { roleRepository } from '~~/server/domains/authorization'
-import { createProfileResource, userRepository } from '~~/server/domains/users'
+import { userProfileResource, userRepository } from '~~/server/domains/users'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
   setRefreshTokenCookie(event, session.refreshToken)
 
   return {
-    user: createProfileResource(user),
+    user: userProfileResource.make(user),
     access_token: session.accessToken,
     refresh_token: session.refreshToken,
     session_uuid: session.uuid,

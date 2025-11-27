@@ -1,4 +1,4 @@
-import { createUserResource, userSource } from '~~/server/domains/users'
+import { userResource, userSource } from '~~/server/domains/users'
 import { viewUserRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -6,5 +6,5 @@ export default defineEventHandler(async (event) => {
 
   const user = await userSource.getByPk(request.params.id)
 
-  return createUserResource(user)
+  return userResource.make(user)
 })

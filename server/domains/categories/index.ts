@@ -1,4 +1,5 @@
 export * from './category.repository'
-export * from './category.resource'
 export * from './category.service'
 export * from './category.source'
+export * from './resources/category-breadcrumb.resource'
+export * from './resources/category.resource'

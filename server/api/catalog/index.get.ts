@@ -2,9 +2,10 @@ import type { WhereOptions } from 'sequelize'
 import type { LotAttributes } from '~~/server/database'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { createImageResource, createLotResource, lotCatalogRepository } from '~~/server/domains/auction'
-import { categorySource, createCategoryResource } from '~~/server/domains/categories'
-import { createUserResource } from '~~/server/domains/users'
+import { lotCatalogRepository, lotResource } from '~~/server/domains/auction'
+import { categoryResource, categorySource } from '~~/server/domains/categories'
+import { imageResource } from '~~/server/domains/storage'
+import { userResource } from '~~/server/domains/users'
 import { viewCatalogRequest } from './index.get.request'
 
 export default defineEventHandler(async (event) => {
@@ -46,11 +47,11 @@ export default defineEventHandler(async (event) => {
       }
 
       return {
-        ...createLotResource(lot),
-        cover: lot.cover?.image ? createImageResource(lot.cover?.image) : null,
-        category: lot.category ? createCategoryResource(lot.category) : null,
-        seller: createUserResource(lot.seller),
-        winner: lot.winner ? createUserResource(lot.winner) : null,
+        ...lotResource.make(lot),
+        cover: imageResource.make(lot.cover?.image),
+        category: categoryResource.make(lot.category),
+        seller: userResource.make(lot.seller),
+        winner: userResource.make(lot.winner),
       }
     }),
   }

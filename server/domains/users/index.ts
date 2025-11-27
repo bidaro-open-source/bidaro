@@ -1,4 +1,6 @@
+export * from './resources/user-anonymous.resource'
+export * from './resources/user-profile.resource'
+export * from './resources/user.resource'
 export * from './user.repository'
-export * from './user.resource'
 export * from './user.service'
 export * from './user.source'
