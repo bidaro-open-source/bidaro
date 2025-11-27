@@ -1,25 +1,33 @@
 import type { Lot } from '../../../database'
-import { Source } from '~~/server/class/Source'
+import { EntitySource } from '~~/server/class/EntitySource'
+import { userSource } from '../../users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'
 import { lotRepository } from './lot.repository'
 
-class LotSource extends Source<Lot> {
-  protected readonly scope = 'lots'
+class LotSource extends EntitySource<Lot> {
+  readonly scope = 'lots'
 
-  protected get keys() {
+  get keys() {
     return {
       one: (id: number) => `${this.scope}:id:${id}`,
       oneBets: (id: number) => `${this.scope}:id:${id}:bets`,
       oneImages: (id: number) => `${this.scope}:id:${id}:images`,
+      tag: (id: number) => `${this.scope}:tags:${id}`,
     }
   }
 
-  protected getEntityKeys(lot: Lot): string[] {
+  getEntityKeys(lot: Lot): string[] {
     return [
       this.keys.one(lot.id),
       this.keys.oneBets(lot.id),
       this.keys.oneImages(lot.id),
+    ]
+  }
+
+  getEntityTags(lot: Lot): string[] {
+    return [
+      this.keys.tag(lot.id),
     ]
   }
 
@@ -56,14 +64,20 @@ class LotSource extends Source<Lot> {
   async getAllBetsById(lotId: number) {
     const key = this.keys.oneBets(lotId)
 
-    return await useDatabaseCache(key, async () => {
-      const data = await lotBetRepository.findAllByLotId(lotId)
+    return await useDatabaseCache(
+      key,
+      async () => {
+        const data = await lotBetRepository.findAllByLotId(lotId)
 
-      return data.map(bet => ({
-        ...bet.toJSON(),
-        user: { username: bet.user?.username || 'anonymous' },
-      }))
-    })
+        return data.map(bet => ({
+          ...bet.toJSON(),
+          user: { username: bet.user?.username || 'anonymous' },
+        }))
+      },
+      (bets) => {
+        return bets.map(bet => userSource.keys.tag(bet.userId))
+      },
+    )
   }
 
   /**

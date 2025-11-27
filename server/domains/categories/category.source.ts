@@ -1,27 +1,33 @@
-import type { SourceInvalidateParams } from '~~/server/class/Source'
 import type { Category } from '../../database'
-import { Source } from '~~/server/class/Source'
+import { EntitySource } from '~~/server/class/EntitySource'
 import { categoryRepository } from './category.repository'
 
-class CategorySource extends Source<Category> {
-  protected readonly scope = 'cat'
+class CategorySource extends EntitySource<Category> {
+  readonly scope = 'cat'
 
-  protected get keys() {
+  get keys() {
     return {
       tree: `${this.scope}:tree`,
       one: (id: number) => `${this.scope}:id:${id}`,
       slug: (slug: string) => `${this.scope}:slug:${slug}`,
       children: (id: number) => `${this.scope}:children:${id}`,
       breadcrumbs: (path: string) => `${this.scope}:crumbs:${path}`,
+      tag: (id: number) => `${this.scope}:tags:${id}`,
     }
   }
 
-  protected getEntityKeys(category: Category): string[] {
+  getEntityKeys(category: Category): string[] {
     return [
       this.keys.one(category.id),
       this.keys.slug(category.slug),
       ...(category.parentId ? [this.keys.children(category.parentId)] : []),
       ...(category.parentId === null ? [this.keys.tree] : []),
+    ]
+  }
+
+  getEntityTags(category: Category): string[] {
+    return [
+      this.keys.tag(category.id),
     ]
   }
 
@@ -108,24 +114,28 @@ class CategorySource extends Source<Category> {
   async getBreadcrumbsById(id: number) {
     const category = await this.getById(id)
 
-    const key = this.keys.breadcrumbs(category.path)
+    return await useDatabaseCache(
+      this.keys.breadcrumbs(category.path),
+      async () => {
+        const ids = category.path.split('/').map(id => Number(id))
 
-    return await useDatabaseCache(key, async () => {
-      const ids = category.path.split('/').map(id => Number(id))
+        const categories = await categoryRepository.findByPks(ids)
 
-      const categories = await categoryRepository.findByPks(ids)
+        if (categories.length !== ids.length) {
+          throw createError({
+            message: 'Категорія була змінена або видалена',
+            status: 500,
+          })
+        }
 
-      if (categories.length !== ids.length) {
-        throw createError({
-          message: 'Категорія була змінена або видалена',
-          status: 500,
-        })
-      }
+        categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
 
-      categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
-
-      return categories
-    })
+        return categories
+      },
+      (categories) => {
+        return categories.map(cat => this.keys.tag(cat.id))
+      },
+    )
   }
 
   /**
@@ -136,36 +146,28 @@ class CategorySource extends Source<Category> {
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsByPath(path: string) {
-    const key = this.keys.breadcrumbs(path)
+    return await useDatabaseCache(
+      this.keys.breadcrumbs(path),
+      async () => {
+        const ids = path.split('/').map(id => Number(id))
 
-    return await useDatabaseCache(key, async () => {
-      const ids = path.split('/').map(id => Number(id))
+        const categories = await categoryRepository.findByPks(ids)
 
-      const categories = await categoryRepository.findByPks(ids)
+        if (categories.length !== ids.length) {
+          throw createError({
+            message: 'Категорія була змінена або видалена',
+            status: 500,
+          })
+        }
 
-      if (categories.length !== ids.length) {
-        throw createError({
-          message: 'Категорія була змінена або видалена',
-          status: 500,
-        })
-      }
+        categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
 
-      categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
-
-      return categories
-    })
-  }
-
-  async invalidate(instance: SourceInvalidateParams<Category>) {
-    const redis = useRedis()
-
-    const cachedBreadcrumbsKeys = await redis.keys(
-      this.keys.breadcrumbs(`*`),
+        return categories
+      },
+      (categories) => {
+        return categories.map(cat => this.keys.tag(cat.id))
+      },
     )
-
-    await redis.del(cachedBreadcrumbsKeys)
-
-    await super.invalidate(instance)
   }
 }
 
