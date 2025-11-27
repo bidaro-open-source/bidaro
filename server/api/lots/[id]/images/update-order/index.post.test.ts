@@ -2,6 +2,7 @@ import type { UpdateImageOrderRequest } from './index.post.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { permissions } from '~~/server/constants'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
 import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -26,7 +27,11 @@ describe('POST /api/lots/:id/images/update-order', async () => {
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should reorder lot images successfully', async () => {
-    const userData = await createUser({ withSession: true })
+    const userData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.UPDATE_LOT_IMAGE_ORDER],
+    })
     const lotData = await createLot({ sellerId: userData.user.id })
 
     const imageData1 = await createImage(IMAGE_PATH)
@@ -76,8 +81,31 @@ describe('POST /api/lots/:id/images/update-order', async () => {
       expect(response.status).toBe(401)
     })
 
+    it('should return 403 when user lacks required permission', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+
+      const response = await updateImageOrderRequest(
+        { body: { ids: [1] }, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(403)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
     it('should return 404 when lot does not exist', async () => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT_IMAGE_ORDER],
+      })
 
       const response = await updateImageOrderRequest(
         { body: { ids: [1] }, params: { id: 93475937459 } },
@@ -91,7 +119,11 @@ describe('POST /api/lots/:id/images/update-order', async () => {
 
     it('should return 403 when user is not the lot owner', async () => {
       const user1Data = await createUser()
-      const user2Data = await createUser({ withSession: true })
+      const user2Data = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT_IMAGE_ORDER],
+      })
       const lotData = await createLot({ sellerId: user1Data.user.id })
 
       const imageData = await createImage(IMAGE_PATH)
@@ -111,7 +143,11 @@ describe('POST /api/lots/:id/images/update-order', async () => {
     })
 
     it('should return 422 when image IDs count does not match existing images', async () => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT_IMAGE_ORDER],
+      })
       const lotData = await createLot({ sellerId: userData.user.id })
 
       const imageData1 = await createImage(IMAGE_PATH)
@@ -135,7 +171,11 @@ describe('POST /api/lots/:id/images/update-order', async () => {
     })
 
     it('should return 422 when image IDs contain foreign image from different lot', async () => {
-      const userData = await createUser({ withSession: true })
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_LOT_IMAGE_ORDER],
+      })
       const lotData1 = await createLot({ sellerId: userData.user.id })
       const lotData2 = await createLot({ sellerId: userData.user.id })
 
