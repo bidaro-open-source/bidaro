@@ -73,3 +73,11 @@ export const lotInitialDurationsInMs: Record<string, number> = {
   [lotInitialDurations.THREE_DAYS]: 3 * 24 * 60 * 60 * 1000,
   [lotInitialDurations.SEVEN_DAYS]: 7 * 24 * 60 * 60 * 1000,
 } as const
+
+export const actionLimits = {
+  CREATE_LOT: 6,
+  CREATE_LOT_BET: 30,
+  EMAIL_VERIFICATION_REQUEST: 3,
+  UPDATE_EMAIL: 3,
+  UPDATE_PASSWORD: 3,
+} as const

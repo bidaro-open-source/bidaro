@@ -1,4 +1,5 @@
 import { lotBetService } from '#domains/auction'
+import { actionLimits } from '~~/server/constants'
 import { createLotBetPolicy } from './index.post.policy'
 import { createLotBetRequest } from './index.post.request'
 
@@ -17,11 +18,13 @@ export default defineEventHandler(async (event) => {
 
   const request = await createLotBetRequest(event)
 
-  const lotBet = await lotBetService.create(
-    request.params.id,
-    user.id,
-    request.body.amount,
-  )
+  const lotBet = await useActionLimiter(event, 'create_lot_bet', actionLimits.CREATE_LOT_BET, async () => {
+    return await lotBetService.create(
+      request.params.id,
+      user.id,
+      request.body.amount,
+    )
+  })
 
   return {
     id: lotBet.id,

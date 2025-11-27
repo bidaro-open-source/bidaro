@@ -1,4 +1,5 @@
 import { userResource, userService } from '#domains/users'
+import { actionLimits } from '~~/server/constants'
 import { updateUserPasswordPolicy } from './index.put.policy'
 import { updateUserPasswordRequest } from './index.put.request'
 
@@ -15,10 +16,12 @@ export default defineEventHandler(async (event) => {
 
   updateUserPasswordPolicy(event, request.params.id)
 
-  const updatedUser = await userService.updatePassword(
-    request.params.id,
-    request.body.password,
-  )
+  const updatedUser = await useActionLimiter(event, 'update_password', actionLimits.UPDATE_PASSWORD, async () => {
+    return await userService.updatePassword(
+      request.params.id,
+      request.body.password,
+    )
+  })
 
   return userResource.make(updatedUser)
 })

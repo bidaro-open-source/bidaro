@@ -1,7 +1,7 @@
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { permissions } from '~~/server/constants'
+import { actionLimits, permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -64,6 +64,34 @@ describe('POST /api/lots', async () => {
       )
 
       expect(response.status).toBe(403)
+
+      await userData.clear()
+    })
+
+    it('should return 429 when the user has exceeded the daily limit', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT],
+      })
+
+      const lotIds: number[] = []
+
+      for (let i = 0; i < actionLimits.CREATE_LOT; i++) {
+        const response = await createLotRequest({ accessToken: userData.access_token })
+
+        expect(response.status).toBe(201)
+
+        lotIds.push(response._data.id)
+      }
+
+      const response = await createLotRequest({ accessToken: userData.access_token })
+
+      expect(response.status).toBe(429)
+
+      for (const id of lotIds) {
+        await destroyLot(id)
+      }
 
       await userData.clear()
     })

@@ -2,7 +2,7 @@ import type { CreateLotBetRequest } from './index.post.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { permissions } from '~~/server/constants'
+import { actionLimits, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
@@ -228,6 +228,53 @@ describe('POST /api/lots/:id/bets', async () => {
       )
 
       expect(response.status).toBe(400)
+
+      await lotData.clear()
+      await cData.clear()
+      await uuData.clear()
+      await uData.clear()
+    })
+
+    it('should return 429 when the user has exceeded the daily limit', async () => {
+      const uData = await createUser()
+      const uuData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.CREATE_LOT_BET],
+      })
+      const cData = await createCategory()
+
+      for (let i = 0; i < actionLimits.CREATE_LOT_BET; i++) {
+        const lotData = await createPublishedLot({
+          sellerId: uData.user.id,
+          categoryId: cData.category.id,
+        })
+
+        const amount = lotData.lot.initialPrice * 2
+
+        const response = await createLotBetRequest(
+          { body: { amount }, params: { id: lotData.lot.id } },
+          { accessToken: uuData.access_token },
+        )
+
+        expect(response.status).toBe(200)
+
+        await lotData.clear()
+      }
+
+      const lotData = await createPublishedLot({
+        sellerId: uData.user.id,
+        categoryId: cData.category.id,
+      })
+
+      const amount = lotData.lot.initialPrice * 2
+
+      const response = await createLotBetRequest(
+        { body: { amount }, params: { id: lotData.lot.id } },
+        { accessToken: uuData.access_token },
+      )
+
+      expect(response.status).toBe(429)
 
       await lotData.clear()
       await cData.clear()
