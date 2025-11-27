@@ -38,6 +38,33 @@ class UserRepository extends Repository<User> {
       where: { username },
     })
   }
+
+  /**
+   * Finds a user by their primary key, including their role and permissions.
+   *
+   * @param pk - user primary key
+   * @param options - sequelize options
+   * @returns user or null if not found
+   */
+  async findByPkWithAuth(pk: number, options: RepositoryOptions = {}) {
+    const db = useDatabase()
+
+    return db.User.findByPk(pk, {
+      transaction: options.transaction,
+      include: [
+        {
+          model: db.Role,
+          as: 'role',
+          include: [
+            {
+              model: db.Permission,
+              as: 'permissions',
+            },
+          ],
+        },
+      ],
+    })
+  }
 }
 
 export const userRepository = new UserRepository()

@@ -1,5 +1,3 @@
-import type { Permission, Role, User } from '../database'
-
 /**
  * Validates that the current request is authenticated with a
  * valid user session.
@@ -35,8 +33,8 @@ export function mustBeAuthenticated(event: H3Event): void {
  *
  * @param event H3Event
  */
-export function getAuthenticatedUser(event: H3Event): User {
-  return event.context.auth?.user as User
+export function getAuthenticatedUser(event: H3Event) {
+  return event.context.auth?.user as NonNullable<typeof event.context.auth>['user']
 }
 
 /**
@@ -50,8 +48,8 @@ export function getAuthenticatedUser(event: H3Event): User {
  */
 export function getAuthenticatedUserRole(
   event: H3Event,
-): Role | undefined {
-  return event.context.auth?.role
+): string | undefined {
+  return event.context.auth?.user.role?.name
 }
 
 /**
@@ -65,6 +63,6 @@ export function getAuthenticatedUserRole(
  */
 export function getAuthenticatedUserPermissions(
   event: H3Event,
-): Permission[] | undefined {
-  return event.context.auth?.permissions
+): string[] | undefined {
+  return event.context.auth?.user.role?.permissions
 }

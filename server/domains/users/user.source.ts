@@ -8,6 +8,7 @@ class UserSource extends EntitySource<User> {
   get keys() {
     return {
       one: (id: number) => `${this.scope}:id:${id}`,
+      oneAuth: (id: number) => `${this.scope}:auth:${id}`,
       tag: (id: number) => `${this.scope}:tags:${id}`,
     }
   }
@@ -45,6 +46,40 @@ class UserSource extends EntitySource<User> {
       }
 
       return data
+    })
+  }
+
+  /**
+   * Retrieve a user auth data by ID, using Redis caching.
+   *
+   * @param id - User primary key
+   * @throws 404 if the user does not exist
+   * @returns The user instance
+   */
+  async getByPkWithAuth(id: number) {
+    const key = this.keys.oneAuth(id)
+
+    return await useDatabaseCache(key, async () => {
+      const data = await userRepository.findByPkWithAuth(id)
+
+      if (!data) {
+        throw createError({
+          message: 'Користувача не знайдено',
+          status: 404,
+        })
+      }
+
+      return {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        role: data.role
+          ? {
+              name: data.role.name,
+              permissions: (data.role.permissions || []).map(p => p.name),
+            }
+          : null,
+      }
     })
   }
 }

@@ -1,5 +1,4 @@
 import { authService } from '../domains/authentication'
-import { roleSource } from '../domains/authorization'
 import { userSource } from '../domains/users'
 
 /**
@@ -50,12 +49,7 @@ export default defineEventHandler(async (event) => {
 
   const payload = authService.decodeAccessToken(token)
 
-  const user = await userSource.getByPk(payload.uid)
+  const user = await userSource.getByPkWithAuth(payload.uid)
 
-  const [role, permissions] = await Promise.all([
-    user.roleName ? roleSource.getByPk(user.roleName) : Promise.resolve(undefined),
-    user.roleName ? roleSource.getPermissionsByPk(user.roleName) : Promise.resolve(undefined),
-  ])
-
-  event.context.auth = { user, role, permissions }
+  event.context.auth = { user }
 })
