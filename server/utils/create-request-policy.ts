@@ -1,5 +1,4 @@
 import type { permissions } from '../constants'
-import type { Permission } from '../database'
 
 /**
  * Creates a request policy function.
@@ -56,11 +55,11 @@ export function createRequestPolicy<Policy extends (...args: any[]) => any>(
  * const canDelete = hasPermission(userPerms, 'DELETE_POSTS'); // returns false
  */
 export function hasPermission(
-  userPermissions: Permission[],
+  userPermissions: string[],
   permission: typeof permissions[keyof typeof permissions],
 ): boolean {
   for (const userPermission of userPermissions) {
-    if (userPermission.name === permission) {
+    if (userPermission === permission) {
       return true
     }
   }

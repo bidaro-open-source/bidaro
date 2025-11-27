@@ -1,4 +1,4 @@
-import type { User } from '../database'
+import type { userSource } from '../domains/users'
 
 export {}
 declare global {
@@ -9,9 +9,7 @@ declare global {
 declare module 'h3' {
   interface H3EventContext {
     auth?: {
-      user: User
-      role: Role | undefined
-      permissions: Permission[] | undefined
+      user: Awaited<ReturnType<typeof userSource.getByPkWithAuth>>
     }
   }
 }
