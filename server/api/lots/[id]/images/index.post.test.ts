@@ -35,6 +35,9 @@ describe('POST /api/lots/:id/images', async () => {
   const IMAGE_JPEG = 'image-normal.jpeg'
   const IMAGE_WEBP = 'image-normal.webp'
   const IMAGE_AVIF = 'image-unsupport.avif'
+  const IMAGE_NOT_JPG_IS_PNG = 'image-not-jpg-is-png.jpg'
+  const IMAGE_INVALID_DIMENSION_BY_WIDTH = 'image-invalid-dimension-by-width.png'
+  const IMAGE_INVALID_DIMENSION_BY_HEIGHT = 'image-invalid-dimension-by-height.png'
 
   describe('valid file uploads', () => {
     it.each([
@@ -42,6 +45,7 @@ describe('POST /api/lots/:id/images', async () => {
       IMAGE_JPG,
       IMAGE_JPEG,
       IMAGE_WEBP,
+      IMAGE_NOT_JPG_IS_PNG,
     ])('should upload file "%s"', async (filename: string) => {
       const userData = await createUser({
         withRole: true,
@@ -127,6 +131,46 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(415)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
+    it('return 400 when file width too big', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+      const multipart = createMultipartConfig(resolveImage(IMAGE_INVALID_DIMENSION_BY_WIDTH))
+
+      const response = await uploadLotImageRequest(
+        { multipart, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(400)
+
+      await lotData.clear()
+      await userData.clear()
+    })
+
+    it('return 400 when file height too big', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+      const multipart = createMultipartConfig(resolveImage(IMAGE_INVALID_DIMENSION_BY_HEIGHT))
+
+      const response = await uploadLotImageRequest(
+        { multipart, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(400)
 
       await lotData.clear()
       await userData.clear()
