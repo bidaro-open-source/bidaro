@@ -3,6 +3,12 @@ import { userRepository, userService } from '#domains/users'
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 3,
+    anonymousLimit: 30,
+    duration: 60,
+  })
+
   const request = await emailVerifyConfirmRequest(event)
 
   const uid = await verificationService.getUserIdByToken(

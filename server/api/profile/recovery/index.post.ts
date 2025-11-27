@@ -5,6 +5,12 @@ import {
 } from '~~/server/api/profile/recovery/index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 0,
+    anonymousLimit: 30,
+    duration: 60,
+  })
+
   const request = await resetPasswordRequest(event)
 
   const user = await userRepository.findByEmail(request.body.email)

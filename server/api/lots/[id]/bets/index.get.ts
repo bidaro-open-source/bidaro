@@ -3,6 +3,12 @@ import { userAnonymousResource } from '#domains/users'
 import { viewLotRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 40,
+    anonymousLimit: 300,
+    duration: 60,
+  })
+
   const request = await viewLotRequest(event)
 
   const lot = await lotSource.getById(request.params.id)

@@ -4,6 +4,12 @@ import { userProfileResource, userSource } from '#domains/users'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 40,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const uid = getAuthenticatedUser(event).id
 
   const user = await userSource.getByPk(uid)

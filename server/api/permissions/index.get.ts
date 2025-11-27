@@ -4,6 +4,12 @@ import { viewPermissionsPolicy } from './index.get.policy'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 40,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   viewPermissionsPolicy(event)
 
   const permissions = await permissionSource.getAll()

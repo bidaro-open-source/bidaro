@@ -5,6 +5,12 @@ import { createLotBetRequest } from './index.post.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   createLotBetPolicy(event)
 
   const user = getAuthenticatedUser(event)

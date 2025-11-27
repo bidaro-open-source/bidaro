@@ -5,6 +5,12 @@ import { createRoleRequest } from './index.post.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 3,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await createRoleRequest(event)
 
   createRolePolicy(event)

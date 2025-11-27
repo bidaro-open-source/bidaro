@@ -3,6 +3,12 @@ import { updateUserPolicy } from './index.patch.policy'
 import { updateUserRequest } from './index.patch.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 20,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   mustBeAuthenticated(event)
 
   const request = await updateUserRequest(event)

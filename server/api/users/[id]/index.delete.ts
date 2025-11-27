@@ -5,6 +5,12 @@ import { deleteUserRequest } from './index.delete.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 10,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await deleteUserRequest(event)
 
   deleteUserPolicy(event)

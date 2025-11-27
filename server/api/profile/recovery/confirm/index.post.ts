@@ -5,6 +5,12 @@ import {
 } from '~~/server/api/profile/recovery/confirm/index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 0,
+    anonymousLimit: 60,
+    duration: 60,
+  })
+
   const request = await confirmResetPasswordRequest(event)
 
   const uid = await recoveryService.getUserIdByToken(request.body.token)

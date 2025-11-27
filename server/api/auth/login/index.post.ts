@@ -4,6 +4,12 @@ import { z } from 'zod'
 import { loginRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
+  await useRateLimiter(event, {
+    authenticatedLimit: 0,
+    anonymousLimit: 40,
+    duration: 60,
+  })
+
   const request = await loginRequest(event)
 
   const user = await userRepository.findByUsername(request.body.username)

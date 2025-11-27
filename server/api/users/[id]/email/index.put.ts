@@ -5,6 +5,12 @@ import { updateUserEmailRequest } from './index.put.request'
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
+  await useRateLimiter(event, {
+    authenticatedLimit: 20,
+    anonymousLimit: 0,
+    duration: 60,
+  })
+
   const request = await updateUserEmailRequest(event)
 
   updateUserEmailPolicy(event, request.params.id)
