@@ -2,7 +2,7 @@ import type { UpdateUserPasswordRequest } from './index.put.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { permissions } from '~~/server/constants'
+import { actionLimits, permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -103,6 +103,37 @@ describe('PUT /api/users/:id/password', async () => {
 
       await userData2.clear()
       await userData1.clear()
+    })
+
+    it('should return 429 when the user has exceeded the daily limit', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPDATE_OWN_PASSWORD],
+      })
+
+      for (let i = 0; i < actionLimits.UPDATE_PASSWORD; i++) {
+        const response = await updateUserPasswordRequest(
+          {
+            body: { password: db.UserFactory.newPassword },
+            params: { id: userData.user.id },
+          },
+          { accessToken: userData.access_token },
+        )
+        expect(response.status).toBe(200)
+      }
+
+      const response = await updateUserPasswordRequest(
+        {
+          body: { password: db.UserFactory.newPassword },
+          params: { id: userData.user.id },
+        },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(429)
+
+      await userData.clear()
     })
   })
 })
