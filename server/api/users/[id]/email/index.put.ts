@@ -1,4 +1,5 @@
 import { userResource, userService } from '#domains/users'
+import { actionLimits } from '~~/server/constants'
 import { updateUserEmailPolicy } from './index.put.policy'
 import { updateUserEmailRequest } from './index.put.request'
 
@@ -15,10 +16,12 @@ export default defineEventHandler(async (event) => {
 
   updateUserEmailPolicy(event, request.params.id)
 
-  const updatedUser = await userService.updateEmail(
-    request.params.id,
-    request.body.email,
-  )
+  const updatedUser = await useActionLimiter(event, 'update_email', actionLimits.UPDATE_EMAIL, async () => {
+    return await userService.updateEmail(
+      request.params.id,
+      request.body.email,
+    )
+  })
 
   return userResource.make(updatedUser)
 })

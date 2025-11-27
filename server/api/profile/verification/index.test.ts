@@ -2,6 +2,7 @@ import type { EmailVerifyConfirmRequest } from './confirm/index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { actionLimits } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -89,6 +90,22 @@ describe('POST /api/profile/verification', async () => {
       const confirmResponse = await confirmVerificationRequest({ body: { token } })
 
       expect(confirmResponse.status).toBe(404)
+    })
+
+    it('should return 429 when the user has exceeded the daily limit', async () => {
+      const data = await createUser({ withSession: true })
+
+      for (let i = 0; i < actionLimits.EMAIL_VERIFICATION_REQUEST; i++) {
+        const response = await sendVerificationRequest({ accessToken: data.access_token })
+
+        expect(response.status).toBe(204)
+      }
+
+      const response = await sendVerificationRequest({ accessToken: data.access_token })
+
+      expect(response.status).toBe(429)
+
+      await data.clear()
     })
   })
 })

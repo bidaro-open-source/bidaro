@@ -1,4 +1,5 @@
 import { lotResource, lotService } from '#domains/auction'
+import { actionLimits } from '~~/server/constants'
 import { createLotPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {
@@ -14,7 +15,9 @@ export default defineEventHandler(async (event) => {
 
   const user = getAuthenticatedUser(event)
 
-  const lot = await lotService.createDraft(user.id)
+  const lot = await useActionLimiter(event, 'create_lot', actionLimits.CREATE_LOT, async () => {
+    return await lotService.createDraft(user.id)
+  })
 
   setResponseStatus(event, 201)
 
