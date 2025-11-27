@@ -1,5 +1,5 @@
-import { lotBetResource, lotSource } from '~~/server/domains/auction'
-import { userAnonymousResource } from '~~/server/domains/users'
+import { lotBetResource, lotSource } from '#domains/auction'
+import { userAnonymousResource } from '#domains/users'
 import { viewLotRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {

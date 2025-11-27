@@ -1,7 +1,7 @@
-import type { RepositoryOptions } from '~~/server/class/BaseRepository'
-import type { LotImage, LotImageAttributesOptional } from '../../../database'
+import type { RepositoryOptions } from '#class/BaseRepository'
+import type { LotImage, LotImageAttributesOptional } from '#database'
+import { BaseRepository } from '#class/BaseRepository'
 import { Op } from 'sequelize'
-import { BaseRepository } from '~~/server/class/BaseRepository'
 
 class LotImageRepository extends BaseRepository<LotImage> {
   protected get model() {

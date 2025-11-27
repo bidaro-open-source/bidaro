@@ -1,5 +1,5 @@
-import { authService } from '~~/server/domains/authentication'
-import { userProfileResource, userRepository } from '~~/server/domains/users'
+import { authService } from '#domains/authentication'
+import { userProfileResource, userRepository } from '#domains/users'
 import { refreshRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

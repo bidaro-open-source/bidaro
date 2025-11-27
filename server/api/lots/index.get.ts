@@ -1,8 +1,8 @@
+import type { LotAttributes } from '#database'
 import type { WhereOptions } from 'sequelize'
-import type { LotAttributes } from '~~/server/database'
+import { lotRepository } from '#domains/auction'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { lotRepository } from '~~/server/domains/auction'
 import { viewLotsRequest } from './index.get.request'
 import { viewLotsPolicy } from './index.policy'
 

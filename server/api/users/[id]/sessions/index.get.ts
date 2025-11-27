@@ -1,4 +1,4 @@
-import { authService } from '~~/server/domains/authentication'
+import { authService } from '#domains/authentication'
 import { viewSessionsRequest } from './index.get.request'
 import { viewSessionsPolicy } from './index.policy'
 

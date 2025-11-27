@@ -1,4 +1,4 @@
-import { createPermissionResource, roleSource } from '~~/server/domains/authorization'
+import { createPermissionResource, roleSource } from '#domains/authorization'
 import { viewRoleRequest } from '../index.request'
 import { viewRolePermissionsPolicy } from './index.policy'
 

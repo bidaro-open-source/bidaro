@@ -1,6 +1,6 @@
+import { verificationService } from '#domains/authentication'
+import { userRepository, userService } from '#domains/users'
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
-import { verificationService } from '~~/server/domains/authentication'
-import { userRepository, userService } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await emailVerifyConfirmRequest(event)

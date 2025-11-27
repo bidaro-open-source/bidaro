@@ -1,4 +1,4 @@
-import type { UserAttributesOptional } from '../../database'
+import type { UserAttributesOptional } from '#database'
 import { lotBetRepository, lotImageRepository, lotRepository } from '../auction'
 import { authService } from '../authentication'
 import { imageService } from '../storage'

@@ -1,5 +1,5 @@
-import { createPermissionResource, createRoleResource, roleSource } from '~~/server/domains/authorization'
-import { userProfileResource, userSource } from '~~/server/domains/users'
+import { createPermissionResource, createRoleResource, roleSource } from '#domains/authorization'
+import { userProfileResource, userSource } from '#domains/users'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

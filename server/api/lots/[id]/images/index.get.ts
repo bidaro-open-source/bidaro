@@ -1,5 +1,5 @@
-import { lotImageRepository, lotSource } from '~~/server/domains/auction'
-import { imageResource } from '~~/server/domains/storage'
+import { lotImageRepository, lotSource } from '#domains/auction'
+import { imageResource } from '#domains/storage'
 import { viewLotRequest } from '../index.request'
 import { viewLotImagesPolicy } from './index.get.policy'
 

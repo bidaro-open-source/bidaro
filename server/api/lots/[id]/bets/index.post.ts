@@ -1,4 +1,4 @@
-import { lotBetService } from '~~/server/domains/auction'
+import { lotBetService } from '#domains/auction'
 import { createLotBetPolicy } from './index.post.policy'
 import { createLotBetRequest } from './index.post.request'
 

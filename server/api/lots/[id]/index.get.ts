@@ -1,7 +1,7 @@
-import { lotResource, lotSource } from '~~/server/domains/auction'
-import { categoryResource, categorySource } from '~~/server/domains/categories'
-import { imageResource } from '~~/server/domains/storage'
-import { userResource, userSource } from '~~/server/domains/users'
+import { lotResource, lotSource } from '#domains/auction'
+import { categoryResource, categorySource } from '#domains/categories'
+import { imageResource } from '#domains/storage'
+import { userResource, userSource } from '#domains/users'
 import { viewLotRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

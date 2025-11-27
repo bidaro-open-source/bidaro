@@ -1,4 +1,4 @@
-import type { Category, CategoryAttributesOptional } from '../../database'
+import type { Category, CategoryAttributesOptional } from '#database'
 import { v4 as uuidv4 } from 'uuid'
 import { categoryRepository } from './category.repository'
 import { categorySource } from './category.source'

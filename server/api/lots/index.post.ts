@@ -1,4 +1,4 @@
-import { lotResource, lotService } from '~~/server/domains/auction'
+import { lotResource, lotService } from '#domains/auction'
 import { createLotPolicy } from './index.policy'
 
 export default defineEventHandler(async (event) => {

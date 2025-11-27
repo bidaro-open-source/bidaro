@@ -1,4 +1,4 @@
-import { lotStatuses } from '../../../constants'
+import { lotStatuses } from '~~/server/constants'
 import { userRepository } from '../../users'
 import { lotRepository } from '../lots/lot.repository'
 import { lotSource } from '../lots/lot.source'

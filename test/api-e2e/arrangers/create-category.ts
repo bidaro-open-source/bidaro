@@ -1,4 +1,4 @@
-import type { Category } from '~~/server/database'
+import type { Category } from '#database'
 
 interface Options {
   parentId?: number

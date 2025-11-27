@@ -1,5 +1,5 @@
-import type { Permission } from '../../../database'
-import { BaseRepository } from '~~/server/class/BaseRepository'
+import type { Permission } from '#database'
+import { BaseRepository } from '#class/BaseRepository'
 
 class PermissionRepository extends BaseRepository<Permission> {
   protected get model() {

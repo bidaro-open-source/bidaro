@@ -1,7 +1,7 @@
-import type { Database } from '../database'
+import type { Database } from '#database'
 import process from 'node:process'
+import { BootstrapDatabase } from '#database'
 import { Sequelize } from 'sequelize'
-import { BootstrapDatabase } from '../database'
 
 /**
  * Singleton instance of the Database.

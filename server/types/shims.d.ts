@@ -1,4 +1,4 @@
-import type { userSource } from '../domains/users'
+import type { userSource } from '#domains/users'
 
 export {}
 declare global {

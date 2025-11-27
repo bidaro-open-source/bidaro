@@ -1,4 +1,4 @@
-import { userService } from '~~/server/domains/users'
+import { userService } from '#domains/users'
 import { deleteUserPolicy } from './index.delete.policy'
 import { deleteUserRequest } from './index.delete.request'
 

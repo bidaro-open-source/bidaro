@@ -1,4 +1,4 @@
-import type { Image } from '../../database'
+import type { Image } from '#database'
 import * as path from 'node:path'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { v4 as uuidv4 } from 'uuid'

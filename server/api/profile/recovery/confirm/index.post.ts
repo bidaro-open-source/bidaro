@@ -1,8 +1,8 @@
+import { recoveryService } from '#domains/authentication'
+import { userRepository, userService } from '#domains/users'
 import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
-import { recoveryService } from '~~/server/domains/authentication'
-import { userRepository, userService } from '~~/server/domains/users'
 
 export default defineEventHandler(async (event) => {
   const request = await confirmResetPasswordRequest(event)

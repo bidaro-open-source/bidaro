@@ -1,4 +1,4 @@
-import type { RoleAttributes } from '../../../database'
+import type { RoleAttributes } from '#database'
 
 export type RoleResource = ReturnType<typeof createRoleResource>
 

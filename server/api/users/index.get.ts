@@ -1,7 +1,7 @@
+import type { UserAttributes } from '#database'
 import type { WhereOptions } from 'sequelize'
-import type { UserAttributes } from '~~/server/database'
+import { userRepository } from '#domains/users'
 import { Op } from 'sequelize'
-import { userRepository } from '~~/server/domains/users'
 import { viewUsersRequest } from './index.get.request'
 import { viewUsersPolicy } from './index.policy'
 

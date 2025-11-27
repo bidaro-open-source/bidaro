@@ -1,4 +1,4 @@
-import { userResource, userService } from '~~/server/domains/users'
+import { userResource, userService } from '#domains/users'
 import { updateUserEmailPolicy } from './index.put.policy'
 import { updateUserEmailRequest } from './index.put.request'
 

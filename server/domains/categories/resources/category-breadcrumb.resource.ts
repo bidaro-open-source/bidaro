@@ -1,5 +1,5 @@
-import type { CategoryAttributes } from '../../../database'
-import { BaseResource } from '~~/server/class/BaseResource'
+import type { CategoryAttributes } from '#database'
+import { BaseResource } from '#class/BaseResource'
 
 export interface CategoryBreadcrumbDto {
   id: number

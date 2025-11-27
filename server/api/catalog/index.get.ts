@@ -1,11 +1,11 @@
+import type { LotAttributes } from '#database'
 import type { WhereOptions } from 'sequelize'
-import type { LotAttributes } from '~~/server/database'
+import { lotCatalogRepository, lotResource } from '#domains/auction'
+import { categoryResource, categorySource } from '#domains/categories'
+import { imageResource } from '#domains/storage'
+import { userResource } from '#domains/users'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
-import { lotCatalogRepository, lotResource } from '~~/server/domains/auction'
-import { categoryResource, categorySource } from '~~/server/domains/categories'
-import { imageResource } from '~~/server/domains/storage'
-import { userResource } from '~~/server/domains/users'
 import { viewCatalogRequest } from './index.get.request'
 
 export default defineEventHandler(async (event) => {

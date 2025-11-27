@@ -1,7 +1,7 @@
-import { lotSource } from '../domains/auction'
-import { permissionSource, roleSource } from '../domains/authorization'
-import { categorySource } from '../domains/categories'
-import { userSource } from '../domains/users'
+import { lotSource } from '#domains/auction'
+import { permissionSource, roleSource } from '#domains/authorization'
+import { categorySource } from '#domains/categories'
+import { userSource } from '#domains/users'
 import { clearCachePolicy } from './cache.delete.policy'
 
 export default defineEventHandler(async (event) => {

@@ -1,4 +1,4 @@
-import { createPermissionResource, permissionRepository, permissionSource, roleSource } from '~~/server/domains/authorization'
+import { createPermissionResource, permissionRepository, permissionSource, roleSource } from '#domains/authorization'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 

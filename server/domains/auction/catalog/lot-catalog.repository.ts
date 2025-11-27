@@ -1,5 +1,5 @@
+import type { LotAttributes } from '#database'
 import type { WhereOptions } from 'sequelize'
-import type { LotAttributes } from '~~/server/database'
 import { Op } from 'sequelize'
 
 interface FindAllForCatalogOptions {

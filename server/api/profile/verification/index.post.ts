@@ -1,4 +1,4 @@
-import { verificationService } from '~~/server/domains/authentication'
+import { verificationService } from '#domains/authentication'
 
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)

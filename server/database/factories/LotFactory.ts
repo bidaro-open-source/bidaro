@@ -3,7 +3,7 @@ import type {
   Lot,
   LotAttributes,
   LotAttributesOptional,
-} from '~~/server/database'
+} from '#database'
 import {
   lotInitialDurations,
   lotInitialDurationsInMs,

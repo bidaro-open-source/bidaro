@@ -3,7 +3,7 @@ import type {
   LotBet,
   LotBetAttributes,
   LotBetAttributesOptional,
-} from '~~/server/database'
+} from '#database'
 import { Factory } from '../class/Factory'
 
 type PartialAttributes = Partial<LotBetAttributes>

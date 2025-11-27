@@ -1,4 +1,4 @@
-import type { Lot } from '~~/server/database'
+import type { Lot } from '#database'
 import { permissions } from '~~/server/constants'
 
 export const deleteLotPolicy = createRequestPolicy((event: H3Event, lot: Lot) => {

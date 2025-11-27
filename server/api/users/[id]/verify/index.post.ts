@@ -1,4 +1,4 @@
-import { userResource, userService } from '~~/server/domains/users'
+import { userResource, userService } from '#domains/users'
 import { verifyUserPolicy } from './index.post.policy'
 import { verifyUserRequest } from './index.post.request'
 

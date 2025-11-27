@@ -1,5 +1,5 @@
-import type { Lot } from '../../../database'
-import { EntitySource } from '~~/server/class/EntitySource'
+import type { Lot } from '#database'
+import { EntitySource } from '#class/EntitySource'
 import { userSource } from '../../users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'

@@ -1,4 +1,4 @@
-import type { LotBet } from '~~/server/database'
+import type { LotBet } from '#database'
 import { lotStatuses } from '~~/server/constants'
 
 interface Options {

@@ -1,4 +1,4 @@
-import { BaseSource } from '~~/server/class/BaseSource'
+import { BaseSource } from '#class/BaseSource'
 import { permissionRepository } from './permission.repository'
 
 class PermissionSource extends BaseSource {

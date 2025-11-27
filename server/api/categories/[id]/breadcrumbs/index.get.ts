@@ -1,4 +1,4 @@
-import { categoryBreadcrumbResource, categorySource } from '~~/server/domains/categories'
+import { categoryBreadcrumbResource, categorySource } from '#domains/categories'
 import { viewCategoryRequest } from '../index.request'
 
 export default defineEventHandler(async (event) => {

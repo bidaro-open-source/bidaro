@@ -1,6 +1,6 @@
-import type { RepositoryOptions } from '~~/server/class/BaseRepository'
-import type { LotBet } from '../../../database/models/LotBet'
-import { BaseRepository } from '~~/server/class/BaseRepository'
+import type { RepositoryOptions } from '#class/BaseRepository'
+import type { LotBet } from '#database'
+import { BaseRepository } from '#class/BaseRepository'
 
 class LotBetRepository extends BaseRepository<LotBet> {
   protected get model() {

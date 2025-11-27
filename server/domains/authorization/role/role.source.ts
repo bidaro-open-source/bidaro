@@ -1,5 +1,5 @@
-import type { Role } from '../../../database'
-import { EntitySource } from '~~/server/class/EntitySource'
+import type { Role } from '#database'
+import { EntitySource } from '#class/EntitySource'
 import { roleRepository } from './role.repository'
 
 class RoleSource extends EntitySource<Role> {

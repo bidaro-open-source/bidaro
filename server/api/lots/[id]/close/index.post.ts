@@ -1,5 +1,5 @@
-import { lotResource, lotService, lotSource } from '~~/server/domains/auction'
-import { userResource, userSource } from '~~/server/domains/users'
+import { lotResource, lotService, lotSource } from '#domains/auction'
+import { userResource, userSource } from '#domains/users'
 import { viewLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 

@@ -3,7 +3,7 @@ import type {
   Image,
   ImageAttributes,
   ImageAttributesOptional,
-} from '~~/server/database'
+} from '#database'
 import { v4 as uuidv4 } from 'uuid'
 import { Factory } from '../class/Factory'
 

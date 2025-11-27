@@ -1,11 +1,7 @@
-import type { Database } from '~~/server/database'
 import { env } from 'node:process'
+import { BootstrapDatabase, BootstrapFactories } from '#database'
 import { Sequelize } from 'sequelize'
 import { afterAll, beforeAll } from 'vitest'
-import {
-  BootstrapDatabase,
-  BootstrapFactories,
-} from '~~/server/database'
 
 async function useDatabase() {
   try {
@@ -21,9 +17,9 @@ async function useDatabase() {
 
     await connection.authenticate()
 
-    const database: Database = BootstrapDatabase(connection)
-
-    return BootstrapFactories(database)
+    return BootstrapFactories(
+      BootstrapDatabase(connection),
+    )
   }
   catch (e) {
     throw new Error(`Database is not connected. Error: ${e}`)

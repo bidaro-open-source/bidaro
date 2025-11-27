@@ -1,4 +1,4 @@
-import type { PermissionAttributes } from '../../../database'
+import type { PermissionAttributes } from '#database'
 
 export type PermissionResource = ReturnType<typeof createPermissionResource>
 

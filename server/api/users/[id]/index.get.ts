@@ -1,4 +1,4 @@
-import { userResource, userSource } from '~~/server/domains/users'
+import { userResource, userSource } from '#domains/users'
 import { viewUserRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

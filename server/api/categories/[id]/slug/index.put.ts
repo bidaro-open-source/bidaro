@@ -1,4 +1,4 @@
-import { categoryResource, categoryService } from '~~/server/domains/categories'
+import { categoryResource, categoryService } from '#domains/categories'
 import { updateCategorySlugPolicy } from './index.get.policy'
 import { updateCategorySlugRequest } from './index.put.request'
 

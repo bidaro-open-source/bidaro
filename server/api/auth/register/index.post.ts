@@ -1,8 +1,8 @@
+import { authService } from '#domains/authentication'
+import { roleRepository } from '#domains/authorization'
+import { userProfileResource, userRepository } from '#domains/users'
 import { z } from 'zod'
 import { roles } from '~~/server/constants'
-import { authService } from '~~/server/domains/authentication'
-import { roleRepository } from '~~/server/domains/authorization'
-import { userProfileResource, userRepository } from '~~/server/domains/users'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

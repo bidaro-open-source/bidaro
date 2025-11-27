@@ -1,4 +1,4 @@
-import { lotService, lotSource } from '~~/server/domains/auction'
+import { lotService, lotSource } from '#domains/auction'
 import { deleteLotPolicy } from './index.delete.policy'
 import { viewLotRequest } from './index.request'
 

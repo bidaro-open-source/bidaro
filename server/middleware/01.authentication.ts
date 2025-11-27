@@ -1,5 +1,5 @@
-import { authService } from '../domains/authentication'
-import { userSource } from '../domains/users'
+import { authService } from '#domains/authentication'
+import { userSource } from '#domains/users'
 
 /**
  * Checks the request for an access token in the `Authorization` header.

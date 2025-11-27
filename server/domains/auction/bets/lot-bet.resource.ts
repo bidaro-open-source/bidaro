@@ -1,5 +1,5 @@
-import type { LotBetAttributes } from '../../../database'
-import { BaseResource } from '~~/server/class/BaseResource'
+import type { LotBetAttributes } from '#database'
+import { BaseResource } from '#class/BaseResource'
 
 export interface LotBetDto {
   id: number

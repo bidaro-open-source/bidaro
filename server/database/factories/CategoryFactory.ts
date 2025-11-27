@@ -3,7 +3,7 @@ import type {
   CategoryAttributes,
   CategoryAttributesOptional,
   Database,
-} from '~~/server/database'
+} from '#database'
 import { v4 as uuidv4 } from 'uuid'
 import { Factory } from '../class/Factory'
 

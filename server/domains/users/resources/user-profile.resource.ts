@@ -1,5 +1,5 @@
-import type { UserAttributes } from '~~/server/database'
-import { BaseResource } from '~~/server/class/BaseResource'
+import type { UserAttributes } from '#database'
+import { BaseResource } from '#class/BaseResource'
 
 export interface UserProfileDto {
   id: number

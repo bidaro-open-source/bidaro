@@ -1,7 +1,15 @@
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-04-29',
 
   srcDir: 'client',
+
+  alias: {
+    '#class': fileURLToPath(new URL('./server/class', import.meta.url)),
+    '#database': fileURLToPath(new URL('./server/database', import.meta.url)),
+    '#domains': fileURLToPath(new URL('./server/domains', import.meta.url)),
+  },
 
   nitro: {
     typescript: {

@@ -1,5 +1,5 @@
-import type { User } from '../../database'
-import { EntitySource } from '~~/server/class/EntitySource'
+import type { User } from '#database'
+import { EntitySource } from '#class/EntitySource'
 import { userRepository } from './user.repository'
 
 class UserSource extends EntitySource<User> {
