@@ -1,7 +1,7 @@
-import type { Lot } from '#database'
+import type { LotAttributes } from '#database'
 import { permissions } from '~~/server/constants'
 
-export const updateImageOrderPolicy = createRequestPolicy((event: H3Event, lot: Lot) => {
+export const updateImageOrderPolicy = createRequestPolicy((event: H3Event, lot: LotAttributes) => {
   const userPermissions = getAuthenticatedUserPermissions(event)
   if (!userPermissions)
     return false

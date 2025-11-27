@@ -90,8 +90,15 @@ class CategoryRepository extends BaseRepository<Category> {
    */
   async updatePaths(oldPath: string, newPath: string, options: RepositoryOptions = {}) {
     const db = useDatabase()
+
+    const tableName = db.sequelize.models?.Category?.tableName
+
+    if (!tableName) {
+      throw new Error('Category model is not initialized in the database.')
+    }
+
     const updateQuery = `
-      UPDATE "${db.sequelize.models.Category.tableName}"
+      UPDATE "${tableName}"
       SET path = REPLACE(path, :oldPathPrefix, :newPathPrefix)
       WHERE path LIKE :oldPathLike;
     `

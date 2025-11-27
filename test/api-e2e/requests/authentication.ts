@@ -3,7 +3,6 @@ import type { LogoutRequest } from '~~/server/api/auth/logout/index.request'
 import type { RefreshRequest } from '~~/server/api/auth/refresh/index.request'
 import type registerApi from '~~/server/api/auth/register/index.post'
 import type { RegisterRequest } from '~~/server/api/auth/register/index.request'
-import type { AccessToken } from '~~/server/utils/crypto-access-token'
 import { fetch } from '../fetch'
 
 export async function registerUser() {
@@ -38,7 +37,7 @@ export async function loginRequest(body: LoginRequest['body']) {
 
 export async function logoutRequest(
   body: LogoutRequest['body'],
-  options: { accessToken?: AccessToken } = {},
+  options: { accessToken?: string } = {},
 ) {
   return await fetch('/api/auth/logout', {
     method: 'POST',

@@ -24,7 +24,7 @@ class PermissionSource extends BaseSource {
   /**
    * Invalidates all permission-related cache entries.
    */
-  async invalidateAll() {
+  override async invalidateAll() {
     const redis = useRedis()
     await redis.del(this.keys.list)
   }
