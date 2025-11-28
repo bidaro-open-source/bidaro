@@ -1,5 +1,6 @@
 import { lotImageService, lotSource } from '#domains/auction'
 import { imageResource, imageService } from '#domains/storage'
+import { IMAGE_PER_LOT_LIMIT } from '~~/server/constants'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'
 
@@ -17,6 +18,15 @@ export default defineEventHandler(async (event) => {
   const lot = await lotSource.getById(request.params.id)
 
   uploadLotImagePolicy(event, lot)
+
+  const images = await lotSource.getAllImagesById(request.params.id)
+
+  if (images.length >= IMAGE_PER_LOT_LIMIT) {
+    throw createError({
+      statusCode: 400,
+      message: 'Максимальна кількість зображень для лоту досягнута (10)',
+    })
+  }
 
   const image = await imageService.upload(request.multipart.buffer)
 

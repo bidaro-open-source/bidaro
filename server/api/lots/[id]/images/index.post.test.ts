@@ -3,7 +3,7 @@ import type { UploadLotImageRequest } from './index.post.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
-import { permissions } from '~~/server/constants'
+import { IMAGE_PER_LOT_LIMIT, permissions } from '~~/server/constants'
 import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
@@ -247,5 +247,43 @@ describe('POST /api/lots/:id/images', async () => {
       await user1Data.clear()
       await user2Data.clear()
     })
-  })
+
+    it('should return 400 when the image upload limit for a lot is reached', async () => {
+      const userData = await createUser({
+        withRole: true,
+        withSession: true,
+        withPermissions: [permissions.UPLOAD_LOT_IMAGE],
+      })
+      const lotData = await createLot({ sellerId: userData.user.id })
+      const multipart = createMultipartConfig(resolveImage(IMAGE))
+
+      const images = []
+
+      for (let i = 0; i < IMAGE_PER_LOT_LIMIT; i++) {
+        const response = await uploadLotImageRequest(
+          { multipart, params: { id: lotData.lot.id } },
+          { accessToken: userData.access_token },
+        )
+
+        expect(response.status).toBe(200)
+
+        images.push(response._data)
+      }
+
+      const response = await uploadLotImageRequest(
+        { multipart, params: { id: lotData.lot.id } },
+        { accessToken: userData.access_token },
+      )
+
+      expect(response.status).toBe(400)
+
+      for (const image of images) {
+        await deleteS3Object(image.bucket, image.key)
+        await (db.Image.destroy({ where: { id: image.id } }))
+      }
+
+      await lotData.clear()
+      await userData.clear()
+    })
+  }, 15_000)
 })

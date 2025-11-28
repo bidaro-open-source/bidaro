@@ -81,3 +81,5 @@ export const actionLimits = {
   UPDATE_EMAIL: 3,
   UPDATE_PASSWORD: 3,
 } as const
+
+export const IMAGE_PER_LOT_LIMIT = 10
