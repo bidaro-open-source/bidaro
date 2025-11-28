@@ -61,18 +61,37 @@ class LotImageService {
         })
       }
 
-      const existingLinks = await lotImageRepository.findAllLinksByLotAndPks(id, imageIds, { transaction })
+      const existingLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
 
-      const safeLinkIds = existingLinks.map(link => link.id)
-      const safeImageIds = existingLinks.map(link => link.imageId)
+      const removedImageIds = existingLinks
+        .filter(link => imageIds.includes(link.imageId))
+        .map(link => link.imageId)
 
-      await lotImageRepository.destroyByPks(safeLinkIds, { transaction })
+      if (removedImageIds.length === 0) {
+        return []
+      }
+
+      const allLinkIds = existingLinks.map(link => link.id)
+
+      await lotImageRepository.destroyByPks(allLinkIds, { transaction })
+
+      const remainingLinks = existingLinks
+        .sort((a, b) => a.order - b.order)
+        .filter(link => !imageIds.includes(link.imageId))
+        .map((link, index) => ({
+          id: link.id,
+          lotId: link.lotId,
+          imageId: link.imageId,
+          order: index,
+        }))
+
+      await lotImageRepository.bulkCreate(remainingLinks, { transaction })
 
       useDatabaseAfterCommit(transaction, 'lot-image.service.unattach-images', async () => {
         await lotSource.invalidate(lot)
       })
 
-      return safeImageIds
+      return removedImageIds
     })
   }
 
