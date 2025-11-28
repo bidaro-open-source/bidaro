@@ -1,9 +1,10 @@
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { authService } from '~~/server/domains/authentication'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
-import { loginRequest } from '~~/test/api-e2e/requests/authentication'
+import { loginRequest, refreshRequest } from '~~/test/api-e2e/requests/authentication'
 
 describe('POST /api/auth/login', async () => {
   await setup({ host: env.SETUP_HOST })
@@ -54,6 +55,28 @@ describe('POST /api/auth/login', async () => {
     expect(response.headers.get('set-cookie')).match(
       new RegExp(`${REFRESH_TOKEN_COOKIE_NAME}=`),
     )
+
+    await data.clear()
+  })
+
+  it('should delete old sessions after reaching the limit', async () => {
+    const data = await createUser({ withSession: true })
+
+    for (let i = 0; i < authService.sessoinLimit; i++) {
+      const response = await loginRequest({
+        username: data.user.username,
+        password: db.UserFactory.password,
+      })
+
+      expect(response.status).toBe(200)
+    }
+
+    const refreshResponse = await refreshRequest(
+      { refresh_token: data.refresh_token },
+      { useBody: true },
+    )
+
+    expect(refreshResponse.status).toBe(404)
 
     await data.clear()
   })

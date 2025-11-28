@@ -28,6 +28,8 @@ export interface SessionMetadataCollection {
 export const REDIS_SESSION_NAMESPACE = 'refresh-session'
 
 class AuthenticationService {
+  readonly sessoinLimit = 6
+
   /**
    * Redis keys.
    */
@@ -194,11 +196,25 @@ class AuthenticationService {
     const tokenKey = this.keys.token(refreshToken)
     const tokensKey = this.keys.tokens(uid)
     const data = JSON.stringify(sessionMetadata)
+    const now = Date.now()
+
+    const sessionCount = await redis.zcard(tokensKey)
+
+    if (sessionCount >= this.sessoinLimit) {
+      const tokensToRemove = await redis.zrange(tokensKey, 0, sessionCount - this.sessoinLimit)
+
+      if (tokensToRemove.length) {
+        await redis.multi()
+          .del(...tokensToRemove.map(t => this.keys.token(t)))
+          .zrem(tokensKey, ...tokensToRemove)
+          .exec()
+      }
+    }
 
     await redis
       .multi()
       .set(tokenKey, data, 'EX', refreshTokenTTL)
-      .sadd(tokensKey, [refreshToken])
+      .zadd(tokensKey, now, refreshToken)
       .pexpire(tokensKey, refreshTokenTTL * 1000)
       .exec()
 
@@ -240,11 +256,12 @@ class AuthenticationService {
     const oldTokenKey = this.keys.token(refreshToken)
     const newTokenKey = this.keys.token(newRefreshToken)
     const data = JSON.stringify(sessionMetadata)
+    const now = Date.now()
 
     await redis
       .multi()
-      .srem(tokensKey, [refreshToken])
-      .sadd(tokensKey, [newRefreshToken])
+      .zrem(tokensKey, refreshToken)
+      .zadd(tokensKey, now, newRefreshToken)
       .pexpire(tokensKey, refreshTokenTTL * 1000)
       .rename(oldTokenKey, newTokenKey)
       .set(newTokenKey, data, 'EX', refreshTokenTTL)
