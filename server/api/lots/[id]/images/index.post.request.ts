@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { imageService } from '~~/server/domains/storage'
 import { primaryKeySchema } from '~~/server/zod'
 
 export type UploadLotImageRequest = ValidatorReturnType<typeof uploadLotImageRequest>
@@ -17,10 +18,13 @@ export const uploadLotImageRequest = createRequestValidator({
       ],
       limits: {
         files: 1,
+        fileSize: 5 * 1024 * 1024,
       },
     })
 
-    if (!multipart.files[0]) {
+    const image = multipart.files[0]
+
+    if (!image) {
       throw new z.ZodError([{
         code: 'custom',
         path: ['files'],
@@ -28,18 +32,20 @@ export const uploadLotImageRequest = createRequestValidator({
       }])
     }
 
-    const image = multipart.files[0]
+    const validatedImage = await imageService.validateBuffer(image.buffer)
 
-    const meta = await useImageValidator(image.buffer, {
-      allowedFormats: ['jpeg', 'png', 'webp'],
-      maxDimension: 8192,
-    })
+    if (!validatedImage.buffer) {
+      throw new z.ZodError([{
+        code: 'custom',
+        path: ['files'],
+        message: `Невірний файл зображення: ${validatedImage.error}`,
+      }])
+    }
 
     return {
-      ...image,
-      mimetype: `image/${meta.format}`,
-      width: meta.width,
-      height: meta.height,
+      buffer: validatedImage.buffer,
+      originalFilename: image.filename,
+      originalMimetype: image.mimetype,
     }
   },
 })
