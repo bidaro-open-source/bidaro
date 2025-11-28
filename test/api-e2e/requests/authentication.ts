@@ -1,21 +1,8 @@
 import type { LoginRequest } from '~~/server/api/auth/login/index.request'
 import type { LogoutRequest } from '~~/server/api/auth/logout/index.request'
 import type { RefreshRequest } from '~~/server/api/auth/refresh/index.request'
-import type registerApi from '~~/server/api/auth/register/index.post'
 import type { RegisterRequest } from '~~/server/api/auth/register/index.request'
 import { fetch } from '../fetch'
-
-export async function registerUser() {
-  const user = db.UserFactory.new().make()
-
-  const response = await registerRequest({
-    email: user.email,
-    username: user.username,
-    password: db.UserFactory.password,
-  })
-
-  return response._data as ReturnType<typeof registerApi>
-}
 
 export async function destroyUser(uid: number) {
   return (await db.User.findByPk(uid))!.destroy()
