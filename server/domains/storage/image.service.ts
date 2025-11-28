@@ -1,107 +1,167 @@
-import type { Image } from '#database'
 import type { Buffer } from 'node:buffer'
-import * as path from 'node:path'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
-
-interface UploadPayload {
-  fieldname: string
-  filename: string
-  mimetype: string
-  buffer: Buffer
-}
-
-interface ErrorHandling {
-  ok: boolean
-  id: number
-  cause?: string
-}
 
 class ImageService {
   /**
-   * Simple utils for image service.
-   *
-   * @param data multipart data
-   * @returns metadata values
+   * Maximum allowed image resolution (width or height).
    */
-  private getMeta(data: UploadPayload) {
-    const extension = path.extname(data.filename || '').toLowerCase()
-    const size = data.buffer?.length || 0
-    const type = data.mimetype || 'application/octet-stream'
-    const key = `${uuidv4()}${extension}`
+  readonly maxResolution = 8192
 
-    return { size, type, key }
+  /**
+   * Allowed image formats.
+   */
+  readonly allowedFormats = ['jpeg', 'png', 'webp']
+
+  /**
+   * Gets image metadata.
+   *
+   * @param buffer image buffer
+   * @returns image metadata or error message
+   */
+  async getMetadata(buffer: Buffer) {
+    try {
+      const metadata = await sharp(buffer).metadata()
+
+      if (!metadata.format || !metadata.width || !metadata.height) {
+        throw new Error('Unable to determine image format or dimensions')
+      }
+
+      return { metadata, error: null }
+    }
+    catch (error: any) {
+      return { metadata: null, error: error.message as string }
+    }
+  }
+
+  /**
+   * Validates image buffer.
+   *
+   * @param buffer image buffer
+   * @returns validated buffer or error message
+   */
+  async validateBuffer(buffer: Buffer) {
+    try {
+      const metadata = await sharp(buffer).metadata()
+
+      if (!metadata.format || !metadata.width || !metadata.height) {
+        throw new Error('Unable to determine image format or dimensions')
+      }
+
+      if (!this.allowedFormats.includes(metadata.format as keyof sharp.FormatEnum)) {
+        throw new Error(`Format "${metadata.format}" is not allowed. Allowed: ${this.allowedFormats.join(', ')}`)
+      }
+
+      if (metadata.width > this.maxResolution || metadata.height > this.maxResolution) {
+        throw new Error(`Image is too large (${metadata.width}x${metadata.height}). Max dimension allowed: ${this.maxResolution}px`)
+      }
+
+      if (metadata.width === 0 || metadata.height === 0) {
+        throw new Error('Image has zero dimensions')
+      }
+
+      return { buffer, error: null }
+    }
+    catch (error: any) {
+      return { buffer: null, error: error.message as string }
+    }
+  }
+
+  /**
+   * Compresses image buffer to AVIF format.
+   *
+   * @param buffer image buffer
+   * @returns compressed buffer or error message
+   */
+  async compressBuffer(buffer: Buffer) {
+    try {
+      const compressedBuffer = await sharp(buffer)
+        .avif({
+          quality: 30,
+          effort: 0,
+        })
+        .toBuffer()
+
+      return { buffer: compressedBuffer, error: null }
+    }
+    catch (error: any) {
+      return { buffer: null, error: error.message as string }
+    }
   }
 
   /**
    * Uploads one image to s3 and creates record in database.
    *
-   * This function follows a "create-then-upload" pattern with rollback.
-   *
-   * 1. Creates an `Image` record in the database with a generated S3 key.
-   * 2. Attempts to upload the file to S3 using the generated key.
-   * 3. **On S3 success:** Returns the created database record.
-   * 4. **On S3 failure:** Deletes the database record (rollback) and throws an error.
-   * 5. **On rollback delete failure:** Throw an error (record stay in db)
-   *
-   * @param data multipart data
+   * @param buffer image buffer
    * @returns Image instance
+   * @throws 400 if image is invalid
    */
-  async upload(data: UploadPayload) {
+  async upload(buffer: Buffer) {
     const db = useDatabase()
     const { s3, Bucket } = useObjectStorage()
-    const { size, type, key } = this.getMeta(data)
 
-    let image: Image | null = null
+    return await useDatabaseTransaction(async (transaction) => {
+      const validatedImage = await this.validateBuffer(buffer)
 
-    try {
-      image = await db.Image.create({
-        bucket: Bucket,
-        mime_type: type,
-        size_bytes: size,
+      if (!validatedImage.buffer) {
+        throw createError({
+          message: `Невірний файл зображення: ${validatedImage.error}`,
+          status: 400,
+        })
+      }
+
+      const comporessedImage = await this.compressBuffer(validatedImage.buffer)
+
+      if (!comporessedImage.buffer) {
+        console.warn('Image compression failed, proceeding with original buffer:', comporessedImage.error)
+        throw createError({
+          message: `Помилка сервера під час обробки зображення: ${comporessedImage.error}`,
+          status: 500,
+        })
+      }
+
+      const metadata = await this.getMetadata(comporessedImage.buffer)
+
+      if (!metadata.metadata) {
+        console.warn('Image metadata extraction failed:', metadata.error)
+        throw createError({
+          message: `Помилка сервера під час отримання метаданих зображення: ${metadata.error}`,
+          status: 500,
+        })
+      }
+
+      const size = comporessedImage.buffer.length
+      const key = `${uuidv4()}.avif`
+
+      const image = await db.Image.create({
         key,
-      })
-    }
-    catch (error) {
-      throw createError({
-        message: 'Помилка сервера під час додавання зображення до бази даних',
-        status: 500,
-        cause: error,
-      })
-    }
+        bucket: Bucket,
+        mime_type: `image/avif`,
+        size_bytes: size,
+        metadata: {
+          width: metadata.metadata.width,
+          height: metadata.metadata.height,
+        },
+      }, { transaction })
 
-    try {
       const s3Command = new PutObjectCommand({
         Key: key,
-        Body: data.buffer,
-        ContentType: type,
+        Body: comporessedImage.buffer,
+        ContentType: `image/avif`,
         ContentLength: size,
         ACL: 'public-read',
         Bucket,
+        Metadata: {
+          width: metadata.metadata.width.toString(),
+          height: metadata.metadata.height.toString(),
+        },
       })
 
       await s3.send(s3Command)
 
       return image
-    }
-    catch (error) {
-      try {
-        await image.destroy()
-      }
-      catch (rollbackError) {
-        throw createError({
-          message: 'Критична помилка сервера під час завантаження зображення',
-          status: 500,
-          cause: rollbackError,
-        })
-      }
-
-      throw createError({
-        message: 'Помилка сервера під час завантаження зображення',
-        status: 500,
-        cause: error,
-      })
-    }
+    })
   }
 
   /**
@@ -142,46 +202,39 @@ class ImageService {
    * @param imageId image primary key
    * @returns Image instance
    */
-  private async safeDeleteImage(imageId: number): Promise<ErrorHandling> {
+  private async safeDeleteImage(imageId: number) {
     const db = useDatabase()
     const { s3 } = useObjectStorage()
 
-    const result: ErrorHandling = { ok: false, id: imageId }
-
     const image = await db.Image.findByPk(imageId)
 
-    if (!image) {
-      result.cause = 'Зображення не знайдено'
-
-      return result
-    }
-
     try {
+      if (!image) {
+        throw new Error('Зображення не знайдено')
+      }
+
       const s3Command = new DeleteObjectCommand({
         Bucket: image.bucket,
         Key: image.key,
       })
 
       await s3.send(s3Command)
-    }
-    catch (error) {
-      result.cause = 'Зображення не вдалося видалити зі сховища об\'єктів'
 
-      return result
-    }
-
-    try {
       await image.destroy()
+
+      return {
+        ok: true,
+        id: imageId,
+      }
     }
     catch (error) {
-      result.cause = 'Зображення не вдалося видалити з бази даних'
-
-      return result
+      console.warn(`Failed to delete image with id ${imageId}:`, error)
+      return {
+        ok: false,
+        id: imageId,
+        cause: 'Зображення не вдалося видалити',
+      }
     }
-
-    result.ok = true
-
-    return result
   }
 }
 

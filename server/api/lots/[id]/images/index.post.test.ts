@@ -136,7 +136,7 @@ describe('POST /api/lots/:id/images', async () => {
       await userData.clear()
     })
 
-    it('return 400 when file width too big', async () => {
+    it('return 422 when file width too big', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -150,13 +150,13 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expect(response.status).toBe(422)
 
       await lotData.clear()
       await userData.clear()
     })
 
-    it('return 400 when file height too big', async () => {
+    it('return 422 when file height too big', async () => {
       const userData = await createUser({
         withRole: true,
         withSession: true,
@@ -170,7 +170,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expect(response.status).toBe(422)
 
       await lotData.clear()
       await userData.clear()

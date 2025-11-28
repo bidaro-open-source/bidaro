@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   uploadLotImagePolicy(event, lot)
 
-  const image = await imageService.upload(request.multipart)
+  const image = await imageService.upload(request.multipart.buffer)
 
   await lotImageService.attachImages(request.params.id, [image])
 
