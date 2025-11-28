@@ -59,6 +59,9 @@ export default defineNuxtConfig({
     diagnostic: {
       token: '',
     },
+    challenge: {
+      enabled: true,
+    },
     db: {
       host: '',
       port: '',
