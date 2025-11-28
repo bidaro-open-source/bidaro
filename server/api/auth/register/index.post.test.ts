@@ -2,18 +2,24 @@ import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
+import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-invalid-token'
+import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
 import { destroyUser, registerRequest } from '~~/test/api-e2e/requests/authentication'
+
+const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
 describe('POST /api/auth/register', async () => {
   await setup({ host: env.SETUP_HOST })
 
   it('should register new user successfully with valid credentials', async () => {
     const userData = db.UserFactory.new().make()
+    const captchaToken = await createChallengeToken()
 
     const response = await registerRequest({
       email: userData.email,
       username: userData.username,
       password: db.UserFactory.password,
+      captchaToken,
     })
 
     const body = response._data
@@ -28,11 +34,13 @@ describe('POST /api/auth/register', async () => {
 
   it('should return both access and refresh tokens upon registration', async () => {
     const userData = db.UserFactory.new().make()
+    const captchaToken = await createChallengeToken()
 
     const response = await registerRequest({
       email: userData.email,
       username: userData.username,
       password: db.UserFactory.password,
+      captchaToken,
     })
 
     const body = response._data
@@ -46,11 +54,13 @@ describe('POST /api/auth/register', async () => {
 
   it('should set refresh token in HTTP-only cookie upon registration', async () => {
     const userData = db.UserFactory.new().make()
+    const captchaToken = await createChallengeToken()
 
     const response = await registerRequest({
       email: userData.email,
       username: userData.username,
       password: db.UserFactory.password,
+      captchaToken,
     })
 
     expect(response.status).toBe(200)
@@ -63,6 +73,20 @@ describe('POST /api/auth/register', async () => {
     await destroyUser(body.user.id)
   })
 
+  it.runIf(CAPTCHA_ENABLED)('should return 400 when captcha token invalid', async () => {
+    const userData = db.UserFactory.new().make()
+    const captchaToken = createChallengeInvalidToken()
+
+    const response = await registerRequest({
+      email: userData.email,
+      username: userData.username,
+      password: db.UserFactory.password,
+      captchaToken,
+    })
+
+    expect(response.status).toBe(400)
+  })
+
   describe('valid email formats', () => {
     it.each([
       'email@example.com',
@@ -71,11 +95,13 @@ describe('POST /api/auth/register', async () => {
       'firstname+lastname@example.com',
     ])('should accept valid email format: "%s"', async (email) => {
       const userData = db.UserFactory.new().make()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         password: db.UserFactory.password,
         username: userData.username,
         email,
+        captchaToken,
       })
 
       const body = response._data
@@ -99,11 +125,13 @@ describe('POST /api/auth/register', async () => {
       'u_____',
     ])('should accept valid username format: "%s"', async (username) => {
       const userData = db.UserFactory.new().make()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         password: db.UserFactory.password,
         email: userData.email,
         username,
+        captchaToken,
       })
 
       const body = response._data
@@ -118,11 +146,13 @@ describe('POST /api/auth/register', async () => {
     it('should return 422 when email is already taken', async () => {
       const userData = db.UserFactory.new().make()
       const userCreated = await db.UserFactory.new().create()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         email: userCreated.email,
         username: userData.username,
         password: userData.password,
+        captchaToken,
       })
 
       expect(response.status).toBe(422)
@@ -133,11 +163,13 @@ describe('POST /api/auth/register', async () => {
     it('should return 422 when username is already taken', async () => {
       const userData = db.UserFactory.new().make()
       const userCreated = await db.UserFactory.new().create()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         email: userData.email,
         username: userCreated.username,
         password: userData.password,
+        captchaToken,
       })
 
       expect(response.status).toBe(422)
@@ -186,11 +218,13 @@ describe('POST /api/auth/register', async () => {
       '"firstname-lastname@example.com',
     ])('should return 422 for invalid email format: "%s"', async (email) => {
       const userData = db.UserFactory.new().make()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         username: userData.username,
         password: userData.password,
         email: email as string,
+        captchaToken,
       })
 
       expect(response.status).toBe(422)
@@ -217,11 +251,13 @@ describe('POST /api/auth/register', async () => {
       '中文字符',
     ])('should return 422 for invalid username format: "%s"', async (username) => {
       const userData = db.UserFactory.new().make()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         email: userData.email,
         password: userData.password,
         username: username as string,
+        captchaToken,
       })
 
       expect(response.status).toBe(422)
@@ -237,11 +273,13 @@ describe('POST /api/auth/register', async () => {
       'a'.repeat(65),
     ])('should return 422 for invalid password: "%s"', async (password) => {
       const userData = db.UserFactory.new().make()
+      const captchaToken = await createChallengeToken()
 
       const response = await registerRequest({
         email: userData.email,
         username: userData.username,
         password: password as string,
+        captchaToken,
       })
 
       expect(response.status).toBe(422)

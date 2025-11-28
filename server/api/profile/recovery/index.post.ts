@@ -3,6 +3,7 @@ import { userRepository } from '#domains/users'
 import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
+import { challengeTokenService } from '~~/server/domains/security/challenge/challenge-token.service'
 
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
@@ -12,6 +13,19 @@ export default defineEventHandler(async (event) => {
   })
 
   const request = await resetPasswordRequest(event)
+
+  const config = useRuntimeConfig()
+
+  if (config.challenge.enabled) {
+    const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
+
+    if (!isValid) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Невірне рішення капчі',
+      })
+    }
+  }
 
   const user = await userRepository.findByEmail(request.body.email)
 
@@ -24,8 +38,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const token = await recoveryService.createToken(user.id)
-
-  const config = useRuntimeConfig()
 
   await sendMail(event, {
     to: request.body.email,

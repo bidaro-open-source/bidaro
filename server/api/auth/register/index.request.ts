@@ -8,5 +8,6 @@ export const registerRequest = createRequestValidator({
     email: userSchema.email,
     username: userSchema.username,
     password: userSchema.password,
+    captchaToken: z.uuidv4().optional(),
   }),
 })

@@ -3,6 +3,7 @@ import { roleRepository } from '#domains/authorization'
 import { userProfileResource, userRepository } from '#domains/users'
 import { z } from 'zod'
 import { roles } from '~~/server/constants'
+import { challengeTokenService } from '~~/server/domains/security/challenge/challenge-token.service'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -13,6 +14,19 @@ export default defineEventHandler(async (event) => {
   })
 
   const request = await registerRequest(event)
+
+  const config = useRuntimeConfig()
+
+  if (config.challenge.enabled) {
+    const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
+
+    if (!isValid) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Невірне рішення капчі',
+      })
+    }
+  }
 
   const userByEmail = await userRepository.findByEmail(request.body.email)
 
