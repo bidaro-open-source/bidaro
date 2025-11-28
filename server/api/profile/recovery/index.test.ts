@@ -3,8 +3,12 @@ import type { ResetPasswordRequest } from './index.request'
 import { env } from 'node:process'
 import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
+import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-invalid-token'
+import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+
+const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
 async function resetPasswordRequest(payload: ResetPasswordRequest) {
   return await fetch('/api/profile/recovery', {
@@ -25,10 +29,13 @@ describe('POST /api/profile/recovery', async () => {
 
   it('should complete password reset flow successfully', async () => {
     const data = await createUser()
+    const captchaToken = await createChallengeToken()
 
     const user = await db.User.findByPk(data.user.id)
 
-    const resetResponse = await resetPasswordRequest({ body: { email: data.user.email } })
+    const resetResponse = await resetPasswordRequest(
+      { body: { email: data.user.email, captchaToken } },
+    )
 
     expect(resetResponse.status).toBe(204)
 
@@ -56,9 +63,10 @@ describe('POST /api/profile/recovery', async () => {
   describe('error handling', () => {
     it('should return 404 when email does not exist', async () => {
       const userData = db.UserFactory.new().make()
+      const captchaToken = await createChallengeToken()
 
       const response = await resetPasswordRequest(
-        { body: { email: userData.email } },
+        { body: { email: userData.email, captchaToken } },
       )
 
       expect(response.status).toBe(404)
@@ -74,9 +82,10 @@ describe('POST /api/profile/recovery', async () => {
 
     it('should return 404 when account is deleted after token generation', async () => {
       const data = await createUser()
+      const captchaToken = await createChallengeToken()
 
       const response = await resetPasswordRequest(
-        { body: { email: data.user.email } },
+        { body: { email: data.user.email, captchaToken } },
       )
 
       expect(response.status).toBe(204)
@@ -96,6 +105,19 @@ describe('POST /api/profile/recovery', async () => {
       )
 
       expect(confirmResponse.status).toBe(404)
+    })
+
+    it.runIf(CAPTCHA_ENABLED)('should return 400 when captcha token is invalid', async () => {
+      const data = await createUser()
+      const captchaToken = createChallengeInvalidToken()
+
+      const resetResponse = await resetPasswordRequest(
+        { body: { email: data.user.email, captchaToken } },
+      )
+
+      expect(resetResponse.status).toBe(400)
+
+      await data.clear()
     })
   })
 })

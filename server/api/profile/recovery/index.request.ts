@@ -8,5 +8,6 @@ export type ResetPasswordRequest = ValidatorReturnType<
 export const resetPasswordRequest = createRequestValidator({
   body: z.object({
     email: userSchema.email,
+    captchaToken: z.uuidv4().optional(),
   }),
 })
