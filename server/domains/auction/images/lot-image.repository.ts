@@ -1,7 +1,6 @@
 import type { RepositoryOptions } from '#class/BaseRepository'
 import type { LotImage, LotImageAttributesOptional } from '#database'
 import { BaseRepository } from '#class/BaseRepository'
-import { Op } from 'sequelize'
 
 class LotImageRepository extends BaseRepository<LotImage> {
   protected get model() {
@@ -45,33 +44,7 @@ class LotImageRepository extends BaseRepository<LotImage> {
   async findAllLinksByLotId(lotId: number, options: RepositoryOptions = {}) {
     return await this.model.findAll({
       where: { lotId },
-      attributes: ['imageId'],
       transaction: options.transaction,
-    })
-  }
-
-  /**
-   * Find lot-image link rows for given image primary keys.
-   *
-   * @param lotId - Primary key of the lot.
-   * @param imageIds - Array of image primary keys to filter by.
-   * @param options - sequelize options
-   * @returns Promise resolving to matching LotImage rows.
-   */
-  async findAllLinksByLotAndPks(
-    lotId: number,
-    imageIds: number[],
-    options: RepositoryOptions = {},
-  ) {
-    return await this.model.findAll({
-      lock: options.lock,
-      transaction: options.transaction,
-      where: {
-        lotId,
-        imageId: {
-          [Op.in]: imageIds,
-        },
-      },
     })
   }
 

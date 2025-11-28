@@ -56,6 +56,46 @@ describe('DELETE /api/lots/:id/images', async () => {
     await userData.clear()
   })
 
+  it('should delete lot image successfully and reorder remaining', async () => {
+    const userData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_LOT_IMAGE],
+    })
+    const lotData = await createLot({ sellerId: userData.user.id })
+
+    const imageData1 = await createImage(IMAGE_PATH)
+    const lotImageData1 = await createLotImage(lotData.lot.id, imageData1.image.id)
+
+    const imageData2 = await createImage(IMAGE_PATH)
+    const lotImageData2 = await createLotImage(lotData.lot.id, imageData2.image.id)
+
+    const imageData3 = await createImage(IMAGE_PATH)
+    const lotImageData3 = await createLotImage(lotData.lot.id, imageData3.image.id)
+
+    const deleteResponse = await deleteLotImageRequest(
+      { body: { ids: [imageData1.image.id] }, params: { id: lotData.lot.id } },
+      { accessToken: userData.access_token },
+    )
+
+    expect(deleteResponse.status).toBe(200)
+
+    await lotImageData2.lotImage.reload()
+    await lotImageData3.lotImage.reload()
+
+    expect(lotImageData2.lotImage.order).toBe(0)
+    expect(lotImageData3.lotImage.order).toBe(1)
+
+    await lotImageData3.clear()
+    await imageData3.clear()
+    await lotImageData2.clear()
+    await imageData2.clear()
+    await lotImageData1.clear()
+    await imageData1.clear()
+    await lotData.clear()
+    await userData.clear()
+  })
+
   describe('error handling', () => {
     it('should return 401 when user is not authenticated', async () => {
       const userData = await createUser()
