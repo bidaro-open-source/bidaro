@@ -57,7 +57,7 @@ interface MultipartResult {
  * @param options - Configuration for limits and allowed MIME types.
  * @returns A promise that resolves to an object containing fields and files.
  * @throws 413 if limits are exceeded.
- * @thorws 415 for invalid MIME types.
+ * @throws 415 for invalid MIME types.
  * @throws 400 for parsing errors.
  */
 export function readMultipartSafely(event: H3Event, options: MultipartOptions = {}): Promise<MultipartResult> {
