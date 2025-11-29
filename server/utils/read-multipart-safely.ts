@@ -111,7 +111,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
       const { filename, mimeType } = info
 
       if (options.allowedMimeTypes && !options.allowedMimeTypes.includes(mimeType)) {
-        fileStream.resume()
+        req.unpipe(busboy)
+        req.resume()
 
         return reject(
           createError({
@@ -127,6 +128,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
 
       fileStream.on('limit', () => {
         req.unpipe(busboy)
+        req.resume()
         reject(
           createError({
             statusCode: 413,
@@ -154,6 +156,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
 
       if (fieldname.length > 100) {
         req.unpipe(busboy)
+        req.resume()
         return reject(
           createError({
             statusCode: 413,
@@ -164,6 +167,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
 
       if (info.valueTruncated) {
         req.unpipe(busboy)
+        req.resume()
+
         return reject(
           createError({
             statusCode: 413,
