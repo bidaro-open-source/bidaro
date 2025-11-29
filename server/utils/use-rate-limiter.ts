@@ -39,7 +39,9 @@ export async function useRateLimiter(
   event: H3Event,
   config: RateLimitConfig = {},
 ) {
-  if (import.meta.dev) {
+  const runtimeConfig = useRuntimeConfig()
+
+  if (!runtimeConfig.rateLimit.enabled) {
     return
   }
 

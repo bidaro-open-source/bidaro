@@ -58,6 +58,9 @@ env:
 
   NUXT_EMAIL_TOKEN_SIZE: 64
 
+  NUXT_RATE_LIMIT_ENABLED: false
+  NUXT_CHALLENGE_ENABLED: true
+
 jobs:
   ci:
     name: Testing pull request
