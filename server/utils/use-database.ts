@@ -1,5 +1,4 @@
 import type { Database } from '#database'
-import process from 'node:process'
 import { BootstrapDatabase } from '#database'
 import { Sequelize } from 'sequelize'
 
@@ -36,7 +35,7 @@ export function useDatabase(event?: H3Event): Database {
           username: runtimeConfig.db.username,
           password: runtimeConfig.db.password,
           dialect: runtimeConfig.db.connection as any,
-          logging: process.env.NODE_ENV === 'development',
+          logging: false,
         }),
       )
     }
