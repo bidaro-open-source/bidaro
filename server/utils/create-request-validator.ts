@@ -119,8 +119,6 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         throw error
       }
 
-      console.log(error)
-
       throw createError({
         statusCode: 500,
         statusMessage: 'Unprocessable Content',

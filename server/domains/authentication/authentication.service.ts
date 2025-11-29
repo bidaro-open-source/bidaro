@@ -28,7 +28,7 @@ export interface SessionMetadataCollection {
 export const REDIS_SESSION_NAMESPACE = 'refresh-session'
 
 class AuthenticationService {
-  readonly sessoinLimit = 6
+  readonly sessionLimit = 6
 
   /**
    * Redis keys.
@@ -200,8 +200,8 @@ class AuthenticationService {
 
     const sessionCount = await redis.zcard(tokensKey)
 
-    if (sessionCount >= this.sessoinLimit) {
-      const tokensToRemove = await redis.zrange(tokensKey, 0, sessionCount - this.sessoinLimit)
+    if (sessionCount >= this.sessionLimit) {
+      const tokensToRemove = await redis.zrange(tokensKey, 0, sessionCount - this.sessionLimit)
 
       if (tokensToRemove.length) {
         await redis.multi()

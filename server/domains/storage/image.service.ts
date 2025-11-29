@@ -111,17 +111,17 @@ class ImageService {
         })
       }
 
-      const comporessedImage = await this.compressBuffer(validatedImage.buffer)
+      const compressedImage = await this.compressBuffer(validatedImage.buffer)
 
-      if (!comporessedImage.buffer) {
-        console.warn('Image compression failed, proceeding with original buffer:', comporessedImage.error)
+      if (!compressedImage.buffer) {
+        console.warn('Image compression failed, proceeding with original buffer:', compressedImage.error)
         throw createError({
-          message: `Помилка сервера під час обробки зображення: ${comporessedImage.error}`,
+          message: `Помилка сервера під час обробки зображення: ${compressedImage.error}`,
           status: 500,
         })
       }
 
-      const metadata = await this.getMetadata(comporessedImage.buffer)
+      const metadata = await this.getMetadata(compressedImage.buffer)
 
       if (!metadata.metadata) {
         console.warn('Image metadata extraction failed:', metadata.error)
@@ -131,7 +131,7 @@ class ImageService {
         })
       }
 
-      const size = comporessedImage.buffer.length
+      const size = compressedImage.buffer.length
       const key = `${uuidv4()}.avif`
 
       const image = await db.Image.create({
@@ -147,7 +147,7 @@ class ImageService {
 
       const s3Command = new PutObjectCommand({
         Key: key,
-        Body: comporessedImage.buffer,
+        Body: compressedImage.buffer,
         ContentType: `image/avif`,
         ContentLength: size,
         ACL: 'public-read',

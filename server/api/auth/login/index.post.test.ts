@@ -62,7 +62,7 @@ describe('POST /api/auth/login', async () => {
   it('should delete old sessions after reaching the limit', async () => {
     const data = await createUser({ withSession: true })
 
-    for (let i = 0; i < authService.sessoinLimit; i++) {
+    for (let i = 0; i < authService.sessionLimit; i++) {
       const response = await loginRequest({
         username: data.user.username,
         password: db.UserFactory.password,
