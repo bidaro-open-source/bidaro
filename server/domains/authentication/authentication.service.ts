@@ -128,7 +128,7 @@ class AuthenticationService {
   async getSessions(uid: number) {
     const redis = useRedis()
     const tokensKey = this.keys.tokens(uid)
-    const tokens = await redis.smembers(tokensKey)
+    const tokens = await redis.zrange(tokensKey, 0, -1)
     const sessions: SessionMetadataCollection = {}
     const inactiveTokens: SessionUUID[] = []
 
@@ -156,7 +156,7 @@ class AuthenticationService {
     }
 
     if (inactiveTokens.length) {
-      await redis.srem(tokensKey, inactiveTokens)
+      await redis.zrem(tokensKey, inactiveTokens)
     }
 
     return sessions
@@ -290,7 +290,7 @@ class AuthenticationService {
     await redis
       .multi()
       .del(tokenKey)
-      .srem(tokensKey, [refreshToken])
+      .zrem(tokensKey, refreshToken)
       .exec()
   }
 
