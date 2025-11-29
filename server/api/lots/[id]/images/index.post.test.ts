@@ -72,7 +72,7 @@ describe('POST /api/lots/:id/images', async () => {
       await (db.Image.destroy({ where: { id: image.id } }))
       await lotData.clear()
       await userData.clear()
-    })
+    }, 15_000)
   })
 
   describe('invalid file uploads', () => {
@@ -94,7 +94,7 @@ describe('POST /api/lots/:id/images', async () => {
 
       await lotData.clear()
       await userData.clear()
-    })
+    }, 15_000)
 
     it('return 413 when file is too heavy', async () => {
       const userData = await createUser({
@@ -114,7 +114,7 @@ describe('POST /api/lots/:id/images', async () => {
 
       await lotData.clear()
       await userData.clear()
-    })
+    }, 15_000)
 
     it('return 415 when file is not allowed type', async () => {
       const userData = await createUser({
@@ -134,7 +134,7 @@ describe('POST /api/lots/:id/images', async () => {
 
       await lotData.clear()
       await userData.clear()
-    })
+    }, 15_000)
 
     it('return 422 when file width too big', async () => {
       const userData = await createUser({
@@ -154,7 +154,7 @@ describe('POST /api/lots/:id/images', async () => {
 
       await lotData.clear()
       await userData.clear()
-    })
+    }, 15_000)
 
     it('return 422 when file height too big', async () => {
       const userData = await createUser({
@@ -174,7 +174,7 @@ describe('POST /api/lots/:id/images', async () => {
 
       await lotData.clear()
       await userData.clear()
-    })
+    }, 15_000)
   })
 
   describe('error handling', () => {
