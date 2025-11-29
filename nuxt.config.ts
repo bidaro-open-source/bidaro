@@ -59,6 +59,9 @@ export default defineNuxtConfig({
     diagnostic: {
       token: '',
     },
+    rateLimit: {
+      enabled: false,
+    },
     challenge: {
       enabled: true,
     },
