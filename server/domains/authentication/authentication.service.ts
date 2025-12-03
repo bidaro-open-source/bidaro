@@ -111,7 +111,7 @@ class AuthenticationService {
       return data ? JSON.parse(data) as SessionMetadata : null
     }
     catch (error) {
-      console.warn('Failed to parse session data from Redis:', error)
+      logger.warn('Failed to parse session data from Redis:', error)
       return null
     }
   }
@@ -145,7 +145,7 @@ class AuthenticationService {
             sessions[currectToken] = JSON.parse(currectSession)
           }
           catch (error) {
-            console.warn('Failed to parse session data from Redis:', error)
+            logger.warn('Failed to parse session data from Redis:', error)
             inactiveTokens.push(currectToken)
           }
         }
