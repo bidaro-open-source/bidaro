@@ -38,7 +38,7 @@ export async function useDatabaseCache<T>(
   }
   catch (error) {
     await redis.del(key)
-    console.warn(`Failed to retrieve cache for key ${key}:`, error)
+    logger.warn(`Failed to retrieve cache for key ${key}`, error)
   }
 
   const data = await getData()
@@ -63,8 +63,8 @@ export async function useDatabaseCache<T>(
 
       await pipeline.exec()
     }
-    catch {
-      console.warn(`Failed to set cache for key ${key}`)
+    catch (error) {
+      logger.warn(`Failed to set cache for key ${key}`, error)
     }
   }
 

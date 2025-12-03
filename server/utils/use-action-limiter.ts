@@ -138,8 +138,8 @@ export async function useActionLimiter<T>(
         key,
       )
     }
-    catch {
-      console.warn('Failed to rollback action limit counter in Redis')
+    catch (error) {
+      logger.warn('Failed to rollback action limit counter in Redis', error)
     }
 
     throw error

@@ -28,7 +28,7 @@ class ChallengeTokenService {
       return token
     }
     catch (error) {
-      console.warn('Error creating challenge token:', error)
+      logger.warn('Error creating challenge token:', error)
       return null
     }
   }
@@ -55,7 +55,7 @@ class ChallengeTokenService {
       return true
     }
     catch (error) {
-      console.warn('Error verifying challenge token:', error)
+      logger.warn('Error verifying challenge token:', error)
       return false
     }
   }

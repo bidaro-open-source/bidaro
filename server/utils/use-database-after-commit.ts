@@ -5,7 +5,7 @@ type TransactionCallback = (transaction: Transaction) => Promise<void> | void
 /**
  * Register a callback to run after the given transaction successfully commits.
  *
- * If passed callback throws an error, it will be caught and logged to the console.
+ * If passed callback throws an error, it will be caught and logged.
  *
  * @param transaction - The Sequelize transaction to attach the afterCommit handler to.
  * @param callback - A function that will be called after the transaction commits. Receives the transaction.
@@ -15,7 +15,7 @@ export function useDatabaseAfterCommit(transaction: Transaction, callback: Trans
 /**
  * Register a named callback to run after the given transaction successfully commits.
  *
- * If passed callback throws an error, it will be caught and logged to the console.
+ * If passed callback throws an error, it will be caught and logged.
  *
  * The provided name is used for contextual logging if the callback throws.
  *
@@ -39,10 +39,10 @@ export function useDatabaseAfterCommit(transaction: Transaction, nameOrCallback:
       const name = typeof nameOrCallback === 'string' ? nameOrCallback : undefined
 
       if (name) {
-        console.error(`Error in afterCommit callback "${name}":`, error)
+        logger.error(`Error in afterCommit callback "${name}":`, error)
       }
       else {
-        console.error('Error in afterCommit callback:', error)
+        logger.error(`Error in afterCommit callback`, error)
       }
     }
   })

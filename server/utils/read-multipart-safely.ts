@@ -184,7 +184,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
       resolve(result)
     })
 
-    busboy.on('error', (err: any) => {
+    busboy.on('error', (error: any) => {
       const clientErrors = [
         'Boundary not found',
         'Unexpected end of multipart data',
@@ -192,17 +192,19 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         'Multipart: Boundary not found',
       ]
 
-      const isClientError = clientErrors.some(msg => err.message?.includes(msg))
+      const isClientError = clientErrors.some(msg => error.message?.includes(msg))
 
       if (isClientError) {
         reject(
           createError({
             statusCode: 400,
-            message: `Помилка розбору multipart даних: ${err.message}`,
+            message: `Помилка розбору multipart даних: ${error.message}`,
           }),
         )
       }
       else {
+        logger.error('Unknown error during reading multipart safely', error)
+
         reject(
           createError({
             statusCode: 500,

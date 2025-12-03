@@ -42,7 +42,7 @@ class ChallengeService {
       return id
     }
     catch (error) {
-      console.error('Error creating challenge:', error)
+      logger.error('Error creating challenge:', error)
       return null
     }
   }
@@ -77,7 +77,7 @@ class ChallengeService {
       return isXValid && isYValid
     }
     catch (error) {
-      console.error('Error verifying challenge:', error)
+      logger.error('Error verifying challenge:', error)
       return false
     }
   }

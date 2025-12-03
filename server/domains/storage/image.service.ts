@@ -114,7 +114,7 @@ class ImageService {
       const compressedImage = await this.compressBuffer(validatedImage.buffer)
 
       if (!compressedImage.buffer) {
-        console.warn('Image compression failed, proceeding with original buffer:', compressedImage.error)
+        logger.warn('Image compression failed, proceeding with original buffer:', compressedImage.error)
         throw createError({
           message: `Помилка сервера під час обробки зображення: ${compressedImage.error}`,
           status: 500,
@@ -124,7 +124,7 @@ class ImageService {
       const metadata = await this.getMetadata(compressedImage.buffer)
 
       if (!metadata.metadata) {
-        console.warn('Image metadata extraction failed:', metadata.error)
+        logger.warn('Image metadata extraction failed:', metadata.error)
         throw createError({
           message: `Помилка сервера під час отримання метаданих зображення: ${metadata.error}`,
           status: 500,
@@ -228,7 +228,7 @@ class ImageService {
       }
     }
     catch (error) {
-      console.warn(`Failed to delete image with id ${imageId}:`, error)
+      logger.warn(`Failed to delete image with id ${imageId}:`, error)
       return {
         ok: false,
         id: imageId,
