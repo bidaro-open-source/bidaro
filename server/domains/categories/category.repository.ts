@@ -1,6 +1,6 @@
-import type { RepositoryOptions } from '#class/BaseRepository'
+import type { RepositoryOptions } from '#classes/BaseRepository'
 import type { Category } from '#database/models/Category'
-import { BaseRepository } from '#class/BaseRepository'
+import { BaseRepository } from '#classes/BaseRepository'
 import { Op, QueryTypes } from 'sequelize'
 
 class CategoryRepository extends BaseRepository<Category> {

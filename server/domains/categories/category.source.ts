@@ -1,5 +1,5 @@
 import type { Category } from '#database'
-import { EntitySource } from '#class/EntitySource'
+import { EntitySource } from '#classes/EntitySource'
 import { categoryRepository } from './category.repository'
 
 class CategorySource extends EntitySource<Category> {

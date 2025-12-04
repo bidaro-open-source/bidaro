@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   srcDir: 'client',
 
   alias: {
-    '#class': fileURLToPath(new URL('./server/class', import.meta.url)),
+    '#classes': fileURLToPath(new URL('./server/classes', import.meta.url)),
     '#database': fileURLToPath(new URL('./server/database', import.meta.url)),
     '#domains': fileURLToPath(new URL('./server/domains', import.meta.url)),
   },

@@ -1,6 +1,6 @@
-import type { RepositoryOptions } from '#class/BaseRepository'
+import type { RepositoryOptions } from '#classes/BaseRepository'
 import type { User } from '#database'
-import { BaseRepository } from '#class/BaseRepository'
+import { BaseRepository } from '#classes/BaseRepository'
 
 class UserRepository extends BaseRepository<User> {
   protected get model() {

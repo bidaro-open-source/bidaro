@@ -1,5 +1,5 @@
 import type { ImageAttributes } from '#database'
-import { BaseResource } from '#class/BaseResource'
+import { BaseResource } from '#classes/BaseResource'
 
 export interface ImageDto {
   id: number
