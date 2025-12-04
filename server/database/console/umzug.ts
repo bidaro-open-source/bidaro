@@ -19,12 +19,12 @@ export function createUmzug(options: UmzugOptions) {
   const GLOB = path.join(TARGET_DIR, '[0-9]*.ts')
 
   const connection = new Sequelize({
-    host: process.env.NUXT_DB_HOST,
-    port: +(process.env.NUXT_DB_PORT || ''),
-    database: process.env.NUXT_DB_DATABASE,
-    username: process.env.NUXT_DB_USERNAME,
-    password: process.env.NUXT_DB_PASSWORD,
-    dialect: process.env.NUXT_DB_CONNECTION as any,
+    host: process.env.DB_HOST,
+    port: +(process.env.DB_PORT || ''),
+    database: process.env.DB_DATABASE,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    dialect: process.env.DB_CONNECTION as any,
     logging: false,
   })
 
