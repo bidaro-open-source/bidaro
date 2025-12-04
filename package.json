@@ -13,8 +13,6 @@
     "prepare": "git config core.hooksPath .hooks",
     "postinstall": "nuxt prepare",
     "test": "bun --env-file=.env run db:reset && bun --env-file=.env vitest run",
-    "test:api": "bun --env-file=.env run db:reset && bun --env-file=.env vitest run test/api",
-    "test:unit": "bun --env-file=.env run db:reset && bun --env-file=.env vitest run test/unit",
     "lint": "eslint --cache .",
     "lint:fix": "eslint . --fix",
     "lint:staged": "lint-staged",
