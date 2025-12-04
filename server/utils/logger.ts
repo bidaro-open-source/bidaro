@@ -1,5 +1,11 @@
 import winston from 'winston'
 
+try {
+  // eslint-disable-next-line ts/no-require-imports
+  require('winston') // Fix issue with open telemetry
+}
+catch {}
+
 const consoleFormat = winston.format.printf(({ level, message, timestamp, trace_id }) => {
   let logBody = message
 

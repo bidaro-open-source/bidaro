@@ -1,12 +1,15 @@
-import type RedisClass from 'ioredis'
+import Redis from 'ioredis'
 
-// eslint-disable-next-line ts/no-require-imports
-const Redis: typeof RedisClass = require('ioredis') // Use require to avoid OpenTelemetry issues
+try {
+  // eslint-disable-next-line ts/no-require-imports
+  require('ioredis') // Fix issue with open telemetry
+}
+catch {}
 
 /**
  * Singleton instance of the Redis client.
  */
-let instance: RedisClass | undefined
+let instance: Redis | undefined
 
 /**
  * Returns a singleton Redis client instance.
@@ -23,7 +26,7 @@ let instance: RedisClass | undefined
  *   return { success: true }
  * })
  */
-export function useRedis(event?: H3Event): RedisClass {
+export function useRedis(event?: H3Event): Redis {
   try {
     if (!instance) {
       const runtimeConfig = useRuntimeConfig(event)
