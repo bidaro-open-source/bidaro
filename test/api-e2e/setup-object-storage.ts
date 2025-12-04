@@ -8,12 +8,12 @@ function useObjectStorage() {
   try {
     if (!s3Client) {
       s3Client = new S3Client({
-        region: env.NUXT_S3_REGION as string,
-        endpoint: env.NUXT_S3_ENDPOINT as string,
+        region: env.S3_REGION as string,
+        endpoint: env.S3_ENDPOINT as string,
         forcePathStyle: true,
         credentials: {
-          accessKeyId: env.NUXT_S3_ACCESS_KEY_ID as string,
-          secretAccessKey: env.NUXT_S3_SECRET_ACCESS_KEY as string,
+          accessKeyId: env.S3_ACCESS_KEY_ID as string,
+          secretAccessKey: env.S3_SECRET_ACCESS_KEY as string,
         },
       })
     }
@@ -29,7 +29,7 @@ beforeAll(() => {
   // @ts-expect-error type
   globalThis.s3 = useObjectStorage()
   // @ts-expect-error type
-  globalThis.s3Bucket = env.NUXT_S3_BUCKET as string
+  globalThis.s3Bucket = env.S3_BUCKET as string
 })
 
 afterAll(async () => {

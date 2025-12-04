@@ -6,12 +6,12 @@ import { afterAll, beforeAll } from 'vitest'
 async function useDatabase() {
   try {
     const connection = new Sequelize({
-      host: env.NUXT_DB_HOST,
-      port: +(env.NUXT_DB_PORT || ''),
-      database: env.NUXT_DB_DATABASE,
-      username: env.NUXT_DB_USERNAME,
-      password: env.NUXT_DB_PASSWORD,
-      dialect: env.NUXT_DB_CONNECTION as any,
+      host: env.DB_HOST,
+      port: +(env.DB_PORT || ''),
+      database: env.DB_DATABASE,
+      username: env.DB_USERNAME,
+      password: env.DB_PASSWORD,
+      dialect: env.DB_CONNECTION as any,
       logging: false,
     })
 

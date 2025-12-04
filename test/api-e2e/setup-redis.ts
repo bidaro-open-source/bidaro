@@ -5,10 +5,10 @@ import { afterAll, beforeAll } from 'vitest'
 beforeAll(() => {
   // @ts-expect-error type
   globalThis.redis = new Redis({
-    host: env.NUXT_REDIS_HOST,
-    port: +(env.NUXT_REDIS_PORT || ''),
-    username: env.NUXT_REDIS_USER,
-    password: env.NUXT_REDIS_PASS,
+    host: env.REDIS_HOST,
+    port: +(env.REDIS_PORT || ''),
+    username: env.REDIS_USER,
+    password: env.REDIS_PASS,
   })
 })
 
