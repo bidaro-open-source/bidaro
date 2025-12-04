@@ -1,5 +1,4 @@
-import { challengeTokenService } from '~~/server/domains/security/challenge/challenge-token.service'
-import { challengeService } from '~~/server/domains/security/challenge/challenge.service'
+import { challengeService, challengeTokenService } from '#domains/security'
 import { verifyChallengeRequest } from './verify.request'
 
 export default defineEventHandler(async (event) => {

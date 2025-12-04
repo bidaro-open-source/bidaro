@@ -1,5 +1,4 @@
-import { challengeGeneratorService } from '~~/server/domains/security/challenge/challenge-generator.service'
-import { challengeService } from '~~/server/domains/security/challenge/challenge.service'
+import { challengeGeneratorService, challengeService } from '#domains/security'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()

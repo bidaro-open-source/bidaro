@@ -1,9 +1,9 @@
 import { recoveryService } from '#domains/authentication'
+import { challengeTokenService } from '#domains/security'
 import { userRepository } from '#domains/users'
 import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
-import { challengeTokenService } from '~~/server/domains/security/challenge/challenge-token.service'
 
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {

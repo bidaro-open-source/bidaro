@@ -1,9 +1,9 @@
 import { authService } from '#domains/authentication'
 import { roleRepository } from '#domains/authorization'
+import { challengeTokenService } from '#domains/security'
 import { userProfileResource, userRepository } from '#domains/users'
 import { z } from 'zod'
 import { roles } from '~~/server/constants'
-import { challengeTokenService } from '~~/server/domains/security/challenge/challenge-token.service'
 import { registerRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

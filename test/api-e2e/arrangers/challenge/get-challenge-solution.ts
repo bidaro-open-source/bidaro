@@ -1,4 +1,4 @@
-import { challengeService } from '~~/server/domains/security/challenge/challenge.service'
+import { challengeService } from '#domains/security'
 
 export async function getChallengeSolution(challengeId: string) {
   const solution = await redis.get(`${challengeService.scope}:${challengeId}`)

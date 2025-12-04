@@ -1,5 +1,5 @@
+import { challengeTokenService } from '#domains/security'
 import { v4 as uuidv4 } from 'uuid'
-import { challengeTokenService } from '~~/server/domains/security/challenge/challenge-token.service'
 
 export async function createChallengeToken() {
   const token = uuidv4()

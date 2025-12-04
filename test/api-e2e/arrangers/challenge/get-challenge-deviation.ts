@@ -1,4 +1,4 @@
-import { challengeService } from '~~/server/domains/security/challenge/challenge.service'
+import { challengeService } from '#domains/security'
 
 export function getChallengeDeviation() {
   return challengeService.tolerance
