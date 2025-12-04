@@ -15,8 +15,9 @@ RUN bun run build
 FROM base AS release
 COPY --chown=bun:bun --from=install /usr/src/app/node_modules node_modules
 COPY --chown=bun:bun --from=install /usr/src/app/.output .
+COPY --chown=bun:bun --from=install /usr/src/app/instrumentation.ts .
 
 USER bun
 ENV HOST 0.0.0.0
 EXPOSE 3000
-ENTRYPOINT [ "bun", "run", "server/index.mjs" ]
+ENTRYPOINT [ "bun", "-r", "instrumentation.ts", "server/index.mjs" ]
