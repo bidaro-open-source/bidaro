@@ -1,6 +1,4 @@
 import type { CreateUserRequest } from '~~/server/api/users/index.post.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -22,8 +20,6 @@ async function destroyUser(id: number) {
 }
 
 describe('POST /api/users', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should create user successfully without role', async () => {
     const adminData = await createUser({
       withRole: true,

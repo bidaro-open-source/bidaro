@@ -1,5 +1,3 @@
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -10,8 +8,6 @@ async function viewCategoriesRequest() {
 }
 
 describe('GET /api/categories', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return categories with correct structure', async () => {
     const userData = await createUser()
     const categoryData1 = await createCategory()

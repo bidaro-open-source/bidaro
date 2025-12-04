@@ -1,6 +1,4 @@
 import type { VerifyUserRequest } from '../../../../../../server/api/users/[id]/verify/index.post.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -17,8 +15,6 @@ async function verifyUserRequest(
 }
 
 describe('POST /api/users/:id/verify', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should verify user email successfully', async () => {
     const userData = await createUser()
     const adminData = await createUser({

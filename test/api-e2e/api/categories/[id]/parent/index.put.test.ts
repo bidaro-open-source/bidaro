@@ -1,6 +1,4 @@
 import type { UpdateCategoryParentRequest } from '../../../../../../server/api/categories/[id]/parent/index.put.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -19,8 +17,6 @@ async function updateCategoryParentRequest(
 }
 
 describe('PUT /api/categories/:id/parent', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should update a category parent successfully', async () => {
     const categoryData1 = await createCategory()
     const categoryData2 = await createCategory()

@@ -1,6 +1,4 @@
 import type { UpdateImageOrderRequest } from '../../../../../../../server/api/lots/[id]/images/update-order/index.post.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
@@ -22,8 +20,6 @@ async function updateImageOrderRequest(
 }
 
 describe('POST /api/lots/:id/images/update-order', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should reorder lot images successfully', async () => {

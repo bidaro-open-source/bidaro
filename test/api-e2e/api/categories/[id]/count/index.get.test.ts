@@ -1,6 +1,4 @@
 import type { ViewCategoryRequest } from '../../../../../../server/api/categories/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -19,8 +17,6 @@ async function viewCategoryCountRequest(
 }
 
 describe('GET /api/categories/:id/count', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return count of lots', async () => {
     const userData = await createUser({
       withRole: true,

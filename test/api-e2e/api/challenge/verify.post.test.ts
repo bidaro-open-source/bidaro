@@ -1,6 +1,5 @@
 import type { VerifyChallengeRequest } from '../../../../server/api/challenge/verify.request'
 import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { getChallengeDeviation } from '~~/test/api-e2e/arrangers/challenge/get-challenge-deviation'
 import { getChallengeInvalidDeviation } from '~~/test/api-e2e/arrangers/challenge/get-challenge-invalid-deviation'
@@ -21,8 +20,6 @@ async function verifyChallengeRequest(payload: VerifyChallengeRequest) {
 }
 
 describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should verify a challenge successfully', async () => {
     const response = await startChallengeRequest()
 
@@ -131,8 +128,6 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
 })
 
 describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/verify (disabled)', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return 404 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
     expect(response.status).toBe(404)

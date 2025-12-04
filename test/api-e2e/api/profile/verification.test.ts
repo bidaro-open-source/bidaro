@@ -1,6 +1,4 @@
 import type { EmailVerifyConfirmRequest } from '../../../../server/api/profile/verification/confirm/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { actionLimits } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -21,8 +19,6 @@ async function confirmVerificationRequest(payload: EmailVerifyConfirmRequest) {
 }
 
 describe('POST /api/profile/verification', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should complete verification flow successfully', async () => {
     const data = await createUser({ withSession: true })
 

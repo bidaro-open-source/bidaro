@@ -1,7 +1,8 @@
 import type { InternalApi } from 'nitropack/types'
 import type { FetchOptions } from 'ofetch'
-import { url } from '@nuxt/test-utils/e2e'
+import process from 'node:process'
 import { ofetch } from 'ofetch'
+import { joinURL } from 'ufo'
 
 type InternalApiEndpoints = keyof InternalApi | (string & {})
 type ExtendedFetchOptions = FetchOptions & {
@@ -25,6 +26,11 @@ const myFetch = ofetch.create({
     }
   },
 })
+
+function url(path: string) {
+  const host = process.env.SETUP_HOST || ''
+  return path.startsWith(host) ? path : joinURL(host, path)
+}
 
 export function fetch(request: InternalApiEndpoints, fetchOptions: ExtendedFetchOptions) {
   return myFetch.raw(url(request), fetchOptions)

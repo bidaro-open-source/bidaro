@@ -1,6 +1,4 @@
 import type { DeleteUserRequest } from '../../../../../server/api/users/[id]/index.delete.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -25,8 +23,6 @@ async function deleteUserRequest(
 }
 
 describe('DELETE /api/users/:id', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should delete user successfully', async () => {
     const userData = await createUser()
     const adminData = await createUser({

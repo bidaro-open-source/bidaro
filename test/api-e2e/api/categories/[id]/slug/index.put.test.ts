@@ -1,6 +1,4 @@
 import type { UpdateCategorySlugRequest } from '../../../../../../server/api/categories/[id]/slug/index.put.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { v4 as uuidv4 } from 'uuid'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
@@ -20,8 +18,6 @@ async function updateCategoryRequest(
 }
 
 describe('PUT /api/categories/:id/slug', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should update category slug successfully', async () => {
     const categoryData = await createCategory()
     const userData = await createUser({

@@ -1,6 +1,4 @@
 import type { ViewRoleRequest } from '../../../../../server/api/roles/[name]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -17,8 +15,6 @@ async function viewRoleRequest(
 }
 
 describe('GET /api/roles/:name', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return role with permissions', async () => {
     const roleData = await db.RoleFactory.new().create()
     await roleData.addPermissions([permissions.VIEW_PERMISSIONS])

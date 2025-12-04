@@ -1,7 +1,6 @@
 import type { ConfirmPasswordRequest } from '../../../../server/api/profile/recovery/confirm/index.request'
 import type { ResetPasswordRequest } from '../../../../server/api/profile/recovery/index.request'
 import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-invalid-token'
 import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
@@ -25,8 +24,6 @@ async function confirmResetPasswordRequest(payload: ConfirmPasswordRequest) {
 }
 
 describe('POST /api/profile/recovery', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should complete password reset flow successfully', async () => {
     const data = await createUser()
     const captchaToken = await createChallengeToken()

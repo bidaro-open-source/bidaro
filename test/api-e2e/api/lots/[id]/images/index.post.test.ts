@@ -1,7 +1,5 @@
 import type { MultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
 import type { UploadLotImageRequest } from '../../../../../../server/api/lots/[id]/images/index.post.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { IMAGE_PER_LOT_LIMIT, permissions } from '~~/server/constants'
 import { createMultipartConfig } from '~~/test/api-e2e/arrangers/create-multipart-config'
@@ -26,8 +24,6 @@ async function uploadLotImageRequest(
 }
 
 describe('POST /api/lots/:id/images', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   const IMAGE = 'image-normal.png'
   const IMAGE_TO_BIG = 'image-heavy.png'
   const IMAGE_PNG = 'image-normal.png'

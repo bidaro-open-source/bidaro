@@ -1,5 +1,3 @@
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { authService } from '~~/server/domains/authentication'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
@@ -7,8 +5,6 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { loginRequest, refreshRequest } from '~~/test/api-e2e/requests/authentication'
 
 describe('POST /api/auth/login', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should authenticate user successfully with valid credentials', async () => {
     const data = await createUser()
 

@@ -1,5 +1,3 @@
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { actionLimits, permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -19,8 +17,6 @@ export async function destroyLot(id: number) {
 }
 
 describe('POST /api/lots', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should create draft lot successfully for authenticated user', async () => {
     const data = await createUser({
       withRole: true,

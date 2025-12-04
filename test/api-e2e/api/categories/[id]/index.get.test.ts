@@ -1,6 +1,4 @@
 import type { ViewCategoryRequest } from '../../../../../server/api/categories/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -11,8 +9,6 @@ async function viewCategoryRequest(payload: ViewCategoryRequest) {
 }
 
 describe('GET /api/categories/:id', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return category with children', async () => {
     const userData = await createUser()
     const categoryData1 = await createCategory()

@@ -1,6 +1,4 @@
 import type { ViewLotRequest } from '../../../../../../server/api/lots/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
@@ -21,8 +19,6 @@ async function viewLotImageRequest(
 }
 
 describe('GET /api/lots/:id/images', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   const IMAGE_PATH = resolveImage('image-normal.png').path
 
   it('should retrieve lot image with correct structure and metadata', async () => {

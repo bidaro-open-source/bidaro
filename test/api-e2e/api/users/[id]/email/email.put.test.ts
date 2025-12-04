@@ -1,6 +1,4 @@
 import type { UpdateUserEmailRequest } from '~~/server/api/users/[id]/email/index.put.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { actionLimits, permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -18,8 +16,6 @@ async function updateUserEmailRequest(
 }
 
 describe('PUT /api/users/:id/email', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should update user email successfully', async () => {
     const userData = await createUser({
       withRole: true,

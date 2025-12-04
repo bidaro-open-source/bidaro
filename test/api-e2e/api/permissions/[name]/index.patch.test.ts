@@ -1,6 +1,4 @@
 import type { UpdatePermissionRequest } from '../../../../../server/api/permissions/[name]/index.patch.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -18,8 +16,6 @@ async function viewPermissionRequest(
 }
 
 describe('PATCH /api/permissions/:id', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   const displayName = 'new display name'
   const description = 'new description'
 

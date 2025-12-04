@@ -1,5 +1,3 @@
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -13,8 +11,6 @@ async function clearCacheRequest(options: { accessToken?: string } = {}) {
 }
 
 describe('DELETE /api/cache', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should clear cache successfully', async () => {
     const userData = await createUser({
       withRole: true,

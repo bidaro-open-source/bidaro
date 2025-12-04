@@ -1,5 +1,4 @@
 import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { fetch } from '~~/test/api-e2e/fetch'
 
@@ -10,8 +9,6 @@ async function startChallengeRequest() {
 }
 
 describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/start', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should create a challenge successfully', async () => {
     const response = await startChallengeRequest()
 
@@ -28,8 +25,6 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/start', async () => {
 })
 
 describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/start (disabled)', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return 404 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
     expect(response.status).toBe(404)

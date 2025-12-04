@@ -1,6 +1,4 @@
 import type { DeleteSessionsRequest } from '../../../../../../server/api/users/[id]/sessions/index.delete.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -19,8 +17,6 @@ async function deleteSessionsRequest(
 }
 
 describe('DELETE /api/profile/sessions', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should delete single session successfully', async () => {
     const data = await createUser({
       withRole: true,

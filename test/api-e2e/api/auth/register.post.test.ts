@@ -1,5 +1,4 @@
 import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-invalid-token'
@@ -9,8 +8,6 @@ import { destroyUser, registerRequest } from '~~/test/api-e2e/requests/authentic
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
 describe('POST /api/auth/register', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should register new user successfully with valid credentials', async () => {
     const userData = db.UserFactory.new().make()
     const captchaToken = await createChallengeToken()

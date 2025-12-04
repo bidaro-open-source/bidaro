@@ -1,5 +1,4 @@
 import type { UpdateLotRequest } from '../../../../../server/api/lots/[id]/index.patch.request'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { lotInitialDurations, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -20,8 +19,6 @@ async function updateLotRequest(
 }
 
 describe('PATCH /api/lots/:id', async () => {
-  await setup({ host: process.env.SETUP_HOST })
-
   it('should update lot successfully and return the correct structure', async () => {
     const uData = await createUser({
       withRole: true,

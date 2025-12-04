@@ -1,6 +1,4 @@
 import type { UpdateUserRequest } from '../../../../../server/api/users/[id]/index.patch.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -18,8 +16,6 @@ async function updateUserRequest(
 }
 
 describe('PATCH /api/users/:id', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   const newName = 'UpdatedName'
   const newSurname = 'UpdatedSurname'
 

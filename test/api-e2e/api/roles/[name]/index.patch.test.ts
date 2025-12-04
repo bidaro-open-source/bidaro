@@ -1,6 +1,4 @@
 import type { UpdateRoleRequest } from '../../../../../server/api/roles/[name]/index.patch.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -18,8 +16,6 @@ async function updateRoleRequest(
 }
 
 describe('PATCH /api/roles/:name', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should update role displayName and description', async () => {
     const roleData = await db.RoleFactory.new().create()
     const userData = await createUser({

@@ -1,6 +1,4 @@
 import type { CreateLotBetRequest } from '../../../../../../server/api/lots/[id]/bets/index.post.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { actionLimits, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -22,8 +20,6 @@ async function createLotBetRequest(
 }
 
 describe('POST /api/lots/:id/bets', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should create bet successfully', async () => {
     const uData = await createUser()
     const uuData = await createUser({

@@ -1,6 +1,4 @@
 import type { ViewLotRequest } from '../../../../../../server/api/lots/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { lotStatuses, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -20,8 +18,6 @@ async function publishLotRequest(
 }
 
 describe('POST /api/lots/:id/publish', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should publish lot successfully', async () => {
     const uData = await createUser({
       withRole: true,

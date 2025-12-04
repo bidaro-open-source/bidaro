@@ -1,6 +1,4 @@
 import type { ViewLotRequest } from '../../../../../server/api/lots/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createImage } from '~~/test/api-e2e/arrangers/create-image'
@@ -18,8 +16,6 @@ async function viewLotRequest(payload: ViewLotRequest) {
 }
 
 describe('GET /api/lots/:id', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should retrieve lot with correct structure', async () => {
     const uData = await createUser({ withSession: true })
     const lotData = await createLot({ sellerId: uData.user.id })

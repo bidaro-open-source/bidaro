@@ -1,5 +1,3 @@
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -15,8 +13,6 @@ async function viewProfileRequest(
 }
 
 describe('GET /api/profile', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should retrieve authenticated user profile successfully', async () => {
     const data = await createUser({
       withRole: true,

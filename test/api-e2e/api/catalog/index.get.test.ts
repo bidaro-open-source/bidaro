@@ -1,5 +1,3 @@
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { lotStatuses } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -13,8 +11,6 @@ async function viewCatalogRequest(query: { page?: number, limit?: number, catego
 }
 
 describe('GET /api/catalog', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return catalog with correct structure', async () => {
     const userData = await createUser()
     const categoryData = await createCategory()

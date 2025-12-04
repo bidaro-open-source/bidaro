@@ -1,6 +1,4 @@
 import type { ViewLotRequest } from '../../../../../../server/api/lots/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { lotStatuses, permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
@@ -21,8 +19,6 @@ async function closeLotRequest(
 }
 
 describe('POST /api/lots/:id/close', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should close lot successfully with reject', async () => {
     const uData = await createUser({
       withRole: true,

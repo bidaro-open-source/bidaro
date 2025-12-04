@@ -1,6 +1,4 @@
 import type { ViewCategoryRequest } from '../../../../../../server/api/categories/[id]/index.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -13,8 +11,6 @@ async function viewCategoryBreadcrumbsRequest(payload: ViewCategoryRequest) {
 }
 
 describe('GET /api/categories/:id/breadcrumbs', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should return category breadcrumbs with correct structure', async () => {
     const userData = await createUser()
 

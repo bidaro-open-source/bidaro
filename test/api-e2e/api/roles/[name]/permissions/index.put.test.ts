@@ -1,6 +1,4 @@
 import type { UpdateRolePermissionsRequest } from '../../../../../../server/api/roles/[name]/permissions/index.put.request'
-import { env } from 'node:process'
-import { setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import { permissions, roles } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
@@ -18,8 +16,6 @@ async function updateRolePermissionsRequest(
 }
 
 describe('PUT /api/roles/:name/permissions', async () => {
-  await setup({ host: env.SETUP_HOST })
-
   it('should update role permissions', async () => {
     const roleData = await db.RoleFactory.new().create()
     const userData = await createUser({
