@@ -1,12 +1,12 @@
-import type { Redis as RedisClass } from 'ioredis'
+import type RedisClass from 'ioredis'
 
 // eslint-disable-next-line ts/no-require-imports
-const Redis = require('ioredis') // Use require to avoid OpenTelemetry issues
+const Redis: typeof RedisClass = require('ioredis') // Use require to avoid OpenTelemetry issues
 
 /**
  * Singleton instance of the Redis client.
  */
-let instance: typeof Redis | undefined
+let instance: RedisClass | undefined
 
 /**
  * Returns a singleton Redis client instance.
