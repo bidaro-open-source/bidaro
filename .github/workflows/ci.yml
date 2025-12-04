@@ -14,6 +14,8 @@ on:
       - develop
 
 env:
+  NODE_ENV: production
+
   SETUP_HOST: http://localhost:3000
   SETUP_MAILER_PORT: 8025
 
@@ -60,6 +62,12 @@ env:
 
   NUXT_RATE_LIMIT_ENABLED: false
   NUXT_CHALLENGE_ENABLED: true
+
+  OBSERVABILITY_ENABLED: false
+  OBSERVABILITY_LOGS_ENABLED: false
+  OBSERVABILITY_TRACES_ENABLED: false
+  OBSERVABILITY_METRICS_ENABLED: false
+  OBSERVABILITY_COLLECTOR_URL:
 
 jobs:
   ci:

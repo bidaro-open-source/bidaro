@@ -21,17 +21,31 @@ import {
   SEMRESATTRS_SERVICE_INSTANCE_ID,
 } from '@opentelemetry/semantic-conventions'
 
-const logExporter = new OTLPLogExporter({
-  url: 'http://localhost:4317',
-})
+const COLLECTOR_URL = process.env.OBSERVABILITY_COLLECTOR_URL
 
-const traceExporter = new OTLPTraceExporter({
-  url: 'http://localhost:4317',
-})
+const ENABLED = process.env.OBSERVABILITY_ENABLED === 'true'
+const ENABLE_LOGS = ENABLED && process.env.OBSERVABILITY_LOGS_ENABLED === 'true'
+const ENABLE_TRACES = ENABLED && process.env.OBSERVABILITY_TRACES_ENABLED === 'true'
+const ENABLE_METRICS = ENABLED && process.env.OBSERVABILITY_METRICS_ENABLED === 'true'
 
-const metricExporter = new OTLPMetricExporter({
-  url: 'http://localhost:4317',
-})
+const traceExporter = ENABLE_TRACES
+  ? new OTLPTraceExporter({ url: COLLECTOR_URL })
+  : undefined
+
+const logExporter = ENABLE_LOGS
+  ? new OTLPLogExporter({ url: COLLECTOR_URL })
+  : undefined
+
+const logRecordProcessor = logExporter
+  ? new BatchLogRecordProcessor(logExporter)
+  : undefined
+
+const metricReader = ENABLE_METRICS
+  ? new PeriodicExportingMetricReader({
+      exporter: new OTLPMetricExporter({ url: COLLECTOR_URL }),
+      exportIntervalMillis: 1000,
+    })
+  : undefined
 
 const sdk = new NodeSDK({
   resource: resourceFromAttributes({
@@ -41,11 +55,8 @@ const sdk = new NodeSDK({
     [SEMRESATTRS_SERVICE_INSTANCE_ID]: process.env.HOSTNAME || `unknown-instance-${Math.floor(Math.random() * 100000)}`,
   }),
   traceExporter,
-  logRecordProcessor: new BatchLogRecordProcessor(logExporter),
-  metricReader: new PeriodicExportingMetricReader({
-    exporter: metricExporter,
-    exportIntervalMillis: 1000,
-  }),
+  logRecordProcessor,
+  metricReader,
   instrumentations: [
     new HttpInstrumentation(),
     new PgInstrumentation(),
@@ -72,20 +83,30 @@ const sdk = new NodeSDK({
   ],
 })
 
-sdk.start()
+if (ENABLED) {
+  sdk.start()
+  console.log(`🔭 OpenTelemetry started`)
+  console.log(`   ├─ Collector: ${COLLECTOR_URL}`)
+  console.log(`   ├─ Traces:    ${ENABLE_TRACES ? '✅' : '❌'}`)
+  console.log(`   ├─ Metrics:   ${ENABLE_METRICS ? '✅' : '❌'}`)
+  console.log(`   └─ Logs:      ${ENABLE_LOGS ? '✅' : '❌'}`)
 
-console.log('🔭 OpenTelemetry initialized')
+  process.on('SIGTERM', () => {
+    sdk.shutdown()
+      .then(() => console.log('OTel SDK shut down'))
+      .catch(error => console.log('Error shutting down SDK', error))
+  })
+}
+else {
+  console.log('⚪ OpenTelemetry disabled')
+}
 
-const hostMetrics = new HostMetrics({
-  meterProvider: opentelemetry.metrics.getMeterProvider(),
-})
+if (ENABLE_METRICS) {
+  const hostMetrics = new HostMetrics({
+    meterProvider: opentelemetry.metrics.getMeterProvider(),
+  })
 
-hostMetrics.start()
+  hostMetrics.start()
 
-console.log('🔭 HostMetrics initialized')
-
-process.on('SIGTERM', () => {
-  sdk.shutdown()
-    .then(() => console.log('OTel SDK shut down'))
-    .catch(error => console.log('Error shutting down SDK', error))
-})
+  console.log('🔭 HostMetrics initialized')
+}
