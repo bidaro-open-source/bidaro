@@ -4,10 +4,10 @@ import { afterAll, beforeAll } from 'vitest'
 function useMailhog() {
   const self = {
     clear: async () => {
-      return fetch(`http://${env.MAILER_HOST}:${env.SETUP_MAILER_PORT}/api/v1/messages`, { method: 'DELETE' })
+      return fetch(`${env.SETUP_MAILER_HOST}/api/v1/messages`, { method: 'DELETE' })
     },
     getMessages: async () => {
-      const res = await fetch(`http://${env.MAILER_HOST}:${env.SETUP_MAILER_PORT}/api/v2/messages`)
+      const res = await fetch(`${env.SETUP_MAILER_HOST}/api/v2/messages`)
       return res.json()
     },
     getMessagesByEmail: async (email: string) => {

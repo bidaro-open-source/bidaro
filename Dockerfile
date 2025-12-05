@@ -6,19 +6,30 @@ FROM --platform=linux/amd64 $IMAGE AS base
 WORKDIR /usr/src/app
 
 # Installing Dependencies
-FROM base AS install
-COPY . .
-RUN apk --no-cache --update add git python3 make g++\
+FROM base AS sys-deps
+RUN apk --no-cache --update add git python3 make g++ \
    && rm -rf /var/cache/apk/*
+
+# For development
+FROM sys-deps AS dev
+USER bun
+ENV NODE_ENV=development
+ENV HOST 0.0.0.0
+EXPOSE 3000
+CMD ["tail", "-f", "/dev/null"]
+
+# For production
+FROM sys-deps AS build
+COPY . .
 RUN bun install --frozen-lockfile --production
 ENV NODE_ENV=production
 RUN bun run build
 
 # Production
 FROM base AS release
-COPY --chown=bun:bun --from=install /usr/src/app/node_modules node_modules
-COPY --chown=bun:bun --from=install /usr/src/app/.output .
-COPY --chown=bun:bun --from=install /usr/src/app/instrumentation.ts .
+COPY --chown=bun:bun --from=build /usr/src/app/node_modules node_modules
+COPY --chown=bun:bun --from=build /usr/src/app/.output .
+COPY --chown=bun:bun --from=build /usr/src/app/instrumentation.ts .
 
 USER bun
 ENV HOST 0.0.0.0
