@@ -317,6 +317,19 @@ export const errors = {
     title: 'Токен відновлення не знайдено',
     description: 'Токен відновлення пароля не існує або прострочений.',
   },
+  EMAIL_NOT_FOUND: {
+    statusCode: 404,
+    title: 'Email не знайдено',
+    description: 'Користувача з такою адресою електронної пошти не знайдено.',
+  },
+  USER_ALREADY_EXISTS: {
+    statusCode: 422,
+    title: 'Користувач вже існує',
+    description: 'Користувач з таким іменем або email вже зареєстрований.',
+    detailsSchema: z.object({
+      field: z.string().optional(),
+    }),
+  },
 
   // Infrastructure errors
   DATABASE_CONNECTION_FAILED: {

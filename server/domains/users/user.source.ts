@@ -1,4 +1,5 @@
 import type { User } from '#database'
+import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
 import { userRepository } from './user.repository'
 
@@ -40,10 +41,7 @@ class UserSource extends EntitySource<User> {
       const data = await userRepository.findByPk(id)
 
       if (!data) {
-        throw createError({
-          message: 'Користувача не знайдено',
-          status: 404,
-        })
+        throw new AppError('USER_NOT_FOUND', { userId: id })
       }
 
       return data
@@ -64,10 +62,7 @@ class UserSource extends EntitySource<User> {
       const data = await userRepository.findByPkWithAuth(id)
 
       if (!data) {
-        throw createError({
-          message: 'Користувача не знайдено',
-          status: 404,
-        })
+        throw new AppError('USER_NOT_FOUND', { userId: id })
       }
 
       return {
