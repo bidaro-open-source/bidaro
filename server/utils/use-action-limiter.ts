@@ -65,8 +65,9 @@ const ACTION_LIMIT_DECREMENT_SCRIPT = `
  * @param duration - Time window in seconds (defaults to one day)
  * @returns Result of the callback function
  *
- * @throws 429 Too Many Requests if limit is exceeded
- * @throws 500 Internal Server Error if Redis operation fails
+ * @throws {AppError} ACTION_LIMIT_EXCEEDED - When user exceeds action limit
+ * @throws {AppError} REDIS_OPERATION_FAILED - When Redis operation fails
+ * @throws {AppError} ACTION_LIMITER_AUTH_REQUIRED - When user is not authenticated
  *
  * @example
  * // Limit lot creation to 6 per day

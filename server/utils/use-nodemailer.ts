@@ -8,6 +8,7 @@ let transporter: nodemailer.Transporter | null = null
  *
  * @param event - H3Event
  * @returns Nodemailer transporter
+ * @throws {AppError} NODEMAILER_CREATION_FAILED - When nodemailer transporter creation fails
  */
 export function useNodemailer(event: H3Event) {
   const runtimeConfig = useRuntimeConfig(event)

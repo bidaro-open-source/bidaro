@@ -21,7 +21,7 @@ let bucket: string | undefined
  *
  * @param event H3Event
  * @returns A configured s3 client instance
- * @throws Error if s3 connection cannot be established
+ * @throws {AppError} OBJECT_STORAGE_CONNECTION_FAILED - When S3 connection cannot be established
  *
  * @example
  * // Use in API route handler

@@ -57,9 +57,12 @@ interface MultipartResult {
  * @param event - The H3 event object containing the request.
  * @param options - Configuration for limits and allowed MIME types.
  * @returns A promise that resolves to an object containing fields and files.
- * @throws 413 if limits are exceeded.
- * @throws 415 for invalid MIME types.
- * @throws 400 for parsing errors.
+ * @throws {AppError} MISSING_CONTENT_TYPE - When Content-Type header is missing
+ * @throws {AppError} UNSUPPORTED_MEDIA_TYPE - When Content-Type is not multipart/form-data or file type not allowed
+ * @throws {AppError} PAYLOAD_TOO_LARGE - When file or field size exceeds limits
+ * @throws {AppError} FIELD_NAME_TOO_LONG - When field name exceeds maximum length
+ * @throws {AppError} INVALID_MULTIPART_DATA - When multipart parsing fails
+ * @throws {AppError} INTERNAL_SERVER_ERROR - When unexpected server error occurs
  */
 export function readMultipartSafely(event: H3Event, options: MultipartOptions = {}): Promise<MultipartResult> {
   return new Promise((resolve, reject) => {

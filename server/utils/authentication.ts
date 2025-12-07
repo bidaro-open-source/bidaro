@@ -7,7 +7,7 @@ import { AppError } from '#classes/app-error'
  * Depends on the `authentication` middleware.
  *
  * @param event H3Event
- * @throws 401 Unauthorized
+ * @throws {AppError} AUTHENTICATION_REQUIRED - When user is not authenticated
  *
  * @example
  * // Usage in protected route handler

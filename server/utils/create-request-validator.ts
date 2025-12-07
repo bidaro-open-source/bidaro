@@ -22,6 +22,22 @@ export type ValidatorReturnType<V>
     : V extends (event: H3Event, context?: any) => Promise<infer R> | infer R ? R
       : never
 
+/**
+ * Creates a request validator function.
+ *
+ * Validates request data (body, query, params, multipart) using Zod schemas or custom functions.
+ *
+ * @param options - Validation options for different request parts
+ * @returns Async function that validates the request and returns validated data
+ * @throws {AppError} VALIDATION_ERROR - When Zod validation fails
+ * @throws {AppError} UNKNOWN_VALIDATION_ERROR - When unexpected validation error occurs
+ *
+ * @example
+ * const validator = createRequestValidator({
+ *   body: z.object({ name: z.string() })
+ * })
+ * const { body } = await validator(event)
+ */
 export function createRequestValidator<Options extends ValidatorOptions>(
   options: Options,
 ) {
@@ -76,9 +92,10 @@ export function createRequestValidator<Options extends ValidatorOptions>(
       }
 
       if (error.data instanceof z.ZodError) {
+        const flattened = z.flattenError(error.data)
         throw new AppError('VALIDATION_ERROR', {
-          fieldErrors: z.flattenError(error.data).fieldErrors,
-          formErrors: z.flattenError(error.data).formErrors,
+          fieldErrors: flattened.fieldErrors,
+          formErrors: flattened.formErrors,
         })
       }
 

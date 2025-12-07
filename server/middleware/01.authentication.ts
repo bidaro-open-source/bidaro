@@ -20,7 +20,9 @@ import { userSource } from '#domains/users'
  * - `User` include `Role` association with all attributes
  * - `Role` include `Permission` association with all attributes
  *
- * @throws 401 Unauthorized
+ * @throws {AppError} INVALID_AUTHORIZATION_METHOD - When authorization method is not Bearer
+ * @throws {AppError} INVALID_ACCESS_TOKEN - When access token is invalid or expired
+ * @throws {AppError} USER_NOT_FOUND - When user does not exist in database
  */
 export default defineEventHandler(async (event) => {
   const authorization = getRequestHeader(event, 'Authorization')

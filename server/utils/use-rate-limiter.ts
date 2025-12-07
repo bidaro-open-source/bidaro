@@ -34,7 +34,8 @@ const RATE_LIMIT_SCRIPT = `
  * @param event - The current H3 event context.
  * @param config - The rate limit configuration object.
  * @returns A promise that resolves if the request is within limits.
- * @throws throws a 429 "Too Many Requests" error if the limit is exceeded.
+ * @throws {AppError} TOO_MANY_REQUESTS - When authenticated user exceeds rate limit
+ * @throws {AppError} TOO_MANY_REQUESTS_ANONYMOUS - When anonymous user exceeds rate limit
  */
 export async function useRateLimiter(
   event: H3Event,

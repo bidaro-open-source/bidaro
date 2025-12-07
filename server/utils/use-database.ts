@@ -13,7 +13,7 @@ let database: Database | undefined
  *
  * @param event H3Event
  * @returns A configured Database instance with all models initialized
- * @throws Error if database connection cannot be established
+ * @throws {AppError} DATABASE_CONNECTION_FAILED - When database connection cannot be established
  *
  * @example
  * // Use in API route handler

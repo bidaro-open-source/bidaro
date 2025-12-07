@@ -5,14 +5,14 @@ import { AppError } from '#classes/app-error'
  * Creates a request policy function.
  *
  * @param policy - policy function
- * @throws 403 error for policy failures
- * @throws 500 error for unexpected errors
+ * @throws {AppError} FORBIDDEN - When policy check fails
+ * @throws {AppError} UNKNOWN_AUTHORIZATION_ERROR - When unexpected error occurs during policy execution
  *
  * @example
  * const policy = createRequestPolicy((event: H3Event, key: string) => key === 'hello world')
  *
  * policy(event, 'hello world') // ok
- * policy(event, 'no') // throws an 403 error
+ * policy(event, 'no') // throws FORBIDDEN error
  */
 export function createRequestPolicy<Policy extends (...args: any[]) => any>(
   policy: Policy,

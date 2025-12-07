@@ -17,7 +17,7 @@ let instance: Redis | undefined
  *
  * @param event H3Event
  * @returns A connected Redis client instance
- * @throws Error if Redis connection cannot be established
+ * @throws {AppError} REDIS_CONNECTION_FAILED - When Redis connection cannot be established
  *
  * @example
  * // Use in API route handler
