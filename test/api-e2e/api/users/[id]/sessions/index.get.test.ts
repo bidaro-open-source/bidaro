@@ -44,6 +44,7 @@ describe('GET /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await user.clear()
     })
@@ -61,6 +62,7 @@ describe('GET /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await data.clear()
     })

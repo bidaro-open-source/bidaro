@@ -80,6 +80,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
       })
 
       expect(verifyRequest.status).toBe(400)
+      expect(verifyRequest._data.code).toBe('INVALID_CHALLENGE_SOLUTION')
     })
 
     it('should return 400 when deviation large by y', async () => {
@@ -102,6 +103,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
       })
 
       expect(verifyRequest.status).toBe(400)
+      expect(verifyRequest._data.code).toBe('INVALID_CHALLENGE_SOLUTION')
     })
 
     it('should return 400 when deviation large for axis', async () => {
@@ -123,6 +125,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
       })
 
       expect(verifyRequest.status).toBe(400)
+      expect(verifyRequest._data.code).toBe('INVALID_CHALLENGE_SOLUTION')
     })
   })
 })
@@ -131,5 +134,6 @@ describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/verify (disabled)', async 
   it('should return 404 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
     expect(response.status).toBe(404)
+    expect(response._data.code).toBe('NOT_FOUND')
   })
 })

@@ -76,6 +76,7 @@ describe('GET /api/categories/:id/count', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('NOT_FOUND')
 
       await userData.clear()
     })
@@ -94,6 +95,7 @@ describe('GET /api/categories/:id/count', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()

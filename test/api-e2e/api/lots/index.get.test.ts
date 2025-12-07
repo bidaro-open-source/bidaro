@@ -65,6 +65,7 @@ describe('GET /api/lots', async () => {
       const response = await viewLotsRequest()
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -82,6 +83,7 @@ describe('GET /api/lots', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })

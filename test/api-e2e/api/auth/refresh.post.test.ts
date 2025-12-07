@@ -39,6 +39,7 @@ describe('POST /api/auth/refresh', async () => {
         )
 
         expect(response.status).toBe(422)
+        expect(response._data.code).toBe('VALIDATION_ERROR')
       },
     )
 
@@ -51,6 +52,7 @@ describe('POST /api/auth/refresh', async () => {
         )
 
         expect(response.status).toBe(422)
+        expect(response._data.code).toBe('VALIDATION_ERROR')
       },
     )
 
@@ -68,6 +70,7 @@ describe('POST /api/auth/refresh', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('NOT_FOUND')
 
       await data.clear()
     })

@@ -84,6 +84,7 @@ describe('GET /api/profile', async () => {
       const response = await viewProfileRequest()
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
     })
   })
 })

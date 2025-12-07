@@ -26,6 +26,8 @@ describe('POST /api/auth/logout', async () => {
       )
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await data.clear()
     })
@@ -40,6 +42,8 @@ describe('POST /api/auth/logout', async () => {
       )
 
       expect(response.status).toBe(422)
+      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.code).toBe('VALIDATION_ERROR')
 
       await data.clear()
     })
@@ -53,6 +57,8 @@ describe('POST /api/auth/logout', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('REFRESH_TOKEN_NOT_FOUND')
+      expect(response._data.code).toBe('REFRESH_TOKEN_NOT_FOUND')
 
       await data.clear()
     })
@@ -67,6 +73,8 @@ describe('POST /api/auth/logout', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('REFRESH_TOKEN_ACCESS_DENIED')
+      expect(response._data.code).toBe('REFRESH_TOKEN_ACCESS_DENIED')
 
       await user1.clear()
       await user2.clear()

@@ -67,6 +67,7 @@ describe('POST /api/profile/recovery', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('RECOVERY_TOKEN_NOT_FOUND')
     })
 
     it('should return 404 when reset token does not exist', async () => {
@@ -75,6 +76,7 @@ describe('POST /api/profile/recovery', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('RECOVERY_TOKEN_NOT_FOUND')
     })
 
     it('should return 404 when account is deleted after token generation', async () => {
@@ -102,6 +104,7 @@ describe('POST /api/profile/recovery', async () => {
       )
 
       expect(confirmResponse.status).toBe(404)
+      expect(confirmResponse._data.code).toBe('RECOVERY_TOKEN_NOT_FOUND')
     })
 
     it.runIf(CAPTCHA_ENABLED)('should return 400 when captcha token is invalid', async () => {
@@ -113,6 +116,7 @@ describe('POST /api/profile/recovery', async () => {
       )
 
       expect(resetResponse.status).toBe(400)
+      expect(resetResponse._data.code).toBe('INVALID_CHALLENGE_SOLUTION')
 
       await data.clear()
     })

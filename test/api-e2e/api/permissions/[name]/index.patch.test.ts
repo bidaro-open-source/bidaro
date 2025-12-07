@@ -54,6 +54,7 @@ describe('PATCH /api/permissions/:id', async () => {
       )
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -72,6 +73,7 @@ describe('PATCH /api/permissions/:id', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await uData.clear()
     })

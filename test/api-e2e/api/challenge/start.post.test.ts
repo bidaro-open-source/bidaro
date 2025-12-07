@@ -28,5 +28,6 @@ describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/start (disabled)', async (
   it('should return 404 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
     expect(response.status).toBe(404)
+    expect(response._data.code).toBe('NOT_FOUND')
   })
 })

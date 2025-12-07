@@ -122,6 +122,7 @@ describe('PUT /api/categories/:id/parent', async () => {
       )
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await categoryData.clear()
     })
@@ -142,6 +143,7 @@ describe('PUT /api/categories/:id/parent', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('NOT_FOUND')
 
       await userData.clear()
     })
@@ -163,6 +165,7 @@ describe('PUT /api/categories/:id/parent', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()
@@ -185,6 +188,7 @@ describe('PUT /api/categories/:id/parent', async () => {
       )
 
       expect(response.status).toBe(422)
+      expect(response._data.code).toBe('PARENT_CATEGORY_NOT_FOUND')
 
       await categoryData.clear()
       await userData.clear()
@@ -209,6 +213,7 @@ describe('PUT /api/categories/:id/parent', async () => {
       )
 
       expect(response.status).toBe(422)
+      expect(response._data.code).toBe('PARENT_CATEGORY_NOT_FOUND')
 
       await categoryData3.clear()
       await categoryData2.clear()

@@ -73,6 +73,7 @@ describe('POST /api/auth/login', async () => {
     )
 
     expect(refreshResponse.status).toBe(404)
+    expect(refreshResponse._data.code).toBe('REFRESH_TOKEN_NOT_FOUND')
 
     await data.clear()
   })
@@ -85,6 +86,7 @@ describe('POST /api/auth/login', async () => {
       })
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('ACCOUNT_NOT_FOUND')
     })
 
     it('should return 422 when password is incorrect', async () => {
@@ -96,6 +98,7 @@ describe('POST /api/auth/login', async () => {
       })
 
       expect(response.status).toBe(422)
+      expect(response._data.code).toBe('INVALID_PASSWORD')
 
       await data.clear()
     })

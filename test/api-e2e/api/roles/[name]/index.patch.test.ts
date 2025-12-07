@@ -109,6 +109,7 @@ describe('PATCH /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(404)
+      expect(response._data.code).toBe('NOT_FOUND')
 
       await userData.clear()
     })
@@ -120,6 +121,7 @@ describe('PATCH /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await roleData.destroy()
     })
@@ -142,6 +144,7 @@ describe('PATCH /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await roleData.destroy()
       await userData.clear()

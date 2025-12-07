@@ -83,6 +83,7 @@ describe('PUT /api/users/:id/email', async () => {
       )
 
       expect(response.status).toBe(401)
+      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -105,6 +106,7 @@ describe('PUT /api/users/:id/email', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })
@@ -128,6 +130,7 @@ describe('PUT /api/users/:id/email', async () => {
       )
 
       expect(response.status).toBe(403)
+      expect(response._data.code).toBe('FORBIDDEN')
 
       await userData2.clear()
       await userData1.clear()
@@ -150,6 +153,7 @@ describe('PUT /api/users/:id/email', async () => {
       )
 
       expect(response.status).toBe(400)
+      expect(response._data.code).toBe('BAD_REQUEST')
 
       await userData2.clear()
       await userData1.clear()
