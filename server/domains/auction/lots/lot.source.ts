@@ -36,7 +36,7 @@ class LotSource extends EntitySource<Lot> {
    * Retrieve a lot by ID, utilizing Redis caching.
    *
    * @param id - The ID of the lot to fetch.
-   * @throws 404 if the lot does not exist
+   * @throws {AppError} LOT_NOT_FOUND
    * @returns The lot instance
    */
   async getById(id: number) {

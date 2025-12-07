@@ -10,6 +10,8 @@ class CategoryService {
    *
    * @param data - category data
    * @returns category instance
+   * @throws {AppError} CATEGORY_SLUG_TAKEN - When slug is already in use
+   * @throws {AppError} PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -60,7 +62,7 @@ class CategoryService {
    * @param id - The ID of the category to update
    * @param data - The data to update
    * @returns The updated category instance
-   * @throws 404 if the category does not exist
+   * @throws {AppError} CATEGORY_NOT_FOUND
    */
   async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -101,8 +103,8 @@ class CategoryService {
    * @param id - category primary key
    * @param slug - new category slug
    * @returns updated category instance
-   * @throws 404 if the category does not exist
-   * @throws 422 if the slug is already taken
+   * @throws {AppError} CATEGORY_NOT_FOUND
+   * @throws {AppError} CATEGORY_SLUG_TAKEN
    */
   async updateSlug(id: number, slug: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -145,9 +147,9 @@ class CategoryService {
    * @param id - category primary key
    * @param parentId - parent category id or null
    * @returns updated category instance
-   * @throws 404 if the category does not exist
-   * @throws 422 if the parent category does not exist
-   * @throws 422 if the parent category is a child of the category itself
+   * @throws {AppError} CATEGORY_NOT_FOUND - When category doesn't exist
+   * @throws {AppError} PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
+   * @throws {AppError} CATEGORY_PARENT_LOOP - When parent category is a child of the category itself
    */
   async updateParent(id: number, parentId: number | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -216,8 +218,9 @@ class CategoryService {
    * Deletes a category.
    *
    * @param id - The ID of the category to delete
-   * @throws 400 if the category has children or lots
-   * @throws 404 if the category does not exist
+   * @throws {AppError} CATEGORY_NOT_FOUND - When category doesn't exist
+   * @throws {AppError} CATEGORY_HAS_CHILDREN - When category has child categories
+   * @throws {AppError} CATEGORY_HAS_LOTS - When category has associated lots
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {

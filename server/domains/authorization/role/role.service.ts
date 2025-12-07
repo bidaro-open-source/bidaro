@@ -12,7 +12,7 @@ class RoleService {
    *
    * @param data - role data
    * @returns role instance
-   * @throws 422 if role name already exists
+   * @throws {AppError} ROLE_NAME_TAKEN - When role name already exists
    */
   async create(data: RoleCreateData) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -38,7 +38,7 @@ class RoleService {
    * @param name - role name
    * @param data - role data to update
    * @returns updated role instance
-   * @throws 404 if role not found
+   * @throws {AppError} ROLE_NOT_FOUND
    */
   async update(name: string, data: Partial<Pick<RoleAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -82,8 +82,8 @@ class RoleService {
    * @param name - role name
    * @param permissionNames - array of permission names
    * @returns role instance
-   * @throws 404 if role not found
-   * @throws 400 if trying to update reserved role
+   * @throws {AppError} ROLE_NOT_FOUND
+   * @throws {AppError} ROLE_IS_RESERVED role
    */
   async updatePermissions(name: string, permissionNames: string[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -120,9 +120,9 @@ class RoleService {
    * Deletes a role.
    *
    * @param name - role name
-   * @throws 404 if role not found
-   * @throws 400 if role is reserved
-   * @throws 400 if role contains users
+   * @throws {AppError} ROLE_NOT_FOUND
+   * @throws {AppError} ROLE_IS_RESERVED
+   * @throws {AppError} ROLE_HAS_USERS
    */
   async delete(name: string) {
     return await useDatabaseTransaction(async (transaction) => {

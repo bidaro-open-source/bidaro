@@ -47,7 +47,7 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve a category by ID, using Redis caching.
    *
    * @param id - Category primary key
-   * @throws 404 if the category does not exist
+   * @throws {AppError} CATEGORY_NOT_FOUND
    * @returns The category instance
    */
   async getById(id: number) {
@@ -68,7 +68,7 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve a category by slug, using Redis caching.
    *
    * @param slug - Category slug
-   * @throws 404 if the category does not exist
+   * @throws {AppError} CATEGORY_NOT_FOUND
    * @returns The category instance
    */
   async getBySlug(slug: string) {
@@ -134,7 +134,7 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve the breadcrumb categories for a given category path, using Redis caching.
    *
    * @param path - Category path string (e.g. "1/2/3")
-   * @throws 500 if one or more categories in the path are missing
+   * @throws {AppError} CATEGORY_MODIFIED_OR_DELETED - When one or more categories in the path are missing
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsByPath(path: string) {

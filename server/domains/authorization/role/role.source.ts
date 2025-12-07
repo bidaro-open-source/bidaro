@@ -49,7 +49,7 @@ class RoleSource extends EntitySource<Role> {
    * Retrieve a role by name, using Redis caching.
    *
    * @param name - Role name
-   * @throws 404 if the role does not exist
+   * @throws {AppError} ROLE_NOT_FOUND
    * @returns The role instance
    */
   async getByPk(name: string) {

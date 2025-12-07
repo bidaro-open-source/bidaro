@@ -31,7 +31,7 @@ class UserSource extends EntitySource<User> {
    * Retrieve a user by ID, using Redis caching.
    *
    * @param id - User primary key
-   * @throws 404 if the user does not exist
+   * @throws {AppError} USER_NOT_FOUND
    * @returns The user instance
    */
   async getByPk(id: number) {
@@ -52,7 +52,7 @@ class UserSource extends EntitySource<User> {
    * Retrieve a user auth data by ID, using Redis caching.
    *
    * @param id - User primary key
-   * @throws 404 if the user does not exist
+   * @throws {AppError} USER_NOT_FOUND
    * @returns User authentication data including role and permissions
    */
   async getByPkWithAuth(id: number) {

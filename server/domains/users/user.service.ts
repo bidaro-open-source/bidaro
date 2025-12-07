@@ -13,7 +13,7 @@ class UserService {
    * @param id - user primary key
    * @param data - profile data to update
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws {AppError} USER_NOT_FOUND
    */
   async update(id: number, data: Pick<UserAttributesOptional, 'name' | 'surname'>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -60,8 +60,8 @@ class UserService {
    * @param id - user primary key
    * @param email - new email
    * @returns updated user instance
-   * @throws 404 if user not found
-   * @throws 400 if email is already taken
+   * @throws {AppError} USER_NOT_FOUND - When user doesn't exist
+   * @throws {AppError} USER_ALREADY_EXISTS - When email is already taken
    */
   async updateEmail(id: number, email: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -104,7 +104,7 @@ class UserService {
    * @param id - user primary key
    * @param password - new password
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws {AppError} USER_NOT_FOUND
    */
   async updatePassword(id: number, password: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -138,7 +138,7 @@ class UserService {
    *
    * @param id - user primary key
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws {AppError} USER_NOT_FOUND
    */
   async verifyEmail(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -171,7 +171,7 @@ class UserService {
    * @param id - user primary key
    * @param roleName - new role name (or null to remove role)
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws {AppError} USER_NOT_FOUND
    */
   async updateRole(id: number, roleName: string | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -207,7 +207,7 @@ class UserService {
    * Deletes all their lots (with images via cascade), bids, and sessions.
    *
    * @param id - user primary key
-   * @throws 404 if user not found
+   * @throws {AppError} USER_NOT_FOUND
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
