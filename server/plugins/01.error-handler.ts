@@ -1,41 +1,52 @@
 export default defineNitroPlugin((nitroApp) => {
-  nitroApp.hooks.hook('error', (error, { event }) => {
-    // Check if this is an error created by createAppError
-    if (error.data && typeof error.data === 'object' && 'code' in error.data) {
-      const errorData = error.data as { code: string, title: string, description: string, details?: unknown }
+  nitroApp.hooks.hook('error', (error: Error, { event }) => {
+    // Try to find error data from createAppError
+    // It can be in error.data or in error.cause.data
+    let errorData: { code: string, title: string, description: string, details?: unknown } | null = null
+    let statusCode: number | undefined
 
-      if (error.statusCode && error.statusCode >= 500) {
+    // Check if error has data property (direct createError result)
+    if (error && typeof error === 'object' && 'data' in error) {
+      const data = (error as any).data
+      if (data && typeof data === 'object' && 'code' in data) {
+        errorData = data as { code: string, title: string, description: string, details?: unknown }
+        statusCode = (error as any).statusCode
+      }
+    }
+
+    // Check if error has cause property with createError result
+    if (!errorData && error.cause && typeof error.cause === 'object' && 'data' in error.cause) {
+      const causeData = (error.cause as any).data
+      if (causeData && typeof causeData === 'object' && 'code' in causeData) {
+        errorData = causeData as { code: string, title: string, description: string, details?: unknown }
+        statusCode = (error.cause as any).statusCode
+      }
+    }
+
+    // If we found error data from createAppError, log 500+ errors
+    if (errorData) {
+      if (statusCode && statusCode >= 500) {
         logger.error(`AppError: ${errorData.code}`, {
           code: errorData.code,
-          statusCode: error.statusCode,
+          statusCode,
           details: errorData.details,
           stack: error.stack,
           url: event?.path,
           method: event?.method,
         })
       }
-
-      if (event) {
-        setResponseStatus(event, error.statusCode || 500)
-        return errorData
-      }
+    }
+    else {
+      // Log all unexpected errors
+      logger.error('Unexpected error', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        url: event?.path,
+        method: event?.method,
+      })
     }
 
-    logger.error('Unexpected error', {
-      error,
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      url: event?.path,
-      method: event?.method,
-    })
-
-    if (event) {
-      setResponseStatus(event, 500)
-      return {
-        code: 'INTERNAL_SERVER_ERROR',
-        title: 'Внутрішня помилка сервера',
-        description: 'Виникла непередбачена помилка на сервері. Спробуйте пізніше або зв\'яжіться з підтримкою.',
-      }
-    }
+    // Do not return anything - Nitro handles response formatting
   })
 })
