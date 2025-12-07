@@ -34,7 +34,8 @@ export default defineNitroPlugin((nitroApp) => {
     }
 
     // Handle H3Error (createError compatibility during transition)
-    if (isError(error) && 'statusCode' in error) {
+    // Note: We check for both H3Error-like structure and avoid AppError to prevent double handling
+    if (isError(error) && 'statusCode' in error && !(error instanceof AppError)) {
       const h3Error = error as H3Error
 
       // Log all 500-level errors

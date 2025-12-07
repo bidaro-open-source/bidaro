@@ -63,12 +63,13 @@ export class AppError extends Error {
         try {
           this.details = errorDef.detailsSchema.parse(details)
         }
-        catch (error) {
+        catch (validationError) {
           // If validation fails, log warning but still include details
-          logger.warn(`AppError details validation failed for ${code}`, {
+          // This prevents errors from being silently lost if details schema is incorrect
+          logger.warn(`AppError details validation failed for ${code}: Schema mismatch for provided details`, {
             code,
             details,
-            error,
+            validationError,
           })
           this.details = details
         }

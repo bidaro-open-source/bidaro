@@ -111,12 +111,23 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         })
       }
 
-      // For createError({ ... }) or AppError
-      if (error instanceof AppError || typeof error?.statusCode === 'number') {
+      // For createError({ ... }) - check for H3Error-like structure but not AppError
+      // This maintains compatibility with remaining createError calls during migration
+      if (error instanceof AppError) {
+        throw error
+      }
+      if (typeof error?.statusCode === 'number' && isError(error)) {
         throw error
       }
 
       throw new AppError('UNKNOWN_VALIDATION_ERROR')
     }
   }
+}
+
+/**
+ * Type guard to check if value is an Error instance
+ */
+function isError(value: unknown): value is Error {
+  return value instanceof Error
 }
