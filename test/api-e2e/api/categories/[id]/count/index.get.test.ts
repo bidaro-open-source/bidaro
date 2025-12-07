@@ -76,7 +76,7 @@ describe('GET /api/categories/:id/count', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('NOT_FOUND')
+      expect(response._data.code).toBe('CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })

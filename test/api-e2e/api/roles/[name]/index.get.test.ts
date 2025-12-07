@@ -53,7 +53,7 @@ describe('GET /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('NOT_FOUND')
+      expect(response._data.code).toBe('ROLE_NOT_FOUND')
 
       await userData.clear()
     })

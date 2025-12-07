@@ -141,7 +141,7 @@ describe('POST /api/lots/:id/receive', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('NOT_FOUND')
+      expect(response._data.code).toBe('LOT_NOT_FOUND')
 
       await uData.clear()
     })
