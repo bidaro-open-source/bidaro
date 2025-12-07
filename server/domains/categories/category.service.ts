@@ -239,7 +239,7 @@ class CategoryService {
       const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
 
       if (lotsCount > 0) {
-        throw new AppError('CATEGORY_HAS_CHILDREN')
+        throw new AppError('CATEGORY_HAS_LOTS')
       }
 
       await categoryRepository.destroyByPk(category.id, { transaction })

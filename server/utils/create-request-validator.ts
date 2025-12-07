@@ -112,7 +112,7 @@ export function createRequestValidator<Options extends ValidatorOptions>(
       }
 
       // For createError({ ... }) or AppError
-      if (typeof error?.statusCode === 'number' || error instanceof AppError) {
+      if (error instanceof AppError || typeof error?.statusCode === 'number') {
         throw error
       }
 

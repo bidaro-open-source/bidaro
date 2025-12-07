@@ -158,6 +158,11 @@ export const errors = {
     title: 'Категорія має підкатегорії',
     description: 'Неможливо виконати операцію, оскільки категорія має підкатегорії.',
   },
+  CATEGORY_HAS_LOTS: {
+    statusCode: 400,
+    title: 'Категорія має лоти',
+    description: 'Неможливо видалити категорію, оскільки вона має асоційовані лоти.',
+  },
   CATEGORY_PARENT_LOOP: {
     statusCode: 400,
     title: 'Циклічна залежність категорій',
@@ -186,6 +191,11 @@ export const errors = {
     title: 'Роль має користувачів',
     description: 'Неможливо видалити роль, оскільки вона призначена користувачам.',
   },
+  ROLE_IS_RESERVED: {
+    statusCode: 400,
+    title: 'Зарезервована роль',
+    description: 'Неможливо змінювати або видаляти зарезервовану системну роль.',
+  },
   DEFAULT_ROLE_NOT_FOUND: {
     statusCode: 500,
     title: 'Роль за замовчуванням не знайдено',
@@ -200,6 +210,11 @@ export const errors = {
     detailsSchema: z.object({
       permissionName: z.string().optional(),
     }),
+  },
+  PERMISSIONS_NOT_FOUND: {
+    statusCode: 422,
+    title: 'Права не знайдено',
+    description: 'Одне або більше прав не знайдено в системі.',
   },
 
   // Lot errors
