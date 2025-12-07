@@ -1,5 +1,6 @@
 import type { LotAttributes } from '#database'
 import type { WhereOptions } from 'sequelize'
+import { AppError } from '#classes/app-error'
 import { lotCatalogRepository, lotResource } from '#domains/auction'
 import { categoryResource, categorySource } from '#domains/categories'
 import { imageResource } from '#domains/storage'
@@ -45,10 +46,7 @@ export default defineEventHandler(async (event) => {
     },
     data: rows.map((lot) => {
       if (!lot.seller) {
-        throw createError({
-          message: 'Продавця лоту не знайдено',
-          status: 500,
-        })
+        throw new AppError('LOT_SELLER_NOT_FOUND')
       }
 
       return {

@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { createPermissionResource, permissionRepository, permissionSource, roleSource } from '#domains/authorization'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
@@ -18,10 +19,7 @@ export default defineEventHandler(async (event) => {
   const permission = await permissionRepository.findByPk(request.params.name)
 
   if (!permission) {
-    throw createError({
-      statusCode: 404,
-      message: 'Право не знайдено',
-    })
+    throw new AppError('PERMISSION_NOT_FOUND', { permissionName: request.params.name })
   }
 
   const displayName = Object.hasOwn(request.body, 'displayName')

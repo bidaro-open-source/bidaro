@@ -57,15 +57,12 @@ export class AppError extends Error {
     this.title = errorDef.title
     this.description = errorDef.description
 
-    // Validate details if schema is defined
     if (details !== undefined) {
       if (errorDef.detailsSchema) {
         try {
           this.details = errorDef.detailsSchema.parse(details)
         }
         catch (validationError) {
-          // If validation fails, log warning but still include details
-          // This prevents errors from being silently lost if details schema is incorrect
           logger.warn(`AppError details validation failed for ${code}: Schema mismatch for provided details`, {
             code,
             details,
@@ -79,13 +76,9 @@ export class AppError extends Error {
       }
     }
 
-    // Maintain proper stack trace
     Error.captureStackTrace(this, this.constructor)
   }
 
-  /**
-   * Convert to JSON representation
-   */
   toJSON() {
     return {
       code: this.code,

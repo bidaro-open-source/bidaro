@@ -27,7 +27,6 @@ export interface ErrorDefinition {
  * Each error key represents a specific error condition with standardized response
  */
 export const errors = {
-  // Universal HTTP errors
   INTERNAL_SERVER_ERROR: {
     statusCode: 500,
     title: 'Внутрішня помилка сервера',
@@ -38,7 +37,7 @@ export const errors = {
     title: 'Помилка валідації',
     description: 'Дані запиту не відповідають очікуваному формату. Перевірте правильність введених даних.',
     detailsSchema: z.object({
-      fieldErrors: z.record(z.array(z.string())).optional(),
+      fieldErrors: z.record(z.string(), z.array(z.string())).optional(),
       formErrors: z.array(z.string()).optional(),
     }),
   },
@@ -71,7 +70,6 @@ export const errors = {
     description: 'У вас немає прав для виконання цієї дії.',
   },
 
-  // Authentication errors
   INVALID_AUTHORIZATION_METHOD: {
     statusCode: 401,
     title: 'Невалідний метод авторизації',
@@ -88,7 +86,6 @@ export const errors = {
     description: 'Для виконання цієї дії необхідно бути авторизованим в системі.',
   },
 
-  // User errors
   USER_NOT_FOUND: {
     statusCode: 404,
     title: 'Користувача не знайдено',
@@ -111,7 +108,6 @@ export const errors = {
     description: 'Введений пароль не співпадає з паролем користувача.',
   },
 
-  // Session/Token errors
   REFRESH_TOKEN_NOT_FOUND: {
     statusCode: 404,
     title: 'Токен оновлення не знайдено',
@@ -123,7 +119,6 @@ export const errors = {
     description: 'Немає доступу до цього токену оновлення.',
   },
 
-  // Category errors
   CATEGORY_NOT_FOUND: {
     statusCode: 404,
     title: 'Категорію не знайдено',
@@ -169,7 +164,6 @@ export const errors = {
     description: 'Неможливо встановити батьківську категорію, оскільки це створить циклічну залежність.',
   },
 
-  // Role errors
   ROLE_NOT_FOUND: {
     statusCode: 404,
     title: 'Роль не знайдено',
@@ -202,7 +196,6 @@ export const errors = {
     description: 'Системна роль за замовчуванням не налаштована. Зверніться до адміністратора.',
   },
 
-  // Permission errors
   PERMISSION_NOT_FOUND: {
     statusCode: 404,
     title: 'Право не знайдено',
@@ -217,7 +210,6 @@ export const errors = {
     description: 'Одне або більше прав не знайдено в системі.',
   },
 
-  // Lot errors
   LOT_NOT_FOUND: {
     statusCode: 404,
     title: 'Лот не знайдено',
@@ -263,7 +255,6 @@ export const errors = {
     }),
   },
 
-  // Rate limiting errors
   TOO_MANY_REQUESTS: {
     statusCode: 429,
     title: 'Занадто багато запитів',
@@ -284,7 +275,6 @@ export const errors = {
     }),
   },
 
-  // Multipart/Upload errors
   MISSING_CONTENT_TYPE: {
     statusCode: 400,
     title: 'Відсутній заголовок Content-Type',
@@ -304,7 +294,6 @@ export const errors = {
     description: 'Ім\'я поля перевищує допустиму довжину.',
   },
 
-  // Challenge/Captcha errors
   INVALID_CHALLENGE_SOLUTION: {
     statusCode: 400,
     title: 'Невірне рішення капчі',
@@ -321,7 +310,6 @@ export const errors = {
     description: 'Не вдалося створити токен для капчі. Спробуйте пізніше.',
   },
 
-  // Email/Recovery errors
   VERIFICATION_TOKEN_NOT_FOUND: {
     statusCode: 404,
     title: 'Токен верифікації не знайдено',
@@ -346,7 +334,6 @@ export const errors = {
     }),
   },
 
-  // Infrastructure errors
   DATABASE_CONNECTION_FAILED: {
     statusCode: 500,
     title: 'Помилка з\'єднання з базою даних',
@@ -378,7 +365,6 @@ export const errors = {
     description: 'Використання обмежувача дій вимагає авторизованого користувача.',
   },
 
-  // General errors
   NOT_FOUND: {
     statusCode: 404,
     title: 'Не знайдено',

@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
 import { refreshRequest } from './index.request'
@@ -16,20 +17,13 @@ export default defineEventHandler(async (event) => {
   if (!oldSession) {
     deleteRefreshTokenCookie(event)
 
-    throw createError({
-      statusCode: 404,
-      message: 'Токен оновлення не знайдено',
-    })
+    throw new AppError('REFRESH_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(oldSession.uid)
 
   if (!user) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Користувач до якого є доступ не існує',
-    })
+    throw new AppError('USER_NOT_FOUND', { userId: oldSession.uid })
   }
 
   const metadata = createRequestMeta(event)

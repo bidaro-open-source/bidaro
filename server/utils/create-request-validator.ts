@@ -17,38 +17,11 @@ type ValidatorResult<Options extends ValidatorOptions> = {
   [K in keyof Options]: K extends keyof Options ? ValidatorReturnType<NonNullable<Options[K]>> : never
 }
 
-/**
- * Returns the validated data from the validator.
- */
 export type ValidatorReturnType<V>
   = V extends z.ZodType<infer T> ? T
     : V extends (event: H3Event, context?: any) => Promise<infer R> | infer R ? R
       : never
 
-/**
- * Creates a request validator function.
- *
- * Options:
- *  - body: validates request body data
- *  - query: validates URL query parameters
- *  - params: validates route parameters
- *  - multipart: validates multipart form data
- *
- * Every option can be a Zod schema or a function that returns
- * the validated data.
- *
- * @param options - Options object
- * @returns validated data
- * @throws 422 error for validation failures
- * @throws 500 error for unexpected validation errors
- *
- * @example
- * const validator = createRequestValidator({
- *   body: z.object({ name: z.string() })
- * })
- * const Request = InferType<typeof validator>
- * const validatedData = await validator(event)
- */
 export function createRequestValidator<Options extends ValidatorOptions>(
   options: Options,
 ) {
@@ -95,7 +68,6 @@ export function createRequestValidator<Options extends ValidatorOptions>(
       return result
     }
     catch (error: any) {
-      // For shema.parse(await readBody(event))
       if (error instanceof z.ZodError) {
         throw new AppError('VALIDATION_ERROR', {
           fieldErrors: z.flattenError(error).fieldErrors,
@@ -103,7 +75,6 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         })
       }
 
-      // For readValidatedBody(event, schema.parse)
       if (error.data instanceof z.ZodError) {
         throw new AppError('VALIDATION_ERROR', {
           fieldErrors: z.flattenError(error.data).fieldErrors,
@@ -111,23 +82,11 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         })
       }
 
-      // For createError({ ... }) - check for H3Error-like structure but not AppError
-      // This maintains compatibility with remaining createError calls during migration
       if (error instanceof AppError) {
-        throw error
-      }
-      if (typeof error?.statusCode === 'number' && isError(error)) {
         throw error
       }
 
       throw new AppError('UNKNOWN_VALIDATION_ERROR')
     }
   }
-}
-
-/**
- * Type guard to check if value is an Error instance
- */
-function isError(value: unknown): value is Error {
-  return value instanceof Error
 }
