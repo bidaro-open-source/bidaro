@@ -3,9 +3,6 @@ import { imageService } from '#domains/storage'
 import { deleteLotImagePolicy } from './index.delete.policy'
 import { deleteLotImageRequest } from './index.delete.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

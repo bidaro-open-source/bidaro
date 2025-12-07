@@ -245,6 +245,11 @@ export const errors = {
       imageId: z.number().optional(),
     }),
   },
+  LOT_IMAGE_ORDER_INVALID: {
+    statusCode: 422,
+    title: 'Невалідний порядок зображень',
+    description: 'Передано невалідний список ідентифікаторів зображень. Список має містити всі зображення лоту без зайвих або відсутніх ідентифікаторів.',
+  },
   LOT_BET_TOO_LOW: {
     statusCode: 400,
     title: 'Ставка занадто низька',

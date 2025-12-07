@@ -2,9 +2,6 @@ import { categoryResource, categoryService } from '#domains/categories'
 import { updateCategorySlugPolicy } from './index.get.policy'
 import { updateCategorySlugRequest } from './index.put.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

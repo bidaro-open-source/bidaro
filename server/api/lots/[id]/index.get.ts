@@ -4,9 +4,6 @@ import { imageResource } from '#domains/storage'
 import { userResource, userSource } from '#domains/users'
 import { viewLotRequest } from './index.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 40,

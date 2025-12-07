@@ -96,7 +96,6 @@ class ImageService {
    *
    * @param buffer image buffer
    * @returns Image instance
-   * @throws 400 if image is invalid
    * @throws {AppError} BAD_REQUEST
    * @throws {AppError} INTERNAL_SERVER_ERROR
    */

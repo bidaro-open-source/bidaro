@@ -9,10 +9,6 @@ import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
 import { viewCatalogRequest } from './index.get.request'
 
-/**
- * API endpoint handler
- * @throws {AppError} LOT_SELLER_NOT_FOUND
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 40,

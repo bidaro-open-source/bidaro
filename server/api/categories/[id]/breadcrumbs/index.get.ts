@@ -1,9 +1,6 @@
 import { categoryBreadcrumbResource, categorySource } from '#domains/categories'
 import { viewCategoryRequest } from '../index.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 40,

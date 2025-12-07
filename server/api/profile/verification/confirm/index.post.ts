@@ -3,11 +3,6 @@ import { verificationService } from '#domains/authentication'
 import { userRepository, userService } from '#domains/users'
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 
-/**
- * API endpoint handler
- * @throws {AppError} USER_NOT_FOUND
- * @throws {AppError} VERIFICATION_TOKEN_NOT_FOUND
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 3,

@@ -1,9 +1,6 @@
 import { userResource, userSource } from '#domains/users'
 import { viewUserRequest } from './index.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 20,

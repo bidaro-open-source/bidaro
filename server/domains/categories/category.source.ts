@@ -103,7 +103,8 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve the breadcrumb categories for a given category ID, using Redis caching.
    *
    * @param id - Category primary key
-   * @throws 500 if one or more categories in the path are missing
+   * @throws {AppError} CATEGORY_NOT_FOUND - When category doesn't exist (via getById)
+   * @throws {AppError} CATEGORY_MODIFIED_OR_DELETED - When one or more categories in the path are missing
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsById(id: number) {

@@ -3,11 +3,6 @@ import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
 import { refreshRequest } from './index.request'
 
-/**
- * API endpoint handler
- * @throws {AppError} REFRESH_TOKEN_NOT_FOUND
- * @throws {AppError} USER_NOT_FOUND
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 10,

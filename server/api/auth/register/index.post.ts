@@ -6,12 +6,6 @@ import { userProfileResource, userRepository } from '#domains/users'
 import { roles } from '~~/server/constants'
 import { registerRequest } from './index.request'
 
-/**
- * API endpoint handler
- * @throws {AppError} INVALID_CHALLENGE_SOLUTION
- * @throws {AppError} DEFAULT_ROLE_NOT_FOUND
- * @throws {AppError} VALIDATION_ERROR
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 0,

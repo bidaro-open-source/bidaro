@@ -2,9 +2,6 @@ import { authService } from '#domains/authentication'
 import { deleteSessionsRequest } from './index.delete.request'
 import { deleteSessionsPolicy } from './index.policy'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

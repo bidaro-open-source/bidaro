@@ -2,9 +2,6 @@ import { authService } from '#domains/authentication'
 import { viewSessionsRequest } from './index.get.request'
 import { viewSessionsPolicy } from './index.policy'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

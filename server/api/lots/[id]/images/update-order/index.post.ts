@@ -2,9 +2,6 @@ import { lotImageService, lotSource } from '#domains/auction'
 import { updateImageOrderPolicy } from './index.post.policy'
 import { updateImageOrderRequest } from './index.post.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

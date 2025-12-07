@@ -5,11 +5,6 @@ import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'
 
-/**
- * API endpoint handler
- * @throws {AppError} RECOVERY_TOKEN_NOT_FOUND
- * @throws {AppError} USER_NOT_FOUND
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 0,

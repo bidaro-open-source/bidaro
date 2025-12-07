@@ -3,9 +3,6 @@ import { actionLimits } from '~~/server/constants'
 import { createLotBetPolicy } from './index.post.policy'
 import { createLotBetRequest } from './index.post.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

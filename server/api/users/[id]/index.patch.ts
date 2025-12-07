@@ -2,9 +2,6 @@ import { userResource, userService } from '#domains/users'
 import { updateUserPolicy } from './index.patch.policy'
 import { updateUserRequest } from './index.patch.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 20,

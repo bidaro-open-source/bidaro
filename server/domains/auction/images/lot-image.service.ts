@@ -100,14 +100,10 @@ class LotImageService {
    *
    * To work, it requires all image ids that this lot has.
    *
-   * @throws 404 - if a lot not found
-   * @throws 422 - if was passed an incomplete array of image ids
-   * @throws 422 - if the imageIds contains foreign ids
-   *
    * @param id lot primary key
    * @param imageIds image ids in new order
-   * @throws {AppError} BAD_REQUEST
    * @throws {AppError} LOT_NOT_FOUND
+   * @throws {AppError} LOT_IMAGE_ORDER_INVALID
    */
   async updateImageOrder(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -127,12 +123,12 @@ class LotImageService {
 
       const extraIds = newImageIds.difference(currentImageIds)
       if (extraIds.size > 0) {
-        throw new AppError('BAD_REQUEST')
+        throw new AppError('LOT_IMAGE_ORDER_INVALID')
       }
 
       const missingIds = currentImageIds.difference(newImageIds)
       if (missingIds.size > 0) {
-        throw new AppError('BAD_REQUEST')
+        throw new AppError('LOT_IMAGE_ORDER_INVALID')
       }
 
       await lotImageRepository.destroyByLotPk(id, { transaction })

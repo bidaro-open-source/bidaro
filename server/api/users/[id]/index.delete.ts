@@ -2,9 +2,6 @@ import { userService } from '#domains/users'
 import { deleteUserPolicy } from './index.delete.policy'
 import { deleteUserRequest } from './index.delete.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

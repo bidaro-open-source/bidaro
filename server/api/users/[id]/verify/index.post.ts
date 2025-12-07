@@ -2,9 +2,6 @@ import { userResource, userService } from '#domains/users'
 import { verifyUserPolicy } from './index.post.policy'
 import { verifyUserRequest } from './index.post.request'
 
-/**
- * API endpoint handler
- */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
