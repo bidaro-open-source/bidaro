@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer'
+import { AppError } from '#classes/app-error'
 import sharp from 'sharp'
 
 class ChallengeGeneratorService {
@@ -111,10 +112,7 @@ class ChallengeGeneratorService {
     const image = await storage.getItemRaw(randomKey)
 
     if (!image) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Не вдалося завантажити зображення для генерації капчі',
-      })
+      throw new AppError('INTERNAL_SERVER_ERROR')
     }
 
     return image

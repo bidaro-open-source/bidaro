@@ -1,4 +1,5 @@
 import type { Buffer } from 'node:buffer'
+import { AppError } from '#classes/app-error'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
@@ -105,30 +106,21 @@ class ImageService {
       const validatedImage = await this.validateBuffer(buffer)
 
       if (!validatedImage.buffer) {
-        throw createError({
-          message: `Невірний файл зображення: ${validatedImage.error}`,
-          status: 400,
-        })
+        throw new AppError('BAD_REQUEST')
       }
 
       const compressedImage = await this.compressBuffer(validatedImage.buffer)
 
       if (!compressedImage.buffer) {
         logger.warn('Image compression failed, proceeding with original buffer:', compressedImage.error)
-        throw createError({
-          message: `Помилка сервера під час обробки зображення: ${compressedImage.error}`,
-          status: 500,
-        })
+        throw new AppError('INTERNAL_SERVER_ERROR')
       }
 
       const metadata = await this.getMetadata(compressedImage.buffer)
 
       if (!metadata.metadata) {
         logger.warn('Image metadata extraction failed:', metadata.error)
-        throw createError({
-          message: `Помилка сервера під час отримання метаданих зображення: ${metadata.error}`,
-          status: 500,
-        })
+        throw new AppError('INTERNAL_SERVER_ERROR')
       }
 
       const size = compressedImage.buffer.length
@@ -174,11 +166,7 @@ class ImageService {
     const result = await this.safeDeleteImage(imageId)
 
     if (!result.ok) {
-      throw createError({
-        message: 'Зображення не видалено',
-        status: 500,
-        cause: result.cause,
-      })
+      throw new AppError('INTERNAL_SERVER_ERROR')
     }
   }
 

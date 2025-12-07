@@ -1,4 +1,5 @@
 import type { Role } from '#database'
+import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
 import { roleRepository } from './role.repository'
 
@@ -58,10 +59,7 @@ class RoleSource extends EntitySource<Role> {
       const data = await roleRepository.findByPk(name)
 
       if (!data) {
-        throw createError({
-          statusCode: 404,
-          message: 'Role not found',
-        })
+        throw new AppError('ROLE_NOT_FOUND')
       }
 
       return data

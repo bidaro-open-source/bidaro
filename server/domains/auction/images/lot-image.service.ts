@@ -1,4 +1,5 @@
 import type { Image } from '#database'
+import { AppError } from '#classes/app-error'
 import { lotRepository } from '../lots/lot.repository'
 import { lotSource } from '../lots/lot.source'
 import { lotImageRepository } from './lot-image.repository'
@@ -18,10 +19,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       const currentMaxOrder = await lotImageRepository.findMaxOrder(id, { transaction })
@@ -55,10 +53,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       const existingLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -118,10 +113,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -131,18 +123,12 @@ class LotImageService {
 
       const extraIds = newImageIds.difference(currentImageIds)
       if (extraIds.size > 0) {
-        throw createError({
-          statusCode: 422,
-          message: 'Знайдено унікальні ідентифікатори, що не належать лоту ',
-        })
+        throw new AppError('BAD_REQUEST')
       }
 
       const missingIds = currentImageIds.difference(newImageIds)
       if (missingIds.size > 0) {
-        throw createError({
-          statusCode: 422,
-          message: 'Кількість унікальних ідентифікаторів не відповідає кількості зображень у лоті.',
-        })
+        throw new AppError('BAD_REQUEST')
       }
 
       await lotImageRepository.destroyByLotPk(id, { transaction })

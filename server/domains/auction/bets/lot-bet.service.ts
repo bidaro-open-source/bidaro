@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { lotStatuses } from '~~/server/constants'
 import { userRepository } from '../../users'
 import { lotRepository } from '../lots/lot.repository'
@@ -25,48 +26,29 @@ class LotBetService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-        throw createError({
-          statusCode: 400,
-          message: 'Неможливо зробити ставку на лот, який не знаходиться в процесі торгів',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       if (!lot.expirationDate || lot.expirationDate <= new Date()) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Неможливо зробити ставку на лот',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       if (lot.currentPrice >= amount) {
-        throw createError({
-          statusCode: 400,
-          message: 'Ставка повинна бути більшою за поточну ціну лоту',
-        })
+        throw new AppError('LOT_BET_TOO_LOW')
       }
 
       const user = await userRepository.findByPk(userId, { transaction })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       if (user.id === lot.sellerId) {
-        throw createError({
-          statusCode: 400,
-          message: 'Продавець не може робити ставки на власний лот',
-        })
+        throw new AppError('BAD_REQUEST')
       }
 
       const bet = await lotBetRepository.create(

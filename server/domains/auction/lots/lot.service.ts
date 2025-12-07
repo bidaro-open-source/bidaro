@@ -1,4 +1,5 @@
 import type { Lot } from '#database'
+import { AppError } from '#classes/app-error'
 import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../../../constants'
 import { categoryRepository } from '../../categories'
 import { lotBetRepository } from '../bets/lot-bet.repository'
@@ -42,19 +43,13 @@ class LotService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       const editableStatuses: string[] = [lotStatuses.DRAFT, lotStatuses.IN_TRADING_PROCESS]
 
       if (!editableStatuses.includes(lot.statusName)) {
-        throw createError({
-          statusCode: 400,
-          message: 'Лот не може бути змінений у поточному статусі',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       const title = updates.title ?? lot.title
@@ -75,10 +70,7 @@ class LotService {
         )
 
         if (!category) {
-          throw createError({
-            statusCode: 400,
-            message: 'Вказана категорія не існує',
-          })
+          throw new AppError('CATEGORY_NOT_FOUND')
         }
 
         categoryId = category.id
@@ -117,26 +109,15 @@ class LotService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.DRAFT) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Лот вже опубліковано',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       if (!lot.categoryId) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Категорія лоту не встановлена',
-        })
+        throw new AppError('BAD_REQUEST')
       }
 
       const updatedLot = await lotRepository.updateByPk(id, {
@@ -170,26 +151,15 @@ class LotService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Лот не може бути закритий у поточному статусі',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       if (!lot.expirationDate || lot.expirationDate > new Date()) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Лот не може бути закритий до завершення терміну дії',
-        })
+        throw new AppError('BAD_REQUEST')
       }
 
       const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
@@ -227,18 +197,11 @@ class LotService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_DISCUSSION_PROCESS) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Лот не може бути відправлений у поточному статусі',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       const updatedLot = await lotRepository.updateByPk(lot.id, {
@@ -269,18 +232,11 @@ class LotService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_DELIVERY_PROCESS) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          message: 'Лот не може бути отриманий у поточному статусі',
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       const updatedLot = await lotRepository.updateByPk(lot.id, {
@@ -310,17 +266,11 @@ class LotService {
       })
 
       if (!lot) {
-        throw createError({
-          statusCode: 404,
-          message: 'Лот не знайдено',
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.DRAFT) {
-        throw createError({
-          message: 'Цей лот не може бути видалений, оскільки він вже опублікований',
-          status: 400,
-        })
+        throw new AppError('LOT_INVALID_STATUS')
       }
 
       await lotRepository.destroyByPk(lot.id, { transaction })

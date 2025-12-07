@@ -1,4 +1,5 @@
 import type { RoleAttributesOptional } from '#database'
+import { AppError } from '#classes/app-error'
 import { permissionRepository } from '../permission/permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'
@@ -18,10 +19,7 @@ class RoleService {
       const existingRole = await roleRepository.findByPk(data.name, { transaction })
 
       if (existingRole) {
-        throw createError({
-          statusCode: 422,
-          message: 'Роль з такою назвою вже існує',
-        })
+        throw new AppError('ROLE_NAME_TAKEN')
       }
 
       const role = await roleRepository.create(data, { transaction })
@@ -50,10 +48,7 @@ class RoleService {
       })
 
       if (!role) {
-        throw createError({
-          statusCode: 404,
-          message: 'Роль не знайдено',
-        })
+        throw new AppError('ROLE_NOT_FOUND')
       }
 
       const displayName = Object.hasOwn(data, 'displayName')
@@ -98,26 +93,17 @@ class RoleService {
       })
 
       if (!role) {
-        throw createError({
-          statusCode: 404,
-          message: 'Роль не знайдено',
-        })
+        throw new AppError('ROLE_NOT_FOUND')
       }
 
       if (role.isReserved) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна змінювати права зарезервованої ролі',
-        })
+        throw new AppError('ROLE_IS_RESERVED')
       }
 
       const permissions = await permissionRepository.findByPks(permissionNames, { transaction })
 
       if (permissions.length !== permissionNames.length) {
-        throw createError({
-          statusCode: 422,
-          message: 'Одне або більше прав не знайдено',
-        })
+        throw new AppError('PERMISSIONS_NOT_FOUND')
       }
 
       await roleRepository.updatePermissionsByPk(name, permissionNames, { transaction })
@@ -146,26 +132,17 @@ class RoleService {
       })
 
       if (!role) {
-        throw createError({
-          statusCode: 404,
-          message: 'Роль не знайдено',
-        })
+        throw new AppError('ROLE_NOT_FOUND')
       }
 
       if (role.isReserved) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна видалити зарезервовану роль',
-        })
+        throw new AppError('ROLE_IS_RESERVED')
       }
 
       const userCount = await roleRepository.countUsersByName(name, { transaction })
 
       if (userCount > 0) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна видалити роль, яка призначена користувачам',
-        })
+        throw new AppError('ROLE_HAS_USERS')
       }
 
       await roleRepository.destroyByPk(name, { transaction })

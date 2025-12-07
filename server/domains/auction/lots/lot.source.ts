@@ -1,4 +1,5 @@
 import type { Lot } from '#database'
+import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
 import { userSource } from '../../users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
@@ -45,10 +46,7 @@ class LotSource extends EntitySource<Lot> {
       const data = await lotRepository.findByPk(id)
 
       if (!data) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw new AppError('LOT_NOT_FOUND')
       }
 
       return data

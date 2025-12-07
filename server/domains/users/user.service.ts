@@ -1,4 +1,5 @@
 import type { UserAttributesOptional } from '#database'
+import { AppError } from '#classes/app-error'
 import { lotBetRepository, lotImageRepository, lotRepository } from '../auction'
 import { authService } from '../authentication'
 import { imageService } from '../storage'
@@ -22,10 +23,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       if (data.name === undefined && data.surname === undefined) {
@@ -73,10 +71,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       if (user.email === email) {
@@ -86,10 +81,7 @@ class UserService {
       const userInDB = await userRepository.findByEmail(email, { transaction })
 
       if (userInDB) {
-        throw createError({
-          statusCode: 400,
-          message: 'Електронна пошта вже зайнята',
-        })
+        throw new AppError('USER_ALREADY_EXISTS', { field: 'email' })
       }
 
       const updatedUser = await userRepository.updateByPk(
@@ -122,10 +114,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       const hashedPassword = await hashPassword(password)
@@ -159,10 +148,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       const updatedUser = await userRepository.updateByPk(
@@ -195,10 +181,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       if (user.roleName === roleName) {
@@ -234,10 +217,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw new AppError('USER_NOT_FOUND')
       }
 
       const lots = await lotRepository.findAllBySellerIdWithLock(id, {
