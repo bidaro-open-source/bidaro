@@ -3,6 +3,9 @@ import { actionLimits } from '~~/server/constants'
 import { updateUserEmailPolicy } from './index.put.policy'
 import { updateUserEmailRequest } from './index.put.request'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

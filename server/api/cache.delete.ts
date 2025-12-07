@@ -4,6 +4,9 @@ import { categorySource } from '#domains/categories'
 import { userSource } from '#domains/users'
 import { clearCachePolicy } from './cache.delete.policy'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

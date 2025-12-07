@@ -2,6 +2,9 @@ import { roleService } from '#domains/authorization'
 import { deleteRolePolicy } from './index.policy'
 import { viewRoleRequest } from './index.request'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

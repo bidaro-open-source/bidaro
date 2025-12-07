@@ -2,6 +2,9 @@ import { lotBetResource, lotSource } from '#domains/auction'
 import { userAnonymousResource } from '#domains/users'
 import { viewLotRequest } from '../index.request'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 40,

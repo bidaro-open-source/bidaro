@@ -2,6 +2,9 @@ import { lotResource, lotService, lotSource } from '#domains/auction'
 import { viewLotRequest } from '../index.request'
 import { shipLotPolicy } from './index.post.policy'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

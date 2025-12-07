@@ -1,6 +1,9 @@
 import { verificationService } from '#domains/authentication'
 import { actionLimits } from '~~/server/constants'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

@@ -3,6 +3,9 @@ import { imageResource } from '#domains/storage'
 import { viewLotRequest } from '../index.request'
 import { viewLotImagesPolicy } from './index.get.policy'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

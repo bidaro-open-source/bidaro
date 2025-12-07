@@ -5,31 +5,7 @@ import sharp from 'sharp'
 class ChallengeGeneratorService {
   /**
    * The width of the generated captcha background image in pixels.
-   */
-  private readonly puzzleWidth: number = 600
-
-  /**
-   * The height of the generated captcha background image in pixels.
-   */
-  private readonly puzzleHeight: number = 300
-
-  /**
-   * The side length of the square puzzle piece in pixels.
-   * This value determines the size of the cutout mask.
-   */
-  private readonly puzzleShapeSize: number = 80
-
-  /**
-   * The minimum safe distance (padding) from the image edges in pixels.
-   * Used to prevent the puzzle piece from being generated too close to the borders.
-   */
-  private readonly puzzlePadding: number = 60
-
-  /**
-   * Generates a new unique puzzle challenge.
-   *
-   * @returns An object containing the Base64 encoded images and the solution
-   * coordinates required for validation.
+   * @throws {AppError} INTERNAL_SERVER_ERROR
    */
   async generate() {
     const maxX = this.puzzleWidth - this.puzzlePadding - this.puzzleShapeSize
@@ -103,7 +79,10 @@ class ChallengeGeneratorService {
    * @returns The raw buffer of the selected image.
    * @throws Throws a 500 error if no image can be retrieved or read.
    */
-  private async getRandomImage(): Promise<Buffer> {
+  private /**
+           * @throws {AppError} INTERNAL_SERVER_ERROR
+           */
+  async getRandomImage(): Promise<Buffer> {
     const storage = useStorage('assets:server')
     const keys = await storage.keys()
     const randomIndex = this.getRandomInt(0, keys.length - 1)

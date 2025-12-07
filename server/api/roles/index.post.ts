@@ -2,6 +2,9 @@ import { createRoleResource, roleService } from '#domains/authorization'
 import { createRolePolicy } from './index.policy'
 import { createRoleRequest } from './index.post.request'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

@@ -10,6 +10,7 @@ class LotImageService {
    *
    * @param id lot primary key
    * @param images images instance
+   * @throws {AppError} LOT_NOT_FOUND
    */
   async attachImages(id: number, images: Image[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -44,6 +45,7 @@ class LotImageService {
    * @param id lot primary key
    * @param imageIds unsafe image primary keys
    * @returns safe image primary keys which already unattached
+   * @throws {AppError} LOT_NOT_FOUND
    */
   async unattachImages(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -104,6 +106,8 @@ class LotImageService {
    *
    * @param id lot primary key
    * @param imageIds image ids in new order
+   * @throws {AppError} BAD_REQUEST
+   * @throws {AppError} LOT_NOT_FOUND
    */
   async updateImageOrder(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {

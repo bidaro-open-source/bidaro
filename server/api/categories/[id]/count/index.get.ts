@@ -2,6 +2,9 @@ import { categoryRepository, categorySource } from '#domains/categories'
 import { viewCategoryRequest } from '../index.request'
 import { viewCategoryCountPolicy } from './index.get.policy'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

@@ -17,6 +17,11 @@ class LotBetService {
    * @throws 400 when lot is not in trading process
    * @throws 400 when lot is expired
    * @throws 400 when bet amount is not higher than current lot price
+   * @throws {AppError} BAD_REQUEST
+   * @throws {AppError} LOT_BET_TOO_LOW
+   * @throws {AppError} LOT_INVALID_STATUS
+   * @throws {AppError} LOT_NOT_FOUND
+   * @throws {AppError} USER_NOT_FOUND
    */
   async create(lotId: number, userId: number, amount: number) {
     return await useDatabaseTransaction(async (transaction) => {

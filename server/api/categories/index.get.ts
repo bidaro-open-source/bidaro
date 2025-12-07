@@ -1,5 +1,8 @@
 import { categoryResource, categorySource } from '#domains/categories'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 40,

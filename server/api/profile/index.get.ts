@@ -1,6 +1,9 @@
 import { createPermissionResource, createRoleResource, roleSource } from '#domains/authorization'
 import { userProfileResource, userSource } from '#domains/users'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

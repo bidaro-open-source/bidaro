@@ -1,6 +1,9 @@
 import { createPermissionResource, permissionSource } from '#domains/authorization'
 import { viewPermissionsPolicy } from './index.get.policy'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

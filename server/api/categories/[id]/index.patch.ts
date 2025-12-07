@@ -2,6 +2,9 @@ import { categoryResource, categoryService } from '#domains/categories'
 import { updateCategoryPolicy } from '../index.policy'
 import { updateCategoryRequest } from './index.patch.request'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

@@ -3,6 +3,9 @@ import { userResource, userSource } from '#domains/users'
 import { viewLotRequest } from '../index.request'
 import { closeLotPolicy } from './index.post.policy'
 
+/**
+ * API endpoint handler
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
