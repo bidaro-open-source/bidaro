@@ -1,4 +1,5 @@
 import type { Category } from '#database'
+import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
 import { categoryRepository } from './category.repository'
 
@@ -56,10 +57,7 @@ class CategorySource extends EntitySource<Category> {
       const data = await categoryRepository.findByPk(id)
 
       if (!data) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       return data
@@ -80,10 +78,7 @@ class CategorySource extends EntitySource<Category> {
       const data = await categoryRepository.findBySlug(slug)
 
       if (!data) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw new AppError('CATEGORY_NOT_FOUND')
       }
 
       return data
@@ -122,10 +117,7 @@ class CategorySource extends EntitySource<Category> {
         const categories = await categoryRepository.findByPks(ids)
 
         if (categories.length !== ids.length) {
-          throw createError({
-            message: 'Категорія була змінена або видалена',
-            status: 500,
-          })
+          throw new AppError('CATEGORY_MODIFIED_OR_DELETED')
         }
 
         categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
@@ -154,10 +146,7 @@ class CategorySource extends EntitySource<Category> {
         const categories = await categoryRepository.findByPks(ids)
 
         if (categories.length !== ids.length) {
-          throw createError({
-            message: 'Категорія була змінена або видалена',
-            status: 500,
-          })
+          throw new AppError('CATEGORY_MODIFIED_OR_DELETED')
         }
 
         categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))

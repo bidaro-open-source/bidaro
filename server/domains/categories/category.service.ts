@@ -1,4 +1,5 @@
 import type { Category, CategoryAttributesOptional } from '#database'
+import { AppError } from '#classes/app-error'
 import { v4 as uuidv4 } from 'uuid'
 import { categoryRepository } from './category.repository'
 import { categorySource } from './category.source'
@@ -15,10 +16,7 @@ class CategoryService {
       const categoryBySlug = await categoryRepository.findBySlug(data.slug, { transaction })
 
       if (categoryBySlug) {
-        throw createError({
-          statusCode: 422,
-          message: 'Слаг вже зайнят',
-        })
+        throw new AppError('CATEGORY_SLUG_TAKEN', { slug: data.slug })
       }
 
       let parentCategory: Category | null = null
@@ -27,10 +25,7 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(data.parentId, { transaction })
 
         if (!parentCategory) {
-          throw createError({
-            message: 'Батьківську категорію не знайдено',
-            status: 422,
-          })
+          throw new AppError('PARENT_CATEGORY_NOT_FOUND', { parentId: data.parentId })
         }
       }
 
@@ -75,10 +70,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       const displayName = data.displayName ?? category.displayName
@@ -120,10 +112,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       if (category.slug === slug) {
@@ -133,10 +122,7 @@ class CategoryService {
       const categoryBySlug = await categoryRepository.findBySlug(slug, { transaction })
 
       if (categoryBySlug) {
-        throw createError({
-          statusCode: 422,
-          message: 'Слаг вже зайнят',
-        })
+        throw new AppError('CATEGORY_SLUG_TAKEN', { slug })
       }
 
       const updatedCategory = await categoryRepository.updateByPk(
@@ -171,10 +157,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       if (category.parentId === parentId) {
@@ -192,17 +175,11 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(parentId, { transaction })
 
         if (!parentCategory) {
-          throw createError({
-            message: 'Батьківську категорію не знайдено',
-            status: 422,
-          })
+          throw new AppError('PARENT_CATEGORY_NOT_FOUND', { parentId })
         }
 
         if (parentCategory.path.split('/').map(Number).includes(id)) {
-          throw createError({
-            message: 'Батьківська категорія не може бути нащадком цієї категорії',
-            status: 422,
-          })
+          throw new AppError('CATEGORY_PARENT_LOOP')
         }
       }
 
@@ -250,28 +227,19 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          statusCode: 404,
-          message: 'Категорію не знайдено',
-        })
+        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       const children = await categoryRepository.findAllByParentId(category.id, { transaction })
 
       if (children.length > 0) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна видалити категорію, яка має дочірні категорії',
-        })
+        throw new AppError('CATEGORY_HAS_CHILDREN')
       }
 
       const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
 
       if (lotsCount > 0) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна видалити категорію, яка має лоти',
-        })
+        throw new AppError('CATEGORY_HAS_CHILDREN')
       }
 
       await categoryRepository.destroyByPk(category.id, { transaction })
