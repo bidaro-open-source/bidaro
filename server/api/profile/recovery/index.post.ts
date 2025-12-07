@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { recoveryService } from '#domains/authentication'
 import { challengeTokenService } from '#domains/security'
 import { userRepository } from '#domains/users'
@@ -20,21 +21,14 @@ export default defineEventHandler(async (event) => {
     const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
 
     if (!isValid) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Невірне рішення капчі',
-      })
+      throw new AppError('INVALID_CHALLENGE_SOLUTION')
     }
   }
 
   const user = await userRepository.findByEmail(request.body.email)
 
   if (!user) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Користувача з такою поштою не знайдено',
-    })
+    throw new AppError('EMAIL_NOT_FOUND')
   }
 
   const token = await recoveryService.createToken(user.id)

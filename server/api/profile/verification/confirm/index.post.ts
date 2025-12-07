@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { verificationService } from '#domains/authentication'
 import { userRepository, userService } from '#domains/users'
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
@@ -16,11 +17,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!uid) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Токен верифікації не знайдено, можливо ви вже активували акаунт або час дії токена закінчився.',
-    })
+    throw new AppError('VERIFICATION_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(uid)
@@ -28,11 +25,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     await verificationService.deleteTokenByUserId(uid)
 
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Токен верифікації правильний, проте акаунт не знайдено. Можливо, його було видалено.',
-    })
+    throw new AppError('USER_NOT_FOUND', { userId: uid })
   }
 
   await userService.verifyEmail(user.id)

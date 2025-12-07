@@ -1,8 +1,8 @@
+import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { roleRepository } from '#domains/authorization'
 import { challengeTokenService } from '#domains/security'
 import { userProfileResource, userRepository } from '#domains/users'
-import { z } from 'zod'
 import { roles } from '~~/server/constants'
 import { registerRequest } from './index.request'
 
@@ -21,10 +21,7 @@ export default defineEventHandler(async (event) => {
     const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
 
     if (!isValid) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Невірне рішення капчі',
-      })
+      throw new AppError('INVALID_CHALLENGE_SOLUTION')
     }
   }
 
@@ -33,38 +30,23 @@ export default defineEventHandler(async (event) => {
   const userByUsername = await userRepository.findByUsername(request.body.username)
 
   if (userByEmail || userByUsername) {
-    const issues: z.core.$ZodIssueCustom[] = []
+    const fieldErrors: Record<string, string[]> = {}
 
     if (userByEmail) {
-      issues.push({
-        code: 'custom',
-        path: ['email'],
-        message: 'Електронна пошта вже зайнята',
-      })
+      fieldErrors.email = ['Електронна пошта вже зайнята']
     }
 
     if (userByUsername) {
-      issues.push({
-        code: 'custom',
-        path: ['username'],
-        message: 'Ім\'я користувача вже зайняте',
-      })
+      fieldErrors.username = ['Ім\'я користувача вже зайняте']
     }
 
-    throw createError({
-      statusCode: 422,
-      message: 'Неправильні дані запиту',
-      data: z.flattenError(new z.ZodError(issues)),
-    })
+    throw new AppError('VALIDATION_ERROR', { fieldErrors })
   }
 
   const defaultRole = await roleRepository.findByPk(roles.USER)
 
   if (!defaultRole) {
-    throw createError({
-      statusCode: 500,
-      message: 'Default role not found.',
-    })
+    throw new AppError('DEFAULT_ROLE_NOT_FOUND')
   }
 
   const user = await userRepository.create({

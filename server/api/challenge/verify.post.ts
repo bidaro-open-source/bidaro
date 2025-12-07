@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { challengeService, challengeTokenService } from '#domains/security'
 import { verifyChallengeRequest } from './verify.request'
 
@@ -5,9 +6,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.challenge.enabled) {
-    throw createError({
-      statusCode: 404,
-    })
+    throw new AppError('NOT_FOUND')
   }
 
   await useRateLimiter(event, {
@@ -27,19 +26,13 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!isValid) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Невірне рішення капчі',
-    })
+    throw new AppError('INVALID_CHALLENGE_SOLUTION')
   }
 
   const token = await challengeTokenService.create()
 
   if (!token) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Не вдалося створити токен для капчі',
-    })
+    throw new AppError('CHALLENGE_TOKEN_CREATION_FAILED')
   }
 
   return {

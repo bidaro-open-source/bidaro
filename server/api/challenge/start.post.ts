@@ -1,12 +1,11 @@
+import { AppError } from '#classes/app-error'
 import { challengeGeneratorService, challengeService } from '#domains/security'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.challenge.enabled) {
-    throw createError({
-      statusCode: 404,
-    })
+    throw new AppError('NOT_FOUND')
   }
 
   await useRateLimiter(event, {
@@ -23,10 +22,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!challengeId) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Не вдалося створити виклик для капчі',
-    })
+    throw new AppError('CHALLENGE_CREATION_FAILED')
   }
 
   return {

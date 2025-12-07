@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { recoveryService } from '#domains/authentication'
 import { userRepository, userService } from '#domains/users'
 import {
@@ -16,11 +17,7 @@ export default defineEventHandler(async (event) => {
   const uid = await recoveryService.getUserIdByToken(request.body.token)
 
   if (!uid) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Токен скидання пароля не знайдено, можливо ви вже скинули пароль або час дії токена закінчився.',
-    })
+    throw new AppError('RECOVERY_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(uid)
@@ -28,11 +25,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     await recoveryService.deleteToken(request.body.token)
 
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Токен скидання пароля правильний, проте акаунт не знайдений, можливо, користувача було видалено.',
-    })
+    throw new AppError('USER_NOT_FOUND', { userId: uid })
   }
 
   await userService.updatePassword(user.id, request.body.password)
