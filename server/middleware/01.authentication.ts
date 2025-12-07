@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { userSource } from '#domains/users'
 
@@ -30,21 +31,13 @@ export default defineEventHandler(async (event) => {
   const [type, token] = authorization.split(' ')
 
   if (type !== 'Bearer') {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Метод авторизації не дозволений',
-    })
+    throw new AppError('INVALID_AUTHORIZATION_METHOD')
   }
 
   const verifed = authService.verifyAccessToken(token)
 
   if (!verifed) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Токен авторизації недійсний',
-    })
+    throw new AppError('INVALID_ACCESS_TOKEN')
   }
 
   const payload = authService.decodeAccessToken(token)

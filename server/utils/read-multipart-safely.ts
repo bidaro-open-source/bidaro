@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer'
+import { AppError } from '#classes/app-error'
 import Busboy from 'busboy'
 
 /**
@@ -65,16 +66,12 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
     const contentType = getRequestHeader(event, 'content-type')
 
     if (!contentType) {
-      throw createError({
-        statusCode: 400,
-        message: 'Missing Content-Type header',
-      })
+      throw new AppError('MISSING_CONTENT_TYPE')
     }
 
     if (!contentType.startsWith('multipart/form-data')) {
-      throw createError({
-        statusCode: 415,
-        message: `Непідтримуваний Content-Type: ${contentType}`,
+      throw new AppError('UNSUPPORTED_MEDIA_TYPE', {
+        contentType,
       })
     }
 
@@ -95,9 +92,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
     }
     catch (err: any) {
       return reject(
-        createError({
-          statusCode: 400,
-          message: `Помилка ініціалізації парсера multipart даних: ${err.message}`,
+        new AppError('INVALID_MULTIPART_DATA', {
+          error: err.message,
         }),
       )
     }
@@ -115,9 +111,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.resume()
 
         return reject(
-          createError({
-            statusCode: 415,
-            message: `Тип файлу "${mimeType}" не підтримується`,
+          new AppError('UNSUPPORTED_MEDIA_TYPE', {
+            mimeType,
           }),
         )
       }
@@ -130,9 +125,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         reject(
-          createError({
-            statusCode: 413,
-            message: `Файл "${filename}" перевищує допустимий розмір`,
+          new AppError('PAYLOAD_TOO_LARGE', {
+            filename,
           }),
         )
       })
@@ -158,10 +152,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         return reject(
-          createError({
-            statusCode: 413,
-            message: 'Ім\'я поля перевищує допустиму довжину',
-          }),
+          new AppError('FIELD_NAME_TOO_LONG'),
         )
       }
 
@@ -170,9 +161,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.resume()
 
         return reject(
-          createError({
-            statusCode: 413,
-            message: `Поле "${fieldname}" перевищує допустимий розмір`,
+          new AppError('PAYLOAD_TOO_LARGE', {
+            field: fieldname,
           }),
         )
       }
@@ -196,9 +186,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
 
       if (isClientError) {
         reject(
-          createError({
-            statusCode: 400,
-            message: `Помилка розбору multipart даних: ${error.message}`,
+          new AppError('INVALID_MULTIPART_DATA', {
+            error: error.message,
           }),
         )
       }
@@ -206,10 +195,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         logger.error('Unknown error during reading multipart safely', error)
 
         reject(
-          createError({
-            statusCode: 500,
-            message: 'Внутрішня помилка сервера під час розбору multipart даних',
-          }),
+          new AppError('INTERNAL_SERVER_ERROR'),
         )
       }
     })

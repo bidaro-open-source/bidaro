@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3'
+import { AppError } from '#classes/app-error'
 
 /**
  * Configuration options for the rate limiter utility.
@@ -93,12 +94,6 @@ export async function useRateLimiter(
   if (isLimited) {
     setResponseHeader(event, 'retry-after', retryAfter)
 
-    throw createError({
-      statusCode: 429,
-      statusMessage: 'Too Many Requests',
-      message: isAuth
-        ? 'Ліміт запитів перевищено. Будь ласка, спробуйте пізніше.'
-        : 'Ліміт запитів для неавторизованих користувачів перевищено. Будь ласка, увійдіть в систему або спробуйте пізніше.',
-    })
+    throw new AppError(isAuth ? 'TOO_MANY_REQUESTS' : 'TOO_MANY_REQUESTS_ANONYMOUS')
   }
 }

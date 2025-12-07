@@ -1,4 +1,5 @@
 import type { permissions } from '../constants'
+import { AppError } from '#classes/app-error'
 
 /**
  * Creates a request policy function.
@@ -23,20 +24,11 @@ export function createRequestPolicy<Policy extends (...args: any[]) => any>(
       result = policy(...args)
     }
     catch (error) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Unprocessable Content',
-        message: 'Невідома помилка під час авторизації запиту',
-        data: error,
-      })
+      throw new AppError('UNKNOWN_AUTHORIZATION_ERROR')
     }
 
     if (!result) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Forbidden',
-        message: 'Немає доступу',
-      })
+      throw new AppError('FORBIDDEN')
     }
   }
 }

@@ -1,3 +1,5 @@
+import { AppError } from '#classes/app-error'
+
 /**
  * Validates that the current request is authenticated with a
  * valid user session.
@@ -17,11 +19,7 @@
  */
 export function mustBeAuthenticated(event: H3Event): void {
   if (!event.context.auth || !event.context.auth.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Для цієї дії необхідно бути в системі',
-    })
+    throw new AppError('AUTHENTICATION_REQUIRED')
   }
 }
 

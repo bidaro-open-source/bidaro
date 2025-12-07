@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import { S3Client } from '@aws-sdk/client-s3'
 
 interface ReturnType {
@@ -56,11 +57,6 @@ export function useObjectStorage(event?: H3Event): ReturnType {
     }
   }
   catch (e) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Object storage connection failed',
-      data: e,
-    })
+    throw new AppError('OBJECT_STORAGE_CONNECTION_FAILED')
   }
 }

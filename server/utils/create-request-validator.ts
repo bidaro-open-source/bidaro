@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3'
+import { AppError } from '#classes/app-error'
 import { z } from 'zod'
 
 type ValidatorFunction<T = any> = (event: H3Event, context?: any) => Promise<T> | T
@@ -96,35 +97,26 @@ export function createRequestValidator<Options extends ValidatorOptions>(
     catch (error: any) {
       // For shema.parse(await readBody(event))
       if (error instanceof z.ZodError) {
-        throw createError({
-          statusCode: 422,
-          statusMessage: 'Unprocessable Content',
-          message: 'Неправильні дані запиту',
-          data: z.flattenError(error),
+        throw new AppError('VALIDATION_ERROR', {
+          fieldErrors: z.flattenError(error).fieldErrors,
+          formErrors: z.flattenError(error).formErrors,
         })
       }
 
       // For readValidatedBody(event, schema.parse)
       if (error.data instanceof z.ZodError) {
-        throw createError({
-          statusCode: 422,
-          statusMessage: 'Unprocessable Content',
-          message: 'Неправильні дані запиту',
-          data: z.flattenError(error.data),
+        throw new AppError('VALIDATION_ERROR', {
+          fieldErrors: z.flattenError(error.data).fieldErrors,
+          formErrors: z.flattenError(error.data).formErrors,
         })
       }
 
-      // For createError({ ... })
-      if (typeof error?.statusCode === 'number') {
+      // For createError({ ... }) or AppError
+      if (typeof error?.statusCode === 'number' || error instanceof AppError) {
         throw error
       }
 
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Unprocessable Content',
-        message: 'Невідома помилка під час валідації запиту',
-        data: error,
-      })
+      throw new AppError('UNKNOWN_VALIDATION_ERROR')
     }
   }
 }

@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import nodemailer from 'nodemailer'
 
 let transporter: nodemailer.Transporter | null = null
@@ -31,9 +32,6 @@ export function useNodemailer(event: H3Event) {
     return transporter
   }
   catch (error) {
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to create nodemailer transporter',
-    })
+    throw new AppError('NODEMAILER_CREATION_FAILED')
   }
 }

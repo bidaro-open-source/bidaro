@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3'
+import { AppError } from '#classes/app-error'
 
 /**
  * One day in seconds (24 * 60 * 60).
@@ -88,11 +89,7 @@ export async function useActionLimiter<T>(
   const user = getAuthenticatedUser(event)
 
   if (!user) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Unauthorized',
-      message: 'Using action limiter requires authenticated user',
-    })
+    throw new AppError('ACTION_LIMITER_AUTH_REQUIRED')
   }
 
   const redis = useRedis()
@@ -111,19 +108,13 @@ export async function useActionLimiter<T>(
     ) as number
   }
   catch (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Операція з Redis не вдалася',
-      data: error,
-    })
+    throw new AppError('REDIS_OPERATION_FAILED')
   }
 
   if (allowed === 0) {
-    throw createError({
-      statusCode: 429,
-      statusMessage: 'Too Many Requests',
-      message: 'Ліміт дій перевищено. Будь ласка, спробуйте пізніше.',
+    throw new AppError('ACTION_LIMIT_EXCEEDED', {
+      action: actionKey,
+      limit,
     })
   }
 

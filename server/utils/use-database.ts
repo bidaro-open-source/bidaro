@@ -1,4 +1,5 @@
 import type { Database } from '#database'
+import { AppError } from '#classes/app-error'
 import { BootstrapDatabase } from '#database'
 import { Sequelize } from 'sequelize'
 
@@ -43,11 +44,6 @@ export function useDatabase(event?: H3Event): Database {
     return database
   }
   catch (e) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Database connection failed',
-      data: e,
-    })
+    throw new AppError('DATABASE_CONNECTION_FAILED')
   }
 }

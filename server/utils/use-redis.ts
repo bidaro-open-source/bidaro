@@ -1,3 +1,4 @@
+import { AppError } from '#classes/app-error'
 import Redis from 'ioredis'
 
 try {
@@ -42,11 +43,6 @@ export function useRedis(event?: H3Event): Redis {
     return instance
   }
   catch (e) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Redis connection failed',
-      data: e,
-    })
+    throw new AppError('REDIS_CONNECTION_FAILED')
   }
 }
