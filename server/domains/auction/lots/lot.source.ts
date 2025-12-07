@@ -1,6 +1,6 @@
 import type { Lot } from '#database'
-import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
+import { createAppError } from '#utils/create-app-error'
 import { userSource } from '../../users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'
@@ -36,7 +36,7 @@ class LotSource extends EntitySource<Lot> {
    * Retrieve a lot by ID, utilizing Redis caching.
    *
    * @param id - The ID of the lot to fetch.
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws LOT_NOT_FOUND
    * @returns The lot instance
    */
   async getById(id: number) {
@@ -46,7 +46,7 @@ class LotSource extends EntitySource<Lot> {
       const data = await lotRepository.findByPk(id)
 
       if (!data) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       return data

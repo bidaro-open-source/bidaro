@@ -1,11 +1,11 @@
 import { Buffer } from 'node:buffer'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import sharp from 'sharp'
 
 class ChallengeGeneratorService {
   /**
    * The width of the generated captcha background image in pixels.
-   * @throws {AppError} INTERNAL_SERVER_ERROR
+   * @throws INTERNAL_SERVER_ERROR
    */
   async generate() {
     const maxX = this.puzzleWidth - this.puzzlePadding - this.puzzleShapeSize
@@ -80,7 +80,7 @@ class ChallengeGeneratorService {
    * @throws Throws a 500 error if no image can be retrieved or read.
    */
   private /**
-           * @throws {AppError} INTERNAL_SERVER_ERROR
+           * @throws INTERNAL_SERVER_ERROR
            */
   async getRandomImage(): Promise<Buffer> {
     const storage = useStorage('assets:server')
@@ -91,7 +91,7 @@ class ChallengeGeneratorService {
     const image = await storage.getItemRaw(randomKey)
 
     if (!image) {
-      throw new AppError('INTERNAL_SERVER_ERROR')
+      throw createAppError('INTERNAL_SERVER_ERROR')
     }
 
     return image

@@ -1,5 +1,5 @@
 import type { RoleAttributesOptional } from '#database'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { permissionRepository } from '../permission/permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'
@@ -12,14 +12,14 @@ class RoleService {
    *
    * @param data - role data
    * @returns role instance
-   * @throws {AppError} ROLE_NAME_TAKEN - When role name already exists
+   * @throws ROLE_NAME_TAKEN - When role name already exists
    */
   async create(data: RoleCreateData) {
     return await useDatabaseTransaction(async (transaction) => {
       const existingRole = await roleRepository.findByPk(data.name, { transaction })
 
       if (existingRole) {
-        throw new AppError('ROLE_NAME_TAKEN')
+        throw createAppError('ROLE_NAME_TAKEN')
       }
 
       const role = await roleRepository.create(data, { transaction })
@@ -38,7 +38,7 @@ class RoleService {
    * @param name - role name
    * @param data - role data to update
    * @returns updated role instance
-   * @throws {AppError} ROLE_NOT_FOUND
+   * @throws ROLE_NOT_FOUND
    */
   async update(name: string, data: Partial<Pick<RoleAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -48,7 +48,7 @@ class RoleService {
       })
 
       if (!role) {
-        throw new AppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND')
       }
 
       const displayName = Object.hasOwn(data, 'displayName')
@@ -82,8 +82,8 @@ class RoleService {
    * @param name - role name
    * @param permissionNames - array of permission names
    * @returns role instance
-   * @throws {AppError} ROLE_NOT_FOUND
-   * @throws {AppError} ROLE_IS_RESERVED role
+   * @throws ROLE_NOT_FOUND
+   * @throws ROLE_IS_RESERVED role
    */
   async updatePermissions(name: string, permissionNames: string[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -93,17 +93,17 @@ class RoleService {
       })
 
       if (!role) {
-        throw new AppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND')
       }
 
       if (role.isReserved) {
-        throw new AppError('ROLE_IS_RESERVED')
+        throw createAppError('ROLE_IS_RESERVED')
       }
 
       const permissions = await permissionRepository.findByPks(permissionNames, { transaction })
 
       if (permissions.length !== permissionNames.length) {
-        throw new AppError('PERMISSIONS_NOT_FOUND')
+        throw createAppError('PERMISSIONS_NOT_FOUND')
       }
 
       await roleRepository.updatePermissionsByPk(name, permissionNames, { transaction })
@@ -120,9 +120,9 @@ class RoleService {
    * Deletes a role.
    *
    * @param name - role name
-   * @throws {AppError} ROLE_NOT_FOUND
-   * @throws {AppError} ROLE_IS_RESERVED
-   * @throws {AppError} ROLE_HAS_USERS
+   * @throws ROLE_NOT_FOUND
+   * @throws ROLE_IS_RESERVED
+   * @throws ROLE_HAS_USERS
    */
   async delete(name: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -132,17 +132,17 @@ class RoleService {
       })
 
       if (!role) {
-        throw new AppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND')
       }
 
       if (role.isReserved) {
-        throw new AppError('ROLE_IS_RESERVED')
+        throw createAppError('ROLE_IS_RESERVED')
       }
 
       const userCount = await roleRepository.countUsersByName(name, { transaction })
 
       if (userCount > 0) {
-        throw new AppError('ROLE_HAS_USERS')
+        throw createAppError('ROLE_HAS_USERS')
       }
 
       await roleRepository.destroyByPk(name, { transaction })

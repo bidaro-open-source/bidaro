@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { z } from 'zod'
 
 type ValidatorFunction<T = any> = (event: H3Event, context?: any) => Promise<T> | T
@@ -29,8 +29,8 @@ export type ValidatorReturnType<V>
  *
  * @param options - Validation options for different request parts
  * @returns Async function that validates the request and returns validated data
- * @throws {AppError} VALIDATION_ERROR - When Zod validation fails
- * @throws {AppError} UNKNOWN_VALIDATION_ERROR - When unexpected validation error occurs
+ * @throws VALIDATION_ERROR - When Zod validation fails
+ * @throws UNKNOWN_VALIDATION_ERROR - When unexpected validation error occurs
  *
  * @example
  * const validator = createRequestValidator({
@@ -85,7 +85,7 @@ export function createRequestValidator<Options extends ValidatorOptions>(
     }
     catch (error: any) {
       if (error instanceof z.ZodError) {
-        throw new AppError('VALIDATION_ERROR', {
+        throw createAppError('VALIDATION_ERROR', {
           fieldErrors: z.flattenError(error).fieldErrors,
           formErrors: z.flattenError(error).formErrors,
         })
@@ -93,7 +93,7 @@ export function createRequestValidator<Options extends ValidatorOptions>(
 
       if (error.data instanceof z.ZodError) {
         const flattened = z.flattenError(error.data)
-        throw new AppError('VALIDATION_ERROR', {
+        throw createAppError('VALIDATION_ERROR', {
           fieldErrors: flattened.fieldErrors,
           formErrors: flattened.formErrors,
         })
@@ -103,7 +103,7 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         throw error
       }
 
-      throw new AppError('UNKNOWN_VALIDATION_ERROR')
+      throw createAppError('UNKNOWN_VALIDATION_ERROR')
     }
   }
 }

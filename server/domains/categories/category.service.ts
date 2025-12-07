@@ -1,5 +1,5 @@
 import type { Category, CategoryAttributesOptional } from '#database'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { v4 as uuidv4 } from 'uuid'
 import { categoryRepository } from './category.repository'
 import { categorySource } from './category.source'
@@ -10,15 +10,15 @@ class CategoryService {
    *
    * @param data - category data
    * @returns category instance
-   * @throws {AppError} CATEGORY_SLUG_TAKEN - When slug is already in use
-   * @throws {AppError} PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
+   * @throws CATEGORY_SLUG_TAKEN - When slug is already in use
+   * @throws PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
     return await useDatabaseTransaction(async (transaction) => {
       const categoryBySlug = await categoryRepository.findBySlug(data.slug, { transaction })
 
       if (categoryBySlug) {
-        throw new AppError('CATEGORY_SLUG_TAKEN', { slug: data.slug })
+        throw createAppError('CATEGORY_SLUG_TAKEN', { slug: data.slug })
       }
 
       let parentCategory: Category | null = null
@@ -27,7 +27,7 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(data.parentId, { transaction })
 
         if (!parentCategory) {
-          throw new AppError('PARENT_CATEGORY_NOT_FOUND', { parentId: data.parentId })
+          throw createAppError('PARENT_CATEGORY_NOT_FOUND', { parentId: data.parentId })
         }
       }
 
@@ -62,7 +62,7 @@ class CategoryService {
    * @param id - The ID of the category to update
    * @param data - The data to update
    * @returns The updated category instance
-   * @throws {AppError} CATEGORY_NOT_FOUND
+   * @throws CATEGORY_NOT_FOUND
    */
   async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -72,7 +72,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       const displayName = data.displayName ?? category.displayName
@@ -103,8 +103,8 @@ class CategoryService {
    * @param id - category primary key
    * @param slug - new category slug
    * @returns updated category instance
-   * @throws {AppError} CATEGORY_NOT_FOUND
-   * @throws {AppError} CATEGORY_SLUG_TAKEN
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_SLUG_TAKEN
    */
   async updateSlug(id: number, slug: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -114,7 +114,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       if (category.slug === slug) {
@@ -124,7 +124,7 @@ class CategoryService {
       const categoryBySlug = await categoryRepository.findBySlug(slug, { transaction })
 
       if (categoryBySlug) {
-        throw new AppError('CATEGORY_SLUG_TAKEN', { slug })
+        throw createAppError('CATEGORY_SLUG_TAKEN', { slug })
       }
 
       const updatedCategory = await categoryRepository.updateByPk(
@@ -147,9 +147,9 @@ class CategoryService {
    * @param id - category primary key
    * @param parentId - parent category id or null
    * @returns updated category instance
-   * @throws {AppError} CATEGORY_NOT_FOUND - When category doesn't exist
-   * @throws {AppError} PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
-   * @throws {AppError} CATEGORY_PARENT_LOOP - When parent category is a child of the category itself
+   * @throws CATEGORY_NOT_FOUND - When category doesn't exist
+   * @throws PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
+   * @throws CATEGORY_PARENT_LOOP - When parent category is a child of the category itself
    */
   async updateParent(id: number, parentId: number | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -159,7 +159,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       if (category.parentId === parentId) {
@@ -177,11 +177,11 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(parentId, { transaction })
 
         if (!parentCategory) {
-          throw new AppError('PARENT_CATEGORY_NOT_FOUND', { parentId })
+          throw createAppError('PARENT_CATEGORY_NOT_FOUND', { parentId })
         }
 
         if (parentCategory.path.split('/').map(Number).includes(id)) {
-          throw new AppError('CATEGORY_PARENT_LOOP')
+          throw createAppError('CATEGORY_PARENT_LOOP')
         }
       }
 
@@ -218,9 +218,9 @@ class CategoryService {
    * Deletes a category.
    *
    * @param id - The ID of the category to delete
-   * @throws {AppError} CATEGORY_NOT_FOUND - When category doesn't exist
-   * @throws {AppError} CATEGORY_HAS_CHILDREN - When category has child categories
-   * @throws {AppError} CATEGORY_HAS_LOTS - When category has associated lots
+   * @throws CATEGORY_NOT_FOUND - When category doesn't exist
+   * @throws CATEGORY_HAS_CHILDREN - When category has child categories
+   * @throws CATEGORY_HAS_LOTS - When category has associated lots
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -230,19 +230,19 @@ class CategoryService {
       })
 
       if (!category) {
-        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       const children = await categoryRepository.findAllByParentId(category.id, { transaction })
 
       if (children.length > 0) {
-        throw new AppError('CATEGORY_HAS_CHILDREN')
+        throw createAppError('CATEGORY_HAS_CHILDREN')
       }
 
       const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
 
       if (lotsCount > 0) {
-        throw new AppError('CATEGORY_HAS_LOTS')
+        throw createAppError('CATEGORY_HAS_LOTS')
       }
 
       await categoryRepository.destroyByPk(category.id, { transaction })

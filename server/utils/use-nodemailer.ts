@@ -1,4 +1,4 @@
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import nodemailer from 'nodemailer'
 
 let transporter: nodemailer.Transporter | null = null
@@ -8,7 +8,7 @@ let transporter: nodemailer.Transporter | null = null
  *
  * @param event - H3Event
  * @returns Nodemailer transporter
- * @throws {AppError} NODEMAILER_CREATION_FAILED - When nodemailer transporter creation fails
+ * @throws NODEMAILER_CREATION_FAILED - When nodemailer transporter creation fails
  */
 export function useNodemailer(event: H3Event) {
   const runtimeConfig = useRuntimeConfig(event)
@@ -33,6 +33,6 @@ export function useNodemailer(event: H3Event) {
     return transporter
   }
   catch (error) {
-    throw new AppError('NODEMAILER_CREATION_FAILED')
+    throw createAppError('NODEMAILER_CREATION_FAILED')
   }
 }

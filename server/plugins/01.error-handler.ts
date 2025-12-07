@@ -1,13 +1,14 @@
-import { AppError } from '#classes/app-error'
-
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('error', (error, { event }) => {
-    if (error instanceof AppError) {
-      if (error.statusCode >= 500) {
-        logger.error(`AppError: ${error.code}`, {
-          code: error.code,
+    // Check if this is an error created by createAppError
+    if (error.data && typeof error.data === 'object' && 'code' in error.data) {
+      const errorData = error.data as { code: string, title: string, description: string, details?: unknown }
+
+      if (error.statusCode && error.statusCode >= 500) {
+        logger.error(`AppError: ${errorData.code}`, {
+          code: errorData.code,
           statusCode: error.statusCode,
-          details: error.details,
+          details: errorData.details,
           stack: error.stack,
           url: event?.path,
           method: event?.method,
@@ -15,8 +16,8 @@ export default defineNitroPlugin((nitroApp) => {
       }
 
       if (event) {
-        setResponseStatus(event, error.statusCode)
-        return error.toJSON()
+        setResponseStatus(event, error.statusCode || 500)
+        return errorData
       }
     }
 

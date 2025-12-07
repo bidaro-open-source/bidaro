@@ -1,6 +1,6 @@
-import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import { refreshRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -17,13 +17,13 @@ export default defineEventHandler(async (event) => {
   if (!oldSession) {
     deleteRefreshTokenCookie(event)
 
-    throw new AppError('REFRESH_TOKEN_NOT_FOUND')
+    throw createAppError('REFRESH_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(oldSession.uid)
 
   if (!user) {
-    throw new AppError('USER_NOT_FOUND', { userId: oldSession.uid })
+    throw createAppError('USER_NOT_FOUND', { userId: oldSession.uid })
   }
 
   const metadata = createRequestMeta(event)

@@ -1,6 +1,6 @@
 import type { Database } from '#database'
-import { AppError } from '#classes/app-error'
 import { BootstrapDatabase } from '#database'
+import { createAppError } from '#utils/create-app-error'
 import { Sequelize } from 'sequelize'
 
 /**
@@ -13,7 +13,7 @@ let database: Database | undefined
  *
  * @param event H3Event
  * @returns A configured Database instance with all models initialized
- * @throws {AppError} DATABASE_CONNECTION_FAILED - When database connection cannot be established
+ * @throws DATABASE_CONNECTION_FAILED - When database connection cannot be established
  *
  * @example
  * // Use in API route handler
@@ -44,6 +44,6 @@ export function useDatabase(event?: H3Event): Database {
     return database
   }
   catch (e) {
-    throw new AppError('DATABASE_CONNECTION_FAILED')
+    throw createAppError('DATABASE_CONNECTION_FAILED')
   }
 }

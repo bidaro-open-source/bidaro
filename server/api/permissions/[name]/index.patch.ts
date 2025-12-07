@@ -1,5 +1,5 @@
-import { AppError } from '#classes/app-error'
 import { createPermissionResource, permissionRepository, permissionSource, roleSource } from '#domains/authorization'
+import { createAppError } from '#utils/create-app-error'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const permission = await permissionRepository.findByPk(request.params.name)
 
   if (!permission) {
-    throw new AppError('PERMISSION_NOT_FOUND', { permissionName: request.params.name })
+    throw createAppError('PERMISSION_NOT_FOUND', { permissionName: request.params.name })
   }
 
   const displayName = Object.hasOwn(request.body, 'displayName')

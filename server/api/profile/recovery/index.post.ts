@@ -1,7 +1,7 @@
-import { AppError } from '#classes/app-error'
 import { recoveryService } from '#domains/authentication'
 import { challengeTokenService } from '#domains/security'
 import { userRepository } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
@@ -21,14 +21,14 @@ export default defineEventHandler(async (event) => {
     const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
 
     if (!isValid) {
-      throw new AppError('INVALID_CHALLENGE_SOLUTION')
+      throw createAppError('INVALID_CHALLENGE_SOLUTION')
     }
   }
 
   const user = await userRepository.findByEmail(request.body.email)
 
   if (!user) {
-    throw new AppError('EMAIL_NOT_FOUND')
+    throw createAppError('EMAIL_NOT_FOUND')
   }
 
   const token = await recoveryService.createToken(user.id)

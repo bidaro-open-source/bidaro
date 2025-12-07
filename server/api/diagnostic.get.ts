@@ -1,11 +1,11 @@
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { HeadBucketCommand } from '@aws-sdk/client-s3'
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event)
 
   if (event.node.req.headers['x-diagnostic-token'] !== runtimeConfig.diagnostic.token) {
-    throw new AppError('UNAUTHORIZED')
+    throw createAppError('UNAUTHORIZED')
   }
 
   let databaseConnectionOk = false

@@ -1,6 +1,6 @@
-import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { userSource } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 
 /**
  * Checks the request for an access token in the `Authorization` header.
@@ -20,9 +20,9 @@ import { userSource } from '#domains/users'
  * - `User` include `Role` association with all attributes
  * - `Role` include `Permission` association with all attributes
  *
- * @throws {AppError} INVALID_AUTHORIZATION_METHOD - When authorization method is not Bearer
- * @throws {AppError} INVALID_ACCESS_TOKEN - When access token is invalid or expired
- * @throws {AppError} USER_NOT_FOUND - When user does not exist in database
+ * @throws INVALID_AUTHORIZATION_METHOD - When authorization method is not Bearer
+ * @throws INVALID_ACCESS_TOKEN - When access token is invalid or expired
+ * @throws USER_NOT_FOUND - When user does not exist in database
  */
 export default defineEventHandler(async (event) => {
   const authorization = getRequestHeader(event, 'Authorization')
@@ -33,13 +33,13 @@ export default defineEventHandler(async (event) => {
   const [type, token] = authorization.split(' ')
 
   if (type !== 'Bearer') {
-    throw new AppError('INVALID_AUTHORIZATION_METHOD')
+    throw createAppError('INVALID_AUTHORIZATION_METHOD')
   }
 
   const verifed = authService.verifyAccessToken(token)
 
   if (!verifed) {
-    throw new AppError('INVALID_ACCESS_TOKEN')
+    throw createAppError('INVALID_ACCESS_TOKEN')
   }
 
   const payload = authService.decodeAccessToken(token)

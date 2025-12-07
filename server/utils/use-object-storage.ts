@@ -1,4 +1,4 @@
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { S3Client } from '@aws-sdk/client-s3'
 
 interface ReturnType {
@@ -21,7 +21,7 @@ let bucket: string | undefined
  *
  * @param event H3Event
  * @returns A configured s3 client instance
- * @throws {AppError} OBJECT_STORAGE_CONNECTION_FAILED - When S3 connection cannot be established
+ * @throws OBJECT_STORAGE_CONNECTION_FAILED - When S3 connection cannot be established
  *
  * @example
  * // Use in API route handler
@@ -57,6 +57,6 @@ export function useObjectStorage(event?: H3Event): ReturnType {
     }
   }
   catch (e) {
-    throw new AppError('OBJECT_STORAGE_CONNECTION_FAILED')
+    throw createAppError('OBJECT_STORAGE_CONNECTION_FAILED')
   }
 }

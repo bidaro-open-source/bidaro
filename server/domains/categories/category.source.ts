@@ -1,6 +1,6 @@
 import type { Category } from '#database'
-import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
+import { createAppError } from '#utils/create-app-error'
 import { categoryRepository } from './category.repository'
 
 class CategorySource extends EntitySource<Category> {
@@ -47,7 +47,7 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve a category by ID, using Redis caching.
    *
    * @param id - Category primary key
-   * @throws {AppError} CATEGORY_NOT_FOUND
+   * @throws CATEGORY_NOT_FOUND
    * @returns The category instance
    */
   async getById(id: number) {
@@ -57,7 +57,7 @@ class CategorySource extends EntitySource<Category> {
       const data = await categoryRepository.findByPk(id)
 
       if (!data) {
-        throw new AppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
       }
 
       return data
@@ -68,7 +68,7 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve a category by slug, using Redis caching.
    *
    * @param slug - Category slug
-   * @throws {AppError} CATEGORY_NOT_FOUND
+   * @throws CATEGORY_NOT_FOUND
    * @returns The category instance
    */
   async getBySlug(slug: string) {
@@ -78,7 +78,7 @@ class CategorySource extends EntitySource<Category> {
       const data = await categoryRepository.findBySlug(slug)
 
       if (!data) {
-        throw new AppError('CATEGORY_NOT_FOUND')
+        throw createAppError('CATEGORY_NOT_FOUND')
       }
 
       return data
@@ -103,8 +103,8 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve the breadcrumb categories for a given category ID, using Redis caching.
    *
    * @param id - Category primary key
-   * @throws {AppError} CATEGORY_NOT_FOUND - When category doesn't exist (via getById)
-   * @throws {AppError} CATEGORY_MODIFIED_OR_DELETED - When one or more categories in the path are missing
+   * @throws CATEGORY_NOT_FOUND - When category doesn't exist (via getById)
+   * @throws CATEGORY_MODIFIED_OR_DELETED - When one or more categories in the path are missing
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsById(id: number) {
@@ -118,7 +118,7 @@ class CategorySource extends EntitySource<Category> {
         const categories = await categoryRepository.findByPks(ids)
 
         if (categories.length !== ids.length) {
-          throw new AppError('CATEGORY_MODIFIED_OR_DELETED')
+          throw createAppError('CATEGORY_MODIFIED_OR_DELETED')
         }
 
         categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
@@ -135,7 +135,7 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve the breadcrumb categories for a given category path, using Redis caching.
    *
    * @param path - Category path string (e.g. "1/2/3")
-   * @throws {AppError} CATEGORY_MODIFIED_OR_DELETED - When one or more categories in the path are missing
+   * @throws CATEGORY_MODIFIED_OR_DELETED - When one or more categories in the path are missing
    * @returns Ordered array of categories representing the breadcrumb path
    */
   async getBreadcrumbsByPath(path: string) {
@@ -147,7 +147,7 @@ class CategorySource extends EntitySource<Category> {
         const categories = await categoryRepository.findByPks(ids)
 
         if (categories.length !== ids.length) {
-          throw new AppError('CATEGORY_MODIFIED_OR_DELETED')
+          throw createAppError('CATEGORY_MODIFIED_OR_DELETED')
         }
 
         categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))

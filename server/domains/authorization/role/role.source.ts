@@ -1,6 +1,6 @@
 import type { Role } from '#database'
-import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
+import { createAppError } from '#utils/create-app-error'
 import { roleRepository } from './role.repository'
 
 class RoleSource extends EntitySource<Role> {
@@ -49,7 +49,7 @@ class RoleSource extends EntitySource<Role> {
    * Retrieve a role by name, using Redis caching.
    *
    * @param name - Role name
-   * @throws {AppError} ROLE_NOT_FOUND
+   * @throws ROLE_NOT_FOUND
    * @returns The role instance
    */
   async getByPk(name: string) {
@@ -59,7 +59,7 @@ class RoleSource extends EntitySource<Role> {
       const data = await roleRepository.findByPk(name)
 
       if (!data) {
-        throw new AppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND')
       }
 
       return data

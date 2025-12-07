@@ -1,5 +1,5 @@
 import type { Image } from '#database'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { lotRepository } from '../lots/lot.repository'
 import { lotSource } from '../lots/lot.source'
 import { lotImageRepository } from './lot-image.repository'
@@ -10,7 +10,7 @@ class LotImageService {
    *
    * @param id lot primary key
    * @param images images instance
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws LOT_NOT_FOUND
    */
   async attachImages(id: number, images: Image[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -20,7 +20,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       const currentMaxOrder = await lotImageRepository.findMaxOrder(id, { transaction })
@@ -45,7 +45,7 @@ class LotImageService {
    * @param id lot primary key
    * @param imageIds unsafe image primary keys
    * @returns safe image primary keys which already unattached
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws LOT_NOT_FOUND
    */
   async unattachImages(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -55,7 +55,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       const existingLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -102,8 +102,8 @@ class LotImageService {
    *
    * @param id lot primary key
    * @param imageIds image ids in new order
-   * @throws {AppError} LOT_NOT_FOUND
-   * @throws {AppError} LOT_IMAGE_ORDER_INVALID
+   * @throws LOT_NOT_FOUND
+   * @throws LOT_IMAGE_ORDER_INVALID
    */
   async updateImageOrder(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -113,7 +113,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -123,12 +123,12 @@ class LotImageService {
 
       const extraIds = newImageIds.difference(currentImageIds)
       if (extraIds.size > 0) {
-        throw new AppError('LOT_IMAGE_ORDER_INVALID')
+        throw createAppError('LOT_IMAGE_ORDER_INVALID')
       }
 
       const missingIds = currentImageIds.difference(newImageIds)
       if (missingIds.size > 0) {
-        throw new AppError('LOT_IMAGE_ORDER_INVALID')
+        throw createAppError('LOT_IMAGE_ORDER_INVALID')
       }
 
       await lotImageRepository.destroyByLotPk(id, { transaction })

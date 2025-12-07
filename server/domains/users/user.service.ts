@@ -1,5 +1,5 @@
 import type { UserAttributesOptional } from '#database'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { lotBetRepository, lotImageRepository, lotRepository } from '../auction'
 import { authService } from '../authentication'
 import { imageService } from '../storage'
@@ -13,7 +13,7 @@ class UserService {
    * @param id - user primary key
    * @param data - profile data to update
    * @returns updated user instance
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    */
   async update(id: number, data: Pick<UserAttributesOptional, 'name' | 'surname'>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -23,7 +23,7 @@ class UserService {
       })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       if (data.name === undefined && data.surname === undefined) {
@@ -60,8 +60,8 @@ class UserService {
    * @param id - user primary key
    * @param email - new email
    * @returns updated user instance
-   * @throws {AppError} USER_NOT_FOUND - When user doesn't exist
-   * @throws {AppError} USER_ALREADY_EXISTS - When email is already taken
+   * @throws USER_NOT_FOUND - When user doesn't exist
+   * @throws USER_ALREADY_EXISTS - When email is already taken
    */
   async updateEmail(id: number, email: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -71,7 +71,7 @@ class UserService {
       })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       if (user.email === email) {
@@ -81,7 +81,7 @@ class UserService {
       const userInDB = await userRepository.findByEmail(email, { transaction })
 
       if (userInDB) {
-        throw new AppError('USER_ALREADY_EXISTS', { field: 'email' })
+        throw createAppError('USER_ALREADY_EXISTS', { field: 'email' })
       }
 
       const updatedUser = await userRepository.updateByPk(
@@ -104,7 +104,7 @@ class UserService {
    * @param id - user primary key
    * @param password - new password
    * @returns updated user instance
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    */
   async updatePassword(id: number, password: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -114,7 +114,7 @@ class UserService {
       })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       const hashedPassword = await hashPassword(password)
@@ -138,7 +138,7 @@ class UserService {
    *
    * @param id - user primary key
    * @returns updated user instance
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    */
   async verifyEmail(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -148,7 +148,7 @@ class UserService {
       })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       const updatedUser = await userRepository.updateByPk(
@@ -171,7 +171,7 @@ class UserService {
    * @param id - user primary key
    * @param roleName - new role name (or null to remove role)
    * @returns updated user instance
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    */
   async updateRole(id: number, roleName: string | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -181,7 +181,7 @@ class UserService {
       })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       if (user.roleName === roleName) {
@@ -207,7 +207,7 @@ class UserService {
    * Deletes all their lots (with images via cascade), bids, and sessions.
    *
    * @param id - user primary key
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -217,7 +217,7 @@ class UserService {
       })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       const lots = await lotRepository.findAllBySellerIdWithLock(id, {

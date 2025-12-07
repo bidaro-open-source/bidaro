@@ -1,12 +1,12 @@
-import { AppError } from '#classes/app-error'
 import { challengeService, challengeTokenService } from '#domains/security'
+import { createAppError } from '#utils/create-app-error'
 import { verifyChallengeRequest } from './verify.request'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.challenge.enabled) {
-    throw new AppError('NOT_FOUND')
+    throw createAppError('NOT_FOUND')
   }
 
   await useRateLimiter(event, {
@@ -26,13 +26,13 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!isValid) {
-    throw new AppError('INVALID_CHALLENGE_SOLUTION')
+    throw createAppError('INVALID_CHALLENGE_SOLUTION')
   }
 
   const token = await challengeTokenService.create()
 
   if (!token) {
-    throw new AppError('CHALLENGE_TOKEN_CREATION_FAILED')
+    throw createAppError('CHALLENGE_TOKEN_CREATION_FAILED')
   }
 
   return {

@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 
 /**
  * One day in seconds (24 * 60 * 60).
@@ -65,9 +65,9 @@ const ACTION_LIMIT_DECREMENT_SCRIPT = `
  * @param duration - Time window in seconds (defaults to one day)
  * @returns Result of the callback function
  *
- * @throws {AppError} ACTION_LIMIT_EXCEEDED - When user exceeds action limit
- * @throws {AppError} REDIS_OPERATION_FAILED - When Redis operation fails
- * @throws {AppError} ACTION_LIMITER_AUTH_REQUIRED - When user is not authenticated
+ * @throws ACTION_LIMIT_EXCEEDED - When user exceeds action limit
+ * @throws REDIS_OPERATION_FAILED - When Redis operation fails
+ * @throws ACTION_LIMITER_AUTH_REQUIRED - When user is not authenticated
  *
  * @example
  * // Limit lot creation to 6 per day
@@ -90,7 +90,7 @@ export async function useActionLimiter<T>(
   const user = getAuthenticatedUser(event)
 
   if (!user) {
-    throw new AppError('ACTION_LIMITER_AUTH_REQUIRED')
+    throw createAppError('ACTION_LIMITER_AUTH_REQUIRED')
   }
 
   const redis = useRedis()
@@ -109,11 +109,11 @@ export async function useActionLimiter<T>(
     ) as number
   }
   catch (error) {
-    throw new AppError('REDIS_OPERATION_FAILED')
+    throw createAppError('REDIS_OPERATION_FAILED')
   }
 
   if (allowed === 0) {
-    throw new AppError('ACTION_LIMIT_EXCEEDED', {
+    throw createAppError('ACTION_LIMIT_EXCEEDED', {
       action: actionKey,
       limit,
     })

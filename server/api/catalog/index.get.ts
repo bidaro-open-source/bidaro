@@ -1,10 +1,10 @@
 import type { LotAttributes } from '#database'
 import type { WhereOptions } from 'sequelize'
-import { AppError } from '#classes/app-error'
 import { lotCatalogRepository, lotResource } from '#domains/auction'
 import { categoryResource, categorySource } from '#domains/categories'
 import { imageResource } from '#domains/storage'
 import { userResource } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import { Op } from 'sequelize'
 import { lotStatuses } from '~~/server/constants'
 import { viewCatalogRequest } from './index.get.request'
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
     },
     data: rows.map((lot) => {
       if (!lot.seller) {
-        throw new AppError('LOT_SELLER_NOT_FOUND')
+        throw createAppError('LOT_SELLER_NOT_FOUND')
       }
 
       return {

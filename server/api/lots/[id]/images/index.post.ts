@@ -1,6 +1,6 @@
-import { AppError } from '#classes/app-error'
 import { lotImageService, lotSource } from '#domains/auction'
 import { imageResource, imageService } from '#domains/storage'
+import { createAppError } from '#utils/create-app-error'
 import { IMAGE_PER_LOT_LIMIT } from '~~/server/constants'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const images = await lotSource.getAllImagesById(request.params.id)
 
   if (images.length >= IMAGE_PER_LOT_LIMIT) {
-    throw new AppError('LOT_IMAGE_LIMIT_REACHED')
+    throw createAppError('LOT_IMAGE_LIMIT_REACHED')
   }
 
   const image = await imageService.upload(request.multipart.buffer)

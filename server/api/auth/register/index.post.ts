@@ -1,8 +1,8 @@
-import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { roleRepository } from '#domains/authorization'
 import { challengeTokenService } from '#domains/security'
 import { userProfileResource, userRepository } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import { roles } from '~~/server/constants'
 import { registerRequest } from './index.request'
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
 
     if (!isValid) {
-      throw new AppError('INVALID_CHALLENGE_SOLUTION')
+      throw createAppError('INVALID_CHALLENGE_SOLUTION')
     }
   }
 
@@ -40,13 +40,13 @@ export default defineEventHandler(async (event) => {
       fieldErrors.username = ['Ім\'я користувача вже зайняте']
     }
 
-    throw new AppError('VALIDATION_ERROR', { fieldErrors })
+    throw createAppError('VALIDATION_ERROR', { fieldErrors })
   }
 
   const defaultRole = await roleRepository.findByPk(roles.USER)
 
   if (!defaultRole) {
-    throw new AppError('DEFAULT_ROLE_NOT_FOUND')
+    throw createAppError('DEFAULT_ROLE_NOT_FOUND')
   }
 
   const user = await userRepository.create({

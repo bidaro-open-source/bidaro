@@ -1,5 +1,5 @@
-import { AppError } from '#classes/app-error'
 import { userRepository, userResource } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import { createUserPolicy } from './index.policy'
 import { createUserRequest } from './index.post.request'
 
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
       fieldErrors.username = ['Ім\'я користувача вже зайняте']
     }
 
-    throw new AppError('VALIDATION_ERROR', { fieldErrors })
+    throw createAppError('VALIDATION_ERROR', { fieldErrors })
   }
 
   const user = await userRepository.create({

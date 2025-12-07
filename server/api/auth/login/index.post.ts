@@ -1,6 +1,6 @@
-import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import { loginRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.findByUsername(request.body.username)
 
   if (!user) {
-    throw new AppError('ACCOUNT_NOT_FOUND', { username: request.body.username })
+    throw createAppError('ACCOUNT_NOT_FOUND', { username: request.body.username })
   }
 
   const passwordsEqual = await comparePassword(
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!passwordsEqual) {
-    throw new AppError('INVALID_PASSWORD')
+    throw createAppError('INVALID_PASSWORD')
   }
 
   const metadata = createRequestMeta(event)

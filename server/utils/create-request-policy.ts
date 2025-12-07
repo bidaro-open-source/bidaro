@@ -1,12 +1,12 @@
 import type { permissions } from '../constants'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 
 /**
  * Creates a request policy function.
  *
  * @param policy - policy function
- * @throws {AppError} FORBIDDEN - When policy check fails
- * @throws {AppError} UNKNOWN_AUTHORIZATION_ERROR - When unexpected error occurs during policy execution
+ * @throws FORBIDDEN - When policy check fails
+ * @throws UNKNOWN_AUTHORIZATION_ERROR - When unexpected error occurs during policy execution
  *
  * @example
  * const policy = createRequestPolicy((event: H3Event, key: string) => key === 'hello world')
@@ -24,11 +24,11 @@ export function createRequestPolicy<Policy extends (...args: any[]) => any>(
       result = policy(...args)
     }
     catch (error) {
-      throw new AppError('UNKNOWN_AUTHORIZATION_ERROR')
+      throw createAppError('UNKNOWN_AUTHORIZATION_ERROR')
     }
 
     if (!result) {
-      throw new AppError('FORBIDDEN')
+      throw createAppError('FORBIDDEN')
     }
   }
 }

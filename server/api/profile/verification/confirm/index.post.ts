@@ -1,6 +1,6 @@
-import { AppError } from '#classes/app-error'
 import { verificationService } from '#domains/authentication'
 import { userRepository, userService } from '#domains/users'
+import { createAppError } from '#utils/create-app-error'
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 
 export default defineEventHandler(async (event) => {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!uid) {
-    throw new AppError('VERIFICATION_TOKEN_NOT_FOUND')
+    throw createAppError('VERIFICATION_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(uid)
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     await verificationService.deleteTokenByUserId(uid)
 
-    throw new AppError('USER_NOT_FOUND', { userId: uid })
+    throw createAppError('USER_NOT_FOUND', { userId: uid })
   }
 
   await userService.verifyEmail(user.id)

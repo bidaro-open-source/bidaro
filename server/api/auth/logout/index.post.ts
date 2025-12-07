@@ -1,5 +1,5 @@
-import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
+import { createAppError } from '#utils/create-app-error'
 import { logoutRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -18,11 +18,11 @@ export default defineEventHandler(async (event) => {
   const session = await authService.getSession(request.body.refresh_token)
 
   if (!session) {
-    throw new AppError('REFRESH_TOKEN_NOT_FOUND')
+    throw createAppError('REFRESH_TOKEN_NOT_FOUND')
   }
 
   if (session.uid !== user.id) {
-    throw new AppError('REFRESH_TOKEN_ACCESS_DENIED')
+    throw createAppError('REFRESH_TOKEN_ACCESS_DENIED')
   }
 
   await authService.deleteSession(session.uid, request.body.refresh_token)

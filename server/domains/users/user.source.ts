@@ -1,6 +1,6 @@
 import type { User } from '#database'
-import { AppError } from '#classes/app-error'
 import { EntitySource } from '#classes/EntitySource'
+import { createAppError } from '#utils/create-app-error'
 import { userRepository } from './user.repository'
 
 class UserSource extends EntitySource<User> {
@@ -31,7 +31,7 @@ class UserSource extends EntitySource<User> {
    * Retrieve a user by ID, using Redis caching.
    *
    * @param id - User primary key
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    * @returns The user instance
    */
   async getByPk(id: number) {
@@ -41,7 +41,7 @@ class UserSource extends EntitySource<User> {
       const data = await userRepository.findByPk(id)
 
       if (!data) {
-        throw new AppError('USER_NOT_FOUND', { userId: id })
+        throw createAppError('USER_NOT_FOUND', { userId: id })
       }
 
       return data
@@ -52,7 +52,7 @@ class UserSource extends EntitySource<User> {
    * Retrieve a user auth data by ID, using Redis caching.
    *
    * @param id - User primary key
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws USER_NOT_FOUND
    * @returns User authentication data including role and permissions
    */
   async getByPkWithAuth(id: number) {
@@ -62,7 +62,7 @@ class UserSource extends EntitySource<User> {
       const data = await userRepository.findByPkWithAuth(id)
 
       if (!data) {
-        throw new AppError('USER_NOT_FOUND', { userId: id })
+        throw createAppError('USER_NOT_FOUND', { userId: id })
       }
 
       return {

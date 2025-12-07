@@ -1,4 +1,4 @@
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { lotStatuses } from '~~/server/constants'
 import { userRepository } from '../../users'
 import { lotRepository } from '../lots/lot.repository'
@@ -17,11 +17,11 @@ class LotBetService {
    * @throws 400 when lot is not in trading process
    * @throws 400 when lot is expired
    * @throws 400 when bet amount is not higher than current lot price
-   * @throws {AppError} BAD_REQUEST
-   * @throws {AppError} LOT_BET_TOO_LOW
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
-   * @throws {AppError} USER_NOT_FOUND
+   * @throws BAD_REQUEST
+   * @throws LOT_BET_TOO_LOW
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
+   * @throws USER_NOT_FOUND
    */
   async create(lotId: number, userId: number, amount: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -31,29 +31,29 @@ class LotBetService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       if (!lot.expirationDate || lot.expirationDate <= new Date()) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       if (lot.currentPrice >= amount) {
-        throw new AppError('LOT_BET_TOO_LOW')
+        throw createAppError('LOT_BET_TOO_LOW')
       }
 
       const user = await userRepository.findByPk(userId, { transaction })
 
       if (!user) {
-        throw new AppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND')
       }
 
       if (user.id === lot.sellerId) {
-        throw new AppError('BAD_REQUEST')
+        throw createAppError('BAD_REQUEST')
       }
 
       const bet = await lotBetRepository.create(

@@ -1,11 +1,11 @@
-import { AppError } from '#classes/app-error'
 import { challengeGeneratorService, challengeService } from '#domains/security'
+import { createAppError } from '#utils/create-app-error'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.challenge.enabled) {
-    throw new AppError('NOT_FOUND')
+    throw createAppError('NOT_FOUND')
   }
 
   await useRateLimiter(event, {
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!challengeId) {
-    throw new AppError('CHALLENGE_CREATION_FAILED')
+    throw createAppError('CHALLENGE_CREATION_FAILED')
   }
 
   return {

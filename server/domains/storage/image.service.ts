@@ -1,5 +1,5 @@
 import type { Buffer } from 'node:buffer'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
@@ -96,8 +96,8 @@ class ImageService {
    *
    * @param buffer image buffer
    * @returns Image instance
-   * @throws {AppError} BAD_REQUEST
-   * @throws {AppError} INTERNAL_SERVER_ERROR
+   * @throws BAD_REQUEST
+   * @throws INTERNAL_SERVER_ERROR
    */
   async upload(buffer: Buffer) {
     const db = useDatabase()
@@ -107,21 +107,21 @@ class ImageService {
       const validatedImage = await this.validateBuffer(buffer)
 
       if (!validatedImage.buffer) {
-        throw new AppError('BAD_REQUEST')
+        throw createAppError('BAD_REQUEST')
       }
 
       const compressedImage = await this.compressBuffer(validatedImage.buffer)
 
       if (!compressedImage.buffer) {
         logger.warn('Image compression failed, proceeding with original buffer:', compressedImage.error)
-        throw new AppError('INTERNAL_SERVER_ERROR')
+        throw createAppError('INTERNAL_SERVER_ERROR')
       }
 
       const metadata = await this.getMetadata(compressedImage.buffer)
 
       if (!metadata.metadata) {
         logger.warn('Image metadata extraction failed:', metadata.error)
-        throw new AppError('INTERNAL_SERVER_ERROR')
+        throw createAppError('INTERNAL_SERVER_ERROR')
       }
 
       const size = compressedImage.buffer.length
@@ -162,13 +162,13 @@ class ImageService {
    *
    * @param imageId image primary key
    * @returns Image instance
-   * @throws {AppError} INTERNAL_SERVER_ERROR
+   * @throws INTERNAL_SERVER_ERROR
    */
   async destroy(imageId: number) {
     const result = await this.safeDeleteImage(imageId)
 
     if (!result.ok) {
-      throw new AppError('INTERNAL_SERVER_ERROR')
+      throw createAppError('INTERNAL_SERVER_ERROR')
     }
   }
 

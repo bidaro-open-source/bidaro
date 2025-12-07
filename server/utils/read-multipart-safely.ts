@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import Busboy from 'busboy'
 
 /**
@@ -57,23 +57,23 @@ interface MultipartResult {
  * @param event - The H3 event object containing the request.
  * @param options - Configuration for limits and allowed MIME types.
  * @returns A promise that resolves to an object containing fields and files.
- * @throws {AppError} MISSING_CONTENT_TYPE - When Content-Type header is missing
- * @throws {AppError} UNSUPPORTED_MEDIA_TYPE - When Content-Type is not multipart/form-data or file type not allowed
- * @throws {AppError} PAYLOAD_TOO_LARGE - When file or field size exceeds limits
- * @throws {AppError} FIELD_NAME_TOO_LONG - When field name exceeds maximum length
- * @throws {AppError} INVALID_MULTIPART_DATA - When multipart parsing fails
- * @throws {AppError} INTERNAL_SERVER_ERROR - When unexpected server error occurs
+ * @throws MISSING_CONTENT_TYPE - When Content-Type header is missing
+ * @throws UNSUPPORTED_MEDIA_TYPE - When Content-Type is not multipart/form-data or file type not allowed
+ * @throws PAYLOAD_TOO_LARGE - When file or field size exceeds limits
+ * @throws FIELD_NAME_TOO_LONG - When field name exceeds maximum length
+ * @throws INVALID_MULTIPART_DATA - When multipart parsing fails
+ * @throws INTERNAL_SERVER_ERROR - When unexpected server error occurs
  */
 export function readMultipartSafely(event: H3Event, options: MultipartOptions = {}): Promise<MultipartResult> {
   return new Promise((resolve, reject) => {
     const contentType = getRequestHeader(event, 'content-type')
 
     if (!contentType) {
-      throw new AppError('MISSING_CONTENT_TYPE')
+      throw createAppError('MISSING_CONTENT_TYPE')
     }
 
     if (!contentType.startsWith('multipart/form-data')) {
-      throw new AppError('UNSUPPORTED_MEDIA_TYPE', {
+      throw createAppError('UNSUPPORTED_MEDIA_TYPE', {
         contentType,
       })
     }
@@ -95,7 +95,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
     }
     catch (err: any) {
       return reject(
-        new AppError('INVALID_MULTIPART_DATA', {
+        createAppError('INVALID_MULTIPART_DATA', {
           error: err.message,
         }),
       )
@@ -114,7 +114,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.resume()
 
         return reject(
-          new AppError('UNSUPPORTED_MEDIA_TYPE', {
+          createAppError('UNSUPPORTED_MEDIA_TYPE', {
             mimeType,
           }),
         )
@@ -128,7 +128,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         reject(
-          new AppError('PAYLOAD_TOO_LARGE', {
+          createAppError('PAYLOAD_TOO_LARGE', {
             filename,
           }),
         )
@@ -155,7 +155,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         return reject(
-          new AppError('FIELD_NAME_TOO_LONG'),
+          createAppError('FIELD_NAME_TOO_LONG'),
         )
       }
 
@@ -164,7 +164,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.resume()
 
         return reject(
-          new AppError('PAYLOAD_TOO_LARGE', {
+          createAppError('PAYLOAD_TOO_LARGE', {
             field: fieldname,
           }),
         )
@@ -189,7 +189,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
 
       if (isClientError) {
         reject(
-          new AppError('INVALID_MULTIPART_DATA', {
+          createAppError('INVALID_MULTIPART_DATA', {
             error: error.message,
           }),
         )
@@ -198,7 +198,7 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         logger.error('Unknown error during reading multipart safely', error)
 
         reject(
-          new AppError('INTERNAL_SERVER_ERROR'),
+          createAppError('INTERNAL_SERVER_ERROR'),
         )
       }
     })

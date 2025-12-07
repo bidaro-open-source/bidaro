@@ -1,5 +1,5 @@
 import type { Lot } from '#database'
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../../../constants'
 import { categoryRepository } from '../../categories'
 import { lotBetRepository } from '../bets/lot-bet.repository'
@@ -34,9 +34,9 @@ class LotService {
    * @throws 400 when lot is not editable
    * @throws 400 when category does not exist
    * @returns updated lot instance
-   * @throws {AppError} CATEGORY_NOT_FOUND
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws CATEGORY_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
    */
   async update(id: number, updates: Partial<Lot>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -46,13 +46,13 @@ class LotService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       const editableStatuses: string[] = [lotStatuses.DRAFT, lotStatuses.IN_TRADING_PROCESS]
 
       if (!editableStatuses.includes(lot.statusName)) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       const title = updates.title ?? lot.title
@@ -73,7 +73,7 @@ class LotService {
         )
 
         if (!category) {
-          throw new AppError('CATEGORY_NOT_FOUND')
+          throw createAppError('CATEGORY_NOT_FOUND')
         }
 
         categoryId = category.id
@@ -103,9 +103,9 @@ class LotService {
    * @throws 400 when lot is already published
    * @throws 400 when lot category is not set
    * @returns updated lot instance
-   * @throws {AppError} BAD_REQUEST
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws BAD_REQUEST
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
    */
   async publish(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -115,15 +115,15 @@ class LotService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.DRAFT) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       if (!lot.categoryId) {
-        throw new AppError('BAD_REQUEST')
+        throw createAppError('BAD_REQUEST')
       }
 
       const updatedLot = await lotRepository.updateByPk(id, {
@@ -148,9 +148,9 @@ class LotService {
    * @throws 400 when lot is not in trading process status
    * @throws 400 when lot expiration date is not reached
    * @returns updated lot instance
-   * @throws {AppError} BAD_REQUEST
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws BAD_REQUEST
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
    */
   async close(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -160,15 +160,15 @@ class LotService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       if (!lot.expirationDate || lot.expirationDate > new Date()) {
-        throw new AppError('BAD_REQUEST')
+        throw createAppError('BAD_REQUEST')
       }
 
       const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
@@ -197,8 +197,8 @@ class LotService {
    * @throws 404 when lot not found
    * @throws 400 when lot is not in discussion process status
    * @returns updated lot instance
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
    */
   async ship(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -208,11 +208,11 @@ class LotService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_DISCUSSION_PROCESS) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       const updatedLot = await lotRepository.updateByPk(lot.id, {
@@ -234,8 +234,8 @@ class LotService {
    * @throws 404 when lot not found
    * @throws 400 when lot is not in delivery process status
    * @returns updated lot instance
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
    */
   async receive(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -245,11 +245,11 @@ class LotService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.IN_DELIVERY_PROCESS) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       const updatedLot = await lotRepository.updateByPk(lot.id, {
@@ -270,8 +270,8 @@ class LotService {
    * @param id lot primary key
    * @throws 404 when lot not found
    * @throws 400 when lot is not in draft status
-   * @throws {AppError} LOT_INVALID_STATUS
-   * @throws {AppError} LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_FOUND
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -281,11 +281,11 @@ class LotService {
       })
 
       if (!lot) {
-        throw new AppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND')
       }
 
       if (lot.statusName !== lotStatuses.DRAFT) {
-        throw new AppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS')
       }
 
       await lotRepository.destroyByPk(lot.id, { transaction })

@@ -1,4 +1,4 @@
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 
 /**
  * Validates that the current request is authenticated with a
@@ -7,7 +7,7 @@ import { AppError } from '#classes/app-error'
  * Depends on the `authentication` middleware.
  *
  * @param event H3Event
- * @throws {AppError} AUTHENTICATION_REQUIRED - When user is not authenticated
+ * @throws AUTHENTICATION_REQUIRED - When user is not authenticated
  *
  * @example
  * // Usage in protected route handler
@@ -19,7 +19,7 @@ import { AppError } from '#classes/app-error'
  */
 export function mustBeAuthenticated(event: H3Event): void {
   if (!event.context.auth || !event.context.auth.user) {
-    throw new AppError('AUTHENTICATION_REQUIRED')
+    throw createAppError('AUTHENTICATION_REQUIRED')
   }
 }
 

@@ -1,4 +1,4 @@
-import { AppError } from '#classes/app-error'
+import { createAppError } from '#utils/create-app-error'
 import Redis from 'ioredis'
 
 try {
@@ -17,7 +17,7 @@ let instance: Redis | undefined
  *
  * @param event H3Event
  * @returns A connected Redis client instance
- * @throws {AppError} REDIS_CONNECTION_FAILED - When Redis connection cannot be established
+ * @throws REDIS_CONNECTION_FAILED - When Redis connection cannot be established
  *
  * @example
  * // Use in API route handler
@@ -43,6 +43,6 @@ export function useRedis(event?: H3Event): Redis {
     return instance
   }
   catch (e) {
-    throw new AppError('REDIS_CONNECTION_FAILED')
+    throw createAppError('REDIS_CONNECTION_FAILED')
   }
 }
