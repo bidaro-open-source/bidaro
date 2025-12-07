@@ -5,6 +5,10 @@ import { IMAGE_PER_LOT_LIMIT } from '~~/server/constants'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} LOT_IMAGE_LIMIT_REACHED
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

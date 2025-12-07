@@ -3,6 +3,10 @@ import { userRepository, userResource } from '#domains/users'
 import { createUserPolicy } from './index.policy'
 import { createUserRequest } from './index.post.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} VALIDATION_ERROR
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

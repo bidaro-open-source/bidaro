@@ -1,6 +1,11 @@
 import { AppError } from '#classes/app-error'
 import { challengeGeneratorService, challengeService } from '#domains/security'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} CHALLENGE_CREATION_FAILED
+ * @throws {AppError} NOT_FOUND
+ */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 

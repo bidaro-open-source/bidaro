@@ -1,6 +1,10 @@
 import { AppError } from '#classes/app-error'
 import { HeadBucketCommand } from '@aws-sdk/client-s3'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} UNAUTHORIZED
+ */
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event)
 

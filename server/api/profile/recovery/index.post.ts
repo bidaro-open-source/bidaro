@@ -6,6 +6,11 @@ import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} EMAIL_NOT_FOUND
+ * @throws {AppError} INVALID_CHALLENGE_SOLUTION
+ */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 0,

@@ -3,6 +3,10 @@ import { createPermissionResource, permissionRepository, permissionSource, roleS
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} PERMISSION_NOT_FOUND
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 

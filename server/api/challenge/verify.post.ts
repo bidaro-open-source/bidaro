@@ -2,6 +2,12 @@ import { AppError } from '#classes/app-error'
 import { challengeService, challengeTokenService } from '#domains/security'
 import { verifyChallengeRequest } from './verify.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} INVALID_CHALLENGE_SOLUTION
+ * @throws {AppError} CHALLENGE_TOKEN_CREATION_FAILED
+ * @throws {AppError} NOT_FOUND
+ */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 

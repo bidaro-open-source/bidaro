@@ -3,6 +3,11 @@ import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
 import { loginRequest } from './index.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} INVALID_PASSWORD
+ * @throws {AppError} ACCOUNT_NOT_FOUND
+ */
 export default defineEventHandler(async (event) => {
   await useRateLimiter(event, {
     authenticatedLimit: 0,

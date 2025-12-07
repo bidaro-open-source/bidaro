@@ -2,6 +2,11 @@ import { AppError } from '#classes/app-error'
 import { authService } from '#domains/authentication'
 import { logoutRequest } from './index.request'
 
+/**
+ * API endpoint handler
+ * @throws {AppError} REFRESH_TOKEN_ACCESS_DENIED
+ * @throws {AppError} REFRESH_TOKEN_NOT_FOUND
+ */
 export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
