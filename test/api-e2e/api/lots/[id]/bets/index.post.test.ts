@@ -278,11 +278,12 @@ describe('POST /api/lots/:id/bets', async () => {
       )
 
       expect(response.status).toBe(429)
+      expect(response._data.data.code).toBe('ACTION_LIMIT_EXCEEDED')
 
       await lotData.clear()
       await cData.clear()
       await uuData.clear()
       await uData.clear()
-    })
+    }, 15_000)
   })
 })

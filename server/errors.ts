@@ -1,24 +1,28 @@
 import { z } from 'zod'
 
 /**
+ * Type representing valid error codes
+ */
+export type ErrorCode = keyof typeof errors
+
+/**
+ * Helper type to extract the Zod output type from the error definition.
+ * If no schema is provided, it returns void (no details required).
+ */
+export type ErrorDetails<T extends ErrorCode>
+  = (typeof errors)[T] extends { detailsSchema: infer S }
+    ? S extends z.ZodType<any>
+      ? z.infer<S>
+      : void
+    : void
+
+/**
  * Error definition structure
  */
 export interface ErrorDefinition {
-  /**
-   * HTTP status code to return
-   */
   statusCode: number
-  /**
-   * Error title in Ukrainian
-   */
   title: string
-  /**
-   * Detailed description of the error and reasons for its occurrence in Ukrainian
-   */
   description: string
-  /**
-   * Zod schema for additional details that can be returned with the error
-   */
   detailsSchema?: z.ZodType<any>
 }
 
@@ -386,5 +390,3 @@ export const errors = {
     description: 'Виникла невідома помилка під час авторизації запиту.',
   },
 } as const satisfies Record<string, ErrorDefinition>
-
-export type ErrorCode = keyof typeof errors
