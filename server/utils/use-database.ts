@@ -1,6 +1,5 @@
 import type { Database } from '#database'
 import { BootstrapDatabase } from '#database'
-import { createAppError } from '#utils/create-app-error'
 import { Sequelize } from 'sequelize'
 
 /**

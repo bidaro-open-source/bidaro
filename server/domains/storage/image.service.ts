@@ -1,5 +1,4 @@
 import type { Buffer } from 'node:buffer'
-import { createAppError } from '#utils/create-app-error'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'

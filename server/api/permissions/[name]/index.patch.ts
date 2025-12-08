@@ -1,5 +1,4 @@
 import { createPermissionResource, permissionRepository, permissionSource, roleSource } from '#domains/authorization'
-import { createAppError } from '#utils/create-app-error'
 import { updatePermissionPolicy } from './index.patch.policy'
 import { updatePermissionRequest } from './index.patch.request'
 

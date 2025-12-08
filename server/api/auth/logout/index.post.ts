@@ -1,5 +1,4 @@
 import { authService } from '#domains/authentication'
-import { createAppError } from '#utils/create-app-error'
 import { logoutRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

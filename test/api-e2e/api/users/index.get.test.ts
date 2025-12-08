@@ -57,7 +57,7 @@ describe('GET /api/users', async () => {
       const response = await viewUsersRequest()
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -75,7 +75,7 @@ describe('GET /api/users', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })

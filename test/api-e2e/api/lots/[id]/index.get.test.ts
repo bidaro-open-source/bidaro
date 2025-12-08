@@ -95,7 +95,7 @@ describe('GET /api/lots/:id', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('LOT_NOT_FOUND')
+      expect(response._data.data.code).toBe('LOT_NOT_FOUND')
     })
   })
 })

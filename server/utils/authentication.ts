@@ -1,5 +1,3 @@
-import { createAppError } from '#utils/create-app-error'
-
 /**
  * Validates that the current request is authenticated with a
  * valid user session.

@@ -1,6 +1,5 @@
 import type { Category } from '#database'
 import { EntitySource } from '#classes/EntitySource'
-import { createAppError } from '#utils/create-app-error'
 import { categoryRepository } from './category.repository'
 
 class CategorySource extends EntitySource<Category> {

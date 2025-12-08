@@ -84,7 +84,7 @@ describe('PATCH /api/categories/:id', async () => {
       )
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await categoryData.clear()
     })
@@ -105,7 +105,7 @@ describe('PATCH /api/categories/:id', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('CATEGORY_NOT_FOUND')
+      expect(response._data.data.code).toBe('CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })
@@ -127,7 +127,7 @@ describe('PATCH /api/categories/:id', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()

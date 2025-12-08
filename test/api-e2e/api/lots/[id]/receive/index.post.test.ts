@@ -64,7 +64,7 @@ describe('POST /api/lots/:id/receive', async () => {
       )
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await lotData.clear()
       await cData.clear()
@@ -92,7 +92,7 @@ describe('POST /api/lots/:id/receive', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await lotData.clear()
       await cData.clear()
@@ -120,7 +120,7 @@ describe('POST /api/lots/:id/receive', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await lotData.clear()
       await cData.clear()
@@ -141,7 +141,7 @@ describe('POST /api/lots/:id/receive', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('LOT_NOT_FOUND')
+      expect(response._data.data.code).toBe('LOT_NOT_FOUND')
 
       await uData.clear()
     })
@@ -166,7 +166,7 @@ describe('POST /api/lots/:id/receive', async () => {
       )
 
       expect(response.status).toBe(400)
-      expect(response._data.code).toBe('BAD_REQUEST')
+      expect(response._data.data.code).toBe('LOT_INVALID_STATUS')
 
       await lotData.clear()
       await cData.clear()

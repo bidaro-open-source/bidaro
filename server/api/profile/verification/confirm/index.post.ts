@@ -1,6 +1,5 @@
 import { verificationService } from '#domains/authentication'
 import { userRepository, userService } from '#domains/users'
-import { createAppError } from '#utils/create-app-error'
 import { emailVerifyConfirmRequest } from '~~/server/api/profile/verification/confirm/index.request'
 
 export default defineEventHandler(async (event) => {

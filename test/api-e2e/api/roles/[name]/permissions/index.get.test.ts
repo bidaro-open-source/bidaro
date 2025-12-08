@@ -79,7 +79,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('PERMISSION_NOT_FOUND')
+      expect(response._data.data.code).toBe('ROLE_NOT_FOUND')
 
       await userData.clear()
     })
@@ -91,7 +91,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       )
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await roleData.destroy()
     })
@@ -110,7 +110,7 @@ describe('GET /api/roles/:name/permissions', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await roleData.destroy()
       await userData.clear()

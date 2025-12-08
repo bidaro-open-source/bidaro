@@ -1,4 +1,3 @@
-import { createAppError } from '#utils/create-app-error'
 import Redis from 'ioredis'
 
 try {

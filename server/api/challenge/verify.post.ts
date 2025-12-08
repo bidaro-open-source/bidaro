@@ -1,5 +1,4 @@
 import { challengeService, challengeTokenService } from '#domains/security'
-import { createAppError } from '#utils/create-app-error'
 import { verifyChallengeRequest } from './verify.request'
 
 export default defineEventHandler(async (event) => {

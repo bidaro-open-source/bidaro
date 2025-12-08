@@ -112,7 +112,7 @@ describe('DELETE /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await data.clear()
     })
@@ -133,7 +133,7 @@ describe('DELETE /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await data.clear()
     })
@@ -157,7 +157,7 @@ describe('DELETE /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await data2.clear()
       await data1.clear()
@@ -179,7 +179,7 @@ describe('DELETE /api/profile/sessions', async () => {
       )
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
 
       await data.clear()
     })

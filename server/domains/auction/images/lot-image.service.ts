@@ -1,5 +1,4 @@
 import type { Image } from '#database'
-import { createAppError } from '#utils/create-app-error'
 import { lotRepository } from '../lots/lot.repository'
 import { lotSource } from '../lots/lot.source'
 import { lotImageRepository } from './lot-image.repository'

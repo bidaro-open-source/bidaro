@@ -1,5 +1,4 @@
 import { challengeGeneratorService, challengeService } from '#domains/security'
-import { createAppError } from '#utils/create-app-error'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()

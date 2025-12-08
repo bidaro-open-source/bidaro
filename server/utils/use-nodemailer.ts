@@ -1,4 +1,3 @@
-import { createAppError } from '#utils/create-app-error'
 import nodemailer from 'nodemailer'
 
 let transporter: nodemailer.Transporter | null = null

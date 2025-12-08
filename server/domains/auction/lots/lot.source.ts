@@ -1,6 +1,5 @@
 import type { Lot } from '#database'
 import { EntitySource } from '#classes/EntitySource'
-import { createAppError } from '#utils/create-app-error'
 import { userSource } from '../../users'
 import { lotBetRepository } from '../bets/lot-bet.repository'
 import { lotImageRepository } from '../images/lot-image.repository'

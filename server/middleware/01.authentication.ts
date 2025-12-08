@@ -1,6 +1,5 @@
 import { authService } from '#domains/authentication'
 import { userSource } from '#domains/users'
-import { createAppError } from '#utils/create-app-error'
 
 /**
  * Checks the request for an access token in the `Authorization` header.

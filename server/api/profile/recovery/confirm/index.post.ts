@@ -1,6 +1,5 @@
 import { recoveryService } from '#domains/authentication'
 import { userRepository, userService } from '#domains/users'
-import { createAppError } from '#utils/create-app-error'
 import {
   confirmResetPasswordRequest,
 } from '~~/server/api/profile/recovery/confirm/index.request'

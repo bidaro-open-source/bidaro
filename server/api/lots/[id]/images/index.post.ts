@@ -1,6 +1,5 @@
 import { lotImageService, lotSource } from '#domains/auction'
 import { imageResource, imageService } from '#domains/storage'
-import { createAppError } from '#utils/create-app-error'
 import { IMAGE_PER_LOT_LIMIT } from '~~/server/constants'
 import { uploadLotImagePolicy } from './index.post.policy'
 import { uploadLotImageRequest } from './index.post.request'

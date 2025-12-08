@@ -51,7 +51,7 @@ describe('DELETE /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('ROLE_NOT_FOUND')
+      expect(response._data.data.code).toBe('ROLE_NOT_FOUND')
 
       await userData.clear()
     })
@@ -69,7 +69,7 @@ describe('DELETE /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(400)
-      expect(response._data.code).toBe('BAD_REQUEST')
+      expect(response._data.data.code).toBe('ROLE_IS_RESERVED')
 
       await userData.clear()
     })
@@ -90,7 +90,7 @@ describe('DELETE /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(400)
-      expect(response._data.code).toBe('BAD_REQUEST')
+      expect(response._data.data.code).toBe('ROLE_HAS_USERS')
 
       await userWithRole.destroy()
       await roleData.destroy()
@@ -101,7 +101,7 @@ describe('DELETE /api/roles/:name', async () => {
       const response = await deleteRoleRequest({ params: { name: 'test' } })
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -117,7 +117,7 @@ describe('DELETE /api/roles/:name', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })

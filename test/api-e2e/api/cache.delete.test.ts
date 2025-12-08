@@ -32,7 +32,7 @@ describe('DELETE /api/cache', async () => {
       const response = await clearCacheRequest()
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('UNAUTHORIZED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -47,7 +47,7 @@ describe('DELETE /api/cache', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })

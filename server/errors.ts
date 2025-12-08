@@ -297,6 +297,9 @@ export const errors = {
     statusCode: 413,
     title: 'Ім\'я поля занадто довге',
     description: 'Ім\'я поля перевищує допустиму довжину.',
+    detailsSchema: z.object({
+      field: z.string().optional(),
+    }),
   },
 
   INVALID_CHALLENGE_SOLUTION: {
@@ -329,14 +332,6 @@ export const errors = {
     statusCode: 404,
     title: 'Email не знайдено',
     description: 'Користувача з такою адресою електронної пошти не знайдено.',
-  },
-  USER_ALREADY_EXISTS: {
-    statusCode: 422,
-    title: 'Користувач вже існує',
-    description: 'Користувач з таким іменем або email вже зареєстрований.',
-    detailsSchema: z.object({
-      field: z.string().optional(),
-    }),
   },
 
   DATABASE_CONNECTION_FAILED: {

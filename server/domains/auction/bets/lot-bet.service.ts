@@ -1,4 +1,3 @@
-import { createAppError } from '#utils/create-app-error'
 import { lotStatuses } from '~~/server/constants'
 import { userRepository } from '../../users'
 import { lotRepository } from '../lots/lot.repository'

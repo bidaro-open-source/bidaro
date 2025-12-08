@@ -52,7 +52,7 @@ describe('GET /api/users/:id', async () => {
       const response = await viewUserRequest({ params: { id: 93475937459 } })
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('USER_NOT_FOUND')
+      expect(response._data.data.code).toBe('USER_NOT_FOUND')
     })
   })
 })

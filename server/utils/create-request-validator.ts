@@ -1,5 +1,4 @@
 import type { H3Event } from 'h3'
-import { createAppError } from '#utils/create-app-error'
 import { z } from 'zod'
 
 type ValidatorFunction<T = any> = (event: H3Event, context?: any) => Promise<T> | T
@@ -85,9 +84,10 @@ export function createRequestValidator<Options extends ValidatorOptions>(
     }
     catch (error: any) {
       if (error instanceof z.ZodError) {
+        const flattened = z.flattenError(error)
         throw createAppError('VALIDATION_ERROR', {
-          fieldErrors: z.flattenError(error).fieldErrors,
-          formErrors: z.flattenError(error).formErrors,
+          fieldErrors: flattened.fieldErrors,
+          formErrors: flattened.formErrors,
         })
       }
 
@@ -99,7 +99,8 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         })
       }
 
-      if (error instanceof AppError) {
+      // For createError({ ... })
+      if (typeof error?.statusCode === 'number') {
         throw error
       }
 

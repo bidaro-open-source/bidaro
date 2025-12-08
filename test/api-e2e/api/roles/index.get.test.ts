@@ -35,7 +35,7 @@ describe('GET /api/roles', async () => {
       const response = await viewRolesRequest()
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -48,7 +48,7 @@ describe('GET /api/roles', async () => {
       const response = await viewRolesRequest({ accessToken: userData.access_token })
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })

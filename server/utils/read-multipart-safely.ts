@@ -1,5 +1,4 @@
 import { Buffer } from 'node:buffer'
-import { createAppError } from '#utils/create-app-error'
 import Busboy from 'busboy'
 
 /**
@@ -155,7 +154,9 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         return reject(
-          createAppError('FIELD_NAME_TOO_LONG'),
+          createAppError('FIELD_NAME_TOO_LONG', {
+            field: fieldname,
+          }),
         )
       }
 

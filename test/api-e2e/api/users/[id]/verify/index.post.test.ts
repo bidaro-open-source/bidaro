@@ -52,7 +52,7 @@ describe('POST /api/users/:id/verify', async () => {
       })
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -71,7 +71,7 @@ describe('POST /api/users/:id/verify', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData.clear()
       await adminData.clear()
@@ -90,7 +90,7 @@ describe('POST /api/users/:id/verify', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('USER_NOT_FOUND')
+      expect(response._data.data.code).toBe('USER_NOT_FOUND')
 
       await adminData.clear()
     })

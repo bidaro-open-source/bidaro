@@ -1,6 +1,5 @@
 import type { User } from '#database'
 import { EntitySource } from '#classes/EntitySource'
-import { createAppError } from '#utils/create-app-error'
 import { userRepository } from './user.repository'
 
 class UserSource extends EntitySource<User> {

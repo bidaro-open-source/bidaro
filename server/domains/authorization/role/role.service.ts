@@ -1,5 +1,4 @@
 import type { RoleAttributesOptional } from '#database'
-import { createAppError } from '#utils/create-app-error'
 import { permissionRepository } from '../permission/permission.repository'
 import { roleRepository } from './role.repository'
 import { roleSource } from './role.source'

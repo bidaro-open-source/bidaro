@@ -1,6 +1,5 @@
 import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
-import { createAppError } from '#utils/create-app-error'
 import { loginRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {

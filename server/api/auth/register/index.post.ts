@@ -2,7 +2,6 @@ import { authService } from '#domains/authentication'
 import { roleRepository } from '#domains/authorization'
 import { challengeTokenService } from '#domains/security'
 import { userProfileResource, userRepository } from '#domains/users'
-import { createAppError } from '#utils/create-app-error'
 import { roles } from '~~/server/constants'
 import { registerRequest } from './index.request'
 

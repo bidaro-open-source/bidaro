@@ -1,5 +1,4 @@
 import type { H3Event } from 'h3'
-import { createAppError } from '#utils/create-app-error'
 
 /**
  * One day in seconds (24 * 60 * 60).

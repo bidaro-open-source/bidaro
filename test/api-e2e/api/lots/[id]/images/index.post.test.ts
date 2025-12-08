@@ -87,7 +87,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
 
       await lotData.clear()
       await userData.clear()
@@ -108,6 +108,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(413)
+      expect(response._data.data.code).toBe('PAYLOAD_TOO_LARGE')
 
       await lotData.clear()
       await userData.clear()
@@ -128,6 +129,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(415)
+      expect(response._data.data.code).toBe('UNSUPPORTED_MEDIA_TYPE')
 
       await lotData.clear()
       await userData.clear()
@@ -148,7 +150,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
 
       await lotData.clear()
       await userData.clear()
@@ -169,7 +171,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
 
       await lotData.clear()
       await userData.clear()
@@ -185,7 +187,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -203,7 +205,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await lotData.clear()
       await userData.clear()
@@ -223,7 +225,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(404)
-      expect(response._data.code).toBe('LOT_NOT_FOUND')
+      expect(response._data.data.code).toBe('LOT_NOT_FOUND')
 
       await userData.clear()
     })
@@ -244,7 +246,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await lotData.clear()
       await user1Data.clear()
@@ -279,7 +281,7 @@ describe('POST /api/lots/:id/images', async () => {
       )
 
       expect(response.status).toBe(400)
-      expect(response._data.code).toBe('BAD_REQUEST')
+      expect(response._data.data.code).toBe('LOT_IMAGE_LIMIT_REACHED')
 
       for (const image of images) {
         await deleteS3Object(image.bucket, image.key)

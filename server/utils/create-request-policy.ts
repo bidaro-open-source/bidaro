@@ -1,5 +1,4 @@
 import type { permissions } from '../constants'
-import { createAppError } from '#utils/create-app-error'
 
 /**
  * Creates a request policy function.

@@ -1,7 +1,6 @@
 import { recoveryService } from '#domains/authentication'
 import { challengeTokenService } from '#domains/security'
 import { userRepository } from '#domains/users'
-import { createAppError } from '#utils/create-app-error'
 import {
   resetPasswordRequest,
 } from '~~/server/api/profile/recovery/index.request'

@@ -82,7 +82,7 @@ describe('POST /api/auth/register', async () => {
     })
 
     expect(response.status).toBe(400)
-    expect(response._data.code).toBe('INVALID_CHALLENGE_SOLUTION')
+    expect(response._data.data.code).toBe('INVALID_CHALLENGE_SOLUTION')
   })
 
   describe('valid email formats', () => {
@@ -154,7 +154,7 @@ describe('POST /api/auth/register', async () => {
       })
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
 
       await destroyUser(userCreated.id)
     })
@@ -172,7 +172,7 @@ describe('POST /api/auth/register', async () => {
       })
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
 
       await destroyUser(userCreated.id)
     })
@@ -228,7 +228,7 @@ describe('POST /api/auth/register', async () => {
       })
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
     })
   })
 
@@ -262,7 +262,7 @@ describe('POST /api/auth/register', async () => {
       })
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
     })
   })
 
@@ -285,7 +285,7 @@ describe('POST /api/auth/register', async () => {
       })
 
       expect(response.status).toBe(422)
-      expect(response._data.code).toBe('VALIDATION_ERROR')
+      expect(response._data.data.code).toBe('VALIDATION_ERROR')
     })
   })
 })

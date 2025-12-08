@@ -1,5 +1,4 @@
 import type { UserAttributesOptional } from '#database'
-import { createAppError } from '#utils/create-app-error'
 import { lotBetRepository, lotImageRepository, lotRepository } from '../auction'
 import { authService } from '../authentication'
 import { imageService } from '../storage'
@@ -61,7 +60,7 @@ class UserService {
    * @param email - new email
    * @returns updated user instance
    * @throws USER_NOT_FOUND - When user doesn't exist
-   * @throws USER_ALREADY_EXISTS - When email is already taken
+   * @throws VALIDATION_ERROR - When email is already taken
    */
   async updateEmail(id: number, email: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -81,7 +80,9 @@ class UserService {
       const userInDB = await userRepository.findByEmail(email, { transaction })
 
       if (userInDB) {
-        throw createAppError('USER_ALREADY_EXISTS', { field: 'email' })
+        throw createAppError('VALIDATION_ERROR', {
+          fieldErrors: { email: ['Електронна пошта вже зайнята'] },
+        })
       }
 
       const updatedUser = await userRepository.updateByPk(

@@ -1,5 +1,4 @@
 import type { H3Event } from 'h3'
-import { createAppError } from '#utils/create-app-error'
 
 /**
  * Configuration options for the rate limiter utility.

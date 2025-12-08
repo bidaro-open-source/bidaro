@@ -79,7 +79,7 @@ describe('PATCH /api/users/:id', async () => {
       )
 
       expect(response.status).toBe(401)
-      expect(response._data.code).toBe('AUTHENTICATION_REQUIRED')
+      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -100,7 +100,7 @@ describe('PATCH /api/users/:id', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData.clear()
     })
@@ -122,7 +122,7 @@ describe('PATCH /api/users/:id', async () => {
       )
 
       expect(response.status).toBe(403)
-      expect(response._data.code).toBe('FORBIDDEN')
+      expect(response._data.data.code).toBe('FORBIDDEN')
 
       await userData2.clear()
       await userData1.clear()

@@ -1,4 +1,3 @@
-import { createAppError } from '#utils/create-app-error'
 import { HeadBucketCommand } from '@aws-sdk/client-s3'
 
 export default defineEventHandler(async (event) => {

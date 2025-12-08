@@ -1,6 +1,5 @@
 import type { Role } from '#database'
 import { EntitySource } from '#classes/EntitySource'
-import { createAppError } from '#utils/create-app-error'
 import { roleRepository } from './role.repository'
 
 class RoleSource extends EntitySource<Role> {

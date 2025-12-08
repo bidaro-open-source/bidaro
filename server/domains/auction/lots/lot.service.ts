@@ -1,5 +1,4 @@
 import type { Lot } from '#database'
-import { createAppError } from '#utils/create-app-error'
 import { lotInitialDurations, lotInitialDurationsInMs, lotStatuses } from '../../../constants'
 import { categoryRepository } from '../../categories'
 import { lotBetRepository } from '../bets/lot-bet.repository'
