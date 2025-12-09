@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { logoutRequest } from '~~/test/api-e2e/requests/authentication'
-import { expectApiError } from '../../utils/expect-error'
-
+import { expectApiError } from '../../utils/expect-api-error'
 
 describe('POST /api/auth/logout', async () => {
   it('should terminate user session successfully', async () => {

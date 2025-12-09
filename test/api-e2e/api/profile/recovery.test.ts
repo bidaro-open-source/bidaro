@@ -6,8 +6,7 @@ import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge
 import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
-import { expectApiError } from '../../utils/expect-error'
-
+import { expectApiError } from '../../utils/expect-api-error'
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 

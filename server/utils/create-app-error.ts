@@ -32,7 +32,7 @@ export function createAppError<T extends ErrorCode>(code: T, details?: ErrorDeta
     statusCode: definition.statusCode,
     data: {
       code,
-      title: definition.title,
+      message: definition.message,
       description: definition.description,
       details: validDetails || undefined,
     },

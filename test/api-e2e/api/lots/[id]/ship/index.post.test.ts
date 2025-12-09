@@ -6,8 +6,7 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { createWinnerLot } from '~~/test/api-e2e/arrangers/lots/create-winner-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
-import { expectApiError } from '../../../../utils/expect-error'
-
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function shipLotRequest(
   payload: ViewLotRequest,

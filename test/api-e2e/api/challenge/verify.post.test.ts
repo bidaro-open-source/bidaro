@@ -5,8 +5,7 @@ import { getChallengeDeviation } from '~~/test/api-e2e/arrangers/challenge/get-c
 import { getChallengeInvalidDeviation } from '~~/test/api-e2e/arrangers/challenge/get-challenge-invalid-deviation'
 import { getChallengeSolution } from '~~/test/api-e2e/arrangers/challenge/get-challenge-solution'
 import { fetch } from '~~/test/api-e2e/fetch'
-import { expectApiError } from '../../utils/expect-error'
-
+import { expectApiError } from '../../utils/expect-api-error'
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 

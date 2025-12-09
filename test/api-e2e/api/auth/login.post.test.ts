@@ -3,8 +3,7 @@ import { authService } from '~~/server/domains/authentication'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { loginRequest, refreshRequest } from '~~/test/api-e2e/requests/authentication'
-import { expectApiError } from '../../utils/expect-error'
-
+import { expectApiError } from '../../utils/expect-api-error'
 
 describe('POST /api/auth/login', async () => {
   it('should authenticate user successfully with valid credentials', async () => {

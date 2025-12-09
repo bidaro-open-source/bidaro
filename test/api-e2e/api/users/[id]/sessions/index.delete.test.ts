@@ -4,8 +4,7 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { loginRequest } from '~~/test/api-e2e/requests/authentication'
-import { expectApiError } from '../../../../utils/expect-error'
-
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function deleteSessionsRequest(
   payload: DeleteSessionsRequest,

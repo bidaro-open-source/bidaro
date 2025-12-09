@@ -1,8 +1,7 @@
 import { env } from 'node:process'
 import { describe, expect, it } from 'vitest'
 import { fetch } from '~~/test/api-e2e/fetch'
-import { expectApiError } from '../../utils/expect-error'
-
+import { expectApiError } from '../../utils/expect-api-error'
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 

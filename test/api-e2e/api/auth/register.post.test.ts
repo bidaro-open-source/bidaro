@@ -4,8 +4,7 @@ import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-invalid-token'
 import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
 import { destroyUser, registerRequest } from '~~/test/api-e2e/requests/authentication'
-import { expectApiError } from '../../utils/expect-error'
-
+import { expectApiError } from '../../utils/expect-api-error'
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 

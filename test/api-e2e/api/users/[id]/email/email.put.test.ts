@@ -3,8 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { actionLimits, permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
-import { expectApiError } from '../../../../utils/expect-error'
-
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function updateUserEmailRequest(
   payload: UpdateUserEmailRequest,

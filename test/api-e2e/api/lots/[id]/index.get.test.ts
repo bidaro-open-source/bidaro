@@ -8,8 +8,7 @@ import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { createWinnerLot } from '~~/test/api-e2e/arrangers/lots/create-winner-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
-import { expectApiError } from '../../../utils/expect-error'
-
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function viewLotRequest(payload: ViewLotRequest) {
   return await fetch(`/api/lots/${payload.params.id}`, {

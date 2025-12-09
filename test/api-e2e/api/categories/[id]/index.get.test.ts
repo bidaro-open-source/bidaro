@@ -3,8 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
-import { expectApiError } from '../../../utils/expect-error'
-
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function viewCategoryRequest(payload: ViewCategoryRequest) {
   return await fetch(`/api/categories/${payload.params.id}`, { method: 'GET' })

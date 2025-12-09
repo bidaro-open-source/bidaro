@@ -1,5 +1,7 @@
+import type { FetchResponse } from 'ofetch'
+import type { ErrorCode } from '~~/server/errors'
 import { expect } from 'vitest'
-import { errors, type ErrorCode } from '#errors'
+import { errors } from '~~/server/errors'
 
 /**
  * Assert that an API response contains the expected error with correct structure
@@ -14,13 +16,13 @@ import { errors, type ErrorCode } from '#errors'
  * ```
  */
 export function expectApiError(
-  response: { status: number, _data: { data: { code: string, message: string, description: string } } },
+  response: FetchResponse<any>,
   errorCode: ErrorCode,
 ): void {
   const errorDefinition = errors[errorCode]
 
   expect(response.status).toBe(errorDefinition.statusCode)
-  expect(response._data.data.code).toBe(errorCode)
-  expect(response._data.data.message).toBe(errorDefinition.title)
-  expect(response._data.data.description).toBe(errorDefinition.description)
+  expect(response._data?.data?.code).toBe(errorCode)
+  expect(response._data?.data?.message).toBe(errorDefinition.message)
+  expect(response._data?.data?.description).toBe(errorDefinition.description)
 }
