@@ -235,13 +235,13 @@ class CategoryService {
       const children = await categoryRepository.findAllByParentId(category.id, { transaction })
 
       if (children.length > 0) {
-        throw createAppError('CATEGORY_HAS_CHILDREN')
+        throw createAppError('CATEGORY_HAS_CHILDREN', { childrenCount: children.length })
       }
 
       const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
 
       if (lotsCount > 0) {
-        throw createAppError('CATEGORY_HAS_LOTS')
+        throw createAppError('CATEGORY_HAS_LOTS', { lotsCount })
       }
 
       await categoryRepository.destroyByPk(category.id, { transaction })

@@ -130,8 +130,8 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
 })
 
 describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/verify (disabled)', async () => {
-  it('should return 404 when challenge is disabled', async () => {
+  it('should return 403 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
-    expectApiError(response, 'NOT_FOUND')
+    expectApiError(response, 'FEATURE_DISABLED')
   })
 })

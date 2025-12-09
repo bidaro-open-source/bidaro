@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.challenge.enabled) {
-    throw createAppError('NOT_FOUND')
+    throw createAppError('FEATURE_DISABLED', { feature: 'challenge' })
   }
 
   await useRateLimiter(event, {

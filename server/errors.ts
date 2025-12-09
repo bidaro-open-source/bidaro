@@ -73,6 +73,14 @@ export const errors = {
     title: 'Доступ заборонено',
     description: 'У вас немає прав для виконання цієї дії.',
   },
+  FEATURE_DISABLED: {
+    statusCode: 403,
+    title: 'Функція вимкнена',
+    description: 'Ця функція наразі вимкнена в системі.',
+    detailsSchema: z.object({
+      feature: z.string(),
+    }),
+  },
 
   INVALID_AUTHORIZATION_METHOD: {
     statusCode: 401,
@@ -153,14 +161,20 @@ export const errors = {
     description: 'Категорія була змінена або видалена іншим користувачем. Оновіть дані та спробуйте знову.',
   },
   CATEGORY_HAS_CHILDREN: {
-    statusCode: 400,
+    statusCode: 409,
     title: 'Категорія має підкатегорії',
     description: 'Неможливо виконати операцію, оскільки категорія має підкатегорії.',
+    detailsSchema: z.object({
+      childrenCount: z.number(),
+    }),
   },
   CATEGORY_HAS_LOTS: {
-    statusCode: 400,
+    statusCode: 409,
     title: 'Категорія має лоти',
     description: 'Неможливо видалити категорію, оскільки вона має асоційовані лоти.',
+    detailsSchema: z.object({
+      lotsCount: z.number(),
+    }),
   },
   CATEGORY_PARENT_LOOP: {
     statusCode: 400,
