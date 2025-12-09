@@ -102,7 +102,7 @@ class ChallengeGeneratorService {
    * @returns The raw buffer of the selected image.
    * @throws Throws a 500 error if no image can be retrieved or read.
    */
-  async getRandomImage(): Promise<Buffer> {
+  private async getRandomImage(): Promise<Buffer> {
     const storage = useStorage('assets:server')
     const keys = await storage.keys()
     const randomIndex = this.getRandomInt(0, keys.length - 1)

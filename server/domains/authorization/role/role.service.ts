@@ -82,7 +82,7 @@ class RoleService {
    * @param permissionNames - array of permission names
    * @returns role instance
    * @throws ROLE_NOT_FOUND
-   * @throws ROLE_IS_RESERVED role
+   * @throws ROLE_IS_RESERVED - When trying to update permissions of a reserved role
    */
   async updatePermissions(name: string, permissionNames: string[]) {
     return await useDatabaseTransaction(async (transaction) => {
