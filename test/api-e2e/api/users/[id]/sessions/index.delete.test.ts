@@ -4,6 +4,8 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { loginRequest } from '~~/test/api-e2e/requests/authentication'
+import { expectApiError } from '../../../../utils/expect-error'
+
 
 async function deleteSessionsRequest(
   payload: DeleteSessionsRequest,
@@ -111,8 +113,7 @@ describe('DELETE /api/profile/sessions', async () => {
         },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await data.clear()
     })
@@ -132,8 +133,7 @@ describe('DELETE /api/profile/sessions', async () => {
         { accessToken: data.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await data.clear()
     })
@@ -156,8 +156,7 @@ describe('DELETE /api/profile/sessions', async () => {
         { accessToken: data1.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await data2.clear()
       await data1.clear()
@@ -178,8 +177,7 @@ describe('DELETE /api/profile/sessions', async () => {
         { accessToken: data.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await data.clear()
     })

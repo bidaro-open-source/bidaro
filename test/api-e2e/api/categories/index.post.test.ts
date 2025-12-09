@@ -4,6 +4,8 @@ import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-error'
+
 
 async function createCategoryRequest(
   payload: CreateCategoryRequest,
@@ -124,8 +126,7 @@ describe('POST /api/categories', async () => {
         { body: { slug, displayName } },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -142,8 +143,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })
@@ -164,8 +164,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('CATEGORY_SLUG_TAKEN')
+      expectApiError(response, 'CATEGORY_SLUG_TAKEN')
 
       await categoryData.clear()
       await userData.clear()
@@ -185,8 +184,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('PARENT_CATEGORY_NOT_FOUND')
+      expectApiError(response, 'PARENT_CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })
@@ -223,8 +221,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await userData.clear()
     })

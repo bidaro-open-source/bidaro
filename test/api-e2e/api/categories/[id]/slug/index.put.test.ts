@@ -5,6 +5,8 @@ import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-error'
+
 
 async function updateCategoryRequest(
   payload: UpdateCategorySlugRequest,
@@ -81,8 +83,7 @@ describe('PUT /api/categories/:id/slug', async () => {
         },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await categoryData.clear()
     })
@@ -102,8 +103,7 @@ describe('PUT /api/categories/:id/slug', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('CATEGORY_NOT_FOUND')
+      expectApiError(response, 'CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })
@@ -124,8 +124,7 @@ describe('PUT /api/categories/:id/slug', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()
@@ -148,8 +147,7 @@ describe('PUT /api/categories/:id/slug', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('CATEGORY_SLUG_TAKEN')
+      expectApiError(response, 'CATEGORY_SLUG_TAKEN')
 
       await categoryData2.clear()
       await categoryData1.clear()

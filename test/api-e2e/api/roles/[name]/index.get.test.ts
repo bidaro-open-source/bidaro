@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-error'
+
 
 async function viewRoleRequest(
   payload: ViewRoleRequest,
@@ -52,8 +54,7 @@ describe('GET /api/roles/:name', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('ROLE_NOT_FOUND')
+      expectApiError(response, 'ROLE_NOT_FOUND')
 
       await userData.clear()
     })
@@ -61,8 +62,7 @@ describe('GET /api/roles/:name', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await viewRoleRequest({ params: { name: 'test' } })
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -78,8 +78,7 @@ describe('GET /api/roles/:name', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await roleData.destroy()
       await userData.clear()

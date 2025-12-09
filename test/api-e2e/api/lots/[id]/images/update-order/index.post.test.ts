@@ -7,6 +7,8 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
+import { expectApiError } from '../../../../../utils/expect-error'
+
 
 async function updateImageOrderRequest(
   payload: UpdateImageOrderRequest,
@@ -74,8 +76,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
         { body: { ids: [1] }, params: { id: 945395394 } },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -91,8 +92,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await userData.clear()
@@ -110,8 +110,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('LOT_NOT_FOUND')
+      expectApiError(response, 'LOT_NOT_FOUND')
 
       await userData.clear()
     })
@@ -133,8 +132,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
         { accessToken: user2Data.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await imageData.clear()
       await lotData.clear()
@@ -162,8 +160,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(getResponse.status).toBe(422)
-      expect(getResponse._data.data.code).toBe('LOT_IMAGE_ORDER_INVALID')
+      expectApiError(getResponse, 'LOT_IMAGE_ORDER_INVALID')
 
       await imageData2.clear()
       await imageData1.clear()
@@ -192,8 +189,7 @@ describe('POST /api/lots/:id/images/update-order', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(getResponse.status).toBe(422)
-      expect(getResponse._data.data.code).toBe('LOT_IMAGE_ORDER_INVALID')
+      expectApiError(getResponse, 'LOT_IMAGE_ORDER_INVALID')
 
       await imageData2.clear()
       await imageData1.clear()

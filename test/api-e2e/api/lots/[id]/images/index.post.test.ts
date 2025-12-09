@@ -8,6 +8,8 @@ import { deleteS3Object } from '~~/test/api-e2e/arrangers/delete-s3-object'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
+import { expectApiError } from '../../../../utils/expect-error'
+
 
 async function uploadLotImageRequest(
   payload: { params: UploadLotImageRequest['params'], multipart: MultipartConfig },
@@ -86,8 +88,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await lotData.clear()
       await userData.clear()
@@ -107,8 +108,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(413)
-      expect(response._data.data.code).toBe('PAYLOAD_TOO_LARGE')
+      expectApiError(response, 'PAYLOAD_TOO_LARGE')
 
       await lotData.clear()
       await userData.clear()
@@ -128,8 +128,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(415)
-      expect(response._data.data.code).toBe('UNSUPPORTED_MEDIA_TYPE')
+      expectApiError(response, 'UNSUPPORTED_MEDIA_TYPE')
 
       await lotData.clear()
       await userData.clear()
@@ -149,8 +148,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await lotData.clear()
       await userData.clear()
@@ -170,8 +168,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await lotData.clear()
       await userData.clear()
@@ -186,8 +183,7 @@ describe('POST /api/lots/:id/images', async () => {
         { multipart, params: { id: 1 } },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -204,8 +200,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await userData.clear()
@@ -224,8 +219,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('LOT_NOT_FOUND')
+      expectApiError(response, 'LOT_NOT_FOUND')
 
       await userData.clear()
     })
@@ -245,8 +239,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: user2Data.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await user1Data.clear()
@@ -280,8 +273,7 @@ describe('POST /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
-      expect(response._data.data.code).toBe('LOT_IMAGE_LIMIT_REACHED')
+      expectApiError(response, 'LOT_IMAGE_LIMIT_REACHED')
 
       for (const image of images) {
         await deleteS3Object(image.bucket, image.key)

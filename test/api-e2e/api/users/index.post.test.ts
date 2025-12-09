@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-error'
+
 
 async function createUserRequest(
   payload: CreateUserRequest,
@@ -79,8 +81,7 @@ describe('POST /api/users', async () => {
         body: { email, username, password },
       })
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -97,8 +98,7 @@ describe('POST /api/users', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await adminData.clear()
     })
@@ -118,8 +118,7 @@ describe('POST /api/users', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await existingUser.clear()
       await adminData.clear()
@@ -140,8 +139,7 @@ describe('POST /api/users', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await existingUser.clear()
       await adminData.clear()

@@ -5,6 +5,8 @@ import { getChallengeDeviation } from '~~/test/api-e2e/arrangers/challenge/get-c
 import { getChallengeInvalidDeviation } from '~~/test/api-e2e/arrangers/challenge/get-challenge-invalid-deviation'
 import { getChallengeSolution } from '~~/test/api-e2e/arrangers/challenge/get-challenge-solution'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-error'
+
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
@@ -79,8 +81,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
         },
       })
 
-      expect(verifyRequest.status).toBe(400)
-      expect(verifyRequest._data.data.code).toBe('INVALID_CHALLENGE_SOLUTION')
+      expectApiError(verifyRequest, 'INVALID_CHALLENGE_SOLUTION')
     })
 
     it('should return 400 when deviation large by y', async () => {
@@ -102,8 +103,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
         },
       })
 
-      expect(verifyRequest.status).toBe(400)
-      expect(verifyRequest._data.data.code).toBe('INVALID_CHALLENGE_SOLUTION')
+      expectApiError(verifyRequest, 'INVALID_CHALLENGE_SOLUTION')
     })
 
     it('should return 400 when deviation large for axis', async () => {
@@ -124,8 +124,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
         },
       })
 
-      expect(verifyRequest.status).toBe(400)
-      expect(verifyRequest._data.data.code).toBe('INVALID_CHALLENGE_SOLUTION')
+      expectApiError(verifyRequest, 'INVALID_CHALLENGE_SOLUTION')
     })
   })
 })
@@ -133,7 +132,6 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
 describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/verify (disabled)', async () => {
   it('should return 404 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
-    expect(response.status).toBe(404)
-    expect(response._data.data.code).toBe('NOT_FOUND')
+    expectApiError(response, 'NOT_FOUND')
   })
 })

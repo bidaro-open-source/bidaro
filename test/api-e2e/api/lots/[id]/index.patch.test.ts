@@ -6,6 +6,8 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-error'
+
 
 async function updateLotRequest(
   payload: UpdateLotRequest,
@@ -114,8 +116,7 @@ describe('PATCH /api/lots/:id', async () => {
         { body: { title: 'UpdatedTitle' }, params: { id: lotData.lot.id } },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await lotData.clear()
       await uData.clear()
@@ -134,8 +135,7 @@ describe('PATCH /api/lots/:id', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await uData.clear()
@@ -155,8 +155,7 @@ describe('PATCH /api/lots/:id', async () => {
         { accessToken: uData2.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await uData2.clear()
@@ -175,8 +174,7 @@ describe('PATCH /api/lots/:id', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('LOT_NOT_FOUND')
+      expectApiError(response, 'LOT_NOT_FOUND')
 
       await uData.clear()
     })
@@ -198,8 +196,7 @@ describe('PATCH /api/lots/:id', async () => {
 
       const error = response._data
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
       expect(error.data.details.fieldErrors.initialPrice).toBeDefined()
 
       await lotData.clear()
@@ -223,8 +220,7 @@ describe('PATCH /api/lots/:id', async () => {
 
       const error = response._data
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
       expect(error.data.details.fieldErrors.initialPrice).toBeDefined()
 
       await lotData.clear()
@@ -248,8 +244,7 @@ describe('PATCH /api/lots/:id', async () => {
 
       const error = response._data
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
       expect(error.data.details.fieldErrors.initialDuration).toBeDefined()
 
       await lotData.clear()
@@ -269,8 +264,7 @@ describe('PATCH /api/lots/:id', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('CATEGORY_NOT_FOUND')
+      expectApiError(response, 'CATEGORY_NOT_FOUND')
 
       await lotData.clear()
       await uData.clear()

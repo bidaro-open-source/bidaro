@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { logoutRequest } from '~~/test/api-e2e/requests/authentication'
+import { expectApiError } from '../../utils/expect-error'
+
 
 describe('POST /api/auth/logout', async () => {
   it('should terminate user session successfully', async () => {
@@ -25,8 +27,7 @@ describe('POST /api/auth/logout', async () => {
         { accessToken: undefined },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await data.clear()
     })
@@ -40,8 +41,7 @@ describe('POST /api/auth/logout', async () => {
         { accessToken: data.access_token },
       )
 
-      expect(response.status).toBe(422)
-      expect(response._data.data.code).toBe('VALIDATION_ERROR')
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await data.clear()
     })
@@ -54,8 +54,7 @@ describe('POST /api/auth/logout', async () => {
         { accessToken: data.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('REFRESH_TOKEN_NOT_FOUND')
+      expectApiError(response, 'REFRESH_TOKEN_NOT_FOUND')
 
       await data.clear()
     })
@@ -69,8 +68,7 @@ describe('POST /api/auth/logout', async () => {
         { accessToken: user1.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('REFRESH_TOKEN_ACCESS_DENIED')
+      expectApiError(response, 'REFRESH_TOKEN_ACCESS_DENIED')
 
       await user1.clear()
       await user2.clear()

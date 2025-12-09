@@ -1,6 +1,8 @@
 import { env } from 'node:process'
 import { describe, expect, it } from 'vitest'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-error'
+
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
@@ -27,7 +29,6 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/start', async () => {
 describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/start (disabled)', async () => {
   it('should return 404 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
-    expect(response.status).toBe(404)
-    expect(response._data.data.code).toBe('NOT_FOUND')
+    expectApiError(response, 'NOT_FOUND')
   })
 })

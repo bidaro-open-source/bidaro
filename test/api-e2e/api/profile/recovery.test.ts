@@ -6,6 +6,8 @@ import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge
 import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-error'
+
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
@@ -66,8 +68,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { email: userData.email, captchaToken } },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('EMAIL_NOT_FOUND')
+      expectApiError(response, 'EMAIL_NOT_FOUND')
     })
 
     it('should return 404 when reset token does not exist', async () => {
@@ -75,8 +76,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { password: db.UserFactory.newPassword, token: 'fff' } },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('RECOVERY_TOKEN_NOT_FOUND')
+      expectApiError(response, 'RECOVERY_TOKEN_NOT_FOUND')
     })
 
     it('should return 404 when account is deleted after token generation', async () => {
@@ -103,8 +103,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { password: db.UserFactory.newPassword, token } },
       )
 
-      expect(confirmResponse.status).toBe(404)
-      expect(confirmResponse._data.data.code).toBe('USER_NOT_FOUND')
+      expectApiError(confirmResponse, 'USER_NOT_FOUND')
     })
 
     it.runIf(CAPTCHA_ENABLED)('should return 400 when captcha token is invalid', async () => {
@@ -115,8 +114,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { email: data.user.email, captchaToken } },
       )
 
-      expect(resetResponse.status).toBe(400)
-      expect(resetResponse._data.data.code).toBe('INVALID_CHALLENGE_SOLUTION')
+      expectApiError(resetResponse, 'INVALID_CHALLENGE_SOLUTION')
 
       await data.clear()
     })

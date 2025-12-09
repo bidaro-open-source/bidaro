@@ -4,6 +4,8 @@ import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-error'
+
 
 async function viewLotsRequest(
   payload: { query?: Partial<ViewLotsRequest['query']> } = {},
@@ -64,8 +66,7 @@ describe('GET /api/lots', async () => {
 
       const response = await viewLotsRequest()
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -82,8 +83,7 @@ describe('GET /api/lots', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })

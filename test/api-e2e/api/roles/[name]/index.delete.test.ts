@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { permissions, roles } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-error'
+
 
 async function deleteRoleRequest(
   payload: ViewRoleRequest,
@@ -50,8 +52,7 @@ describe('DELETE /api/roles/:name', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('ROLE_NOT_FOUND')
+      expectApiError(response, 'ROLE_NOT_FOUND')
 
       await userData.clear()
     })
@@ -68,8 +69,7 @@ describe('DELETE /api/roles/:name', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
-      expect(response._data.data.code).toBe('ROLE_IS_RESERVED')
+      expectApiError(response, 'ROLE_IS_RESERVED')
 
       await userData.clear()
     })
@@ -89,8 +89,7 @@ describe('DELETE /api/roles/:name', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
-      expect(response._data.data.code).toBe('ROLE_HAS_USERS')
+      expectApiError(response, 'ROLE_HAS_USERS')
 
       await userWithRole.destroy()
       await roleData.destroy()
@@ -100,8 +99,7 @@ describe('DELETE /api/roles/:name', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await deleteRoleRequest({ params: { name: 'test' } })
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -116,8 +114,7 @@ describe('DELETE /api/roles/:name', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })

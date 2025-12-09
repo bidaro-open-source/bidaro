@@ -2,6 +2,8 @@ import type { ViewUserRequest } from '../../../../../server/api/users/[id]/index
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-error'
+
 
 async function viewUserRequest(
   payload: ViewUserRequest,
@@ -51,8 +53,7 @@ describe('GET /api/users/:id', async () => {
     it('should return 404 when user does not exist', async () => {
       const response = await viewUserRequest({ params: { id: 93475937459 } })
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('USER_NOT_FOUND')
+      expectApiError(response, 'USER_NOT_FOUND')
     })
   })
 })

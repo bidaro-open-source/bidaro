@@ -5,6 +5,8 @@ import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-error'
+
 
 async function viewCategoryCountRequest(
   payload: ViewCategoryRequest,
@@ -75,8 +77,7 @@ describe('GET /api/categories/:id/count', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
-      expect(response._data.data.code).toBe('CATEGORY_NOT_FOUND')
+      expectApiError(response, 'CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })
@@ -94,8 +95,7 @@ describe('GET /api/categories/:id/count', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { actionLimits, permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-error'
+
 
 async function updateUserPasswordRequest(
   payload: UpdateUserPasswordRequest,
@@ -54,8 +56,7 @@ describe('PUT /api/users/:id/password', async () => {
         },
       )
 
-      expect(response.status).toBe(401)
-      expect(response._data.data.code).toBe('AUTHENTICATION_REQUIRED')
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -75,8 +76,7 @@ describe('PUT /api/users/:id/password', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })
@@ -97,8 +97,7 @@ describe('PUT /api/users/:id/password', async () => {
         { accessToken: userData1.access_token },
       )
 
-      expect(response.status).toBe(403)
-      expect(response._data.data.code).toBe('FORBIDDEN')
+      expectApiError(response, 'FORBIDDEN')
 
       await userData2.clear()
       await userData1.clear()
