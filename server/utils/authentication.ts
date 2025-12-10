@@ -5,7 +5,7 @@
  * Depends on the `authentication` middleware.
  *
  * @param event H3Event
- * @throws AUTHENTICATION_REQUIRED - When user is not authenticated
+ * @throws AUTHENTICATION_REQUIRED
  *
  * @example
  * // Usage in protected route handler

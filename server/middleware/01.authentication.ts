@@ -14,14 +14,9 @@ import { userSource } from '#domains/users'
  * After checking the request, modifies the request context with the
  * authenticated user data.
  *
- * Context data:
- * - `User` inctance with all attributes
- * - `User` include `Role` association with all attributes
- * - `Role` include `Permission` association with all attributes
- *
- * @throws INVALID_AUTHORIZATION_METHOD - When authorization method is not Bearer
- * @throws INVALID_ACCESS_TOKEN - When access token is invalid or expired
- * @throws USER_NOT_FOUND - When user does not exist in database
+ * @throws INVALID_AUTHORIZATION_METHOD
+ * @throws INVALID_ACCESS_TOKEN
+ * @throws USER_NOT_FOUND
  */
 export default defineEventHandler(async (event) => {
   const authorization = getRequestHeader(event, 'Authorization')

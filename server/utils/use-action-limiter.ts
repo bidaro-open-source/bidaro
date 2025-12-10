@@ -64,7 +64,7 @@ const ACTION_LIMIT_DECREMENT_SCRIPT = `
  * @param duration - Time window in seconds (defaults to one day)
  * @returns Result of the callback function
  *
- * @throws ACTION_LIMIT_EXCEEDED - When user exceeds action limit
+ * @throws ACTION_LIMIT_EXCEEDED
  *
  * @example
  * // Limit lot creation to 6 per day

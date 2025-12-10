@@ -28,7 +28,7 @@ export type ValidatorReturnType<V>
  *
  * @param options - Validation options for different request parts
  * @returns Async function that validates the request and returns validated data
- * @throws VALIDATION_ERROR - When Zod validation fails
+ * @throws VALIDATION_ERROR
  *
  * @example
  * const validator = createRequestValidator({

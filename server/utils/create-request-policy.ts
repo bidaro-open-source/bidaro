@@ -4,7 +4,7 @@ import type { permissions } from '../constants'
  * Creates a request policy function.
  *
  * @param policy - policy function
- * @throws FORBIDDEN - When policy check fails
+ * @throws FORBIDDEN
  *
  * @example
  * const policy = createRequestPolicy((event: H3Event, key: string) => key === 'hello world')

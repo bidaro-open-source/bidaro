@@ -160,7 +160,7 @@ export const errors = {
     }),
   },
   CATEGORY_SLUG_TAKEN: {
-    statusCode: 400,
+    statusCode: 409,
     message: 'Слаг вже зайнятий',
     description: 'Категорія з таким слагом вже існує. Оберіть інший слаг.',
     detailsSchema: z.object({
@@ -168,7 +168,7 @@ export const errors = {
     }),
   },
   CATEGORY_PARENT_NOT_FOUND: {
-    statusCode: 400,
+    statusCode: 404,
     message: 'Батьківську категорію не знайдено',
     description: 'Батьківська категорія не існує в системі.',
     detailsSchema: z.object({
@@ -224,7 +224,7 @@ export const errors = {
     }),
   },
   ROLE_NAME_TAKEN: {
-    statusCode: 400,
+    statusCode: 409,
     message: 'Ім\'я ролі вже зайняте',
     description: 'Роль з таким іменем вже існує в системі.',
     detailsSchema: z.object({
@@ -232,7 +232,7 @@ export const errors = {
     }),
   },
   ROLE_HAS_USERS: {
-    statusCode: 400,
+    statusCode: 409,
     message: 'Роль має користувачів',
     description: 'Неможливо видалити роль, оскільки вона призначена користувачам.',
     detailsSchema: z.object({
@@ -240,7 +240,7 @@ export const errors = {
     }),
   },
   ROLE_IS_RESERVED: {
-    statusCode: 400,
+    statusCode: 409,
     message: 'Зарезервована роль',
     description: 'Неможливо змінювати або видаляти зарезервовану системну роль.',
   },
@@ -254,7 +254,7 @@ export const errors = {
     }),
   },
   PERMISSIONS_NOT_FOUND: {
-    statusCode: 400,
+    statusCode: 404,
     message: 'Права не знайдено',
     description: 'Одне або більше прав не знайдено в системі.',
     detailsSchema: z.object({
