@@ -18,7 +18,9 @@ export default defineEventHandler(async (event) => {
   const permission = await permissionRepository.findByPk(request.params.name)
 
   if (!permission) {
-    throw createAppError('PERMISSION_NOT_FOUND', { permissionName: request.params.name })
+    throw createAppError('PERMISSION_NOT_FOUND', {
+      name: request.params.name,
+    })
   }
 
   const displayName = Object.hasOwn(request.body, 'displayName')

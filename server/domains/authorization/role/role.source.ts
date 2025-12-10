@@ -58,7 +58,7 @@ class RoleSource extends EntitySource<Role> {
       const data = await roleRepository.findByPk(name)
 
       if (!data) {
-        throw createAppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND', { name })
       }
 
       return data

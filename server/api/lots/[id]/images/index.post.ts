@@ -22,7 +22,9 @@ export default defineEventHandler(async (event) => {
   const images = await lotSource.getAllImagesById(request.params.id)
 
   if (images.length >= IMAGE_PER_LOT_LIMIT) {
-    throw createAppError('LOT_IMAGE_LIMIT_REACHED')
+    throw createAppError('LOT_IMAGE_LIMIT_REACHED', {
+      maxImages: IMAGE_PER_LOT_LIMIT,
+    })
   }
 
   const image = await imageService.upload(request.multipart.buffer)

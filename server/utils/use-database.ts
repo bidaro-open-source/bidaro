@@ -12,7 +12,6 @@ let database: Database | undefined
  *
  * @param event H3Event
  * @returns A configured Database instance with all models initialized
- * @throws DATABASE_CONNECTION_FAILED - When database connection cannot be established
  *
  * @example
  * // Use in API route handler
@@ -42,7 +41,8 @@ export function useDatabase(event?: H3Event): Database {
 
     return database
   }
-  catch (e) {
-    throw createAppError('DATABASE_CONNECTION_FAILED')
+  catch (error) {
+    logger.error('Failed to create database connection', error)
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 }

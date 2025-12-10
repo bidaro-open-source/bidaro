@@ -36,14 +36,15 @@ export const errors = {
     message: 'Внутрішня помилка сервера',
     description: 'Виникла непередбачена помилка на сервері. Спробуйте пізніше або зв\'яжіться з підтримкою.',
   },
-  VALIDATION_ERROR: {
-    statusCode: 422,
-    message: 'Помилка валідації',
-    description: 'Дані запиту не відповідають очікуваному формату. Перевірте правильність введених даних.',
-    detailsSchema: z.object({
-      fieldErrors: z.record(z.string(), z.array(z.string())).optional(),
-      formErrors: z.array(z.string()).optional(),
-    }),
+  UNAUTHORIZED: {
+    statusCode: 401,
+    message: 'Не авторизовано',
+    description: 'Для виконання цієї дії необхідно бути авторизованим в системі.',
+  },
+  FORBIDDEN: {
+    statusCode: 403,
+    message: 'Доступ заборонено',
+    description: 'У вас немає прав для виконання цієї дії.',
   },
   PAYLOAD_TOO_LARGE: {
     statusCode: 413,
@@ -63,15 +64,33 @@ export const errors = {
       mimeType: z.string().optional(),
     }),
   },
-  UNAUTHORIZED: {
-    statusCode: 401,
-    message: 'Не авторизовано',
-    description: 'Для виконання цієї дії необхідно бути авторизованим в системі.',
+  VALIDATION_ERROR: {
+    statusCode: 422,
+    message: 'Помилка валідації',
+    description: 'Дані запиту не відповідають очікуваному формату. Перевірте правильність введених даних.',
+    detailsSchema: z.object({
+      fieldErrors: z.record(z.string(), z.array(z.string())).optional(),
+      formErrors: z.array(z.string()).optional(),
+    }),
   },
-  FORBIDDEN: {
-    statusCode: 403,
-    message: 'Доступ заборонено',
-    description: 'У вас немає прав для виконання цієї дії.',
+  TOO_MANY_REQUESTS: {
+    statusCode: 429,
+    message: 'Занадто багато запитів',
+    description: 'Ліміт запитів перевищено. Будь ласка, спробуйте пізніше.',
+  },
+  TOO_MANY_REQUESTS_ANONYMOUS: {
+    statusCode: 429,
+    message: 'Занадто багато запитів',
+    description: 'Ліміт запитів для неавторизованих користувачів перевищено. Будь ласка, увійдіть в систему або спробуйте пізніше.',
+  },
+  ACTION_LIMIT_EXCEEDED: {
+    statusCode: 429,
+    message: 'Ліміт дій перевищено',
+    description: 'Ліміт дій перевищено. Будь ласка, спробуйте пізніше.',
+    detailsSchema: z.object({
+      action: z.string().optional(),
+      limit: z.number().optional(),
+    }),
   },
   FEATURE_DISABLED: {
     statusCode: 403,
@@ -90,7 +109,7 @@ export const errors = {
   INVALID_ACCESS_TOKEN: {
     statusCode: 401,
     message: 'Невалідний токен доступу',
-    description: 'Токен авторизації недійсний, прострочений або був відкликаний. Увійдіть в систему знову.',
+    description: 'Токен авторизації недійсний, прострочений або був відкликаний.',
   },
   AUTHENTICATION_REQUIRED: {
     statusCode: 401,
@@ -103,7 +122,7 @@ export const errors = {
     message: 'Користувача не знайдено',
     description: 'Користувач з вказаним ідентифікатором не існує в системі.',
     detailsSchema: z.object({
-      userId: z.number().optional(),
+      id: z.number().optional(),
     }),
   },
   ACCOUNT_NOT_FOUND: {
@@ -115,7 +134,7 @@ export const errors = {
     }),
   },
   INVALID_PASSWORD: {
-    statusCode: 422,
+    statusCode: 400,
     message: 'Невірний пароль',
     description: 'Введений пароль не співпадає з паролем користувача.',
   },
@@ -136,19 +155,20 @@ export const errors = {
     message: 'Категорію не знайдено',
     description: 'Категорія з вказаним ідентифікатором не існує в системі.',
     detailsSchema: z.object({
-      categoryId: z.number().optional(),
+      id: z.number().optional(),
+      slug: z.string().optional(),
     }),
   },
   CATEGORY_SLUG_TAKEN: {
-    statusCode: 422,
+    statusCode: 400,
     message: 'Слаг вже зайнятий',
     description: 'Категорія з таким слагом вже існує. Оберіть інший слаг.',
     detailsSchema: z.object({
       slug: z.string().optional(),
     }),
   },
-  PARENT_CATEGORY_NOT_FOUND: {
-    statusCode: 422,
+  CATEGORY_PARENT_NOT_FOUND: {
+    statusCode: 400,
     message: 'Батьківську категорію не знайдено',
     description: 'Батьківська категорія не існує в системі.',
     detailsSchema: z.object({
@@ -180,6 +200,19 @@ export const errors = {
     statusCode: 400,
     message: 'Циклічна залежність категорій',
     description: 'Неможливо встановити батьківську категорію, оскільки це створить циклічну залежність.',
+    detailsSchema: z.object({
+      categoryId: z.number().optional(),
+      parentId: z.number().optional(),
+    }),
+  },
+
+  INVALID_IMAGE_BUFFER: {
+    statusCode: 422,
+    message: 'Невалідний буфер зображення',
+    description: 'Переданий буфер зображення невалідний або пошкоджений.',
+    detailsSchema: z.object({
+      message: z.string().optional(),
+    }),
   },
 
   ROLE_NOT_FOUND: {
@@ -187,31 +220,29 @@ export const errors = {
     message: 'Роль не знайдено',
     description: 'Роль з вказаним іменем не існує в системі.',
     detailsSchema: z.object({
-      roleName: z.string().optional(),
+      name: z.string().optional(),
     }),
   },
   ROLE_NAME_TAKEN: {
-    statusCode: 422,
+    statusCode: 400,
     message: 'Ім\'я ролі вже зайняте',
     description: 'Роль з таким іменем вже існує в системі.',
     detailsSchema: z.object({
-      roleName: z.string().optional(),
+      name: z.string().optional(),
     }),
   },
   ROLE_HAS_USERS: {
     statusCode: 400,
     message: 'Роль має користувачів',
     description: 'Неможливо видалити роль, оскільки вона призначена користувачам.',
+    detailsSchema: z.object({
+      usersCount: z.number().optional(),
+    }),
   },
   ROLE_IS_RESERVED: {
     statusCode: 400,
     message: 'Зарезервована роль',
     description: 'Неможливо змінювати або видаляти зарезервовану системну роль.',
-  },
-  DEFAULT_ROLE_NOT_FOUND: {
-    statusCode: 500,
-    message: 'Роль за замовчуванням не знайдено',
-    description: 'Системна роль за замовчуванням не налаштована. Зверніться до адміністратора.',
   },
 
   PERMISSION_NOT_FOUND: {
@@ -219,13 +250,16 @@ export const errors = {
     message: 'Право не знайдено',
     description: 'Право з вказаним іменем не існує в системі.',
     detailsSchema: z.object({
-      permissionName: z.string().optional(),
+      name: z.string().optional(),
     }),
   },
   PERMISSIONS_NOT_FOUND: {
-    statusCode: 422,
+    statusCode: 400,
     message: 'Права не знайдено',
     description: 'Одне або більше прав не знайдено в системі.',
+    detailsSchema: z.object({
+      missingPermissions: z.array(z.string()).optional(),
+    }),
   },
 
   LOT_NOT_FOUND: {
@@ -233,13 +267,8 @@ export const errors = {
     message: 'Лот не знайдено',
     description: 'Лот з вказаним ідентифікатором не існує в системі.',
     detailsSchema: z.object({
-      lotId: z.number().optional(),
+      id: z.number().optional(),
     }),
-  },
-  LOT_SELLER_NOT_FOUND: {
-    statusCode: 500,
-    message: 'Продавця лоту не знайдено',
-    description: 'Продавець лоту не знайдений в системі. Зверніться до підтримки.',
   },
   LOT_INVALID_STATUS: {
     statusCode: 400,
@@ -250,51 +279,53 @@ export const errors = {
       requiredStatus: z.string().optional(),
     }),
   },
+  LOT_NOT_EXPIRED: {
+    statusCode: 400,
+    message: 'Лот ще не завершено',
+    description: 'Лот не може бути закритий до досягнення дати завершення.',
+    detailsSchema: z.object({
+      currentDate: z.string().optional(),
+      expirationDate: z.string().nullable().optional(),
+    }),
+  },
+  LOT_CATEGORY_NOT_SET: {
+    statusCode: 400,
+    message: 'Категорія лоту не встановлена',
+    description: 'Лот повинен мати встановлену категорію перед публікацією.',
+  },
   LOT_IMAGE_LIMIT_REACHED: {
     statusCode: 400,
     message: 'Ліміт зображень досягнуто',
-    description: 'Досягнуто максимальну кількість зображень для лоту (10).',
-  },
-  LOT_IMAGE_NOT_FOUND: {
-    statusCode: 404,
-    message: 'Зображення не знайдено',
-    description: 'Зображення лоту не знайдено в системі.',
+    description: 'Досягнуто максимальну кількість зображень для лоту',
     detailsSchema: z.object({
-      imageId: z.number().optional(),
+      maxImages: z.number().optional(),
     }),
   },
   LOT_IMAGE_ORDER_INVALID: {
-    statusCode: 422,
+    statusCode: 400,
     message: 'Невалідний порядок зображень',
     description: 'Передано невалідний список ідентифікаторів зображень. Список має містити всі зображення лоту без зайвих або відсутніх ідентифікаторів.',
+    detailsSchema: z.object({
+      extraIds: z.array(z.number()).optional(),
+      missingIds: z.array(z.number()).optional(),
+    }),
   },
   LOT_BET_TOO_LOW: {
     statusCode: 400,
     message: 'Ставка занадто низька',
     description: 'Ставка повинна бути вищою за поточну ціну лоту.',
     detailsSchema: z.object({
-      currentPrice: z.number().optional(),
-      minimumBet: z.number().optional(),
+      lotPrice: z.number().optional(),
+      betAmount: z.number().optional(),
     }),
   },
-
-  TOO_MANY_REQUESTS: {
-    statusCode: 429,
-    message: 'Занадто багато запитів',
-    description: 'Ліміт запитів перевищено. Будь ласка, спробуйте пізніше.',
-  },
-  TOO_MANY_REQUESTS_ANONYMOUS: {
-    statusCode: 429,
-    message: 'Занадто багато запитів',
-    description: 'Ліміт запитів для неавторизованих користувачів перевищено. Будь ласка, увійдіть в систему або спробуйте пізніше.',
-  },
-  ACTION_LIMIT_EXCEEDED: {
-    statusCode: 429,
-    message: 'Ліміт дій перевищено',
-    description: 'Ліміт дій перевищено. Будь ласка, спробуйте пізніше.',
+  LOT_BET_OWNER_IS_SELLER: {
+    statusCode: 400,
+    message: 'Продавець не може робити ставки на свій лот',
+    description: 'Користувач не може робити ставки на лоти, які він продає.',
     detailsSchema: z.object({
-      action: z.string().optional(),
-      limit: z.number().optional(),
+      userId: z.number().optional(),
+      sellerId: z.number().optional(),
     }),
   },
 
@@ -325,16 +356,6 @@ export const errors = {
     message: 'Невірне рішення капчі',
     description: 'Рішення капчі не вірне або прострочене.',
   },
-  CHALLENGE_CREATION_FAILED: {
-    statusCode: 500,
-    message: 'Не вдалося створити капчу',
-    description: 'Не вдалося створити виклик для капчі. Спробуйте пізніше.',
-  },
-  CHALLENGE_TOKEN_CREATION_FAILED: {
-    statusCode: 500,
-    message: 'Не вдалося створити токен',
-    description: 'Не вдалося створити токен для капчі. Спробуйте пізніше.',
-  },
 
   VERIFICATION_TOKEN_NOT_FOUND: {
     statusCode: 404,
@@ -350,57 +371,5 @@ export const errors = {
     statusCode: 404,
     message: 'Email не знайдено',
     description: 'Користувача з такою адресою електронної пошти не знайдено.',
-  },
-
-  DATABASE_CONNECTION_FAILED: {
-    statusCode: 500,
-    message: 'Помилка з\'єднання з базою даних',
-    description: 'Не вдалося встановити з\'єднання з базою даних. Спробуйте пізніше.',
-  },
-  REDIS_CONNECTION_FAILED: {
-    statusCode: 500,
-    message: 'Помилка з\'єднання з Redis',
-    description: 'Не вдалося встановити з\'єднання з Redis. Спробуйте пізніше.',
-  },
-  REDIS_OPERATION_FAILED: {
-    statusCode: 500,
-    message: 'Помилка операції Redis',
-    description: 'Операція з Redis не вдалася. Спробуйте пізніше.',
-  },
-  OBJECT_STORAGE_CONNECTION_FAILED: {
-    statusCode: 500,
-    message: 'Помилка з\'єднання зі сховищем',
-    description: 'Не вдалося встановити з\'єднання зі сховищем об\'єктів. Спробуйте пізніше.',
-  },
-  NODEMAILER_CREATION_FAILED: {
-    statusCode: 500,
-    message: 'Помилка створення nodemailer',
-    description: 'Не вдалося створити nodemailer транспорт. Спробуйте пізніше.',
-  },
-  ACTION_LIMITER_AUTH_REQUIRED: {
-    statusCode: 500,
-    message: 'Помилка використання обмежувача дій',
-    description: 'Використання обмежувача дій вимагає авторизованого користувача.',
-  },
-
-  NOT_FOUND: {
-    statusCode: 404,
-    message: 'Не знайдено',
-    description: 'Запитуваний ресурс не знайдено.',
-  },
-  BAD_REQUEST: {
-    statusCode: 400,
-    message: 'Поганий запит',
-    description: 'Запит містить невалідні або неповні дані.',
-  },
-  UNKNOWN_VALIDATION_ERROR: {
-    statusCode: 500,
-    message: 'Невідома помилка валідації',
-    description: 'Виникла невідома помилка під час валідації запиту.',
-  },
-  UNKNOWN_AUTHORIZATION_ERROR: {
-    statusCode: 500,
-    message: 'Невідома помилка авторизації',
-    description: 'Виникла невідома помилка під час авторизації запиту.',
   },
 } as const satisfies Record<string, ErrorDefinition>

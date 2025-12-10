@@ -39,10 +39,10 @@ export function useDatabaseAfterCommit(transaction: Transaction, nameOrCallback:
       const name = typeof nameOrCallback === 'string' ? nameOrCallback : undefined
 
       if (name) {
-        logger.error(`Error in afterCommit callback "${name}":`, error)
+        logger.error(`In afterCommit callback "${name}":`, error)
       }
       else {
-        logger.error(`Error in afterCommit callback`, error)
+        logger.error(`In afterCommit callback`, error)
       }
     }
   })

@@ -124,7 +124,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uData1.access_token },
       )
 
-      expectApiError(response, 'BAD_REQUEST')
+      expectApiError(response, 'LOT_BET_OWNER_IS_SELLER')
 
       await lotData.clear()
       await cData.clear()

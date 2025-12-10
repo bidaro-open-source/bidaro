@@ -45,7 +45,11 @@ export default defineEventHandler(async (event) => {
   const defaultRole = await roleRepository.findByPk(roles.USER)
 
   if (!defaultRole) {
-    throw createAppError('DEFAULT_ROLE_NOT_FOUND')
+    logger.crit('Default role not found during user registration', {
+      roleId: roles.USER,
+    })
+
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   const user = await userRepository.create({

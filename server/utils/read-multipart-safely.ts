@@ -196,11 +196,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         )
       }
       else {
-        logger.error('Unknown error during reading multipart safely', error)
-
-        reject(
-          createAppError('INTERNAL_SERVER_ERROR'),
-        )
+        logger.crit('Unknown error during reading multipart safely', error)
+        reject(createAppError('INTERNAL_SERVER_ERROR'))
       }
     })
 

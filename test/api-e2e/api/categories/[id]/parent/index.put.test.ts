@@ -185,7 +185,7 @@ describe('PUT /api/categories/:id/parent', async () => {
         { accessToken: userData.access_token },
       )
 
-      expectApiError(response, 'PARENT_CATEGORY_NOT_FOUND')
+      expectApiError(response, 'CATEGORY_PARENT_NOT_FOUND')
 
       await categoryData.clear()
       await userData.clear()

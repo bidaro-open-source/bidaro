@@ -35,8 +35,8 @@ class LotSource extends EntitySource<Lot> {
    * Retrieve a lot by ID, utilizing Redis caching.
    *
    * @param id - The ID of the lot to fetch.
-   * @throws LOT_NOT_FOUND
    * @returns The lot instance
+   * @throws LOT_NOT_FOUND
    */
   async getById(id: number) {
     const key = this.keys.one(id)
@@ -45,7 +45,7 @@ class LotSource extends EntitySource<Lot> {
       const data = await lotRepository.findByPk(id)
 
       if (!data) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       return data

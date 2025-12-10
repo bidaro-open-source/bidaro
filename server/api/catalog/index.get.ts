@@ -45,7 +45,8 @@ export default defineEventHandler(async (event) => {
     },
     data: rows.map((lot) => {
       if (!lot.seller) {
-        throw createAppError('LOT_SELLER_NOT_FOUND')
+        logger.crit('Lot seller not found in catalog response', { lotId: lot.id })
+        throw createAppError('INTERNAL_SERVER_ERROR')
       }
 
       return {

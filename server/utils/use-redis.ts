@@ -16,7 +16,6 @@ let instance: Redis | undefined
  *
  * @param event H3Event
  * @returns A connected Redis client instance
- * @throws REDIS_CONNECTION_FAILED - When Redis connection cannot be established
  *
  * @example
  * // Use in API route handler
@@ -41,7 +40,8 @@ export function useRedis(event?: H3Event): Redis {
 
     return instance
   }
-  catch (e) {
-    throw createAppError('REDIS_CONNECTION_FAILED')
+  catch (error) {
+    logger.error('Failed to create Redis client', error)
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 }

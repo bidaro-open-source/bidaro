@@ -65,8 +65,6 @@ const ACTION_LIMIT_DECREMENT_SCRIPT = `
  * @returns Result of the callback function
  *
  * @throws ACTION_LIMIT_EXCEEDED - When user exceeds action limit
- * @throws REDIS_OPERATION_FAILED - When Redis operation fails
- * @throws ACTION_LIMITER_AUTH_REQUIRED - When user is not authenticated
  *
  * @example
  * // Limit lot creation to 6 per day
@@ -89,7 +87,12 @@ export async function useActionLimiter<T>(
   const user = getAuthenticatedUser(event)
 
   if (!user) {
-    throw createAppError('ACTION_LIMITER_AUTH_REQUIRED')
+    logger.error('ActionLimter - called without authenticated user', {
+      method: event.method,
+      path: event.path,
+    })
+
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   const redis = useRedis()
@@ -108,7 +111,8 @@ export async function useActionLimiter<T>(
     ) as number
   }
   catch (error) {
-    throw createAppError('REDIS_OPERATION_FAILED')
+    logger.error('ActionLimter - Failed to execute check in Redis', error)
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   if (allowed === 0) {
@@ -130,7 +134,7 @@ export async function useActionLimiter<T>(
       )
     }
     catch (error) {
-      logger.warn('Failed to rollback action limit counter in Redis', error)
+      logger.warn('ActionLimter - Failed to rollback counter in Redis', error)
     }
 
     throw error

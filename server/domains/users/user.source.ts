@@ -30,8 +30,8 @@ class UserSource extends EntitySource<User> {
    * Retrieve a user by ID, using Redis caching.
    *
    * @param id - User primary key
-   * @throws USER_NOT_FOUND
    * @returns The user instance
+   * @throws USER_NOT_FOUND
    */
   async getByPk(id: number) {
     const key = this.keys.one(id)
@@ -40,7 +40,7 @@ class UserSource extends EntitySource<User> {
       const data = await userRepository.findByPk(id)
 
       if (!data) {
-        throw createAppError('USER_NOT_FOUND', { userId: id })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       return data
@@ -51,8 +51,8 @@ class UserSource extends EntitySource<User> {
    * Retrieve a user auth data by ID, using Redis caching.
    *
    * @param id - User primary key
-   * @throws USER_NOT_FOUND
    * @returns User authentication data including role and permissions
+   * @throws USER_NOT_FOUND
    */
   async getByPkWithAuth(id: number) {
     const key = this.keys.oneAuth(id)
@@ -61,7 +61,7 @@ class UserSource extends EntitySource<User> {
       const data = await userRepository.findByPkWithAuth(id)
 
       if (!data) {
-        throw createAppError('USER_NOT_FOUND', { userId: id })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       return {

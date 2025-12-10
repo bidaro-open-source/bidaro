@@ -9,8 +9,8 @@ class CategoryService {
    *
    * @param data - category data
    * @returns category instance
-   * @throws CATEGORY_SLUG_TAKEN - When slug is already in use
-   * @throws PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
+   * @throws CATEGORY_SLUG_TAKEN
+   * @throws CATEGORY_PARENT_NOT_FOUND
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -26,7 +26,7 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(data.parentId, { transaction })
 
         if (!parentCategory) {
-          throw createAppError('PARENT_CATEGORY_NOT_FOUND', { parentId: data.parentId })
+          throw createAppError('CATEGORY_PARENT_NOT_FOUND', { parentId: data.parentId })
         }
       }
 
@@ -71,7 +71,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       const displayName = data.displayName ?? category.displayName
@@ -113,7 +113,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       if (category.slug === slug) {
@@ -146,9 +146,9 @@ class CategoryService {
    * @param id - category primary key
    * @param parentId - parent category id or null
    * @returns updated category instance
-   * @throws CATEGORY_NOT_FOUND - When category doesn't exist
-   * @throws PARENT_CATEGORY_NOT_FOUND - When parent category doesn't exist
-   * @throws CATEGORY_PARENT_LOOP - When parent category is a child of the category itself
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_PARENT_NOT_FOUND
+   * @throws CATEGORY_PARENT_LOOP
    */
   async updateParent(id: number, parentId: number | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -158,7 +158,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       if (category.parentId === parentId) {
@@ -176,11 +176,14 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(parentId, { transaction })
 
         if (!parentCategory) {
-          throw createAppError('PARENT_CATEGORY_NOT_FOUND', { parentId })
+          throw createAppError('CATEGORY_PARENT_NOT_FOUND', { parentId })
         }
 
         if (parentCategory.path.split('/').map(Number).includes(id)) {
-          throw createAppError('CATEGORY_PARENT_LOOP')
+          throw createAppError('CATEGORY_PARENT_LOOP', {
+            categoryId: id,
+            parentId,
+          })
         }
       }
 
@@ -217,9 +220,9 @@ class CategoryService {
    * Deletes a category.
    *
    * @param id - The ID of the category to delete
-   * @throws CATEGORY_NOT_FOUND - When category doesn't exist
-   * @throws CATEGORY_HAS_CHILDREN - When category has child categories
-   * @throws CATEGORY_HAS_LOTS - When category has associated lots
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_HAS_CHILDREN
+   * @throws CATEGORY_HAS_LOTS
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -229,7 +232,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createAppError('CATEGORY_NOT_FOUND', { categoryId: id })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       const children = await categoryRepository.findAllByParentId(category.id, { transaction })

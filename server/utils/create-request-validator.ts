@@ -29,7 +29,6 @@ export type ValidatorReturnType<V>
  * @param options - Validation options for different request parts
  * @returns Async function that validates the request and returns validated data
  * @throws VALIDATION_ERROR - When Zod validation fails
- * @throws UNKNOWN_VALIDATION_ERROR - When unexpected validation error occurs
  *
  * @example
  * const validator = createRequestValidator({
@@ -104,7 +103,9 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         throw error
       }
 
-      throw createAppError('UNKNOWN_VALIDATION_ERROR')
+      logger.crit('Unknown error during request validation', error)
+
+      throw createAppError('INTERNAL_SERVER_ERROR')
     }
   }
 }

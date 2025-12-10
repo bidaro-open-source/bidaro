@@ -17,10 +17,14 @@ export default defineEventHandler(async (event) => {
   const session = await authService.getSession(request.body.refresh_token)
 
   if (!session) {
+    deleteRefreshTokenCookie(event)
+
     throw createAppError('REFRESH_TOKEN_NOT_FOUND')
   }
 
   if (session.uid !== user.id) {
+    deleteRefreshTokenCookie(event)
+
     throw createAppError('REFRESH_TOKEN_ACCESS_DENIED')
   }
 

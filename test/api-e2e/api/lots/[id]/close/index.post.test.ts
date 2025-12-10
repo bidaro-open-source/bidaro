@@ -262,7 +262,7 @@ describe('POST /api/lots/:id/close', async () => {
         { accessToken: uData.access_token },
       )
 
-      expectApiError(response, 'BAD_REQUEST')
+      expectApiError(response, 'LOT_NOT_EXPIRED')
 
       await lotData.clear()
       await cData.clear()

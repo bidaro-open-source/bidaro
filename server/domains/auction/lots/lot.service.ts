@@ -30,12 +30,10 @@ class LotService {
    *
    * @param id lot primary key
    * @param updates lot properties
-   * @throws 400 when lot is not editable
-   * @throws 400 when category does not exist
    * @returns updated lot instance
-   * @throws CATEGORY_NOT_FOUND
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws CATEGORY_NOT_FOUND
    */
   async update(id: number, updates: Partial<Lot>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -45,13 +43,16 @@ class LotService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const editableStatuses: string[] = [lotStatuses.DRAFT, lotStatuses.IN_TRADING_PROCESS]
 
       if (!editableStatuses.includes(lot.statusName)) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: editableStatuses.join(', '),
+        })
       }
 
       const title = updates.title ?? lot.title
@@ -72,7 +73,9 @@ class LotService {
         )
 
         if (!category) {
-          throw createAppError('CATEGORY_NOT_FOUND')
+          throw createAppError('CATEGORY_NOT_FOUND', {
+            id: updates.categoryId,
+          })
         }
 
         categoryId = category.id
@@ -98,13 +101,10 @@ class LotService {
    * Publishes a lot.
    *
    * @param id lot primary key
-   * @throws 404 when lot not found
-   * @throws 400 when lot is already published
-   * @throws 400 when lot category is not set
    * @returns updated lot instance
-   * @throws BAD_REQUEST
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_CATEGORY_NOT_SET
    */
   async publish(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -114,15 +114,18 @@ class LotService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       if (lot.statusName !== lotStatuses.DRAFT) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.DRAFT,
+        })
       }
 
       if (!lot.categoryId) {
-        throw createAppError('BAD_REQUEST')
+        throw createAppError('LOT_CATEGORY_NOT_SET')
       }
 
       const updatedLot = await lotRepository.updateByPk(id, {
@@ -143,13 +146,10 @@ class LotService {
    * Closes a lot.
    *
    * @param id lot primary key
-   * @throws 404 when lot not found
-   * @throws 400 when lot is not in trading process status
-   * @throws 400 when lot expiration date is not reached
    * @returns updated lot instance
-   * @throws BAD_REQUEST
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_NOT_EXPIRED
    */
   async close(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -159,15 +159,23 @@ class LotService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.IN_TRADING_PROCESS,
+        })
       }
 
-      if (!lot.expirationDate || lot.expirationDate > new Date()) {
-        throw createAppError('BAD_REQUEST')
+      const now = new Date()
+
+      if (!lot.expirationDate || lot.expirationDate > now) {
+        throw createAppError('LOT_NOT_EXPIRED', {
+          currentDate: now.toISOString(),
+          expirationDate: lot.expirationDate?.toISOString(),
+        })
       }
 
       const latestBet = await lotBetRepository.findLatestByLotId(lot.id)
@@ -193,11 +201,9 @@ class LotService {
    * Ships a lot.
    *
    * @param id - lot primary key
-   * @throws 404 when lot not found
-   * @throws 400 when lot is not in discussion process status
    * @returns updated lot instance
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
    */
   async ship(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -207,11 +213,14 @@ class LotService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       if (lot.statusName !== lotStatuses.IN_DISCUSSION_PROCESS) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.IN_DISCUSSION_PROCESS,
+        })
       }
 
       const updatedLot = await lotRepository.updateByPk(lot.id, {
@@ -230,11 +239,9 @@ class LotService {
    * Receives a lot.
    *
    * @param id lot primary key
-   * @throws 404 when lot not found
-   * @throws 400 when lot is not in delivery process status
    * @returns updated lot instance
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
    */
   async receive(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -244,11 +251,14 @@ class LotService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       if (lot.statusName !== lotStatuses.IN_DELIVERY_PROCESS) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.IN_DELIVERY_PROCESS,
+        })
       }
 
       const updatedLot = await lotRepository.updateByPk(lot.id, {
@@ -267,10 +277,8 @@ class LotService {
    * Deletes a lot.
    *
    * @param id lot primary key
-   * @throws 404 when lot not found
-   * @throws 400 when lot is not in draft status
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -280,11 +288,14 @@ class LotService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       if (lot.statusName !== lotStatuses.DRAFT) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.DRAFT,
+        })
       }
 
       await lotRepository.destroyByPk(lot.id, { transaction })

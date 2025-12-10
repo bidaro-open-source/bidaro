@@ -183,7 +183,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expectApiError(response, 'PARENT_CATEGORY_NOT_FOUND')
+      expectApiError(response, 'CATEGORY_PARENT_NOT_FOUND')
 
       await userData.clear()
     })

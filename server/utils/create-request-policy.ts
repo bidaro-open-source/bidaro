@@ -5,7 +5,6 @@ import type { permissions } from '../constants'
  *
  * @param policy - policy function
  * @throws FORBIDDEN - When policy check fails
- * @throws UNKNOWN_AUTHORIZATION_ERROR - When unexpected error occurs during policy execution
  *
  * @example
  * const policy = createRequestPolicy((event: H3Event, key: string) => key === 'hello world')
@@ -23,7 +22,8 @@ export function createRequestPolicy<Policy extends (...args: any[]) => any>(
       result = policy(...args)
     }
     catch (error) {
-      throw createAppError('UNKNOWN_AUTHORIZATION_ERROR')
+      logger.crit('Unknown error during request policy execution', error)
+      throw createAppError('INTERNAL_SERVER_ERROR')
     }
 
     if (!result) {

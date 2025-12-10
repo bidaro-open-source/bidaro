@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!challengeId) {
-    throw createAppError('CHALLENGE_CREATION_FAILED')
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   return {

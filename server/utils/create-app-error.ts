@@ -18,7 +18,7 @@ export function createAppError<T extends ErrorCode>(code: T, details?: ErrorDeta
     const parseResult = definition.detailsSchema.safeParse(details || {})
 
     if (!parseResult.success) {
-      logger.error(`[AppError] Schema Mismatch for code: ${code}`, {
+      logger.warn(`createAppError - Schema Mismatch for code: ${code}`, {
         code,
         providedDetails: details,
         zodErrors: parseResult.error,

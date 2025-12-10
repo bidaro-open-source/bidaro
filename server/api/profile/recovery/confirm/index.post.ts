@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     await recoveryService.deleteToken(request.body.token)
 
-    throw createAppError('USER_NOT_FOUND', { userId: uid })
+    throw createAppError('USER_NOT_FOUND', { id: uid })
   }
 
   await userService.updatePassword(user.id, request.body.password)

@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   const token = await challengeTokenService.create()
 
   if (!token) {
-    throw createAppError('CHALLENGE_TOKEN_CREATION_FAILED')
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   return {

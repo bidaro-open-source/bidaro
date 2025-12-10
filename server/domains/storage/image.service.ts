@@ -25,13 +25,13 @@ class ImageService {
       const metadata = await sharp(buffer).metadata()
 
       if (!metadata.format || !metadata.width || !metadata.height) {
-        throw new Error('Unable to determine image format or dimensions')
+        throw new Error('Неможливо визначити формат або розміри зображення')
       }
 
       return { metadata, error: null }
     }
     catch (error: any) {
-      return { metadata: null, error: error.message as string }
+      return { metadata: null, error: error.message as string | undefined | null }
     }
   }
 
@@ -46,25 +46,25 @@ class ImageService {
       const metadata = await sharp(buffer).metadata()
 
       if (!metadata.format || !metadata.width || !metadata.height) {
-        throw new Error('Unable to determine image format or dimensions')
+        throw new Error('Неможливо визначити формат або розміри зображення')
       }
 
       if (!this.allowedFormats.includes(metadata.format as keyof sharp.FormatEnum)) {
-        throw new Error(`Format "${metadata.format}" is not allowed. Allowed: ${this.allowedFormats.join(', ')}`)
+        throw new Error(`Формат "${metadata.format}" не допускається. Допускається: ${this.allowedFormats.join(', ')}`)
       }
 
       if (metadata.width > this.maxResolution || metadata.height > this.maxResolution) {
-        throw new Error(`Image is too large (${metadata.width}x${metadata.height}). Max dimension allowed: ${this.maxResolution}px`)
+        throw new Error(`Зображення занадто велике (${metadata.width}x${metadata.height}). Максимально допустимі розміри: ${this.maxResolution}px`)
       }
 
       if (metadata.width === 0 || metadata.height === 0) {
-        throw new Error('Image has zero dimensions')
+        throw new Error('Зображення має нульові розміри')
       }
 
       return { buffer, error: null }
     }
     catch (error: any) {
-      return { buffer: null, error: error.message as string }
+      return { buffer: null, error: error.message as string | undefined | null }
     }
   }
 
@@ -86,7 +86,7 @@ class ImageService {
       return { buffer: compressedBuffer, error: null }
     }
     catch (error: any) {
-      return { buffer: null, error: error.message as string }
+      return { buffer: null, error: error.message as string | undefined | null }
     }
   }
 
@@ -95,8 +95,7 @@ class ImageService {
    *
    * @param buffer image buffer
    * @returns Image instance
-   * @throws BAD_REQUEST
-   * @throws INTERNAL_SERVER_ERROR
+   * @throws INVALID_IMAGE_BUFFER
    */
   async upload(buffer: Buffer) {
     const db = useDatabase()
@@ -106,7 +105,9 @@ class ImageService {
       const validatedImage = await this.validateBuffer(buffer)
 
       if (!validatedImage.buffer) {
-        throw createAppError('BAD_REQUEST')
+        throw createAppError('INVALID_IMAGE_BUFFER', {
+          message: validatedImage.error || 'Unknown validation error',
+        })
       }
 
       const compressedImage = await this.compressBuffer(validatedImage.buffer)

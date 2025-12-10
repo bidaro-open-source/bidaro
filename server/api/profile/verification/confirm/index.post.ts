@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     await verificationService.deleteTokenByUserId(uid)
 
-    throw createAppError('USER_NOT_FOUND', { userId: uid })
+    throw createAppError('USER_NOT_FOUND', { id: uid })
   }
 
   await userService.verifyEmail(user.id)

@@ -11,14 +11,14 @@ class RoleService {
    *
    * @param data - role data
    * @returns role instance
-   * @throws ROLE_NAME_TAKEN - When role name already exists
+   * @throws ROLE_NAME_TAKEN
    */
   async create(data: RoleCreateData) {
     return await useDatabaseTransaction(async (transaction) => {
       const existingRole = await roleRepository.findByPk(data.name, { transaction })
 
       if (existingRole) {
-        throw createAppError('ROLE_NAME_TAKEN')
+        throw createAppError('ROLE_NAME_TAKEN', { name: data.name })
       }
 
       const role = await roleRepository.create(data, { transaction })
@@ -47,7 +47,7 @@ class RoleService {
       })
 
       if (!role) {
-        throw createAppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND', { name })
       }
 
       const displayName = Object.hasOwn(data, 'displayName')
@@ -82,7 +82,7 @@ class RoleService {
    * @param permissionNames - array of permission names
    * @returns role instance
    * @throws ROLE_NOT_FOUND
-   * @throws ROLE_IS_RESERVED - When trying to update permissions of a reserved role
+   * @throws ROLE_IS_RESERVED
    */
   async updatePermissions(name: string, permissionNames: string[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -92,7 +92,7 @@ class RoleService {
       })
 
       if (!role) {
-        throw createAppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND', { name })
       }
 
       if (role.isReserved) {
@@ -102,7 +102,9 @@ class RoleService {
       const permissions = await permissionRepository.findByPks(permissionNames, { transaction })
 
       if (permissions.length !== permissionNames.length) {
-        throw createAppError('PERMISSIONS_NOT_FOUND')
+        throw createAppError('PERMISSIONS_NOT_FOUND', {
+          missingPermissions: permissionNames.filter(pn => !permissions.find(p => p.name === pn)),
+        })
       }
 
       await roleRepository.updatePermissionsByPk(name, permissionNames, { transaction })
@@ -131,7 +133,7 @@ class RoleService {
       })
 
       if (!role) {
-        throw createAppError('ROLE_NOT_FOUND')
+        throw createAppError('ROLE_NOT_FOUND', { name })
       }
 
       if (role.isReserved) {
@@ -141,7 +143,9 @@ class RoleService {
       const userCount = await roleRepository.countUsersByName(name, { transaction })
 
       if (userCount > 0) {
-        throw createAppError('ROLE_HAS_USERS')
+        throw createAppError('ROLE_HAS_USERS', {
+          usersCount: userCount,
+        })
       }
 
       await roleRepository.destroyByPk(name, { transaction })

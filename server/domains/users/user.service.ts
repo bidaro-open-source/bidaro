@@ -22,7 +22,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       if (data.name === undefined && data.surname === undefined) {
@@ -59,8 +59,8 @@ class UserService {
    * @param id - user primary key
    * @param email - new email
    * @returns updated user instance
-   * @throws USER_NOT_FOUND - When user doesn't exist
-   * @throws VALIDATION_ERROR - When email is already taken
+   * @throws USER_NOT_FOUND
+   * @throws VALIDATION_ERROR
    */
   async updateEmail(id: number, email: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -70,7 +70,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       if (user.email === email) {
@@ -115,7 +115,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       const hashedPassword = await hashPassword(password)
@@ -149,7 +149,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       const updatedUser = await userRepository.updateByPk(
@@ -182,7 +182,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       if (user.roleName === roleName) {
@@ -218,7 +218,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       const lots = await lotRepository.findAllBySellerIdWithLock(id, {

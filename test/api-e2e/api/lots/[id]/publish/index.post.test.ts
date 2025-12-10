@@ -162,7 +162,7 @@ describe('POST /api/lots/:id/publish', async () => {
         { accessToken: uData.access_token },
       )
 
-      expectApiError(response, 'BAD_REQUEST')
+      expectApiError(response, 'LOT_CATEGORY_NOT_SET')
 
       await lotData.clear()
       await uData.clear()

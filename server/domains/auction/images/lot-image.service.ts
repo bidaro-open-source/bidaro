@@ -19,7 +19,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const currentMaxOrder = await lotImageRepository.findMaxOrder(id, { transaction })
@@ -54,7 +54,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const existingLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -100,9 +100,9 @@ class LotImageService {
    * To work, it requires all image ids that this lot has.
    *
    * @param id lot primary key
-   * @param imageIds image ids in new order
    * @throws LOT_NOT_FOUND
    * @throws LOT_IMAGE_ORDER_INVALID
+   * @param imageIds image ids in new order
    */
   async updateImageOrder(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -112,7 +112,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -121,13 +121,13 @@ class LotImageService {
       const newImageIds = new Set(imageIds)
 
       const extraIds = newImageIds.difference(currentImageIds)
-      if (extraIds.size > 0) {
-        throw createAppError('LOT_IMAGE_ORDER_INVALID')
-      }
-
       const missingIds = currentImageIds.difference(newImageIds)
-      if (missingIds.size > 0) {
-        throw createAppError('LOT_IMAGE_ORDER_INVALID')
+
+      if (extraIds.size > 0 || missingIds.size > 0) {
+        throw createAppError('LOT_IMAGE_ORDER_INVALID', {
+          extraIds: Array.from(extraIds),
+          missingIds: Array.from(missingIds),
+        })
       }
 
       await lotImageRepository.destroyByLotPk(id, { transaction })

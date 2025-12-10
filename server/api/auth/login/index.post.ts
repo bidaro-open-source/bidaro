@@ -14,7 +14,9 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.findByUsername(request.body.username)
 
   if (!user) {
-    throw createAppError('ACCOUNT_NOT_FOUND', { username: request.body.username })
+    throw createAppError('ACCOUNT_NOT_FOUND', {
+      username: request.body.username,
+    })
   }
 
   const passwordsEqual = await comparePassword(

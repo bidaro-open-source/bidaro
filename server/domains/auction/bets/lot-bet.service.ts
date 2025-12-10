@@ -12,15 +12,11 @@ class LotBetService {
    * @param userId user primary key
    * @param amount bet amount
    * @returns created lot bet instance
-   * @throws 404 when lot or user not found
-   * @throws 400 when lot is not in trading process
-   * @throws 400 when lot is expired
-   * @throws 400 when bet amount is not higher than current lot price
-   * @throws BAD_REQUEST
-   * @throws LOT_BET_TOO_LOW
-   * @throws LOT_INVALID_STATUS
    * @throws LOT_NOT_FOUND
+   * @throws LOT_INVALID_STATUS
+   * @throws LOT_BET_TOO_LOW
    * @throws USER_NOT_FOUND
+   * @throws LOT_BET_OWNER_IS_SELLER
    */
   async create(lotId: number, userId: number, amount: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -30,29 +26,45 @@ class LotBetService {
       })
 
       if (!lot) {
-        throw createAppError('LOT_NOT_FOUND')
+        throw createAppError('LOT_NOT_FOUND', {
+          id: lotId,
+        })
       }
 
       if (lot.statusName !== lotStatuses.IN_TRADING_PROCESS) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.IN_TRADING_PROCESS,
+        })
       }
 
       if (!lot.expirationDate || lot.expirationDate <= new Date()) {
-        throw createAppError('LOT_INVALID_STATUS')
+        throw createAppError('LOT_INVALID_STATUS', {
+          currentStatus: lot.statusName,
+          requiredStatus: lotStatuses.IN_TRADING_PROCESS,
+        })
       }
 
       if (lot.currentPrice >= amount) {
-        throw createAppError('LOT_BET_TOO_LOW')
+        throw createAppError('LOT_BET_TOO_LOW', {
+          lotPrice: lot.currentPrice,
+          betAmount: amount,
+        })
       }
 
       const user = await userRepository.findByPk(userId, { transaction })
 
       if (!user) {
-        throw createAppError('USER_NOT_FOUND')
+        throw createAppError('USER_NOT_FOUND', {
+          id: userId,
+        })
       }
 
       if (user.id === lot.sellerId) {
-        throw createAppError('BAD_REQUEST')
+        throw createAppError('LOT_BET_OWNER_IS_SELLER', {
+          userId: user.id,
+          sellerId: lot.sellerId,
+        })
       }
 
       const bet = await lotBetRepository.create(

@@ -111,6 +111,7 @@ class ChallengeGeneratorService {
     const image = await storage.getItemRaw(randomKey)
 
     if (!image) {
+      logger.error('ChallengeGeneratorService - Failed to retrieve image from storage:', randomKey)
       throw createAppError('INTERNAL_SERVER_ERROR')
     }
 

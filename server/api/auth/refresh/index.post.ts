@@ -22,7 +22,9 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.findByPk(oldSession.uid)
 
   if (!user) {
-    throw createAppError('USER_NOT_FOUND', { userId: oldSession.uid })
+    deleteRefreshTokenCookie(event)
+
+    throw createAppError('USER_NOT_FOUND', { id: oldSession.uid })
   }
 
   const metadata = createRequestMeta(event)
