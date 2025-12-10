@@ -20,21 +20,14 @@ export default defineEventHandler(async (event) => {
     const isValid = await challengeTokenService.verify(request.body.captchaToken || '')
 
     if (!isValid) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Невірне рішення капчі',
-      })
+      throw createAppError('INVALID_CHALLENGE_SOLUTION')
     }
   }
 
   const user = await userRepository.findByEmail(request.body.email)
 
   if (!user) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Користувача з такою поштою не знайдено',
-    })
+    throw createAppError('EMAIL_NOT_FOUND')
   }
 
   const token = await recoveryService.createToken(user.id)

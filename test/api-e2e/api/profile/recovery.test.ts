@@ -6,6 +6,7 @@ import { createChallengeInvalidToken } from '~~/test/api-e2e/arrangers/challenge
 import { createChallengeToken } from '~~/test/api-e2e/arrangers/challenge/create-challenge-token'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-api-error'
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
@@ -66,7 +67,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { email: userData.email, captchaToken } },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'EMAIL_NOT_FOUND')
     })
 
     it('should return 404 when reset token does not exist', async () => {
@@ -74,7 +75,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { password: db.UserFactory.newPassword, token: 'fff' } },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'RECOVERY_TOKEN_NOT_FOUND')
     })
 
     it('should return 404 when account is deleted after token generation', async () => {
@@ -101,7 +102,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { password: db.UserFactory.newPassword, token } },
       )
 
-      expect(confirmResponse.status).toBe(404)
+      expectApiError(confirmResponse, 'USER_NOT_FOUND')
     })
 
     it.runIf(CAPTCHA_ENABLED)('should return 400 when captcha token is invalid', async () => {
@@ -112,7 +113,7 @@ describe('POST /api/profile/recovery', async () => {
         { body: { email: data.user.email, captchaToken } },
       )
 
-      expect(resetResponse.status).toBe(400)
+      expectApiError(resetResponse, 'INVALID_CHALLENGE_SOLUTION')
 
       await data.clear()
     })

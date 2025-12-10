@@ -12,7 +12,7 @@ class UserService {
    * @param id - user primary key
    * @param data - profile data to update
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws USER_NOT_FOUND
    */
   async update(id: number, data: Pick<UserAttributesOptional, 'name' | 'surname'>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -22,10 +22,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       if (data.name === undefined && data.surname === undefined) {
@@ -62,8 +59,8 @@ class UserService {
    * @param id - user primary key
    * @param email - new email
    * @returns updated user instance
-   * @throws 404 if user not found
-   * @throws 400 if email is already taken
+   * @throws USER_NOT_FOUND
+   * @throws VALIDATION_ERROR
    */
   async updateEmail(id: number, email: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -73,10 +70,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       if (user.email === email) {
@@ -86,9 +80,8 @@ class UserService {
       const userInDB = await userRepository.findByEmail(email, { transaction })
 
       if (userInDB) {
-        throw createError({
-          statusCode: 400,
-          message: 'Електронна пошта вже зайнята',
+        throw createAppError('VALIDATION_ERROR', {
+          fieldErrors: { email: ['Електронна пошта вже зайнята'] },
         })
       }
 
@@ -112,7 +105,7 @@ class UserService {
    * @param id - user primary key
    * @param password - new password
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws USER_NOT_FOUND
    */
   async updatePassword(id: number, password: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -122,10 +115,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       const hashedPassword = await hashPassword(password)
@@ -149,7 +139,7 @@ class UserService {
    *
    * @param id - user primary key
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws USER_NOT_FOUND
    */
   async verifyEmail(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -159,10 +149,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       const updatedUser = await userRepository.updateByPk(
@@ -185,7 +172,7 @@ class UserService {
    * @param id - user primary key
    * @param roleName - new role name (or null to remove role)
    * @returns updated user instance
-   * @throws 404 if user not found
+   * @throws USER_NOT_FOUND
    */
   async updateRole(id: number, roleName: string | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -195,10 +182,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       if (user.roleName === roleName) {
@@ -224,7 +208,7 @@ class UserService {
    * Deletes all their lots (with images via cascade), bids, and sessions.
    *
    * @param id - user primary key
-   * @throws 404 if user not found
+   * @throws USER_NOT_FOUND
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -234,10 +218,7 @@ class UserService {
       })
 
       if (!user) {
-        throw createError({
-          statusCode: 404,
-          message: 'Користувача не знайдено',
-        })
+        throw createAppError('USER_NOT_FOUND', { id })
       }
 
       const lots = await lotRepository.findAllBySellerIdWithLock(id, {

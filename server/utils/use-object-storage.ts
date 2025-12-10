@@ -20,7 +20,6 @@ let bucket: string | undefined
  *
  * @param event H3Event
  * @returns A configured s3 client instance
- * @throws Error if s3 connection cannot be established
  *
  * @example
  * // Use in API route handler
@@ -55,12 +54,8 @@ export function useObjectStorage(event?: H3Event): ReturnType {
       Bucket: bucket,
     }
   }
-  catch (e) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Object storage connection failed',
-      data: e,
-    })
+  catch (error) {
+    logger.error('Failed to create S3 client', error)
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 }

@@ -7,6 +7,7 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function deleteLotImageRequest(
   payload: DeleteLotImageRequest,
@@ -101,7 +102,7 @@ describe('DELETE /api/lots/:id/images', async () => {
         { body: { ids: [1] }, params: { id: lotData.lot.id } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await lotData.clear()
       await userData.clear()
@@ -120,7 +121,7 @@ describe('DELETE /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await userData.clear()
@@ -138,7 +139,7 @@ describe('DELETE /api/lots/:id/images', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'LOT_NOT_FOUND')
 
       await userData.clear()
     })

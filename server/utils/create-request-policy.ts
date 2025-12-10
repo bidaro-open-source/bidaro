@@ -4,14 +4,13 @@ import type { permissions } from '../constants'
  * Creates a request policy function.
  *
  * @param policy - policy function
- * @throws 403 error for policy failures
- * @throws 500 error for unexpected errors
+ * @throws FORBIDDEN
  *
  * @example
  * const policy = createRequestPolicy((event: H3Event, key: string) => key === 'hello world')
  *
  * policy(event, 'hello world') // ok
- * policy(event, 'no') // throws an 403 error
+ * policy(event, 'no') // throws FORBIDDEN error
  */
 export function createRequestPolicy<Policy extends (...args: any[]) => any>(
   policy: Policy,
@@ -23,20 +22,12 @@ export function createRequestPolicy<Policy extends (...args: any[]) => any>(
       result = policy(...args)
     }
     catch (error) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Unprocessable Content',
-        message: 'Невідома помилка під час авторизації запиту',
-        data: error,
-      })
+      logger.crit('Unknown error during request policy execution', error)
+      throw createAppError('INTERNAL_SERVER_ERROR')
     }
 
     if (!result) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Forbidden',
-        message: 'Немає доступу',
-      })
+      throw createAppError('FORBIDDEN')
     }
   }
 }

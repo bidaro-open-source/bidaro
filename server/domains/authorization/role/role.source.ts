@@ -48,7 +48,7 @@ class RoleSource extends EntitySource<Role> {
    * Retrieve a role by name, using Redis caching.
    *
    * @param name - Role name
-   * @throws 404 if the role does not exist
+   * @throws ROLE_NOT_FOUND
    * @returns The role instance
    */
   async getByPk(name: string) {
@@ -58,10 +58,7 @@ class RoleSource extends EntitySource<Role> {
       const data = await roleRepository.findByPk(name)
 
       if (!data) {
-        throw createError({
-          statusCode: 404,
-          message: 'Role not found',
-        })
+        throw createAppError('ROLE_NOT_FOUND', { name })
       }
 
       return data

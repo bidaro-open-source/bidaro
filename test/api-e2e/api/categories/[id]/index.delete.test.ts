@@ -5,6 +5,7 @@ import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function deleteCategoryRequest(
   payload: ViewCategoryRequest,
@@ -44,7 +45,7 @@ describe('DELETE /api/categories/:id', async () => {
         { params: { id: categoryData.category.id } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await categoryData.clear()
     })
@@ -61,7 +62,7 @@ describe('DELETE /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })
@@ -79,7 +80,7 @@ describe('DELETE /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()
@@ -102,7 +103,7 @@ describe('DELETE /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'CATEGORY_HAS_CHILDREN')
 
       await categoryData2.clear()
       await categoryData1.clear()
@@ -126,7 +127,7 @@ describe('DELETE /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'CATEGORY_HAS_LOTS')
 
       await lotData.clear()
       await categoryData.clear()

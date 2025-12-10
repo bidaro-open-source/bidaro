@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function updateUserRequest(
   payload: UpdateUserRequest,
@@ -78,7 +79,7 @@ describe('PATCH /api/users/:id', async () => {
         },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -98,7 +99,7 @@ describe('PATCH /api/users/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })
@@ -119,7 +120,7 @@ describe('PATCH /api/users/:id', async () => {
         { accessToken: userData1.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData2.clear()
       await userData1.clear()

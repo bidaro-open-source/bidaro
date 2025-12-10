@@ -56,25 +56,24 @@ interface MultipartResult {
  * @param event - The H3 event object containing the request.
  * @param options - Configuration for limits and allowed MIME types.
  * @returns A promise that resolves to an object containing fields and files.
- * @throws 413 if limits are exceeded.
- * @throws 415 for invalid MIME types.
- * @throws 400 for parsing errors.
+ * @throws MISSING_CONTENT_TYPE
+ * @throws UNSUPPORTED_MEDIA_TYPE
+ * @throws PAYLOAD_TOO_LARGE
+ * @throws FIELD_NAME_TOO_LONG
+ * @throws INVALID_MULTIPART_DATA
+ * @throws INTERNAL_SERVER_ERROR
  */
 export function readMultipartSafely(event: H3Event, options: MultipartOptions = {}): Promise<MultipartResult> {
   return new Promise((resolve, reject) => {
     const contentType = getRequestHeader(event, 'content-type')
 
     if (!contentType) {
-      throw createError({
-        statusCode: 400,
-        message: 'Missing Content-Type header',
-      })
+      throw createAppError('MISSING_CONTENT_TYPE')
     }
 
     if (!contentType.startsWith('multipart/form-data')) {
-      throw createError({
-        statusCode: 415,
-        message: `Непідтримуваний Content-Type: ${contentType}`,
+      throw createAppError('UNSUPPORTED_MEDIA_TYPE', {
+        contentType,
       })
     }
 
@@ -95,9 +94,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
     }
     catch (err: any) {
       return reject(
-        createError({
-          statusCode: 400,
-          message: `Помилка ініціалізації парсера multipart даних: ${err.message}`,
+        createAppError('INVALID_MULTIPART_DATA', {
+          error: err.message,
         }),
       )
     }
@@ -115,9 +113,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.resume()
 
         return reject(
-          createError({
-            statusCode: 415,
-            message: `Тип файлу "${mimeType}" не підтримується`,
+          createAppError('UNSUPPORTED_MEDIA_TYPE', {
+            mimeType,
           }),
         )
       }
@@ -130,9 +127,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         reject(
-          createError({
-            statusCode: 413,
-            message: `Файл "${filename}" перевищує допустимий розмір`,
+          createAppError('PAYLOAD_TOO_LARGE', {
+            filename,
           }),
         )
       })
@@ -158,9 +154,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.unpipe(busboy)
         req.resume()
         return reject(
-          createError({
-            statusCode: 413,
-            message: 'Ім\'я поля перевищує допустиму довжину',
+          createAppError('FIELD_NAME_TOO_LONG', {
+            field: fieldname,
           }),
         )
       }
@@ -170,9 +165,8 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
         req.resume()
 
         return reject(
-          createError({
-            statusCode: 413,
-            message: `Поле "${fieldname}" перевищує допустимий розмір`,
+          createAppError('PAYLOAD_TOO_LARGE', {
+            field: fieldname,
           }),
         )
       }
@@ -196,21 +190,14 @@ export function readMultipartSafely(event: H3Event, options: MultipartOptions = 
 
       if (isClientError) {
         reject(
-          createError({
-            statusCode: 400,
-            message: `Помилка розбору multipart даних: ${error.message}`,
+          createAppError('INVALID_MULTIPART_DATA', {
+            error: error.message,
           }),
         )
       }
       else {
-        logger.error('Unknown error during reading multipart safely', error)
-
-        reject(
-          createError({
-            statusCode: 500,
-            message: 'Внутрішня помилка сервера під час розбору multipart даних',
-          }),
-        )
+        logger.crit('Unknown error during reading multipart safely', error)
+        reject(createAppError('INTERNAL_SERVER_ERROR'))
       }
     })
 

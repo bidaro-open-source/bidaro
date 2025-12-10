@@ -18,9 +18,8 @@ export default defineEventHandler(async (event) => {
   const permission = await permissionRepository.findByPk(request.params.name)
 
   if (!permission) {
-    throw createError({
-      statusCode: 404,
-      message: 'Право не знайдено',
+    throw createAppError('PERMISSION_NOT_FOUND', {
+      name: request.params.name,
     })
   }
 

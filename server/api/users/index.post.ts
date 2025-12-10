@@ -1,5 +1,4 @@
 import { userRepository, userResource } from '#domains/users'
-import { z } from 'zod'
 import { createUserPolicy } from './index.policy'
 import { createUserRequest } from './index.post.request'
 
@@ -20,29 +19,17 @@ export default defineEventHandler(async (event) => {
   const userByUsername = await userRepository.findByUsername(request.body.username)
 
   if (userByEmail || userByUsername) {
-    const issues: z.core.$ZodIssueCustom[] = []
+    const fieldErrors: Record<string, string[]> = {}
 
     if (userByEmail) {
-      issues.push({
-        code: 'custom',
-        path: ['email'],
-        message: 'Електронна пошта вже зайнята',
-      })
+      fieldErrors.email = ['Електронна пошта вже зайнята']
     }
 
     if (userByUsername) {
-      issues.push({
-        code: 'custom',
-        path: ['username'],
-        message: 'Ім\'я користувача вже зайняте',
-      })
+      fieldErrors.username = ['Ім\'я користувача вже зайняте']
     }
 
-    throw createError({
-      statusCode: 422,
-      message: 'Неправильні дані запиту',
-      data: z.flattenError(new z.ZodError(issues)),
-    })
+    throw createAppError('VALIDATION_ERROR', { fieldErrors })
   }
 
   const user = await userRepository.create({

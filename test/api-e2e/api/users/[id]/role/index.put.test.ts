@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions, roles } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function updateUserRoleRequest(
   payload: UpdateUserRoleRequest,
@@ -77,7 +78,7 @@ describe('PUT /api/users/:id/role', async () => {
         body: { roleName: roles.USER },
       })
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -98,7 +99,7 @@ describe('PUT /api/users/:id/role', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
       await adminData.clear()
@@ -119,7 +120,7 @@ describe('PUT /api/users/:id/role', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'USER_NOT_FOUND')
 
       await adminData.clear()
     })

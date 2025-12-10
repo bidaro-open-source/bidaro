@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../utils/expect-api-error'
 
 async function clearCacheRequest(options: { accessToken?: string } = {}) {
   return await fetch(`/api/cache`, {
@@ -31,7 +32,7 @@ describe('DELETE /api/cache', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await clearCacheRequest()
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -45,7 +46,7 @@ describe('DELETE /api/cache', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })

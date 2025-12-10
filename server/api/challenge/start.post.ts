@@ -4,9 +4,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.challenge.enabled) {
-    throw createError({
-      statusCode: 404,
-    })
+    throw createAppError('FEATURE_DISABLED', { feature: 'challenge' })
   }
 
   await useRateLimiter(event, {
@@ -23,10 +21,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!challengeId) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Не вдалося створити виклик для капчі',
-    })
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   return {

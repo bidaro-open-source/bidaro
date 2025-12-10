@@ -5,6 +5,7 @@ import { getChallengeDeviation } from '~~/test/api-e2e/arrangers/challenge/get-c
 import { getChallengeInvalidDeviation } from '~~/test/api-e2e/arrangers/challenge/get-challenge-invalid-deviation'
 import { getChallengeSolution } from '~~/test/api-e2e/arrangers/challenge/get-challenge-solution'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-api-error'
 
 const CAPTCHA_ENABLED = env.NUXT_CHALLENGE_ENABLED === 'true'
 
@@ -79,7 +80,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
         },
       })
 
-      expect(verifyRequest.status).toBe(400)
+      expectApiError(verifyRequest, 'INVALID_CHALLENGE_SOLUTION')
     })
 
     it('should return 400 when deviation large by y', async () => {
@@ -101,7 +102,7 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
         },
       })
 
-      expect(verifyRequest.status).toBe(400)
+      expectApiError(verifyRequest, 'INVALID_CHALLENGE_SOLUTION')
     })
 
     it('should return 400 when deviation large for axis', async () => {
@@ -122,14 +123,14 @@ describe.runIf(CAPTCHA_ENABLED)('POST /api/challenge/verify', async () => {
         },
       })
 
-      expect(verifyRequest.status).toBe(400)
+      expectApiError(verifyRequest, 'INVALID_CHALLENGE_SOLUTION')
     })
   })
 })
 
 describe.skipIf(CAPTCHA_ENABLED)('POST /api/challenge/verify (disabled)', async () => {
-  it('should return 404 when challenge is disabled', async () => {
+  it('should return 403 when challenge is disabled', async () => {
     const response = await startChallengeRequest()
-    expect(response.status).toBe(404)
+    expectApiError(response, 'FEATURE_DISABLED')
   })
 })

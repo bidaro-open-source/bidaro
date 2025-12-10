@@ -3,6 +3,7 @@ import { authService } from '~~/server/domains/authentication'
 import { REFRESH_TOKEN_COOKIE_NAME } from '~~/server/utils/refresh-token-cookie'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { loginRequest, refreshRequest } from '~~/test/api-e2e/requests/authentication'
+import { expectApiError } from '../../utils/expect-api-error'
 
 describe('POST /api/auth/login', async () => {
   it('should authenticate user successfully with valid credentials', async () => {
@@ -72,7 +73,7 @@ describe('POST /api/auth/login', async () => {
       { useBody: true },
     )
 
-    expect(refreshResponse.status).toBe(404)
+    expectApiError(refreshResponse, 'REFRESH_TOKEN_NOT_FOUND')
 
     await data.clear()
   })
@@ -84,7 +85,7 @@ describe('POST /api/auth/login', async () => {
         password: db.UserFactory.invalidPassword,
       })
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'ACCOUNT_NOT_FOUND')
     })
 
     it('should return 422 when password is incorrect', async () => {
@@ -95,7 +96,7 @@ describe('POST /api/auth/login', async () => {
         password: db.UserFactory.invalidPassword,
       })
 
-      expect(response.status).toBe(422)
+      expectApiError(response, 'INVALID_PASSWORD')
 
       await data.clear()
     })

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions, roles } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function updateRolePermissionsRequest(
   payload: UpdateRolePermissionsRequest,
@@ -119,7 +120,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'ROLE_NOT_FOUND')
 
       await userData.clear()
     })
@@ -139,7 +140,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'ROLE_IS_RESERVED')
 
       await userData.clear()
     })
@@ -160,7 +161,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
+      expectApiError(response, 'PERMISSIONS_NOT_FOUND')
 
       await roleData.destroy()
       await userData.clear()
@@ -171,7 +172,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
         { params: { name: 'test' }, body: { permissions: [] } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -187,7 +188,7 @@ describe('PUT /api/roles/:name/permissions', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await roleData.destroy()
       await userData.clear()

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-api-error'
 
 async function viewRolesRequest(options: { accessToken?: string } = {}) {
   return await fetch(`/api/roles`, {
@@ -34,7 +35,7 @@ describe('GET /api/roles', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await viewRolesRequest()
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -46,7 +47,7 @@ describe('GET /api/roles', async () => {
 
       const response = await viewRolesRequest({ accessToken: userData.access_token })
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })

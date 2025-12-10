@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-api-error'
 
 async function viewProfileRequest(
   options: { accessToken?: string } = {},
@@ -83,7 +84,7 @@ describe('GET /api/profile', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await viewProfileRequest()
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
   })
 })

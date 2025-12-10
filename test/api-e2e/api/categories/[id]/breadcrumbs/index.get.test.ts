@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function viewCategoryBreadcrumbsRequest(payload: ViewCategoryRequest) {
   return await fetch(`/api/categories/${payload.params.id}/breadcrumbs`, {
@@ -48,7 +49,7 @@ describe('GET /api/categories/:id/breadcrumbs', async () => {
         { params: { id: 93475937459 } },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })

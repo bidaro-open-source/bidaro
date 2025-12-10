@@ -16,11 +16,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!uid) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Токен верифікації не знайдено, можливо ви вже активували акаунт або час дії токена закінчився.',
-    })
+    throw createAppError('VERIFICATION_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(uid)
@@ -28,11 +24,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     await verificationService.deleteTokenByUserId(uid)
 
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Токен верифікації правильний, проте акаунт не знайдено. Можливо, його було видалено.',
-    })
+    throw createAppError('USER_NOT_FOUND', { id: uid })
   }
 
   await userService.verifyEmail(user.id)

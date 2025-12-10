@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function viewSessionsRequest(
   payload: ViewSessionsRequest,
@@ -43,7 +44,7 @@ describe('GET /api/profile/sessions', async () => {
         { params: { id: user.user.id } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await user.clear()
     })
@@ -60,7 +61,7 @@ describe('GET /api/profile/sessions', async () => {
         { accessToken: data.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await data.clear()
     })

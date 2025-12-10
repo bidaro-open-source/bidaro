@@ -4,6 +4,7 @@ import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function updateCategoryRequest(
   payload: UpdateCategoryRequest,
@@ -83,7 +84,7 @@ describe('PATCH /api/categories/:id', async () => {
         },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await categoryData.clear()
     })
@@ -103,7 +104,7 @@ describe('PATCH /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'CATEGORY_NOT_FOUND')
 
       await userData.clear()
     })
@@ -124,7 +125,7 @@ describe('PATCH /api/categories/:id', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await categoryData.clear()
       await userData.clear()

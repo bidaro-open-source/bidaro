@@ -5,7 +5,7 @@
  * Depends on the `authentication` middleware.
  *
  * @param event H3Event
- * @throws 401 Unauthorized
+ * @throws AUTHENTICATION_REQUIRED
  *
  * @example
  * // Usage in protected route handler
@@ -17,11 +17,7 @@
  */
 export function mustBeAuthenticated(event: H3Event): void {
   if (!event.context.auth || !event.context.auth.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Для цієї дії необхідно бути в системі',
-    })
+    throw createAppError('AUTHENTICATION_REQUIRED')
   }
 }
 

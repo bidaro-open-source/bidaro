@@ -1,6 +1,5 @@
 import { authService } from '#domains/authentication'
 import { userProfileResource, userRepository } from '#domains/users'
-import { z } from 'zod'
 import { loginRequest } from './index.request'
 
 export default defineEventHandler(async (event) => {
@@ -15,9 +14,8 @@ export default defineEventHandler(async (event) => {
   const user = await userRepository.findByUsername(request.body.username)
 
   if (!user) {
-    throw createError({
-      statusCode: 404,
-      message: 'Аккаунт не знайдено',
+    throw createAppError('ACCOUNT_NOT_FOUND', {
+      username: request.body.username,
     })
   }
 
@@ -27,17 +25,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!passwordsEqual) {
-    const issues: z.core.$ZodIssueCustom[] = [{
-      code: 'custom',
-      path: ['password'],
-      message: 'Пароль неправильний',
-    }]
-
-    throw createError({
-      statusCode: 422,
-      message: 'Неправильні дані запиту',
-      data: z.flattenError(new z.ZodError(issues)),
-    })
+    throw createAppError('INVALID_PASSWORD')
   }
 
   const metadata = createRequestMeta(event)

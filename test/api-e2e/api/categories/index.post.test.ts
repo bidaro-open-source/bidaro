@@ -4,6 +4,7 @@ import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-api-error'
 
 async function createCategoryRequest(
   payload: CreateCategoryRequest,
@@ -124,7 +125,7 @@ describe('POST /api/categories', async () => {
         { body: { slug, displayName } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 403 when user lacks required permission', async () => {
@@ -141,7 +142,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
     })
@@ -162,7 +163,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
+      expectApiError(response, 'CATEGORY_SLUG_TAKEN')
 
       await categoryData.clear()
       await userData.clear()
@@ -182,7 +183,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
+      expectApiError(response, 'CATEGORY_PARENT_NOT_FOUND')
 
       await userData.clear()
     })
@@ -219,7 +220,7 @@ describe('POST /api/categories', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(422)
+      expectApiError(response, 'VALIDATION_ERROR')
 
       await userData.clear()
     })

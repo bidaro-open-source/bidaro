@@ -16,20 +16,15 @@ export default defineEventHandler(async (event) => {
   if (!oldSession) {
     deleteRefreshTokenCookie(event)
 
-    throw createError({
-      statusCode: 404,
-      message: 'Токен оновлення не знайдено',
-    })
+    throw createAppError('REFRESH_TOKEN_NOT_FOUND')
   }
 
   const user = await userRepository.findByPk(oldSession.uid)
 
   if (!user) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Користувач до якого є доступ не існує',
-    })
+    deleteRefreshTokenCookie(event)
+
+    throw createAppError('USER_NOT_FOUND', { id: oldSession.uid })
   }
 
   const metadata = createRequestMeta(event)

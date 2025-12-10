@@ -14,12 +14,9 @@ import { userSource } from '#domains/users'
  * After checking the request, modifies the request context with the
  * authenticated user data.
  *
- * Context data:
- * - `User` inctance with all attributes
- * - `User` include `Role` association with all attributes
- * - `Role` include `Permission` association with all attributes
- *
- * @throws 401 Unauthorized
+ * @throws INVALID_AUTHORIZATION_METHOD
+ * @throws INVALID_ACCESS_TOKEN
+ * @throws USER_NOT_FOUND
  */
 export default defineEventHandler(async (event) => {
   const authorization = getRequestHeader(event, 'Authorization')
@@ -30,21 +27,13 @@ export default defineEventHandler(async (event) => {
   const [type, token] = authorization.split(' ')
 
   if (type !== 'Bearer') {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Метод авторизації не дозволений',
-    })
+    throw createAppError('INVALID_AUTHORIZATION_METHOD')
   }
 
   const verifed = authService.verifyAccessToken(token)
 
   if (!verifed) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      message: 'Токен авторизації недійсний',
-    })
+    throw createAppError('INVALID_ACCESS_TOKEN')
   }
 
   const payload = authService.decodeAccessToken(token)

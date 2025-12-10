@@ -9,16 +9,15 @@ class CategoryService {
    *
    * @param data - category data
    * @returns category instance
+   * @throws CATEGORY_SLUG_TAKEN
+   * @throws CATEGORY_PARENT_NOT_FOUND
    */
   async create(data: Omit<CategoryAttributesOptional, 'path'>) {
     return await useDatabaseTransaction(async (transaction) => {
       const categoryBySlug = await categoryRepository.findBySlug(data.slug, { transaction })
 
       if (categoryBySlug) {
-        throw createError({
-          statusCode: 422,
-          message: 'Слаг вже зайнят',
-        })
+        throw createAppError('CATEGORY_SLUG_TAKEN', { slug: data.slug })
       }
 
       let parentCategory: Category | null = null
@@ -27,10 +26,7 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(data.parentId, { transaction })
 
         if (!parentCategory) {
-          throw createError({
-            message: 'Батьківську категорію не знайдено',
-            status: 422,
-          })
+          throw createAppError('CATEGORY_PARENT_NOT_FOUND', { parentId: data.parentId })
         }
       }
 
@@ -65,7 +61,7 @@ class CategoryService {
    * @param id - The ID of the category to update
    * @param data - The data to update
    * @returns The updated category instance
-   * @throws 404 if the category does not exist
+   * @throws CATEGORY_NOT_FOUND
    */
   async update(id: number, data: Partial<Pick<CategoryAttributesOptional, 'displayName' | 'description'>>) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -75,10 +71,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       const displayName = data.displayName ?? category.displayName
@@ -109,8 +102,8 @@ class CategoryService {
    * @param id - category primary key
    * @param slug - new category slug
    * @returns updated category instance
-   * @throws 404 if the category does not exist
-   * @throws 422 if the slug is already taken
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_SLUG_TAKEN
    */
   async updateSlug(id: number, slug: string) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -120,10 +113,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       if (category.slug === slug) {
@@ -133,10 +123,7 @@ class CategoryService {
       const categoryBySlug = await categoryRepository.findBySlug(slug, { transaction })
 
       if (categoryBySlug) {
-        throw createError({
-          statusCode: 422,
-          message: 'Слаг вже зайнят',
-        })
+        throw createAppError('CATEGORY_SLUG_TAKEN', { slug })
       }
 
       const updatedCategory = await categoryRepository.updateByPk(
@@ -159,9 +146,9 @@ class CategoryService {
    * @param id - category primary key
    * @param parentId - parent category id or null
    * @returns updated category instance
-   * @throws 404 if the category does not exist
-   * @throws 422 if the parent category does not exist
-   * @throws 422 if the parent category is a child of the category itself
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_PARENT_NOT_FOUND
+   * @throws CATEGORY_PARENT_LOOP
    */
   async updateParent(id: number, parentId: number | null) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -171,10 +158,7 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       if (category.parentId === parentId) {
@@ -192,16 +176,13 @@ class CategoryService {
         parentCategory = await categoryRepository.findByPk(parentId, { transaction })
 
         if (!parentCategory) {
-          throw createError({
-            message: 'Батьківську категорію не знайдено',
-            status: 422,
-          })
+          throw createAppError('CATEGORY_PARENT_NOT_FOUND', { parentId })
         }
 
         if (parentCategory.path.split('/').map(Number).includes(id)) {
-          throw createError({
-            message: 'Батьківська категорія не може бути нащадком цієї категорії',
-            status: 422,
+          throw createAppError('CATEGORY_PARENT_LOOP', {
+            categoryId: id,
+            parentId,
           })
         }
       }
@@ -239,8 +220,9 @@ class CategoryService {
    * Deletes a category.
    *
    * @param id - The ID of the category to delete
-   * @throws 400 if the category has children or lots
-   * @throws 404 if the category does not exist
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_HAS_CHILDREN
+   * @throws CATEGORY_HAS_LOTS
    */
   async delete(id: number) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -250,28 +232,19 @@ class CategoryService {
       })
 
       if (!category) {
-        throw createError({
-          statusCode: 404,
-          message: 'Категорію не знайдено',
-        })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       const children = await categoryRepository.findAllByParentId(category.id, { transaction })
 
       if (children.length > 0) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна видалити категорію, яка має дочірні категорії',
-        })
+        throw createAppError('CATEGORY_HAS_CHILDREN', { childrenCount: children.length })
       }
 
       const lotsCount = await categoryRepository.countLotsByPath(category.path, { transaction })
 
       if (lotsCount > 0) {
-        throw createError({
-          statusCode: 400,
-          message: 'Не можна видалити категорію, яка має лоти',
-        })
+        throw createAppError('CATEGORY_HAS_LOTS', { lotsCount })
       }
 
       await categoryRepository.destroyByPk(category.id, { transaction })

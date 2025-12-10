@@ -242,7 +242,7 @@ class AuthenticationService {
     const session = await this.getSession(refreshToken)
 
     if (!session)
-      throw new Error('Refresh token not found!')
+      throw createAppError('REFRESH_TOKEN_NOT_FOUND')
 
     const uid = session.uid
     const uuid = uuidv4()

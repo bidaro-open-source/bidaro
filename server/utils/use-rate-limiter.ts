@@ -33,7 +33,8 @@ const RATE_LIMIT_SCRIPT = `
  * @param event - The current H3 event context.
  * @param config - The rate limit configuration object.
  * @returns A promise that resolves if the request is within limits.
- * @throws throws a 429 "Too Many Requests" error if the limit is exceeded.
+ * @throws TOO_MANY_REQUESTS
+ * @throws TOO_MANY_REQUESTS_ANONYMOUS
  */
 export async function useRateLimiter(
   event: H3Event,
@@ -93,12 +94,6 @@ export async function useRateLimiter(
   if (isLimited) {
     setResponseHeader(event, 'retry-after', retryAfter)
 
-    throw createError({
-      statusCode: 429,
-      statusMessage: 'Too Many Requests',
-      message: isAuth
-        ? 'Ліміт запитів перевищено. Будь ласка, спробуйте пізніше.'
-        : 'Ліміт запитів для неавторизованих користувачів перевищено. Будь ласка, увійдіть в систему або спробуйте пізніше.',
-    })
+    throw createAppError(isAuth ? 'TOO_MANY_REQUESTS' : 'TOO_MANY_REQUESTS_ANONYMOUS')
   }
 }

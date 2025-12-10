@@ -16,9 +16,6 @@ type ValidatorResult<Options extends ValidatorOptions> = {
   [K in keyof Options]: K extends keyof Options ? ValidatorReturnType<NonNullable<Options[K]>> : never
 }
 
-/**
- * Returns the validated data from the validator.
- */
 export type ValidatorReturnType<V>
   = V extends z.ZodType<infer T> ? T
     : V extends (event: H3Event, context?: any) => Promise<infer R> | infer R ? R
@@ -27,26 +24,17 @@ export type ValidatorReturnType<V>
 /**
  * Creates a request validator function.
  *
- * Options:
- *  - body: validates request body data
- *  - query: validates URL query parameters
- *  - params: validates route parameters
- *  - multipart: validates multipart form data
+ * Validates request data (body, query, params, multipart) using Zod schemas or custom functions.
  *
- * Every option can be a Zod schema or a function that returns
- * the validated data.
- *
- * @param options - Options object
- * @returns validated data
- * @throws 422 error for validation failures
- * @throws 500 error for unexpected validation errors
+ * @param options - Validation options for different request parts
+ * @returns Async function that validates the request and returns validated data
+ * @throws VALIDATION_ERROR
  *
  * @example
  * const validator = createRequestValidator({
  *   body: z.object({ name: z.string() })
  * })
- * const Request = InferType<typeof validator>
- * const validatedData = await validator(event)
+ * const { body } = await validator(event)
  */
 export function createRequestValidator<Options extends ValidatorOptions>(
   options: Options,
@@ -94,23 +82,19 @@ export function createRequestValidator<Options extends ValidatorOptions>(
       return result
     }
     catch (error: any) {
-      // For shema.parse(await readBody(event))
       if (error instanceof z.ZodError) {
-        throw createError({
-          statusCode: 422,
-          statusMessage: 'Unprocessable Content',
-          message: 'Неправильні дані запиту',
-          data: z.flattenError(error),
+        const flattened = z.flattenError(error)
+        throw createAppError('VALIDATION_ERROR', {
+          fieldErrors: flattened.fieldErrors,
+          formErrors: flattened.formErrors,
         })
       }
 
-      // For readValidatedBody(event, schema.parse)
       if (error.data instanceof z.ZodError) {
-        throw createError({
-          statusCode: 422,
-          statusMessage: 'Unprocessable Content',
-          message: 'Неправильні дані запиту',
-          data: z.flattenError(error.data),
+        const flattened = z.flattenError(error.data)
+        throw createAppError('VALIDATION_ERROR', {
+          fieldErrors: flattened.fieldErrors,
+          formErrors: flattened.formErrors,
         })
       }
 
@@ -119,12 +103,9 @@ export function createRequestValidator<Options extends ValidatorOptions>(
         throw error
       }
 
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Unprocessable Content',
-        message: 'Невідома помилка під час валідації запиту',
-        data: error,
-      })
+      logger.crit('Unknown error during request validation', error)
+
+      throw createAppError('INTERNAL_SERVER_ERROR')
     }
   }
 }

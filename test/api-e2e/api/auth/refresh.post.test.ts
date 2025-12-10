@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { refreshRequest } from '~~/test/api-e2e/requests/authentication'
+import { expectApiError } from '../../utils/expect-api-error'
 
 describe('POST /api/auth/refresh', async () => {
   it('should refresh session successfully with token in request body', async () => {
@@ -38,7 +39,7 @@ describe('POST /api/auth/refresh', async () => {
           { useBody: true },
         )
 
-        expect(response.status).toBe(422)
+        expectApiError(response, 'VALIDATION_ERROR')
       },
     )
 
@@ -50,7 +51,7 @@ describe('POST /api/auth/refresh', async () => {
           { useCookie: true },
         )
 
-        expect(response.status).toBe(422)
+        expectApiError(response, 'VALIDATION_ERROR')
       },
     )
 
@@ -67,7 +68,7 @@ describe('POST /api/auth/refresh', async () => {
         { useBody: true },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'REFRESH_TOKEN_NOT_FOUND')
 
       await data.clear()
     })

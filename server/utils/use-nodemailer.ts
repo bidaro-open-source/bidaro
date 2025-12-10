@@ -31,9 +31,7 @@ export function useNodemailer(event: H3Event) {
     return transporter
   }
   catch (error) {
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to create nodemailer transporter',
-    })
+    logger.error('Failed to create nodemailer transporter', error)
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 }

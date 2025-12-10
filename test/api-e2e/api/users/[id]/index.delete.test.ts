@@ -11,6 +11,7 @@ import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-publis
 import { createWinnerLot } from '~~/test/api-e2e/arrangers/lots/create-winner-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
 import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function deleteUserRequest(
   payload: DeleteUserRequest,
@@ -126,7 +127,7 @@ describe('DELETE /api/users/:id', async () => {
         params: { id: userData.user.id },
       })
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await userData.clear()
     })
@@ -144,7 +145,7 @@ describe('DELETE /api/users/:id', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await userData.clear()
       await adminData.clear()
@@ -162,7 +163,7 @@ describe('DELETE /api/users/:id', async () => {
         { accessToken: adminData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'USER_NOT_FOUND')
 
       await adminData.clear()
     })

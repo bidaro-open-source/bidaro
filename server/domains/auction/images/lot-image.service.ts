@@ -9,6 +9,7 @@ class LotImageService {
    *
    * @param id lot primary key
    * @param images images instance
+   * @throws LOT_NOT_FOUND
    */
   async attachImages(id: number, images: Image[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -18,10 +19,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const currentMaxOrder = await lotImageRepository.findMaxOrder(id, { transaction })
@@ -46,6 +44,7 @@ class LotImageService {
    * @param id lot primary key
    * @param imageIds unsafe image primary keys
    * @returns safe image primary keys which already unattached
+   * @throws LOT_NOT_FOUND
    */
   async unattachImages(id: number, imageIds: number[]) {
     return await useDatabaseTransaction(async (transaction) => {
@@ -55,10 +54,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const existingLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -103,11 +99,9 @@ class LotImageService {
    *
    * To work, it requires all image ids that this lot has.
    *
-   * @throws 404 - if a lot not found
-   * @throws 422 - if was passed an incomplete array of image ids
-   * @throws 422 - if the imageIds contains foreign ids
-   *
    * @param id lot primary key
+   * @throws LOT_NOT_FOUND
+   * @throws LOT_IMAGE_ORDER_INVALID
    * @param imageIds image ids in new order
    */
   async updateImageOrder(id: number, imageIds: number[]) {
@@ -118,10 +112,7 @@ class LotImageService {
       })
 
       if (!lot) {
-        throw createError({
-          message: 'Лот не знайдено',
-          status: 404,
-        })
+        throw createAppError('LOT_NOT_FOUND', { id })
       }
 
       const currentLinks = await lotImageRepository.findAllLinksByLotId(id, { transaction })
@@ -130,18 +121,12 @@ class LotImageService {
       const newImageIds = new Set(imageIds)
 
       const extraIds = newImageIds.difference(currentImageIds)
-      if (extraIds.size > 0) {
-        throw createError({
-          statusCode: 422,
-          message: 'Знайдено унікальні ідентифікатори, що не належать лоту ',
-        })
-      }
-
       const missingIds = currentImageIds.difference(newImageIds)
-      if (missingIds.size > 0) {
-        throw createError({
-          statusCode: 422,
-          message: 'Кількість унікальних ідентифікаторів не відповідає кількості зображень у лоті.',
+
+      if (extraIds.size > 0 || missingIds.size > 0) {
+        throw createAppError('LOT_IMAGE_ORDER_INVALID', {
+          extraIds: Array.from(extraIds),
+          missingIds: Array.from(missingIds),
         })
       }
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { actionLimits } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../utils/expect-api-error'
 
 async function sendVerificationRequest(options: { accessToken?: string } = {}) {
   return await fetch('/api/profile/verification', {
@@ -51,7 +52,7 @@ describe('POST /api/profile/verification', async () => {
     it('should return 401 when user is not authenticated', async () => {
       const response = await sendVerificationRequest()
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
     })
 
     it('should return 404 when token does not exist', async () => {
@@ -59,12 +60,12 @@ describe('POST /api/profile/verification', async () => {
 
       const response = await confirmVerificationRequest({ body: { token: 'sdlfjsldfjlsdf' } })
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'VERIFICATION_TOKEN_NOT_FOUND')
 
       await data.clear()
     })
 
-    it('should complete verification flow successfully', async () => {
+    it('should return 404 when user not exist', async () => {
       const data = await createUser({ withSession: true })
 
       const verificationResponse = await sendVerificationRequest({
@@ -85,7 +86,7 @@ describe('POST /api/profile/verification', async () => {
 
       const confirmResponse = await confirmVerificationRequest({ body: { token } })
 
-      expect(confirmResponse.status).toBe(404)
+      expectApiError(confirmResponse, 'USER_NOT_FOUND')
     })
 
     it('should return 429 when the user has exceeded the daily limit', async () => {

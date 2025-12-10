@@ -6,6 +6,7 @@ import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../utils/expect-api-error'
 
 async function deleteLotRequest(
   payload: ViewLotRequest,
@@ -50,7 +51,7 @@ describe('DELETE /api/lots/:id', async () => {
         { params: { id: lotData.lot.id } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await lotData.clear()
       await uData.clear()
@@ -69,7 +70,7 @@ describe('DELETE /api/lots/:id', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await uData.clear()
@@ -93,7 +94,7 @@ describe('DELETE /api/lots/:id', async () => {
         { accessToken: uData2.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await cData.clear()
@@ -113,7 +114,7 @@ describe('DELETE /api/lots/:id', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'LOT_NOT_FOUND')
 
       await uData.clear()
     })
@@ -135,7 +136,7 @@ describe('DELETE /api/lots/:id', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'LOT_INVALID_STATUS')
 
       await lotData.clear()
       await cData.clear()

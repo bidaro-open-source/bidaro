@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event)
 
   if (event.node.req.headers['x-diagnostic-token'] !== runtimeConfig.diagnostic.token) {
-    throw createError({ statusCode: 401, message: 'Unauthorized' })
+    throw createAppError('UNAUTHORIZED')
   }
 
   let databaseConnectionOk = false

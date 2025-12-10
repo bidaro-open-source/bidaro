@@ -46,8 +46,8 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve a category by ID, using Redis caching.
    *
    * @param id - Category primary key
-   * @throws 404 if the category does not exist
    * @returns The category instance
+   * @throws CATEGORY_NOT_FOUND
    */
   async getById(id: number) {
     const key = this.keys.one(id)
@@ -56,10 +56,7 @@ class CategorySource extends EntitySource<Category> {
       const data = await categoryRepository.findByPk(id)
 
       if (!data) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw createAppError('CATEGORY_NOT_FOUND', { id })
       }
 
       return data
@@ -70,8 +67,8 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve a category by slug, using Redis caching.
    *
    * @param slug - Category slug
-   * @throws 404 if the category does not exist
    * @returns The category instance
+   * @throws CATEGORY_NOT_FOUND
    */
   async getBySlug(slug: string) {
     const key = this.keys.slug(slug)
@@ -80,10 +77,7 @@ class CategorySource extends EntitySource<Category> {
       const data = await categoryRepository.findBySlug(slug)
 
       if (!data) {
-        throw createError({
-          message: 'Категорію не знайдено',
-          status: 404,
-        })
+        throw createAppError('CATEGORY_NOT_FOUND', { slug })
       }
 
       return data
@@ -108,8 +102,9 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve the breadcrumb categories for a given category ID, using Redis caching.
    *
    * @param id - Category primary key
-   * @throws 500 if one or more categories in the path are missing
    * @returns Ordered array of categories representing the breadcrumb path
+   * @throws CATEGORY_NOT_FOUND
+   * @throws CATEGORY_MODIFIED_OR_DELETED
    */
   async getBreadcrumbsById(id: number) {
     const category = await this.getById(id)
@@ -122,10 +117,7 @@ class CategorySource extends EntitySource<Category> {
         const categories = await categoryRepository.findByPks(ids)
 
         if (categories.length !== ids.length) {
-          throw createError({
-            message: 'Категорія була змінена або видалена',
-            status: 500,
-          })
+          throw createAppError('CATEGORY_MODIFIED_OR_DELETED')
         }
 
         categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))
@@ -142,8 +134,8 @@ class CategorySource extends EntitySource<Category> {
    * Retrieve the breadcrumb categories for a given category path, using Redis caching.
    *
    * @param path - Category path string (e.g. "1/2/3")
-   * @throws 500 if one or more categories in the path are missing
    * @returns Ordered array of categories representing the breadcrumb path
+   * @throws CATEGORY_MODIFIED_OR_DELETED
    */
   async getBreadcrumbsByPath(path: string) {
     return await useDatabaseCache(
@@ -154,10 +146,7 @@ class CategorySource extends EntitySource<Category> {
         const categories = await categoryRepository.findByPks(ids)
 
         if (categories.length !== ids.length) {
-          throw createError({
-            message: 'Категорія була змінена або видалена',
-            status: 500,
-          })
+          throw createAppError('CATEGORY_MODIFIED_OR_DELETED')
         }
 
         categories.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id))

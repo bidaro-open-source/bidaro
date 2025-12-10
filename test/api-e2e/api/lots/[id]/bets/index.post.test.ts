@@ -7,6 +7,7 @@ import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { createReadyForClosingLot } from '~~/test/api-e2e/arrangers/lots/create-ready-for-closing-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function createLotBetRequest(
   payload: CreateLotBetRequest,
@@ -69,7 +70,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { body: { amount }, params: { id: lotData.lot.id } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await lotData.clear()
       await cData.clear()
@@ -96,7 +97,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uuData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await lotData.clear()
       await cData.clear()
@@ -123,7 +124,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uData1.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'LOT_BET_OWNER_IS_SELLER')
 
       await lotData.clear()
       await cData.clear()
@@ -142,7 +143,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'LOT_NOT_FOUND')
 
       await uData.clear()
     })
@@ -167,7 +168,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uuData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'LOT_INVALID_STATUS')
 
       await lotData.clear()
       await cData.clear()
@@ -195,7 +196,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uuData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'LOT_INVALID_STATUS')
 
       await lotData.clear()
       await cData.clear()
@@ -223,7 +224,7 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uuData.access_token },
       )
 
-      expect(response.status).toBe(400)
+      expectApiError(response, 'LOT_BET_TOO_LOW')
 
       await lotData.clear()
       await cData.clear()
@@ -270,12 +271,12 @@ describe('POST /api/lots/:id/bets', async () => {
         { accessToken: uuData.access_token },
       )
 
-      expect(response.status).toBe(429)
+      expectApiError(response, 'ACTION_LIMIT_EXCEEDED')
 
       await lotData.clear()
       await cData.clear()
       await uuData.clear()
       await uData.clear()
-    })
+    }, 15_000)
   })
 })

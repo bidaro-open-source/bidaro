@@ -17,17 +17,15 @@ export default defineEventHandler(async (event) => {
   const session = await authService.getSession(request.body.refresh_token)
 
   if (!session) {
-    throw createError({
-      statusCode: 404,
-      message: 'Токен оновлення не знайдено',
-    })
+    deleteRefreshTokenCookie(event)
+
+    throw createAppError('REFRESH_TOKEN_NOT_FOUND')
   }
 
   if (session.uid !== user.id) {
-    throw createError({
-      statusCode: 403,
-      message: 'Немає доступу до цього токену',
-    })
+    deleteRefreshTokenCookie(event)
+
+    throw createAppError('REFRESH_TOKEN_ACCESS_DENIED')
   }
 
   await authService.deleteSession(session.uid, request.body.refresh_token)

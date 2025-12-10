@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { expectApiError } from '../../../../utils/expect-api-error'
 
 async function viewRolePermissionsRequest(
   payload: ViewRoleRequest,
@@ -78,7 +79,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(404)
+      expectApiError(response, 'ROLE_NOT_FOUND')
 
       await userData.clear()
     })
@@ -89,7 +90,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         { params: { name: roleData.name } },
       )
 
-      expect(response.status).toBe(401)
+      expectApiError(response, 'AUTHENTICATION_REQUIRED')
 
       await roleData.destroy()
     })
@@ -107,7 +108,7 @@ describe('GET /api/roles/:name/permissions', async () => {
         { accessToken: userData.access_token },
       )
 
-      expect(response.status).toBe(403)
+      expectApiError(response, 'FORBIDDEN')
 
       await roleData.destroy()
       await userData.clear()

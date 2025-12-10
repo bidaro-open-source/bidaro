@@ -64,8 +64,7 @@ const ACTION_LIMIT_DECREMENT_SCRIPT = `
  * @param duration - Time window in seconds (defaults to one day)
  * @returns Result of the callback function
  *
- * @throws 429 Too Many Requests if limit is exceeded
- * @throws 500 Internal Server Error if Redis operation fails
+ * @throws ACTION_LIMIT_EXCEEDED
  *
  * @example
  * // Limit lot creation to 6 per day
@@ -88,11 +87,12 @@ export async function useActionLimiter<T>(
   const user = getAuthenticatedUser(event)
 
   if (!user) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Unauthorized',
-      message: 'Using action limiter requires authenticated user',
+    logger.error('ActionLimter - called without authenticated user', {
+      method: event.method,
+      path: event.path,
     })
+
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   const redis = useRedis()
@@ -111,19 +111,14 @@ export async function useActionLimiter<T>(
     ) as number
   }
   catch (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Операція з Redis не вдалася',
-      data: error,
-    })
+    logger.error('ActionLimter - Failed to execute check in Redis', error)
+    throw createAppError('INTERNAL_SERVER_ERROR')
   }
 
   if (allowed === 0) {
-    throw createError({
-      statusCode: 429,
-      statusMessage: 'Too Many Requests',
-      message: 'Ліміт дій перевищено. Будь ласка, спробуйте пізніше.',
+    throw createAppError('ACTION_LIMIT_EXCEEDED', {
+      action: actionKey,
+      limit,
     })
   }
 
@@ -139,7 +134,7 @@ export async function useActionLimiter<T>(
       )
     }
     catch (error) {
-      logger.warn('Failed to rollback action limit counter in Redis', error)
+      logger.warn('ActionLimter - Failed to rollback counter in Redis', error)
     }
 
     throw error

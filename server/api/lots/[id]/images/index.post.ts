@@ -22,9 +22,8 @@ export default defineEventHandler(async (event) => {
   const images = await lotSource.getAllImagesById(request.params.id)
 
   if (images.length >= IMAGE_PER_LOT_LIMIT) {
-    throw createError({
-      statusCode: 400,
-      message: 'Максимальна кількість зображень для лоту досягнута (10)',
+    throw createAppError('LOT_IMAGE_LIMIT_REACHED', {
+      maxImages: IMAGE_PER_LOT_LIMIT,
     })
   }
 
