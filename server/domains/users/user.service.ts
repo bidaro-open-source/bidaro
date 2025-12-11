@@ -1,7 +1,4 @@
 import type { UserAttributesOptional } from '#database'
-import { lotBetRepository, lotImageRepository, lotRepository } from '../auction'
-import { authService } from '../authentication'
-import { imageService } from '../storage'
 import { userRepository } from './user.repository'
 import { userSource } from './user.source'
 
@@ -205,7 +202,6 @@ class UserService {
 
   /**
    * Deletes a user by their primary key.
-   * Deletes all their lots (with images via cascade), bids, and sessions.
    *
    * @param id - user primary key
    * @throws USER_NOT_FOUND
@@ -219,32 +215,6 @@ class UserService {
 
       if (!user) {
         throw createAppError('USER_NOT_FOUND', { id })
-      }
-
-      const lots = await lotRepository.findAllBySellerIdWithLock(id, {
-        lock: transaction.LOCK.UPDATE,
-        transaction,
-      })
-
-      for (const lot of lots) {
-        const images = await lotImageRepository.findAllByLotId(lot.id, {
-          transaction,
-        })
-
-        const imagesIds = images.map(image => image.id)
-
-        await imageService.destroySafely(imagesIds)
-
-        await lotRepository.destroyByPk(lot.id, { transaction })
-      }
-
-      await lotBetRepository.destroyByUserId(id, { transaction })
-
-      const sessions = await authService.getSessions(id)
-      const sessionUuids = Object.values(sessions).map(session => session.uuid)
-
-      if (sessionUuids.length > 0) {
-        await authService.deleteSessions(id, sessionUuids)
       }
 
       await userRepository.destroyByPk(id, { transaction })
