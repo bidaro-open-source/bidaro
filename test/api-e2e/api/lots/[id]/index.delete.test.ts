@@ -2,10 +2,13 @@ import type { ViewLotRequest } from '../../../../../server/api/lots/[id]/index.r
 import { describe, expect, it } from 'vitest'
 import { permissions } from '~~/server/constants'
 import { createCategory } from '~~/test/api-e2e/arrangers/create-category'
+import { createImage } from '~~/test/api-e2e/arrangers/create-image'
+import { createLotImage } from '~~/test/api-e2e/arrangers/create-lot-image'
 import { createUser } from '~~/test/api-e2e/arrangers/create-user'
 import { createLot } from '~~/test/api-e2e/arrangers/lots/create-lot'
 import { createPublishedLot } from '~~/test/api-e2e/arrangers/lots/create-published-lot'
 import { fetch } from '~~/test/api-e2e/fetch'
+import { resolveImage } from '~~/test/api-e2e/utils/resolve-image'
 import { expectApiError } from '../../../utils/expect-api-error'
 
 async function deleteLotRequest(
@@ -33,6 +36,29 @@ describe('DELETE /api/lots/:id', async () => {
     )
 
     expect(response.status).toBe(204)
+
+    await lotData.clear()
+    await uData.clear()
+  })
+
+  it('should delete lot successfully with all images', async () => {
+    const uData = await createUser({
+      withRole: true,
+      withSession: true,
+      withPermissions: [permissions.DELETE_LOT],
+    })
+    const lotData = await createLot({ sellerId: uData.user.id })
+    const imageData = await createImage(resolveImage('image-normal.png').path)
+    const lotImageData = await createLotImage(lotData.lot.id, imageData.image.id)
+
+    const response = await deleteLotRequest(
+      { params: { id: lotData.lot.id } },
+      { accessToken: uData.access_token },
+    )
+
+    expect(response.status).toBe(204)
+    expect(await db.Image.findByPk(imageData.image.id)).toBeNull()
+    expect(await db.LotImage.findByPk(lotImageData.lotImage.id)).toBeNull()
 
     await lotData.clear()
     await uData.clear()
