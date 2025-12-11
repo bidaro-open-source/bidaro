@@ -91,7 +91,7 @@ class UserService {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'user.service.update_email', async () => {
+      useDatabaseAfterCommit(transaction, 'user.service.update-email', async () => {
         await userSource.invalidate([user, updatedUser])
       })
 
@@ -158,7 +158,7 @@ class UserService {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'user.service.verify_email', async () => {
+      useDatabaseAfterCommit(transaction, 'user.service.verify-email', async () => {
         await userSource.invalidate([user, updatedUser])
       })
 
@@ -195,7 +195,7 @@ class UserService {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'user.service.update_role', async () => {
+      useDatabaseAfterCommit(transaction, 'user.service.update-role', async () => {
         await userSource.invalidate([user, updatedUser])
       })
 

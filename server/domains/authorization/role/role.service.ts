@@ -109,7 +109,7 @@ class RoleService {
 
       await roleRepository.updatePermissionsByPk(name, permissionNames, { transaction })
 
-      useDatabaseAfterCommit(transaction, 'role.service.update_permissions', async () => {
+      useDatabaseAfterCommit(transaction, 'role.service.update-permissions', async () => {
         await roleSource.invalidate(role)
       })
 

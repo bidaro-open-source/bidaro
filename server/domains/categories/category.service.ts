@@ -132,7 +132,7 @@ class CategoryService {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'category.service.create_slug', async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.create-slug', async () => {
         await categorySource.invalidate([category, updatedCategory])
       })
 
@@ -203,7 +203,7 @@ class CategoryService {
         { transaction },
       )
 
-      useDatabaseAfterCommit(transaction, 'category.service.create_parent', async () => {
+      useDatabaseAfterCommit(transaction, 'category.service.create-parent', async () => {
         await categorySource.invalidate([
           category,
           updatedCategory,
