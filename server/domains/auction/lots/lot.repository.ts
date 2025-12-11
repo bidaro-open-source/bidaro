@@ -56,6 +56,22 @@ class LotRepository extends BaseRepository<Lot> {
       ],
     })
   }
+
+  /**
+   * Destroys all lots by seller id.
+   *
+   * @param sellerId - seller primary key
+   * @param options - sequelize options
+   * @returns number of deleted records
+   */
+  async destroyBySellerId(sellerId: number, options: RepositoryOptions = {}) {
+    const db = useDatabase()
+
+    return await db.Lot.destroy({
+      where: { sellerId },
+      transaction: options.transaction,
+    })
+  }
 }
 
 export const lotRepository = new LotRepository()

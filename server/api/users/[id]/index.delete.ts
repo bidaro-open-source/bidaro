@@ -1,7 +1,7 @@
-import { lotBetRepository, lotImageRepository, lotRepository } from '#domains/auction'
+import { lotBetRepository, lotRepository } from '#domains/auction'
 import { authService } from '#domains/authentication'
 import { imageService } from '#domains/storage'
-import { userRepository, userService } from '#domains/users'
+import { userRepository, userSource } from '#domains/users'
 import { deleteUserPolicy } from './index.delete.policy'
 import { deleteUserRequest } from './index.delete.request'
 
@@ -20,19 +20,35 @@ export default defineEventHandler(async (event) => {
 
   const userId = request.params.id
 
-  // Fetch user with row lock to ensure no other process is modifying this user
-  const user = await useDatabaseTransaction(async (transaction) => {
-    return await userRepository.findByPk(userId, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
-    })
-  })
+  const user = await userRepository.findByPk(userId)
 
   if (!user) {
     throw createAppError('USER_NOT_FOUND', { id: userId })
   }
 
-  // Revoke/delete all active sessions
+  const db = useDatabase()
+
+  const lots = await db.Lot.findAll({
+    where: { sellerId: userId },
+    include: [
+      {
+        model: db.Image,
+        as: 'images',
+        through: { attributes: [] },
+        required: false,
+      },
+    ],
+  })
+
+  const allImageIds = lots.flatMap(lot => lot.images?.map(image => image.id) || [])
+
+  try {
+    await imageService.destroySafely(allImageIds)
+  }
+  catch (error) {
+    logger.warn(`Failed to delete images for user ${userId}:`, error)
+  }
+
   const sessions = await authService.getSessions(userId)
   const sessionUuids = Object.values(sessions).map(session => session.uuid)
 
@@ -40,42 +56,17 @@ export default defineEventHandler(async (event) => {
     await authService.deleteSessions(userId, sessionUuids)
   }
 
-  // Remove user's bets
   await useDatabaseTransaction(async (transaction) => {
     await lotBetRepository.destroyByUserId(userId, { transaction })
-  })
 
-  // Remove user's lots with image cleanup
-  const lots = await useDatabaseTransaction(async (transaction) => {
-    return await lotRepository.findAllBySellerIdWithLock(userId, {
-      lock: transaction.LOCK.UPDATE,
-      transaction,
+    await lotRepository.destroyBySellerId(userId, { transaction })
+
+    await userRepository.destroyByPk(userId, { transaction })
+
+    useDatabaseAfterCommit(transaction, 'user.delete', async () => {
+      await userSource.invalidate(user)
     })
   })
-
-  for (const lot of lots) {
-    const images = await useDatabaseTransaction(async (transaction) => {
-      return await lotImageRepository.findAllByLotId(lot.id, { transaction })
-    })
-
-    const imageIds = images.map(image => image.id)
-
-    // Attempt to delete images, but proceed even if deletion fails
-    try {
-      await imageService.destroySafely(imageIds)
-    }
-    catch (error) {
-      logger.warn(`Failed to delete images for lot ${lot.id} during user ${userId} deletion:`, error)
-    }
-
-    // Delete the lot
-    await useDatabaseTransaction(async (transaction) => {
-      await lotRepository.destroyByPk(lot.id, { transaction })
-    })
-  }
-
-  // Finally, delete the user
-  await userService.delete(userId)
 
   setResponseStatus(event, 204)
 })
