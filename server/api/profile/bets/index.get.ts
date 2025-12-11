@@ -1,4 +1,4 @@
-import { lotBetRepository, lotResource } from '#domains/auction'
+import { lotBetRepository, lotBetResource, lotResource } from '#domains/auction'
 import { imageResource } from '#domains/storage'
 import { userResource } from '#domains/users'
 import { viewProfileBetsRequest } from './index.get.request'
@@ -31,13 +31,7 @@ export default defineEventHandler(async (event) => {
         ...lotResource.make(lot),
         seller: userResource.make(lot.seller),
         cover: imageResource.make(lot.cover?.image),
-        lastBet: lastBet
-          ? {
-              id: lastBet.id,
-              amount: lastBet.amount,
-              createdAt: lastBet.createdAt,
-            }
-          : null,
+        lastBet: lotBetResource.make(lastBet),
       }
     }),
     meta: {
