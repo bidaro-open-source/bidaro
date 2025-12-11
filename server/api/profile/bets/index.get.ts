@@ -7,18 +7,18 @@ export default defineEventHandler(async (event) => {
   mustBeAuthenticated(event)
 
   await useRateLimiter(event, {
-    authenticatedLimit: 60,
+    authenticatedLimit: 10,
     anonymousLimit: 0,
     duration: 60,
   })
 
   const request = await viewProfileBetsRequest(event)
-  const userId = getAuthenticatedUser(event).id
+  const user = getAuthenticatedUser(event)
 
   const offset = (request.query.page - 1) * request.query.limit
 
   const { rows, count } = await lotBetRepository.findUniqueLotsByUserId(
-    userId,
+    user.id,
     request.query.limit,
     offset,
   )

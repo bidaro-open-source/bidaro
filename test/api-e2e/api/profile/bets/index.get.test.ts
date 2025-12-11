@@ -43,10 +43,13 @@ describe('GET /api/profile/bets', async () => {
       { accessToken: bidderData.access_token },
     )
 
-    const meta = response._data?.meta ? response._data.meta : {}
-    const lots = Array.isArray(response._data?.data) ? response._data.data : []
-
     expect(response.status).toBe(200)
+    expect(response._data).toHaveProperty('meta')
+    expect(response._data).toHaveProperty('data')
+    expect(Array.isArray(response._data.data)).toBe(true)
+
+    const meta = response._data.meta
+    const lots = response._data.data
 
     expect(meta).toHaveProperty('totalItems')
     expect(meta).toHaveProperty('currentPage')
@@ -84,10 +87,14 @@ describe('GET /api/profile/bets', async () => {
       { accessToken: userData.access_token },
     )
 
-    const meta = response._data?.meta ? response._data.meta : {}
-    const lots = Array.isArray(response._data?.data) ? response._data.data : []
-
     expect(response.status).toBe(200)
+    expect(response._data).toHaveProperty('meta')
+    expect(response._data).toHaveProperty('data')
+    expect(Array.isArray(response._data.data)).toBe(true)
+
+    const meta = response._data.meta
+    const lots = response._data.data
+
     expect(lots).toHaveLength(0)
     expect(meta.totalItems).toBe(0)
 
@@ -125,12 +132,16 @@ describe('GET /api/profile/bets', async () => {
       { accessToken: bidderData.access_token },
     )
 
-    const lots = Array.isArray(response._data?.data) ? response._data.data : []
-
     expect(response.status).toBe(200)
+    expect(response._data).toHaveProperty('meta')
+    expect(response._data).toHaveProperty('data')
+    expect(Array.isArray(response._data.data)).toBe(true)
+
+    const lots = response._data.data
+
     expect(lots).toHaveLength(1)
     expect(response._data.meta.totalItems).toBe(1)
-    // Should return the latest bet
+    // Should return the highest bet
     expect(lots[0].lastBet.amount).toBe(bet2.amount)
 
     await bet1.destroy()
@@ -186,8 +197,11 @@ describe('GET /api/profile/bets', async () => {
       { accessToken: bidderData.access_token },
     )
 
-    const lots1 = Array.isArray(response1._data?.data) ? response1._data.data : []
     expect(response1.status).toBe(200)
+    expect(response1._data).toHaveProperty('data')
+    expect(Array.isArray(response1._data.data)).toBe(true)
+
+    const lots1 = response1._data.data
     expect(lots1).toHaveLength(2)
     expect(response1._data.meta.totalItems).toBe(3)
 
@@ -197,8 +211,11 @@ describe('GET /api/profile/bets', async () => {
       { accessToken: bidderData.access_token },
     )
 
-    const lots2 = Array.isArray(response2._data?.data) ? response2._data.data : []
     expect(response2.status).toBe(200)
+    expect(response2._data).toHaveProperty('data')
+    expect(Array.isArray(response2._data.data)).toBe(true)
+
+    const lots2 = response2._data.data
     expect(lots2).toHaveLength(1)
 
     await bet1.destroy()

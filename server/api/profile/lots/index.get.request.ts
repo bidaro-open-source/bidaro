@@ -13,8 +13,8 @@ export const viewProfileLotsRequest = createRequestValidator({
     limit: z.coerce.number()
       .int()
       .min(1)
-      .max(100)
+      .max(10)
       .optional()
-      .default(20),
+      .default(10),
   }),
 })
