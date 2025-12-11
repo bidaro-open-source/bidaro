@@ -21,7 +21,6 @@ export default defineNuxtConfig({
       },
     },
     ignore: [
-      'api/**/*.{test,spec}.ts',
       'api/**/*.policy.ts',
       'api/**/*.request.ts',
     ],
