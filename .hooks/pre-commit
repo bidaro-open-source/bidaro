@@ -1,2 +1,2 @@
 #!/bin/sh
-bun run lint:staged
+/home/runner/.bun/bin/bun run lint:staged

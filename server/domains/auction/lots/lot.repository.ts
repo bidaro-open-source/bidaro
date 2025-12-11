@@ -23,6 +23,39 @@ class LotRepository extends BaseRepository<Lot> {
       lock: options.lock,
     })
   }
+
+  /**
+   * Finds all lots by owner (seller) id with pagination and coverImage.
+   *
+   * @param ownerId - owner (seller) primary key
+   * @param limit - maximum number of results
+   * @param offset - number of results to skip
+   * @returns lots array with count
+   */
+  async findAllByOwnerIdWithCover(ownerId: number, limit: number, offset: number) {
+    const db = useDatabase()
+
+    return await db.Lot.findAndCountAll({
+      where: { sellerId: ownerId },
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: db.LotImage,
+          as: 'cover',
+          required: false,
+          include: [
+            {
+              model: db.Image,
+              as: 'image',
+              required: false,
+            },
+          ],
+        },
+      ],
+    })
+  }
 }
 
 export const lotRepository = new LotRepository()
