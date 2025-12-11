@@ -31,6 +31,12 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
+  vite: {
+    server: {
+      allowedHosts: true,
+    },
+  },
+
   modules: [
     '@nuxt/ui',
     '@nuxt/eslint',
