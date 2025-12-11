@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   const offset = (request.query.page - 1) * request.query.limit
 
-  const { rows, count } = await lotRepository.findAllByOwnerIdWithCover(
+  const { rows, count } = await lotRepository.findAllBySellerIdWithCover(
     user.id,
     request.query.limit,
     offset,

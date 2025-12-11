@@ -32,7 +32,7 @@ class LotRepository extends BaseRepository<Lot> {
    * @param offset - number of results to skip
    * @returns lots array with count
    */
-  async findAllByOwnerIdWithCover(sellerId: number, limit: number, offset: number) {
+  async findAllBySellerIdWithCover(sellerId: number, limit: number, offset: number) {
     const db = useDatabase()
 
     return await db.Lot.findAndCountAll({

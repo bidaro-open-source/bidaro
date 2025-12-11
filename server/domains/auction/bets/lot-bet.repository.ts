@@ -1,7 +1,7 @@
 import type { RepositoryOptions } from '#classes/BaseRepository'
 import type { LotBet } from '#database'
 import { BaseRepository } from '#classes/BaseRepository'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 
 class LotBetRepository extends BaseRepository<LotBet> {
   protected get model() {
@@ -76,21 +76,16 @@ class LotBetRepository extends BaseRepository<LotBet> {
   async findUniqueLotsByUserId(userId: number, limit: number, offset: number) {
     const db = useDatabase()
 
-    const lotBets = await db.LotBet.findAll({
-      where: { userId },
-      attributes: ['lotId'],
-      group: ['lotId'],
-      raw: true,
-    })
-
-    const lotIds = lotBets.map((bet: { lotId: number }) => bet.lotId)
-
-    if (lotIds.length === 0) {
-      return { rows: [], count: 0 }
-    }
-
     return await db.Lot.findAndCountAll({
-      where: { id: { [Op.in]: lotIds } },
+      where: {
+        id: {
+          [Op.in]: Sequelize.literal(`(
+            SELECT "lotId" 
+            FROM "lot_bets" 
+            WHERE "lot_bets"."userId" = ${userId}
+          )`),
+        },
+      },
       limit,
       offset,
       order: [['createdAt', 'DESC']],
@@ -118,7 +113,7 @@ class LotBetRepository extends BaseRepository<LotBet> {
           required: false,
           separate: true,
           limit: 1,
-          order: [['amount', 'DESC']], // Get the highest bet by amount
+          order: [['amount', 'DESC']],
         },
       ],
     })
