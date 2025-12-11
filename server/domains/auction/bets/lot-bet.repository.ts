@@ -84,7 +84,7 @@ class LotBetRepository extends BaseRepository<LotBet> {
       raw: true,
     })
 
-    const lotIds = lotBets.map((bet: any) => bet.lotId)
+    const lotIds = lotBets.map((bet: { lotId: number }) => bet.lotId)
 
     if (lotIds.length === 0) {
       return { rows: [], count: 0 }
@@ -120,7 +120,7 @@ class LotBetRepository extends BaseRepository<LotBet> {
           required: false,
           separate: true,
           limit: 1,
-          order: [['createdAt', 'DESC']],
+          order: [['amount', 'DESC']], // Get the highest bet by amount
         },
       ],
     })
