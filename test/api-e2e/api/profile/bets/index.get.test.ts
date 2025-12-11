@@ -31,7 +31,6 @@ describe('GET /api/profile/bets', async () => {
       categoryId: categoryData.category.id,
     })
 
-    // Create a bet for the user
     const bet = await db.LotBetFactory.new().create({
       lotId: lotData.lot.id,
       userId: bidderData.user.id,
@@ -114,7 +113,6 @@ describe('GET /api/profile/bets', async () => {
       categoryId: categoryData.category.id,
     })
 
-    // Create multiple bets for the same lot
     const bet1 = await db.LotBetFactory.new().create({
       lotId: lotData.lot.id,
       userId: bidderData.user.id,
@@ -141,7 +139,6 @@ describe('GET /api/profile/bets', async () => {
 
     expect(lots).toHaveLength(1)
     expect(response._data.meta.totalItems).toBe(1)
-    // Should return the highest bet
     expect(lots[0].lastBet.amount).toBe(bet2.amount)
 
     await bet1.destroy()
@@ -160,7 +157,6 @@ describe('GET /api/profile/bets', async () => {
     })
     const categoryData = await createCategory()
 
-    // Create 3 lots with bets
     const lot1 = await createPublishedLot({
       sellerId: sellerData.user.id,
       categoryId: categoryData.category.id,
@@ -191,7 +187,6 @@ describe('GET /api/profile/bets', async () => {
       amount: lot3.lot.initialPrice + 100,
     })
 
-    // Get first page with limit 2
     const response1 = await viewProfileBetsRequest(
       { query: { page: 1, limit: 2 } },
       { accessToken: bidderData.access_token },
@@ -205,7 +200,6 @@ describe('GET /api/profile/bets', async () => {
     expect(lots1).toHaveLength(2)
     expect(response1._data.meta.totalItems).toBe(3)
 
-    // Get second page
     const response2 = await viewProfileBetsRequest(
       { query: { page: 2, limit: 2 } },
       { accessToken: bidderData.access_token },

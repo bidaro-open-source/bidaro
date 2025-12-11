@@ -89,12 +89,10 @@ describe('GET /api/profile/lots', async () => {
       withSession: true,
     })
 
-    // Create 3 lots
     const lot1 = await createLot({ sellerId: userData.user.id })
     const lot2 = await createLot({ sellerId: userData.user.id })
     const lot3 = await createLot({ sellerId: userData.user.id })
 
-    // Get first page with limit 2
     const response1 = await viewProfileLotsRequest(
       { query: { page: 1, limit: 2 } },
       { accessToken: userData.access_token },
@@ -108,7 +106,6 @@ describe('GET /api/profile/lots', async () => {
     expect(lots1).toHaveLength(2)
     expect(response1._data.meta.totalItems).toBe(3)
 
-    // Get second page
     const response2 = await viewProfileLotsRequest(
       { query: { page: 2, limit: 2 } },
       { accessToken: userData.access_token },

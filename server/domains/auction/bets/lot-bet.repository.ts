@@ -76,7 +76,6 @@ class LotBetRepository extends BaseRepository<LotBet> {
   async findUniqueLotsByUserId(userId: number, limit: number, offset: number) {
     const db = useDatabase()
 
-    // First, get unique lot IDs where user has bet
     const lotBets = await db.LotBet.findAll({
       where: { userId },
       attributes: ['lotId'],
@@ -90,7 +89,6 @@ class LotBetRepository extends BaseRepository<LotBet> {
       return { rows: [], count: 0 }
     }
 
-    // Now get the lots with all required associations
     return await db.Lot.findAndCountAll({
       where: { id: { [Op.in]: lotIds } },
       limit,
