@@ -1,6 +1,7 @@
 import type { RepositoryOptions } from '#classes/BaseRepository'
 import type { LotBet } from '#database'
 import { BaseRepository } from '#classes/BaseRepository'
+import { Op, Sequelize } from 'sequelize'
 
 class LotBetRepository extends BaseRepository<LotBet> {
   protected get model() {
@@ -60,6 +61,61 @@ class LotBetRepository extends BaseRepository<LotBet> {
     return await db.LotBet.destroy({
       where: { userId },
       transaction: options.transaction,
+    })
+  }
+
+  /**
+   * Finds unique lots where user has placed bets with pagination.
+   * Includes seller, coverImage, and the last bet (highest) for each lot.
+   *
+   * @param userId - user primary key
+   * @param limit - maximum number of results
+   * @param offset - number of results to skip
+   * @returns unique lots with count
+   */
+  async findUniqueLotsByUserId(userId: number, limit: number, offset: number) {
+    const db = useDatabase()
+
+    return await db.Lot.findAndCountAll({
+      where: {
+        id: {
+          [Op.in]: Sequelize.literal(`(
+            SELECT "lotId" 
+            FROM "lot_bets" 
+            WHERE "lot_bets"."userId" = ${userId}
+          )`),
+        },
+      },
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: db.User,
+          as: 'seller',
+          attributes: ['name', 'surname', 'username'],
+        },
+        {
+          model: db.LotImage,
+          as: 'cover',
+          required: false,
+          include: [
+            {
+              model: db.Image,
+              as: 'image',
+              required: false,
+            },
+          ],
+        },
+        {
+          model: db.LotBet,
+          as: 'bets',
+          required: false,
+          separate: true,
+          limit: 1,
+          order: [['amount', 'DESC']],
+        },
+      ],
     })
   }
 }
