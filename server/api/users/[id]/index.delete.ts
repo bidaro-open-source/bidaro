@@ -1,4 +1,4 @@
-import { lotBetRepository, lotRepository } from '#domains/auction'
+import { lotBetRepository, lotRepository, lotSource } from '#domains/auction'
 import { authService } from '#domains/authentication'
 import { imageService } from '#domains/storage'
 import { userRepository, userSource } from '#domains/users'
@@ -26,19 +26,7 @@ export default defineEventHandler(async (event) => {
     throw createAppError('USER_NOT_FOUND', { id: userId })
   }
 
-  const db = useDatabase()
-
-  const lots = await db.Lot.findAll({
-    where: { sellerId: userId },
-    include: [
-      {
-        model: db.Image,
-        as: 'images',
-        through: { attributes: [] },
-        required: false,
-      },
-    ],
-  })
+  const lots = await lotRepository.findAllBySellerIdWithImages(userId)
 
   const allImageIds = lots.flatMap(lot => lot.images?.map(image => image.id) || [])
 
@@ -46,7 +34,7 @@ export default defineEventHandler(async (event) => {
     await imageService.destroySafely(allImageIds)
   }
   catch (error) {
-    logger.warn(`Failed to delete images for user ${userId}:`, error)
+    logger.warn(`Failed to delete images for user ${userId}. Images ids: ${allImageIds.join(', ')}`, error)
   }
 
   const sessions = await authService.getSessions(userId)
@@ -64,6 +52,7 @@ export default defineEventHandler(async (event) => {
     await userRepository.destroyByPk(userId, { transaction })
 
     useDatabaseAfterCommit(transaction, 'user.delete', async () => {
+      await lotSource.invalidate(lots)
       await userSource.invalidate(user)
     })
   })

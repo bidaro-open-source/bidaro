@@ -58,6 +58,30 @@ class LotRepository extends BaseRepository<Lot> {
   }
 
   /**
+   * Finds all lots by seller id with pagination and coverImage.
+   *
+   * @param sellerId - seller primary key
+   * @param options - sequelize options
+   * @returns lots array with count
+   */
+  async findAllBySellerIdWithImages(sellerId: number, options: RepositoryOptions = {}) {
+    const db = useDatabase()
+
+    return await db.Lot.findAll({
+      transaction: options.transaction,
+      where: { sellerId },
+      include: [
+        {
+          model: db.Image,
+          as: 'images',
+          through: { attributes: [] },
+          required: false,
+        },
+      ],
+    })
+  }
+
+  /**
    * Destroys all lots by seller id.
    *
    * @param sellerId - seller primary key
