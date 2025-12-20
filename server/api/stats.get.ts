@@ -1,3 +1,5 @@
+import process from 'node:process'
+
 export default defineEventHandler(async () => {
   // Gather all metrics in parallel
   const [databaseMetrics, redisMetrics, systemMetrics] = await Promise.all([
@@ -68,9 +70,8 @@ export default defineEventHandler(async () => {
     // System metrics
     (async () => {
       try {
-        const processModule = await import('node:process')
-        const uptime = processModule.uptime()
-        const memoryUsage = processModule.memoryUsage()
+        const uptime = process.uptime()
+        const memoryUsage = process.memoryUsage()
 
         return {
           processUptimeSeconds: uptime,
